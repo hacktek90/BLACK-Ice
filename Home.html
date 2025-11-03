@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Screen</title>
 
-<!-- Preload connections to speed up iframe navigation -->
 <link rel="preconnect" href="https://black-ice-3dbk.onrender.com" crossorigin>
 <link rel="dns-prefetch" href="//black-ice-3dbk.onrender.com">
 
@@ -37,7 +36,6 @@
     line-height:1.45;
   }
 
-  /* Top bar */
   .topbar{
     height: var(--topbar);
     position: sticky; top:0; z-index: 100;
@@ -49,7 +47,6 @@
   }
   .brand{ font-weight:650; letter-spacing:.2px; }
 
-  /* Toggle button */
   #toggleSidebar{
     width:40px; height:40px;
     border-radius:10px;
@@ -63,7 +60,6 @@
   #toggleSidebar:hover{ background:var(--hover); }
   #toggleSidebar:focus-visible{ outline:none; box-shadow: var(--ring); }
 
-  /* Off-canvas sidebar (all devices) */
   nav.sidebar{
     position: fixed;
     inset: var(--topbar) auto 0 0;
@@ -92,41 +88,58 @@
     pointer-events:none;
   }
 
-  /* Projects list */
   .list{ list-style:none; padding:0; margin:0; }
-  .item button{
-    width:100%;
+
+  .item-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:8px;
+  }
+
+  .item button.project-btn{
+    flex:1;
     display:flex; align-items:start; gap:10px;
     padding:10px 10px;
     border-radius:10px;
     background:transparent;
     color:var(--text);
     border:1px solid transparent;
-    cursor:pointer;
-    text-align:left;
+    cursor:pointer; text-align:left;
     transition:.15s;
   }
-  .item button:hover{ background:var(--hover); border-color:var(--border); }
-  .item button:focus-visible{ outline:none; box-shadow: var(--ring); }
-  .item .title{ font-weight:600; line-height:1.25; }
-  .item .meta{ color:var(--muted); font-size:.85rem; }
-  .item button.active{ background:var(--hover); border-color:var(--accent); }
-
-  /* Sidebar skeleton */
-  .skeleton{ padding:6px 0; }
-  .sk-row{
-    height:16px; border-radius:8px;
-    background: linear-gradient(90deg,#e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
-    background-size:200% 100%; animation: shimmer 1.1s infinite;
+  .item button.project-btn:hover{
+    background:var(--hover); border-color:var(--border);
   }
-  .sk-row.w70{ width:70%; } .sk-row.w50{ width:50%; }
-  @keyframes shimmer { 0%{ background-position:200% 0; } 100%{ background-position:-200% 0; } }
+  .item button.project-btn.active{
+    background:var(--hover); border-color:var(--accent);
+  }
 
-  /* Main iframe area (full viewport under topbar) */
-  main{ padding:0; }
+  .copy-btn{
+    font-size:.75rem;
+    padding:4px 8px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    cursor:pointer;
+    color:var(--muted);
+    white-space:nowrap;
+    margin-top:10px;
+  }
+  .copy-btn:hover{
+    background:var(--hover);
+    color:var(--text);
+  }
+  .copy-btn:focus-visible{
+    outline:none;
+    box-shadow:var(--ring);
+  }
+
+  .title{ font-weight:600; line-height:1.25; }
+  .meta{ color:var(--muted); font-size:.85rem; }
+
   .frame-wrap{
     position:relative;
-    height: calc(100dvh - var(--topbar));
     height: calc(100vh - var(--topbar));
     background:#fff;
   }
@@ -137,49 +150,37 @@
   }
 </style>
 </head>
+
 <body>
 
-<header class="topbar" role="banner">
-  <button id="toggleSidebar" aria-label="Toggle project list" aria-expanded="false" aria-controls="sidebar">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-       stroke-linecap="round" stroke-linejoin="round">
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-</button>
-
+<header class="topbar">
+  <button id="toggleSidebar" aria-label="Toggle project list" aria-expanded="false">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" 
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
   <div class="brand">Home Screen</div>
 </header>
 
-<!-- Sidebar with projects (off-canvas on all devices) -->
-<nav id="sidebar" class="sidebar" aria-label="Projects" hidden>
+<nav id="sidebar" class="sidebar" hidden>
   <div class="side-hd">Projects</div>
-  <div class="side-search" role="search">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" fill="none"/><line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor"/></svg>
-    <input id="searchInput" type="search" placeholder="Search projects..." autocomplete="off" aria-label="Search projects" />
+
+  <div class="side-search">
+    <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" fill="none"/><line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor"/></svg>
+    <input id="searchInput" type="search" placeholder="Search projects..." autocomplete="off" />
   </div>
-  <ul id="projectList" class="list" aria-live="polite" aria-busy="true">
-    <!-- Skeleton while loading -->
-    <li class="skeleton"><div class="sk-row w70"></div></li>
-    <li class="skeleton"><div class="sk-row w50"></div></li>
-    <li class="skeleton"><div class="sk-row w70"></div></li>
-    <li class="skeleton"><div class="sk-row w50"></div></li>
-  </ul>
+
+  <ul id="projectList" class="list"></ul>
 </nav>
 
-<!-- Clean home screen with embedded portal -->
-<main id="main">
+<main>
   <div class="frame-wrap">
-    <iframe
-      id="portalFrame"
-      class="portal"
+    <iframe id="portalFrame" class="portal"
       src="https://black-ice-3dbk.onrender.com/"
-      title="BlackICE Academy — Ethical Hacking Learning Portal"
-      referrerpolicy="no-referrer-when-downgrade"
-      allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera"
-      loading="eager">
-    </iframe>
+      allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera"></iframe>
   </div>
 </main>
 
@@ -200,27 +201,24 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  const $ = (s)=>document.querySelector(s);
-  const sidebar = $('#sidebar');
-  const projectList = $('#projectList');
-  const searchInput = $('#searchInput');
-  const toggleBtn = $('#toggleSidebar');
-  const frame = document.getElementById('portalFrame');
-  const portalURL = 'https://black-ice-3dbk.onrender.com/';
+  const sidebar = document.querySelector('#sidebar');
+  const toggleBtn = document.querySelector('#toggleSidebar');
+  const projectList = document.querySelector('#projectList');
+  const searchInput = document.querySelector('#searchInput');
+  const frame = document.querySelector('#portalFrame');
 
-  // Sidebar toggle (all devices): update aria-expanded and visibility
   const setSidebar = (open)=>{
     sidebar.classList.toggle('open', !!open);
-    toggleBtn.setAttribute('aria-expanded', !!open);
     sidebar.hidden = !open;
+    toggleBtn.setAttribute('aria-expanded', !!open);
   };
   setSidebar(false);
   toggleBtn.addEventListener('click', ()=> setSidebar(!sidebar.classList.contains('open')));
 
   const sanitizeHTML = (str)=>{
-    const t = document.createElement('div');
-    t.textContent = str ?? '';
-    return t.innerHTML;
+    const d = document.createElement('div');
+    d.textContent = str ?? '';
+    return d.innerHTML;
   };
 
   const timeAgo = (ts)=>{
@@ -243,52 +241,59 @@
     return rtf.format(0,'second');
   };
 
-  // Sidebar list; clicking loads into the iframe
   let allSites = [];
   let queryText = '';
 
   const renderList = ()=>{
-    projectList.setAttribute('aria-busy','false');
     let list = allSites.slice();
 
     if (queryText){
       const q = queryText.toLowerCase();
-      list = list.filter(s=>{
-        const title = (s.title||'').toLowerCase();
-        const desc = (s.description||'').toLowerCase();
-        return title.includes(q) || desc.includes(q);
-      });
+      list = list.filter(s => 
+        (s.title || '').toLowerCase().includes(q) || 
+        (s.description || '').toLowerCase().includes(q)
+      );
     }
 
     if (!list.length){
-      projectList.innerHTML = `<li class="item"><button type="button" tabindex="-1"><div><div class="title">No matches</div><div class="meta">Try a different search</div></div></button></li>`;
+      projectList.innerHTML = `<li class="item"><div>No matches</div></li>`;
       return;
     }
 
-    projectList.innerHTML = list.map(site=>{
-      const safeTitle = sanitizeHTML(site.title || 'Untitled');
-      const when = site.timestamp ? timeAgo(site.timestamp) : '';
-      const safeUrl = sanitizeHTML(site.url || '#');
+    projectList.innerHTML = list.map(site => {
+      const safeTitle = sanitizeHTML(site.title);
+      const safeUrl = sanitizeHTML(site.url);
+      const when = site.timestamp ? timeAgo(site.timestamp) : "";
       return `
-        <li class="item">
+        <li class="item item-row">
           <button type="button" class="project-btn" data-url="${safeUrl}">
             <div>
               <div class="title">${safeTitle}</div>
-              ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ''}
+              ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
             </div>
           </button>
+          <button class="copy-btn" data-copy="${safeUrl}">or Copylink</button>
         </li>
       `;
-    }).join('');
+    }).join("");
 
-    // Hook up click handlers
     projectList.querySelectorAll('.project-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        const url = btn.dataset.url || portalURL;
-        frame.src = url; // load into iframe
-        projectList.querySelectorAll('.project-btn.active').forEach(b=> b.classList.remove('active'));
+        frame.src = btn.dataset.url;
+        projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         setSidebar(false);
+      });
+    });
+
+    projectList.querySelectorAll('.copy-btn').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const url = btn.dataset.copy;
+        navigator.clipboard.writeText(url).then(()=>{
+          btn.textContent = "Copied!";
+          setTimeout(()=> btn.textContent = "Copy", 900);
+        });
       });
     });
   };
@@ -298,22 +303,20 @@
     renderList();
   });
 
-  onValue(ref(db, 'sites'), (snapshot)=>{
+  onValue(ref(db, 'sites'), snapshot=>{
     const sites = snapshot.val();
     if (!sites){
-      projectList.innerHTML = `<li class="item"><button type="button" tabindex="-1"><div><div class="title">No projects yet</div><div class="meta">Add some to get started</div></div></button></li>`;
-      projectList.setAttribute('aria-busy','false');
+      projectList.innerHTML = `<li>No projects yet</li>`;
       return;
     }
-    const arr = Object.entries(sites).map(([id, site])=> ({
+    allSites = Object.entries(sites).map(([id, site])=>({
       id,
-      title: site.title ?? 'Untitled',
-      url: site.url ?? '#',
-      timestamp: site.timestamp ?? 0,
-      description: site.description ?? ''
+      title: site.title || "Untitled",
+      url: site.url || "#",
+      timestamp: site.timestamp || 0,
+      description: site.description || ""
     }));
-    arr.sort((a,b)=> (b.timestamp||0) - (a.timestamp||0));
-    allSites = arr;
+    allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
     renderList();
   });
 </script>
