@@ -162,7 +162,8 @@
       <line x1="3" y1="18" x2="21" y2="18"></line>
     </svg>
   </button>
-  <div class="brand">Home Screen</div>
+ <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div>
+
 </header>
 
 <nav id="sidebar" class="sidebar" hidden>
@@ -319,6 +320,10 @@
     allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
     renderList();
   });
+  document.querySelector("#goHome").addEventListener("click", () => {
+  frame.src = "https://black-ice-3dbk.onrender.com/Home.html";
+});
+
 </script>
 
 </body>
