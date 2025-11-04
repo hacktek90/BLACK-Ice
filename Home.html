@@ -149,6 +149,30 @@
     width:100%; height:100%;
     border:0; display:block; background:#fff;
   }
+  /* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 37%, #eeeeee 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.skel-item {
+  height: 48px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.skel-copy {
+  height: 18px;
+  width: 70px;
+  border-radius: 8px;
+  margin-top: -4px;
+}
+
 </style>
 </head>
 
@@ -175,11 +199,29 @@
     <input id="searchInput" type="search" placeholder="Search projects..." autocomplete="off" />
   </div>
 
-  <ul id="projectList" class="list"></ul>
+  <ul id="projectList" class="list">
+
+  <!-- Skeleton template (shows before Firebase loads) -->
+  <div id="skeletonLoader">
+    <div class="skeleton skel-item"></div>
+    <div class="skeleton skel-item"></div>
+    <div class="skeleton skel-item"></div>
+    <div class="skeleton skel-item"></div>
+    <div class="skeleton skel-item"></div>
+  </div>
+
+</ul>
+
 </nav>
 
 <main>
   <div class="frame-wrap">
+      <div id="offlineBox"
+     style="display:none; text-align:center; padding:25px; font-size:18px; color:#b91c1c;
+            background:#fee2e2; border:1px solid #fecaca;">
+  ❌ No Internet Connection
+</div>
+
     <iframe id="portalFrame" class="portal"
       src="https://black-ice-3dbk.onrender.com/"
       allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera"></iframe>
@@ -324,6 +366,43 @@
   document.querySelector("#goHome").addEventListener("click", () => {
   frame.src = "https://black-ice-3dbk.onrender.com/";
 });
+/* -------------------------------
+   OFFLINE + FIRST-TIME PAGE CACHE
+-------------------------------- */
+const offlineBox = document.getElementById("offlineBox");
+const mainFrame = document.getElementById("portalFrame");
+
+async function checkNetworkAndCache() {
+  if (!navigator.onLine) {
+    // OFFLINE MODE
+    offlineBox.style.display = "block";
+    mainFrame.style.display = "none";
+    return;
+  }
+
+  // ONLINE MODE
+  offlineBox.style.display = "none";
+  mainFrame.style.display = "block";
+
+  // Cache main homepage only once
+  if (!localStorage.getItem("cachedHome")) {
+    try {
+      const res = await fetch("https://black-ice-3dbk.onrender.com/");
+      const html = await res.text();
+      localStorage.setItem("cachedHome", html);
+      console.log("✅ Home cached for offline mode");
+    } catch (err) {
+      console.warn("❌ Cannot cache homepage:", err);
+    }
+  }
+}
+
+// Initial check
+checkNetworkAndCache();
+
+// Auto update on network changes
+window.addEventListener("online", checkNetworkAndCache);
+window.addEventListener("offline", checkNetworkAndCache);
 
 </script>
 
