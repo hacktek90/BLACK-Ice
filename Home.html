@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +17,7 @@
     --surface-2: #fafbff;
     --text: #111827;
     --muted: #6b7280;
-    --border: #e5e7eb;    /* light grey */
+    --border: #e5e7eb;
     --hover: #f3f4f6;
     --accent: #2563eb;
     --ring: 0 0 0 4px rgba(37,99,235,.18);
@@ -24,9 +25,6 @@
     --shadow-md: 0 10px 24px rgba(0,0,0,.12);
     --radius: 14px;
     --sidebar-w: 300px;
-
-    /* Border color for the "Home Screen" badge (set to grey if you prefer) */
-    --brand-border: #000000;    /* use var(--border) for grey */
   }
 
   * { box-sizing: border-box; }
@@ -48,23 +46,7 @@
     border-bottom:1px solid var(--border);
     box-shadow: var(--shadow-sm);
   }
-
-  /* Bordered "Home Screen" + breadcrumb badge */
-  .brand{
-    font-weight:650; letter-spacing:.2px;
-    padding: 6px 10px;
-    border: 1.5px solid var(--brand-border);  /* black or grey */
-    border-radius: 8px;                       /* optional rounding */
-    display: inline-flex;
-    align-items: center;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-  }
-  .brand .sep{
-    color: var(--muted);
-    padding: 0 6px;
-  }
+  .brand{ font-weight:650; letter-spacing:.2px; }
 
   #toggleSidebar{
     width:40px; height:40px;
@@ -181,8 +163,8 @@
       <line x1="3" y1="18" x2="21" y2="18"></line>
     </svg>
   </button>
-  <!-- Clickable breadcrumb badge -->
-  <div class="brand" id="breadcrumb" title="Go to Home">Home Screen</div>
+ <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div>
+
 </header>
 
 <nav id="sidebar" class="sidebar" hidden>
@@ -226,9 +208,6 @@
   const projectList = document.querySelector('#projectList');
   const searchInput = document.querySelector('#searchInput');
   const frame = document.querySelector('#portalFrame');
-  const breadcrumbEl = document.querySelector('#breadcrumb');
-
-  const HOME_URL = normalize('https://black-ice-3dbk.onrender.com/');
 
   const setSidebar = (open)=>{
     sidebar.classList.toggle('open', !!open);
@@ -238,21 +217,13 @@
   setSidebar(false);
   toggleBtn.addEventListener('click', ()=> setSidebar(!sidebar.classList.contains('open')));
 
-  function sanitizeHTML(str){
+  const sanitizeHTML = (str)=>{
     const d = document.createElement('div');
     d.textContent = str ?? '';
     return d.innerHTML;
-  }
+  };
 
-  function normalize(u){
-    try{
-      const x = new URL(u, location.href);
-      x.hash = '';
-      return x.href.replace(/\/+$/,'/');
-    }catch{ return u }
-  }
-
-  function timeAgo(ts){
+  const timeAgo = (ts)=>{
     if (!ts) return '';
     const rtf = new Intl.RelativeTimeFormat(undefined,{numeric:'auto'});
     const diff = ts - Date.now();
@@ -270,64 +241,12 @@
       if (Math.abs(val) >= 1) return rtf.format(val, unit);
     }
     return rtf.format(0,'second');
-  }
-
-  // Breadcrumb rendering
-  function setBreadcrumbParts(parts){
-    breadcrumbEl.innerHTML = parts
-      .filter(Boolean)
-      .map(sanitizeHTML)
-      .join(' <span class="sep">&lt;</span> ');
-  }
-  function setBreadcrumbForUrl(url, title){
-    const isHome = normalize(url) === HOME_URL;
-    if (isHome){
-      setBreadcrumbParts(['Home Screen']);
-    }else{
-      setBreadcrumbParts(['Home Screen', 'Projects', title && title.trim()]);
-    }
-  }
-
-  // Click breadcrumb badge to go Home
-  breadcrumbEl.addEventListener('click', ()=>{
-    frame.src = HOME_URL;
-    setBreadcrumbForUrl(HOME_URL, '');
-  });
-
-  // Update breadcrumb when iframe loads (same-origin read allowed, else fallback)
-  frame.addEventListener('load', ()=>{
-    let title = '';
-    try{
-      title = frame.contentDocument?.title || frame.contentWindow?.document?.title || '';
-      if (title) {
-        setBreadcrumbForUrl(frame.src, title);
-        return;
-      }
-    }catch{
-      // Cross-origin: cannot read title directly, fallback to hostname until message arrives
-    }
-    const host = (()=>{ try{ return new URL(frame.src).hostname }catch{ return '' }})();
-    setBreadcrumbForUrl(frame.src, host);
-  });
-
-  // Cross-origin title updates via postMessage
-  window.addEventListener('message', (e)=>{
-    // Accept only from the currently loaded iframe origin and source
-    let currentOrigin = '';
-    try{ currentOrigin = new URL(frame.src).origin }catch{}
-    if (e.origin !== currentOrigin) return;
-    if (e.source !== frame.contentWindow) return;
-
-    if (e.data && e.data.type === 'title'){
-      const t = String(e.data.title || '').slice(0, 120);
-      setBreadcrumbForUrl(frame.src, t || new URL(frame.src).hostname);
-    }
-  });
+  };
 
   let allSites = [];
   let queryText = '';
 
-  function renderList(){
+  const renderList = ()=>{
     let list = allSites.slice();
 
     if (queryText){
@@ -362,10 +281,7 @@
 
     projectList.querySelectorAll('.project-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        const url = btn.dataset.url;
-        frame.src = url;
-        // Immediate breadcrumb feedback while loading
-        setBreadcrumbParts(['Home Screen', 'Projects', 'Loading…']);
+        frame.src = btn.dataset.url;
         projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         setSidebar(false);
@@ -382,7 +298,7 @@
         });
       });
     });
-  }
+  };
 
   searchInput.addEventListener('input', (e)=>{
     queryText = e.target.value.trim();
@@ -405,6 +321,10 @@
     allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
     renderList();
   });
+  document.querySelector("#goHome").addEventListener("click", () => {
+  frame.src = "https://black-ice-3dbk.onrender.com/";
+});
+
 </script>
 
 </body>
