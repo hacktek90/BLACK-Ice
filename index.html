@@ -564,24 +564,6 @@ h1{font-size:32px}
     line-height: 1.5;
   }
 
-  /* === CAUTION MESSAGE === */
-  .caution {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ffcc00;
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
-    display: none;
-    z-index: 1200;
-  }
-  .caution.show {
-    display: block;
-  }
  
  
 .custombg {
@@ -972,12 +954,10 @@ document.querySelectorAll('.card').forEach(card=>{
 <!-- Info Panel -->
 <div id="infoPanel">
   <p>
-   Site created for general users who tend to learn ethical  hacking and not for harmuful reasons -- Site Owner (Subhankar) 
+   Site created for general users who tend to learn ethical  hacking and not meant for harmuful or abusive reasons -- Site Owner (Subhankar) 
   </p>
 </div>
 
-<!-- Caution Message -->
-<div class="caution" id="cautionMsg">⚠️ Caution: This is not for viewing purpose ( You can close it) .</div>
 
 <script>
 const btn = document.getElementById('circleBtn');
