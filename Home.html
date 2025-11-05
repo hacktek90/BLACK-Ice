@@ -489,6 +489,18 @@ function injectTitleUpdater(iframe) {
 // ✅ Inject script into your main iframe
 injectTitleUpdater(document.getElementById("portalFrame"));
 </script>
+<script>
+const brandEl = document.querySelector(".brand");
+
+window.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "title-update") return;
+
+  const siteTitle = event.data.title || "Loading...";
+
+  // ✅ Update navbar text
+  brandEl.textContent = "Home Screen < " + siteTitle;
+});
+</script>
 
 
 </body>
