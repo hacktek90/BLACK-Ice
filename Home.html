@@ -461,6 +461,35 @@ hideBtn.addEventListener('click', () => {
 });
 
 </script>
+  <script>
+function injectTitleUpdater(iframe) {
+  iframe.addEventListener("load", () => {
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc) return;
+
+      const script = doc.createElement("script");
+      script.textContent = `
+        window.addEventListener("DOMContentLoaded", () => {
+          window.parent.postMessage(
+            { type: "title-update", title: document.title },
+            "*"
+          );
+        });
+      `;
+      doc.head.appendChild(script);
+
+      console.log("✅ Title update script injected into:", iframe.src);
+    } catch (err) {
+      console.warn("❌ Cannot inject into iframe:", iframe.src, err);
+    }
+  });
+}
+
+// ✅ Inject script into your main iframe
+injectTitleUpdater(document.getElementById("portalFrame"));
+</script>
+
 
 </body>
 </html>
