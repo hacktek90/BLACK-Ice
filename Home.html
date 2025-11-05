@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -172,6 +173,36 @@
   border-radius: 8px;
   margin-top: -4px;
 }
+/* right-end toggle */
+.icon-btn,
+#hideNavbar{
+  width:40px; height:40px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-size:20px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:.2s;
+}
+#hideNavbar:hover{ background:var(--hover); }
+#hideNavbar:focus-visible{ outline:none; box-shadow: var(--ring); }
+
+/* collapse top bar via CSS variable so dependent layout updates */
+body.nav-hidden{ --topbar: 0px; }
+
+/* remove bar visuals when collapsed */
+body.nav-hidden .topbar{
+  padding:0; border:0; box-shadow:none; overflow:hidden;
+}
+
+/* keep the toggle reachable while bar is hidden */
+body.nav-hidden #hideNavbar{
+  position: fixed;
+  top: 8px; right: 16px;
+  z-index: 130;
+}
+
 
 </style>
 </head>
@@ -187,7 +218,14 @@
       <line x1="3" y1="18" x2="21" y2="18"></line>
     </svg>
   </button>
- <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div>
+ <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div><button id="hideNavbar" class="icon-btn" aria-pressed="false" title="Hide navbar" style="margin-left:auto;">
+  <!-- chevron-up icon -->
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
 
 </header>
 
@@ -403,6 +441,24 @@ checkNetworkAndCache();
 // Auto update on network changes
 window.addEventListener("online", checkNetworkAndCache);
 window.addEventListener("offline", checkNetworkAndCache);
+
+
+
+const hideBtn = document.querySelector('#hideNavbar');
+
+const setTopbarHidden = (hide) => {
+  document.body.classList.toggle('nav-hidden', !!hide);
+  hideBtn.setAttribute('aria-pressed', !!hide);
+  hideBtn.title = hide ? 'Show navbar' : 'Hide navbar';
+};
+
+// initial state
+setTopbarHidden(false);
+
+// toggle on click
+hideBtn.addEventListener('click', () => {
+  setTopbarHidden(!document.body.classList.contains('nav-hidden'));
+});
 
 </script>
 
