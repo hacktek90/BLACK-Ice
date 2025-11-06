@@ -23,7 +23,17 @@
   --shadow-md: 0 10px 24px rgba(0,0,0,.12);
   --radius: 14px;
   --sidebar-w: 300px;
+
+  /* Animated RGB gradient for the brand border */
+  --rgb-gradient: linear-gradient(90deg, #ff0040, #ffd500, #00ff85, #00c3ff, #7a00ff, #ff00c8, #ff0040);
 }
+
+/* Animate gradient position for a subtle shimmering border */
+@keyframes shiftHue {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body{
@@ -33,6 +43,8 @@ body{
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial;
   line-height:1.45;
 }
+
+/* Top bar */
 .topbar{
   height: var(--topbar);
   position: sticky; top:0; z-index: 100;
@@ -42,7 +54,8 @@ body{
   border-bottom:1px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
-.brand{ font-weight:650; letter-spacing:.2px; }
+
+/* Sidebar toggle */
 #toggleSidebar{
   width:40px; height:40px;
   border-radius:10px;
@@ -56,9 +69,62 @@ body{
 #toggleSidebar:hover{ background:var(--hover); }
 #toggleSidebar:focus-visible{ outline:none; box-shadow: var(--ring); }
 
+/* Brand: animated RGB gradient border around the "Home Screen" text */
+.brand{
+  position: relative;
+  font-weight:650; letter-spacing:.2px;
+  padding: 6px 12px;
+  border-radius: 12px;
 
+  /* Create a gradient border with rounded corners using two backgrounds */
+  border: 2px solid transparent;                         /* required gap for border layer */
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box, /* inner fill */
+    var(--rgb-gradient) border-box;                      /* visible border */
+  background-size: 100% 100%, 200% 200%;                 /* animate only the gradient layer */
+  animation: shiftHue 6s linear infinite;                /* subtle continuous shift */
+  cursor: pointer;                                       /* remains clickable */
+}
+
+/* Right-end button */
+.icon-btn,
+#hideNavbar{
+  width:40px; height:40px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-size:20px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:.2s;
+}
+#hideNavbar:hover{ background:var(--hover); }
+#hideNavbar:focus-visible{ outline:none; box-shadow: var(--ring); }
+
+/* Collapse top bar */
+body.nav-hidden{ --topbar: 0px; }
+body.nav-hidden .topbar{
+  padding:0; border:0; box-shadow:none; overflow:hidden;
+}
+body.nav-hidden #hideNavbar{
+  position: fixed; top: 8px; right: 16px; z-index: 130;
+}
+
+/* Sidebar */
 nav.sidebar.open{ transform: translateX(0); }
-
+nav.sidebar {
+  position: fixed;
+  inset: var(--topbar) auto 0 0;
+  width: var(--sidebar-w);
+  z-index: 120;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform .3s ease;
+  box-shadow: var(--shadow-md);
+}
 .side-hd{ font-weight:650; margin-bottom:8px; }
 .side-search{ position:relative; margin-bottom:12px; }
 .side-search input{
@@ -117,6 +183,7 @@ nav.sidebar.open{ transform: translateX(0); }
 .title{ font-weight:600; line-height:1.25; }
 .meta{ color:var(--muted); font-size:.85rem; }
 
+/* Frame area */
 .frame-wrap{
   position:relative;
   height: calc(100vh - var(--topbar));
@@ -159,85 +226,25 @@ iframe.portal{
   0% { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
-.skel-item {
-  height: 48px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-.skel-copy {
-  height: 18px;
-  width: 70px;
-  border-radius: 8px;
-  margin-top: -4px;
-}
+.skel-item { height: 48px; border-radius: 10px; margin-bottom: 10px; }
+.skel-copy { height: 18px; width: 70px; border-radius: 8px; margin-top: -4px; }
 
-/* right-end toggle */
-.icon-btn,
-#hideNavbar{
-  width:40px; height:40px;
-  border-radius:10px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  color:var(--text);
-  font-size:20px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:.2s;
-}
-#hideNavbar:hover{ background:var(--hover); }
-#hideNavbar:focus-visible{ outline:none; box-shadow: var(--ring); }
-
-/* collapse top bar via CSS variable so dependent layout updates */
-body.nav-hidden{ --topbar: 0px; }
-/* remove bar visuals when collapsed */
-body.nav-hidden .topbar{
-  padding:0; border:0; box-shadow:none; overflow:hidden;
-}
-/* keep the toggle reachable while bar is hidden */
-body.nav-hidden #hideNavbar{
-  position: fixed;
-  top: 8px; right: 16px;
-  z-index: 130;
-}
-
-/* duplicate sidebar rule retained from source; keep background explicit */
-nav.sidebar {
-  position: fixed;
-  inset: var(--topbar) auto 0 0;
-  width: var(--sidebar-w);
-  z-index: 120;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 16px;
-  overflow-y: auto;
-  transform: translateX(-100%);
-  transition: transform .3s ease;
-  box-shadow: var(--shadow-md);
-}
-
-/* Variant B: Dark pill */
+/* Restore-last pill */
 #restoreLastBtn{
-  position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 140;
-  display: none;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background-color: #111827;
-  border: 1px solid #0b1220;
-  color: #ffffff;
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 140; display: none; padding: 8px 12px;
+  border-radius: 999px; background-color: #111827; border: 1px solid #0b1220;
+  color: #ffffff; box-shadow: var(--shadow-md); cursor: pointer;
   transition: background-color .15s ease, opacity .15s ease;
 }
-#restoreLastBtn.show{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
+#restoreLastBtn.show{ display: inline-flex; align-items: center; gap: 6px; }
 #restoreLastBtn:hover{ background-color: #0b1220; }
 #restoreLastBtn:focus-visible{ outline: none; box-shadow: var(--ring); }
+
+/* Reduced motion: pause animated border */
+@media (prefers-reduced-motion: reduce){
+  .brand{ animation: none; background-position: 100% 50%, 100% 50%; }
+}
 </style>
 </head>
 <body>
@@ -250,7 +257,9 @@ nav.sidebar {
       <line x1="3" y1="18" x2="21" y2="18"></line>
     </svg>
   </button>
-  <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div>
+
+  <div class="brand" id="goHome" title="Go Home">Home Screen</div>
+
   <button id="hideNavbar" class="icon-btn" aria-pressed="false" title="Hide navbar" style="margin-left:auto;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -287,11 +296,7 @@ nav.sidebar {
       background:#fee2e2; border:1px solid #fecaca;">
       ❌ No Internet Connection
     </div>
-
-    <!-- Loader overlay -->
     <div id="frameLoader" class="frame-loader" aria-live="polite" aria-busy="true"></div>
-
-    <!-- Iframe -->
     <iframe id="portalFrame" class="portal"
       src="https://black-ice-3dbk.onrender.com/"
       allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera"></iframe>
@@ -311,7 +316,6 @@ const firebaseConfig = {
   messagingSenderId: "367196609301",
   appId: "1:367196609301:web:156e24c1b4532c26af671c"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -335,7 +339,6 @@ const sanitizeHTML = (str)=>{
   d.textContent = str ?? '';
   return d.innerHTML;
 };
-
 const timeAgo = (ts)=>{
   if (!ts) return '';
   const rtf = new Intl.RelativeTimeFormat(undefined,{numeric:'auto'});
@@ -344,7 +347,7 @@ const timeAgo = (ts)=>{
     ['year', 1000*60*60*24*365],
     ['month', 1000*60*60*24*30],
     ['week', 1000*60*60*24*7],
-    ['day', 1000*60*60*24],
+    ['day,', 1000*60*60*24],
     ['hour', 1000*60*60],
     ['minute', 1000*60],
     ['second', 1000],
@@ -360,29 +363,23 @@ const timeAgo = (ts)=>{
 const HOME_URL = "https://black-ice-3dbk.onrender.com/";
 const LAST_KEY = "lastPortalUrl";
 const restoreBtn = document.getElementById("restoreLastBtn");
+const offlineBox = document.getElementById("offlineBox");
 
-// Loader helpers (cross-origin safe using iframe events)
 function showFrameLoader() {
-  if (offlineBox.style.display === "block") return; // suppress when offline box is shown
+  if (offlineBox.style.display === "block") return;
   frameLoader.style.display = 'flex';
 }
 function hideFrameLoader() {
   frameLoader.style.display = 'none';
 }
-
-// Centralized setter so we remember non-home URLs automatically
 function setFrameSrc(url, opts = { remember: true }) {
-  showFrameLoader();                 // show before navigation
-  frame.src = url;                   // navigate iframe
+  showFrameLoader();
+  frame.src = url;
   if (opts.remember && url && url !== HOME_URL) {
-    localStorage.setItem(LAST_KEY, url); // persist last URL
+    localStorage.setItem(LAST_KEY, url);
   }
 }
-
-// Hide loader when current iframe document fully loads
 frame.addEventListener('load', hideFrameLoader);
-
-// Show the temporary restore button on Home; auto-hide after 7s
 function maybeShowRestore() {
   const last = localStorage.getItem(LAST_KEY);
   const current = frame.getAttribute("src");
@@ -397,10 +394,8 @@ function maybeShowRestore() {
     restoreBtn.classList.remove("show");
   };
 }
-
-// Ensure the button can render immediately after DOM is parsed
 document.addEventListener("DOMContentLoaded", () => {
-  showFrameLoader(); // show spinner until the initial iframe load completes
+  showFrameLoader();
   maybeShowRestore();
 });
 
@@ -425,27 +420,25 @@ const renderList = ()=>{
     const safeUrl = sanitizeHTML(site.url);
     const when = site.timestamp ? timeAgo(site.timestamp) : "";
     return `
-      <li class="item item-row">
-        <button type="button" class="project-btn" data-url="${safeUrl}">
-          <div>
-            <div class="title">${safeTitle}</div>
-            ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
-          </div>
-        </button>
-        <button class="copy-btn" data-copy="${safeUrl}">or Copylink</button>
-      </li>
+    <li class="item item-row">
+      <button type="button" class="project-btn" data-url="${safeUrl}">
+        <div>
+          <div class="title">${safeTitle}</div>
+          ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
+        </div>
+      </button>
+      <button class="copy-btn" data-copy="${safeUrl}">or Copylink</button>
+    </li>
     `;
   }).join("");
-
   projectList.querySelectorAll('.project-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      setFrameSrc(btn.dataset.url); // show loader + remember last non-home URL
+      setFrameSrc(btn.dataset.url);
       projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       setSidebar(false);
     });
   });
-
   projectList.querySelectorAll('.copy-btn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -457,12 +450,10 @@ const renderList = ()=>{
     });
   });
 };
-
 searchInput.addEventListener('input', (e)=>{
   queryText = e.target.value.trim();
   renderList();
 });
-
 onValue(ref(db, 'sites'), snapshot=>{
   const sites = snapshot.val();
   if (!sites){
@@ -481,46 +472,33 @@ onValue(ref(db, 'sites'), snapshot=>{
 });
 
 document.querySelector("#goHome").addEventListener("click", () => {
-  setFrameSrc(HOME_URL, { remember: false }); // go Home but don't override last URL
+  setFrameSrc(HOME_URL, { remember: false });
   setTimeout(maybeShowRestore, 0);
 });
 
 /* -------------------------------
 OFFLINE + FIRST-TIME PAGE CACHE
 -------------------------------- */
-const offlineBox = document.getElementById("offlineBox");
 const mainFrame = document.getElementById("portalFrame");
-
 async function checkNetworkAndCache() {
   if (!navigator.onLine) {
-    // OFFLINE MODE
     offlineBox.style.display = "block";
     mainFrame.style.display = "none";
-    hideFrameLoader(); // ensure loader isn't shown while offline box is visible
+    hideFrameLoader();
     return;
   }
-  // ONLINE MODE
   offlineBox.style.display = "none";
   mainFrame.style.display = "block";
-
-  // If iframe was hidden and now visible, show loader until it loads
   showFrameLoader();
-
-  // Cache main homepage only once
   if (!localStorage.getItem("cachedHome")) {
     try {
       const res = await fetch("https://black-ice-3dbk.onrender.com/");
       const html = await res.text();
       localStorage.setItem("cachedHome", html);
-      // console.log("✅ Home cached for offline mode");
-    } catch (err) {
-      // console.warn("❌ Cannot cache homepage:", err);
-    }
+    } catch (err) { /* ignore */ }
   }
 }
-// Initial check
 checkNetworkAndCache();
-// Auto update on network changes
 window.addEventListener("online", checkNetworkAndCache);
 window.addEventListener("offline", checkNetworkAndCache);
 
