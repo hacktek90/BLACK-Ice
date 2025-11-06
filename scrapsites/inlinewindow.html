@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iframe Site Opener (Inline)</title>
+<style>
+  :root{
+    --bg:#0b1220; --panel:#0f172a; --panel-2:#0c1426; --text:#e6e8ee; --muted:#9aa3b2;
+    --accent:#3b82f6; --accent-2:#1d4ed8; --border:#1e293b; --warn:#fde68a; --warn-text:#7a5c00;
+    --ring:0 0 0 4px rgba(59,130,246,.25);
+    --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,#0b1220,#0b1220 120px,#0e1627);
+    color:var(--text); font:14.5px/1.45 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial;
+  }
+
+  header{
+    position:sticky; top:0; z-index:50; background:rgba(11,18,32,.7); backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:14px 16px; display:flex; gap:12px; align-items:center}
+  .brand{ font-weight:650; letter-spacing:.2px; padding:8px 12px; border-radius:12px; background:var(--panel); border:1px solid var(--border) }
+
+  .banner{
+    max-width:1100px; margin:10px auto 0; border:1px solid #f5d36b; background:var(--warn); color:var(--warn-text);
+    padding:10px 12px; border-radius:12px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  }
+  .banner button{
+    border:0; background:transparent; color:inherit; cursor:pointer; padding:6px 8px; border-radius:10px;
+  }
+  .banner button:hover{ background:rgba(0,0,0,.07) }
+
+  .controls{
+    max-width:1100px; margin:12px auto 0; padding:12px 16px; display:flex; gap:10px; align-items:center;
+  }
+  .field{
+    flex:1; display:flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--border);
+    padding:6px 8px; border-radius:12px;
+  }
+  .field input{ flex:1; height:38px; padding:0 10px; color:var(--text); background:transparent; border:0 }
+  .field input:focus{ outline:none }
+  .btn{
+    height:40px; padding:0 14px; border-radius:12px; border:1px solid var(--accent-2); color:#fff;
+    background:linear-gradient(180deg,var(--accent),var(--accent-2)); cursor:pointer; transition:.15s;
+  }
+  .btn:hover{ filter:brightness(1.05) }
+  .btn.secondary{ border-color:var(--border); background:var(--panel); color:var(--text) }
+  .btn.secondary:hover{ background:var(--panel-2) }
+  .btn:focus-visible{ outline:none; box-shadow:var(--ring) }
+
+  .layout{display:grid; grid-template-columns: minmax(0,1fr) 360px; gap:14px; max-width:1100px; margin:12px auto; padding:0 16px}
+  @media (max-width: 980px){ .layout{ grid-template-columns: 1fr } }
+
+  .viewer{
+    background:#000; min-height:60vh; border:1px solid var(--border); border-radius:16px; overflow:hidden; position:relative;
+  }
+  iframe{
+    position:relative; width:100%; height:72vh; border:0; display:block; background:#fff;
+  }
+  .loader{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(12,20,38,.65);
+  }
+  .loader::before{
+    content:""; width:38px; height:38px; border:4px solid #2a3752; border-top-color:#6ba1ff; border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg) } }
+
+  .side{
+    border:1px solid var(--border); border-radius:16px; background:var(--panel);
+    padding:12px; min-height:200px;
+  }
+  .side-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px }
+  .side .title{ font-weight:650 }
+  .list{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:8px }
+  .row{
+    display:flex; align-items:center; gap:8px; background:var(--panel-2); border:1px solid var(--border);
+    border-radius:12px; padding:8px;
+  }
+  .url{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#cfe1ff }
+  .chip{ font-size:12px; color:var(--muted) }
+  .icon-btn{
+    width:34px; height:34px; border-radius:10px; background:transparent; border:1px solid var(--border); color:var(--text);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn:hover{ background:#0f1a30 }
+  .icon-btn:focus-visible{ outline:none; box-shadow:var(--ring) }
+  .danger{ border-color:#6b1d1d; color:#ffdcdc }
+  .danger:hover{ background:#2b1212 }
+
+  .hidden{ display:none !important }
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand" aria-label="App name">Iframe Site Opener (Inline)</div>
+    </div>
+  </header>
+
+  <div id="caution" class="banner" role="alert" aria-live="polite">
+    <div>
+      Some sites will not load in an iframe due to security headers like X‑Frame‑Options or the Content‑Security‑Policy frame‑ancestors directive, which intentionally block embedding to prevent clickjacking [web:34][web:40].
+    </div>
+    <button type="button" id="dismissBanner" aria-label="Dismiss">×</button>
+  </div>
+
+  <section class="controls" aria-label="Open link controls">
+    <div class="field" role="group" aria-label="Paste link">
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#7f8aa1" d="M10 4h10v10h-2V8.41L6.41 20 4 17.59 15.59 6H10z"/></svg>
+      <input id="urlInput" type="url" placeholder="Paste a link, e.g. https://example.com" autocomplete="off" inputmode="url" aria-label="Link input">
+    </div>
+    <button id="openBtn" class="btn" type="button" aria-label="Open in frame">Open in frame</button>
+    <button id="openHereBtn" class="btn secondary" type="button" aria-label="Open this tab">Open this tab</button>
+  </section>
+
+  <section class="layout">
+    <div class="viewer" aria-label="Iframe viewer">
+      <div id="loader" class="loader" aria-hidden="true"></div>
+      <iframe id="viewer"
+              title="Site preview"
+              allow="fullscreen; geolocation; microphone; camera; clipboard-read; clipboard-write"
+              referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+
+    <aside class="side" aria-label="History panel">
+      <div class="side-hd">
+        <div class="title">History</div>
+        <button id="clearBtn" class="icon-btn danger" type="button" title="Clear all history" aria-label="Clear all history">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2zM9 10v8h2v-8H9zm4 0v8h2v-8h-2z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="list" id="historyList" aria-live="polite" aria-label="Recent links"></div>
+    </aside>
+  </section>
+
+<script>
+(function(){
+  const input = document.getElementById('urlInput');
+  const openBtn = document.getElementById('openBtn');
+  const openHereBtn = document.getElementById('openHereBtn');
+  const frame = document.getElementById('viewer');
+  const loader = document.getElementById('loader');
+  const historyList = document.getElementById('historyList');
+  const clearBtn = document.getElementById('clearBtn');
+  const caution = document.getElementById('caution');
+  const dismissBanner = document.getElementById('dismissBanner');
+
+  const LS_KEY = 'inlineIframe.history.v1';
+  const MAX_ITEMS = 80;
+
+  function safeURL(raw){
+    if (!raw) return '';
+    let s = raw.trim();
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(s)) s = 'https://' + s;
+    try { return new URL(s).href; } catch { return ''; }
+  }
+
+  function showLoader(){ loader.style.display = 'flex'; }
+  function hideLoader(){ loader.style.display = 'none'; }
+
+  function loadHistory(){
+    try { const v = JSON.parse(localStorage.getItem(LS_KEY)); return Array.isArray(v) ? v : []; } catch { return []; }
+  }
+  function saveHistory(list){
+    try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch {}
+  }
+  function addToHistory(url){
+    let list = loadHistory().filter(x => x.url !== url);
+    list.unshift({ url, ts: Date.now() });
+    if (list.length > MAX_ITEMS) list = list.slice(0, MAX_ITEMS);
+    saveHistory(list);
+  }
+  function removeFromHistory(url){
+    saveHistory(loadHistory().filter(x => x.url !== url));
+  }
+  function fmtAgo(ts){
+    const s = Math.round((Date.now()-ts)/1000);
+    if (s < 60) return s + 's ago';
+    const m = Math.round(s/60); if (m < 60) return m + 'm ago';
+    const h = Math.round(m/60); if (h < 24) return h + 'h ago';
+    const d = Math.round(h/24); return d + 'd ago';
+  }
+
+  function renderHistory(){
+    const list = loadHistory();
+    historyList.innerHTML = list.map(item=>{
+      const esc = item.url.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      return `
+        <div class="row">
+          <button class="icon-btn" data-open="${esc}" title="Open in frame" aria-label="Open ${esc}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3z"/><path d="M5 5h6v2H7v10h10v-4h2v6H5z"/></svg>
+          </button>
+          <div class="url" title="${esc}">${esc}</div>
+          <div class="chip" aria-hidden="true">${fmtAgo(item.ts)}</div>
+          <button class="icon-btn danger" data-del="${esc}" title="Delete from history" aria-label="Delete ${esc}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2zM9 10v8h2v-8H9zm4 0v8h2v-8h-2z"/></svg>
+          </button>
+        </div>
+      `;
+    }).join('') || `<div class="row"><div class="url">No history yet</div></div>`;
+  }
+
+  function openInFrame(url){
+    showLoader();
+    frame.src = url; // Inline iframe load (no immersive mode)
+    addToHistory(url);
+    renderHistory();
+  }
+
+  frame.addEventListener('load', hideLoader);
+
+  // Primary actions
+  openBtn.addEventListener('click', ()=>{
+    const href = safeURL(input.value);
+    if (href) openInFrame(href); else input.focus();
+  });
+  input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') openBtn.click(); });
+
+  // Fallback: true same-tab navigation (leaves this app)
+  openHereBtn.addEventListener('click', ()=>{
+    const href = safeURL(input.value);
+    if (href){
+      addToHistory(href);
+      renderHistory();
+      location.assign(href);
+    } else {
+      input.focus();
+    }
+  });
+
+  // History list interactions
+  historyList.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const toOpen = btn.getAttribute('data-open');
+    const toDel = btn.getAttribute('data-del');
+    if (toOpen) openInFrame(toOpen);
+    else if (toDel){ removeFromHistory(toDel); renderHistory(); }
+  });
+  clearBtn.addEventListener('click', ()=>{
+    if (confirm('Clear all history?')) { localStorage.removeItem(LS_KEY); renderHistory(); }
+  });
+
+  // Banner
+  dismissBanner.addEventListener('click', ()=> caution.classList.add('hidden'));
+
+  // Init
+  renderHistory();
+})();
+</script>
+</body>
+</html>
