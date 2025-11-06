@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>PeerShare — Secure P2P File Transfer</title>
+
+  <!-- Tailwind (CDN for rapid prototype; for production compile-tailwind into CSS) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+ 
+<!-- Primary Meta Tags -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="theme-color" content="#0f172a" />
+
+<title>Secure File Share — Fast P2P File Transfer</title>
+<meta name="title" content="Secure File Share — Fast P2P File Transfer" />
+<meta name="description" content="Share files instantly using secure peer-to-peer connections. No uploads, no servers, no storage. Fully private, fast, and works directly in your browser." />
+<meta name="keywords" content="file sharing, p2p, web rtc, direct transfer, share files online, secure file transfer, fast file sharing" />
+<meta name="author" content="Your App Name" />
+<meta name="robots" content="index, follow" />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://your-domain.com/" />
+<meta property="og:title" content="Secure File Share — Fast P2P File Transfer" />
+<meta property="og:description" content="Instant secure peer-to-peer file transfers. No server storage — files stay private." />
+<meta property="og:image" content="https://your-domain.com/og-image.png" />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content="https://your-domain.com/" />
+<meta property="twitter:title" content="Secure File Share — Fast P2P File Transfer" />
+<meta property="twitter:description" content="Instant secure peer-to-peer file transfers. No server storage — your files stay private." />
+<meta property="twitter:image" content="https://your-domain.com/og-image.png" />
+
+<!-- App Icons -->
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<!-- Manifest (optional, for PWA) -->
+<link rel="manifest" href="/manifest.json" />
+
+<!-- Extra Security Headers (recommended for production hosting) -->
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+
+  <!-- PeerJS CDN -->
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+
+  <style>
+    /* Visual polish + mobile-safe areas */
+    body { background: linear-gradient(180deg,#0f172a 0%, #071028 100%); }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .file-card::-webkit-scrollbar { height: 8px; }
+    .file-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+
+    :root {
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sat: env(safe-area-inset-top, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+    }
+
+    html, body {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    .toast {
+      position: fixed;
+      right: 1rem;
+      bottom: calc(1rem + var(--sab));
+      z-index: 60;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6 text-slate-200">
+  <main class="w-full max-w-5xl">
+    <section class="glass rounded-2xl p-4 md:p-6 shadow-2xl ring-1 ring-white/6">
+      <header class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+        <div class="flex-none w-14 h-14 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-xl flex items-center justify-center text-2xl font-semibold">PS</div>
+        <div class="flex-1">
+          <h1 class="text-xl md:text-2xl font-semibold">PeerShare <span class="text-xs md:text-sm text-slate-400">— secure P2P file transfer</span></h1>
+          <p class="mt-1 text-xs md:text-sm text-slate-400">Files are sent directly between peers using WebRTC (PeerJS). No file upload to servers. Works in modern browsers.</p>
+        </div>
+        <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
+          <div id="peerState" class="text-xs text-slate-400">Initializing...</div>
+          <div class="flex flex-wrap gap-2">
+            <button id="copyIdBtn" class="px-3 py-2 text-sm rounded bg-white/6 hover:bg-white/10 flex-1 md:flex-none">Copy my link</button>
+            <button id="regenBtn" title="Generate new Peer ID" class="p-2 rounded bg-white/4 hover:bg-white/8">⟲</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <!-- LEFT: Send area -->
+        <div class="md:col-span-2">
+          <section class="p-3 md:p-4 rounded-lg border border-white/6">
+            <h2 class="font-medium">Send files</h2>
+            <p class="text-xs md:text-sm text-slate-400 mt-1">Drag & drop files, or click to browse; create a share link and send to your peer to start transfer.</p>
+
+            <div id="dropzone" class="mt-4 h-40 sm:h-48 border-2 border-dashed border-white/6 rounded-lg flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-white/2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16h10M12 12v8m0-12l-4 4m4-4 4 4"/></svg>
+              <div class="text-sm text-slate-300">Drop files here or <span id="browseBtn" class="text-indigo-300 underline cursor-pointer">browse</span></div>
+              <input id="fileInput" type="file" multiple class="hidden" />
+            </div>
+
+            <ul id="filesList" class="mt-4 space-y-3 max-h-56 sm:max-h-64 overflow-auto">
+              <!-- file items go here -->
+            </ul>
+
+            <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button id="createLinkBtn" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 w-full sm:w-auto">Create share link</button>
+              <div id="shareActions" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 hidden">
+                <input id="shareUrl" class="bg-white text-slate-900 px-3 py-2 rounded w-full sm:w-80 text-sm" readonly />
+                <div class="flex gap-2">
+                  <button id="copyLink" class="px-3 py-2 rounded bg-white/6 flex-1 sm:flex-none">Copy</button>
+                  <button id="qrBtn" class="px-3 py-2 rounded bg-white/6 flex-1 sm:flex-none">QR</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="qrModal" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50">
+              <div class="bg-slate-900 p-4 rounded-lg w-[90vw] max-w-sm">
+                <h3 class="text-sm font-medium">Scan QR to connect</h3>
+                <img id="qrImg" class="mt-3 w-full h-auto aspect-square bg-white/5 rounded" alt="QR code" />
+                <div class="mt-3 text-right">
+                  <button id="closeQr" class="px-3 py-2 rounded bg-white/6">Close</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mt-4 p-3 md:p-4 rounded-lg border border-white/6">
+            <h3 class="font-medium">Active transfers</h3>
+            <div id="transfers" class="mt-3 space-y-3">
+              <!-- progress cards -->
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT: Receive / Connect area -->
+        <aside class="md:col-span-1">
+          <section class="p-3 md:p-4 rounded-lg border border-white/6">
+            <h3 class="font-medium">Connect</h3>
+            <p class="text-xs md:text-sm text-slate-400 mt-1">Paste peer link or ID to connect, or scan a QR code from the sender.</p>
+            <input id="remoteId" class="mt-3 w-full bg-white text-slate-900 px-3 py-2 rounded text-sm" placeholder="Enter connection ID or link" />
+            <div class="mt-3 flex flex-col sm:flex-row gap-2">
+              <button id="connectBtn" class="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-700 flex-1">Connect</button>
+              <button id="acceptBtn" class="px-3 py-2 rounded bg-white/6 flex-1 sm:flex-none">Open receiver</button>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="text-sm font-medium">My peer ID</h4>
+              <div id="myId" class="mt-2 font-mono bg-white/6 px-3 py-2 rounded text-sm break-words"></div>
+            </div>
+          </section>
+
+          <section class="mt-4 p-3 md:p-4 rounded-lg border border-white/6">
+            <h4 class="font-medium">Security</h4>
+            <p class="text-xs md:text-sm text-slate-400 mt-1">Files are transferred directly between peers; no stored files.</p>
+            <div class="mt-3 text-xs text-slate-400">Tip: Verify peer ID or use video/voice call for identity confirmation before accepting large files.</div>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="mt-4 text-xs text-slate-500 text-center px-3 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
+      Built with PeerJS • For production: host over HTTPS, compile Tailwind, and configure your own PeerServer for high reliability.
+    </footer>
+  </main>
+
+  <template id="fileItemTpl">
+    <li class="file-card flex items-center justify-between gap-3 p-3 rounded-md bg-white/2">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 text-sm font-medium file-icon">F</div>
+        <div>
+          <div class="font-medium file-name"></div>
+          <div class="text-xs text-slate-400 file-meta"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="send-btn px-3 py-1 rounded bg-indigo-600">Send</button>
+        <button class="remove-btn px-3 py-1 rounded bg-white/6">Remove</button>
+      </div>
+    </li>
+  </template>
+
+<script>
+// Production-ready single-file app (front-end only)
+// NOTES FOR PRODUCTION:
+// - Compile Tailwind locally and ship CSS (avoid CDN for performance)
+// - Configure a PeerServer (or PeerJS cloud) for predictable IDs / reliability
+// - Consider code signing and end-to-end encryption if you need confidentiality
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const browseBtn = document.getElementById('browseBtn');
+const filesList = document.getElementById('filesList');
+const createLinkBtn = document.getElementById('createLinkBtn');
+const shareActions = document.getElementById('shareActions');
+const shareUrl = document.getElementById('shareUrl');
+const copyLink = document.getElementById('copyLink');
+const qrBtn = document.getElementById('qrBtn');
+const qrModal = document.getElementById('qrModal');
+const qrImg = document.getElementById('qrImg');
+const closeQr = document.getElementById('closeQr');
+const remoteId = document.getElementById('remoteId');
+const connectBtn = document.getElementById('connectBtn');
+const acceptBtn = document.getElementById('acceptBtn');
+const myIdEl = document.getElementById('myId');
+const peerState = document.getElementById('peerState');
+const copyIdBtn = document.getElementById('copyIdBtn');
+const regenBtn = document.getElementById('regenBtn');
+const transfers = document.getElementById('transfers');
+
+let files = []; // {file, id}
+let activeConns = new Map();
+let peer = null;
+
+// Utility
+const humanSize = (n) => {
+  if (n < 1024) return n + ' B';
+  const units = ['KB','MB','GB','TB'];
+  let i = -1; do { n /= 1024; i++; } while (n >= 1024 && i < units.length-1);
+  return n.toFixed(1) + ' ' + units[i];
+};
+
+// Drag & drop
+['dragenter','dragover'].forEach(e => dropzone.addEventListener(e, (ev)=>{ ev.preventDefault(); dropzone.classList.add('ring-2','ring-indigo-500'); }));
+['dragleave','drop'].forEach(e => dropzone.addEventListener(e, (ev)=>{ ev.preventDefault(); dropzone.classList.remove('ring-2','ring-indigo-500'); }));
+dropzone.addEventListener('drop', (ev) => { handleFiles(ev.dataTransfer.files); });
+browseBtn.addEventListener('click', ()=>fileInput.click());
+fileInput.addEventListener('change', (ev)=> handleFiles(ev.target.files));
+
+function handleFiles(fileList){
+  for (const f of fileList){
+    const id = crypto.randomUUID();
+    files.push({file: f, id});
+    addFileItem(f, id);
+  }
+}
+
+function addFileItem(file, id){
+  const tpl = document.getElementById('fileItemTpl');
+  const li = tpl.content.firstElementChild.cloneNode(true);
+  li.dataset.id = id;
+  li.querySelector('.file-name').textContent = file.name;
+  li.querySelector('.file-meta').textContent = humanSize(file.size) + ' • ' + file.type;
+  li.querySelector('.file-icon').textContent = file.name.split('.').pop().toUpperCase().slice(0,3);
+  li.querySelector('.remove-btn').addEventListener('click', ()=>{
+    files = files.filter(x=>x.id!==id); li.remove();
+  });
+  li.querySelector('.send-btn').addEventListener('click', ()=>{
+    // quick-send: create link and copy
+    createShareLink().then(()=>{
+      copyToClipboard(shareUrl.value);
+      showToast('Share link copied — send it to your peer');
+    });
+  });
+  filesList.appendChild(li);
+}
+
+// Toasts (safe-area aware)
+function showToast(msg, ms=2500){
+  const t = document.createElement('div');
+  t.className = 'toast bg-slate-900/90 text-white px-4 py-2 rounded shadow';
+  t.textContent = msg; document.body.appendChild(t);
+  // Ensure safe-area is honored even if CSS fails to load
+  t.style.right = '1rem';
+  t.style.bottom = 'calc(1rem + env(safe-area-inset-bottom, 0px))';
+  setTimeout(()=> t.remove(), ms);
+}
+
+// Peer initialization
+function initPeer(id=null){
+  if (peer){ try{ peer.destroy(); } catch(e){} }
+  peerState.textContent = 'Starting...';
+
+  // For production you should host your own PeerServer. The default PeerJS cloud may not be reliable for heavy usage.
+  const options = { debug: 2 };
+  if (id) options['id'] = id;
+  peer = new Peer(options);
+
+  peer.on('open', (id) => {
+    myIdEl.textContent = id;
+    peerState.textContent = 'Ready';
+    shareActions.classList.remove('hidden');
+    shareUrl.value = location.href.split('#')[0] + '#peer=' + encodeURIComponent(id);
+  });
+
+  peer.on('connection', (conn) => {
+    setupConnection(conn, true);
+  });
+
+  peer.on('disconnected', ()=> peerState.textContent = 'Disconnected — reconnecting');
+  peer.on('close', ()=> peerState.textContent = 'Closed');
+  peer.on('error', (err)=>{ console.error(err); showToast('Peer error: '+err); peerState.textContent = 'Error'; });
+}
+
+initPeer();
+
+// Copy link / QR
+copyLink.addEventListener('click', ()=>{ copyToClipboard(shareUrl.value); showToast('Link copied'); });
+copyIdBtn.addEventListener('click', ()=>{ copyToClipboard(shareUrl.value); showToast('Link copied'); });
+regenBtn.addEventListener('click', ()=>{ initPeer(); showToast('New peer initialized'); });
+
+qrBtn.addEventListener('click', ()=>{
+  const url = shareUrl.value;
+  // using free QR image generation (no backend). For production consider generating server-side.
+  qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(url);
+  qrModal.classList.remove('hidden'); qrModal.style.display = 'flex';
+});
+closeQr.addEventListener('click', ()=>{ qrModal.classList.add('hidden'); qrModal.style.display='none'; });
+
+createLinkBtn.addEventListener('click', ()=> createShareLink().then(()=> showToast('Share link created')));
+
+async function createShareLink(){
+  if (!peer || !peer.id) initPeer();
+  shareUrl.value = location.href.split('#')[0] + '#peer=' + encodeURIComponent(peer.id);
+  shareActions.classList.remove('hidden');
+}
+
+function copyToClipboard(text){ navigator.clipboard.writeText(text).catch(()=>{}); }
+
+// Connect to remote
+connectBtn.addEventListener('click', ()=>{
+  const value = remoteId.value.trim();
+  if (!value) return showToast('Enter an ID or link');
+  const id = parsePeerId(value);
+  const conn = peer.connect(id);
+  setupConnection(conn, false);
+});
+
+function parsePeerId(input){
+  try{ const u = new URL(input); const h = u.hash || u.search; if (h){
+      const m = (h+'').match(/peer=([^&]+)/); if (m) return decodeURIComponent(m[1]); }
+  } catch(e){}
+  return input;
+}
+
+// When acting as "receiver" open a connection to accept incoming files
+acceptBtn.addEventListener('click', ()=>{
+  const id = prompt('Paste sender peer id here (or leave blank to wait):');
+  if (!id) return showToast('Waiting for incoming connection');
+  const conn = peer.connect(id);
+  setupConnection(conn, false);
+});
+
+// Connection setup
+function setupConnection(conn, isIncoming){
+  conn.on('open', ()=>{
+    showToast('Connected to ' + conn.peer);
+    activeConns.set(conn.peer, conn);
+    renderActiveConnection(conn);
+  });
+  conn.on('data', (d)=> handleControlMessage(conn, d));
+  conn.on('close', ()=>{ activeConns.delete(conn.peer); showToast('Connection closed: '+conn.peer); removeTransferUI(conn.peer); });
+  conn.on('error', (e)=>{ console.error('conn error', e); showToast('Connection error'); });
+}
+
+// Control + transfer protocol
+async function handleControlMessage(conn, msg){
+  if (msg && msg.type === 'meta'){
+    const list = msg.files || [];
+    if (!list.length) return;
+    const card = createIncomingCard(conn.peer, list, conn);
+    transfers.appendChild(card);
+  }
+}
+
+function renderActiveConnection(conn){
+  const id = conn.peer;
+  const existing = document.getElementById('active-'+id);
+  if (existing) return;
+  const c = document.createElement('div'); c.id = 'active-'+id; c.className='p-3 rounded bg-white/3 mt-3 flex items-center justify-between';
+  c.innerHTML = `<div class="text-sm">Connected: <span class="font-mono">${id}</span></div>`;
+  const controls = document.createElement('div'); controls.className='flex gap-2';
+  const push = document.createElement('button'); push.className='px-3 py-1 rounded bg-indigo-600'; push.textContent='Push files';
+  push.addEventListener('click', ()=> streamFilesToPeer(conn));
+  controls.appendChild(push);
+  c.appendChild(controls);
+  document.querySelector('section').appendChild(c);
+}
+
+function createIncomingCard(peerId, list, conn){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'p-3 rounded bg-white/3';
+  wrapper.id = 'incoming-'+peerId;
+  const title = document.createElement('div'); title.className='font-medium'; title.textContent = 'Incoming files from ' + peerId;
+  wrapper.appendChild(title);
+  const ul = document.createElement('ul'); ul.className='mt-2 space-y-1 text-sm';
+  list.forEach(f=>{
+    const li = document.createElement('li'); li.textContent = f.name + ' • ' + humanSize(f.size); li.dataset.id = f.id; ul.appendChild(li);
+  });
+  wrapper.appendChild(ul);
+  const btns = document.createElement('div'); btns.className='mt-3 flex gap-2';
+  const accept = document.createElement('button'); accept.className='px-3 py-1 rounded bg-emerald-600'; accept.textContent='Accept';
+  const reject = document.createElement('button'); reject.className='px-3 py-1 rounded bg-white/6'; reject.textContent='Reject';
+  btns.appendChild(accept); btns.appendChild(reject);
+  wrapper.appendChild(btns);
+
+  accept.addEventListener('click', ()=>{
+    conn.send({ type: 'accept-all' });
+    startReceiving(conn, list);
+    accept.remove(); reject.remove();
+  });
+  reject.addEventListener('click', ()=>{ conn.send({ type: 'reject-all' }); wrapper.remove(); });
+  return wrapper;
+}
+
+// Receiving logic
+function startReceiving(conn, list){
+  const incoming = {};
+  list.forEach(f=> incoming[f.id] = { meta: f, received: [], bytes: 0 });
+
+  const tcard = createTransferCard('recv-'+conn.peer, 'Receiving from '+conn.peer, list.reduce((s,f)=>s+f.size,0));
+  transfers.appendChild(tcard);
+
+  conn.on('data', (msg)=>{
+    if (msg && msg.type){
+      if (msg.type === 'done'){
+        const id = msg.id; finalizeReceive(incoming[id], id);
+      }
+      return;
+    }
+    if (msg instanceof ArrayBuffer){
+      const dv = new DataView(msg);
+      const headerLen = dv.getUint16(0);
+      const headerBytes = new Uint8Array(msg,2,headerLen);
+      const headerJson = new TextDecoder().decode(headerBytes);
+      const header = JSON.parse(headerJson);
+      const chunk = msg.slice(2+headerLen);
+      const rec = incoming[header.id];
+      if (!rec) return;
+      rec.received.push(chunk);
+      rec.bytes += chunk.byteLength;
+      updateTransferProgress('recv-'+conn.peer, rec.bytes);
+      if (rec.bytes >= rec.meta.size){ finalizeReceive(rec, header.id); }
+    }
+  });
+}
+
+function finalizeReceive(rec, id){
+  try{
+    const blob = new Blob(rec.received, { type: rec.meta.type || 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = rec.meta.name; a.textContent = 'Download ' + rec.meta.name;
+    const card = document.getElementById('recv-'+rec.meta.id) || document.getElementById('recv-'+rec.meta.name) || document.createElement('div');
+    card.className='p-3 rounded bg-white/3 mt-2';
+    card.appendChild(a);
+    transfers.appendChild(card);
+    showToast('Received '+rec.meta.name);
+  } catch(e){ console.error(e); showToast('Error assembling file'); }
+}
+
+// Sender
+function streamFilesToPeer(conn){
+  const meta = { type: 'meta', files: files.map(f=>({ id: f.id, name: f.file.name, size: f.file.size, type: f.file.type })) };
+  conn.send(meta);
+
+  conn.on('data', async (msg)=>{
+    if (msg && (msg.type === 'accept-all' || msg.type === 'accept')){
+      for (const item of files){
+        await sendFile(conn, item.file, item.id);
+      }
+      conn.send({ type: 'done-all' });
+    }
+    if (msg && msg.type === 'reject-all'){
+      showToast('Peer rejected transfer');
+    }
+  });
+}
+
+async function sendFile(conn, file, id){
+  const CHUNK = 256 * 1024; // 256KB
+  const total = file.size;
+  let offset = 0;
+  const tcard = createTransferCard('send-'+id, 'Sending ' + file.name, total);
+  transfers.appendChild(tcard);
+
+  while (offset < total){
+    const slice = file.slice(offset, offset + CHUNK);
+    const ab = await slice.arrayBuffer();
+    const header = JSON.stringify({ id });
+    const headerBytes = new TextEncoder().encode(header);
+    const headerLen = headerBytes.length;
+    const buf = new ArrayBuffer(2 + headerLen + ab.byteLength);
+    const dv = new DataView(buf);
+    dv.setUint16(0, headerLen);
+    new Uint8Array(buf,2,headerLen).set(headerBytes);
+    new Uint8Array(buf,2+headerLen).set(new Uint8Array(ab));
+
+    conn.send(buf);
+    offset += ab.byteLength;
+    updateTransferProgress('send-'+id, offset);
+    await waitForConnDrain(conn);
+  }
+  conn.send({ type: 'done', id });
+  showToast('Finished sending ' + file.name);
+}
+
+function waitForConnDrain(conn){
+  return new Promise((res)=> setTimeout(res, 20));
+}
+
+function createTransferCard(id, title, total){
+  const c = document.createElement('div');
+  c.id = id;
+  c.className = 'p-3 rounded bg-white/3';
+  const t = document.createElement('div'); t.className='font-medium'; t.textContent = title;
+  const pWrap = document.createElement('div'); pWrap.className='mt-2';
+  const bar = document.createElement('div'); bar.className='h-2 w-full bg-white/6 rounded overflow-hidden';
+  const prog = document.createElement('div'); prog.className='h-2 bg-indigo-600 rounded w-0'; prog.style.transition='width 200ms linear';
+  bar.appendChild(prog); pWrap.appendChild(bar);
+  const meta = document.createElement('div'); meta.className='mt-2 text-xs text-slate-300'; meta.textContent = '0 / ' + humanSize(total);
+  c.appendChild(t); c.appendChild(pWrap); c.appendChild(meta);
+  return c;
+}
+
+function updateTransferProgress(id, bytes){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const bar = el.querySelector('div > div');
+  const meta = el.querySelector('.text-xs');
+  meta.textContent = humanSize(bytes) + ' transferred';
+  // Use percentage if total known; fallback approximates to avoid zero width on initial bytes
+  const pct = Math.max(1, Math.min(100, Math.round((bytes / (parseInt(meta.dataset?.total || (bytes+1)))) * 100)));
+  bar.style.width = pct + '%';
+}
+
+function removeTransferUI(peerId){
+  const el = document.getElementById('incoming-'+peerId); if (el) el.remove();
+  const s = document.getElementById('recv-'+peerId); if (s) s.remove();
+}
+
+// On page load, if URL contains #peer=..., prefill remoteId
+(function handleHash(){
+  const h = location.hash || '';
+  const m = h.match(/peer=([^&]+)/);
+  if (m){ remoteId.value = decodeURIComponent(m[1]); }
+})();
+</script>
+</body>
+</html>
