@@ -1,170 +1,151 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Home Screen</title>
-  <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
-
-<link rel="preconnect" href="https://black-ice-3dbk.onrender.com" crossorigin>
-<link rel="dns-prefetch" href="//black-ice-3dbk.onrender.com">
-
+<link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
+<link rel="preconnect" href="https://black-ice-3dbk.onrender.com/" crossorigin>
+<link rel="dns-prefetch" href="https://black-ice-3dbk.onrender.com/">
 <style>
-  :root{
-    --topbar: 56px;
-    --bg: #f7f8fb;
-    --surface: #ffffff;
-    --surface-2: #fafbff;
-    --text: #111827;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --hover: #f3f4f6;
-    --accent: #2563eb;
-    --ring: 0 0 0 4px rgba(37,99,235,.18);
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
-    --shadow-md: 0 10px 24px rgba(0,0,0,.12);
-    --radius: 14px;
-    --sidebar-w: 300px;
-  }
-
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial;
-    line-height:1.45;
-  }
-
-  .topbar{
-    height: var(--topbar);
-    position: sticky; top:0; z-index: 100;
-    display:flex; align-items:center; gap:12px;
-    padding:10px 16px;
-    background:var(--surface);
-    border-bottom:1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-  }
-  .brand{ font-weight:650; letter-spacing:.2px; }
-
-  #toggleSidebar{
-    width:40px; height:40px;
-    border-radius:10px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    color:var(--text);
-    font-size:20px;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition:.2s;
-  }
-  #toggleSidebar:hover{ background:var(--hover); }
-  #toggleSidebar:focus-visible{ outline:none; box-shadow: var(--ring); }
-
-  nav.sidebar{
-    position: fixed;
-    inset: var(--topbar) auto 0 0;
-    width: var(--sidebar-w);
-    z-index: 120;
-    background:var(--surface);
-    border-right:1px solid var(--border);
-    padding:16px;
-    overflow-y:auto;
-    transform: translateX(-100%);
-    transition: transform .3s ease;
-    box-shadow: var(--shadow-md);
-  }
-  nav.sidebar.open{ transform: translateX(0); }
-
-  .side-hd{ font-weight:650; margin-bottom:8px; }
-  .side-search{ position:relative; margin-bottom:12px; }
-  .side-search input{
-    width:100%; height:38px; padding:0 12px 0 40px;
-    border:1px solid var(--border); border-radius:10px;
-    background:var(--surface-2); color:var(--text);
-  }
-  .side-search input:focus{ outline:none; border-color:var(--accent); box-shadow: var(--ring); }
-  .side-search .icon{
-    position:absolute; top:10px; left:12px; width:18px; height:18px; color:#6b7280;
-    pointer-events:none;
-  }
-
-  .list{ list-style:none; padding:0; margin:0; }
-
-  .item-row{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:8px;
-  }
-
-  .item button.project-btn{
-    flex:1;
-    display:flex; align-items:start; gap:10px;
-    padding:10px 10px;
-    border-radius:10px;
-    background:transparent;
-    color:var(--text);
-    border:1px solid transparent;
-    cursor:pointer; text-align:left;
-    transition:.15s;
-  }
-  .item button.project-btn:hover{
-    background:var(--hover); border-color:var(--border);
-  }
-  .item button.project-btn.active{
-    background:var(--hover); border-color:var(--accent);
-  }
-
-  .copy-btn{
-    font-size:.75rem;
-    padding:4px 8px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background:var(--surface-2);
-    cursor:pointer;
-    color:var(--muted);
-    white-space:nowrap;
-    margin-top:10px;
-  }
-  .copy-btn:hover{
-    background:var(--hover);
-    color:var(--text);
-  }
-  .copy-btn:focus-visible{
-    outline:none;
-    box-shadow:var(--ring);
-  }
-
-  .title{ font-weight:600; line-height:1.25; }
-  .meta{ color:var(--muted); font-size:.85rem; }
-
-  .frame-wrap{
-    position:relative;
-    height: calc(100vh - var(--topbar));
-    background:#fff;
-  }
-  iframe.portal{
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    border:0; display:block; background:#fff;
-  }
-  /* Skeleton loader */
+:root{
+  --topbar: 56px;
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-2: #fafbff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --hover: #f3f4f6;
+  --accent: #2563eb;
+  --ring: 0 0 0 4px rgba(37,99,235,.18);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 10px 24px rgba(0,0,0,.12);
+  --radius: 14px;
+  --sidebar-w: 300px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial;
+  line-height:1.45;
+}
+.topbar{
+  height: var(--topbar);
+  position: sticky; top:0; z-index: 100;
+  display:flex; align-items:center; gap:12px;
+  padding:10px 16px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.brand{ font-weight:650; letter-spacing:.2px; }
+#toggleSidebar{
+  width:40px; height:40px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-size:20px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:.2s;
+}
+#toggleSidebar:hover{ background:var(--hover); }
+#toggleSidebar:focus-visible{ outline:none; box-shadow: var(--ring); }
+nav.sidebar{
+  position: fixed;
+  inset: var(--topbar) auto 0 0;
+  width: var(--sidebar-w);
+  z-index: 120;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:16px;
+  overflow-y:auto;
+  transform: translateX(-100%);
+  transition: transform .3s ease;
+  box-shadow: var(--shadow-md);
+}
+nav.sidebar.open{ transform: translateX(0); }
+.side-hd{ font-weight:650; margin-bottom:8px; }
+.side-search{ position:relative; margin-bottom:12px; }
+.side-search input{
+  width:100%; height:38px; padding:0 12px 0 40px;
+  border:1px solid var(--border); border-radius:10px;
+  background:var(--surface-2); color:var(--text);
+}
+.side-search input:focus{ outline:none; border-color:var(--accent); box-shadow: var(--ring); }
+.side-search .icon{
+  position:absolute; top:10px; left:12px; width:18px; height:18px; color:#6b7280;
+  pointer-events:none;
+}
+.list{ list-style:none; padding:0; margin:0; }
+.item-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.item button.project-btn{
+  flex:1;
+  display:flex; align-items:start; gap:10px;
+  padding:10px 10px;
+  border-radius:10px;
+  background:transparent;
+  color:var(--text);
+  border:1px solid transparent;
+  cursor:pointer; text-align:left;
+  transition:.15s;
+}
+.item button.project-btn:hover{
+  background:var(--hover); border-color:var(--border);
+}
+.item button.project-btn.active{
+  background:var(--hover); border-color:var(--accent);
+}
+.copy-btn{
+  font-size:.75rem;
+  padding:4px 8px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--surface-2);
+  cursor:pointer;
+  color:var(--muted);
+  white-space:nowrap;
+  margin-top:10px;
+}
+.copy-btn:hover{
+  background:var(--hover);
+  color:var(--text);
+}
+.copy-btn:focus-visible{
+  outline:none;
+  box-shadow:var(--ring);
+}
+.title{ font-weight:600; line-height:1.25; }
+.meta{ color:var(--muted); font-size:.85rem; }
+.frame-wrap{
+  position:relative;
+  height: calc(100vh - var(--topbar));
+  background:#fff;
+}
+iframe.portal{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  border:0; display:block; background:#fff;
+}
+/* Skeleton loader */
 .skeleton {
   background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 37%, #eeeeee 63%);
   background-size: 400% 100%;
   animation: skeleton-loading 1.4s ease infinite;
 }
-
 @keyframes skeleton-loading {
   0% { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
-
 .skel-item {
   height: 48px;
   border-radius: 10px;
@@ -190,29 +171,25 @@
 }
 #hideNavbar:hover{ background:var(--hover); }
 #hideNavbar:focus-visible{ outline:none; box-shadow: var(--ring); }
-
 /* collapse top bar via CSS variable so dependent layout updates */
 body.nav-hidden{ --topbar: 0px; }
-
 /* remove bar visuals when collapsed */
 body.nav-hidden .topbar{
   padding:0; border:0; box-shadow:none; overflow:hidden;
 }
-
 /* keep the toggle reachable while bar is hidden */
 body.nav-hidden #hideNavbar{
   position: fixed;
   top: 8px; right: 16px;
   z-index: 130;
 }
-
+/* duplicate sidebar rule retained from source; keep background explicit */
 nav.sidebar {
   position: fixed;
   inset: var(--topbar) auto 0 0;
   width: var(--sidebar-w);
   z-index: 120;
-  /* Make sidebar transparent */
-  background: ;/* ← changed from var(--surface) */
+  background: var(--surface);
   border-right: 1px solid var(--border);
   padding: 16px;
   overflow-y: auto;
@@ -221,62 +198,82 @@ nav.sidebar {
   box-shadow: var(--shadow-md);
 }
 
+
+/* Variant B: Dark pill */
+#restoreLastBtn{
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 140;
+  display: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background-color: #111827;            /* slate-900 */
+  border: 1px solid #0b1220;            /* subtle border */
+  color: #ffffff;                       /* readable on dark */
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: background-color .15s ease, opacity .15s ease;
+}
+#restoreLastBtn.show{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+#restoreLastBtn:hover{ background-color: #0b1220; }
+#restoreLastBtn:focus-visible{ outline: none; box-shadow: var(--ring); }
+
 </style>
 </head>
-
 <body>
-
 <header class="topbar">
   <button id="toggleSidebar" aria-label="Toggle project list" aria-expanded="false">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" 
-         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="3" y1="6" x2="21" y2="6"></line>
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="18" x2="21" y2="18"></line>
     </svg>
   </button>
- <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div><button id="hideNavbar" class="icon-btn" aria-pressed="false" title="Hide navbar" style="margin-left:auto;">
-  <!-- chevron-up icon -->
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="18 15 12 9 6 15"></polyline>
-  </svg>
-</button>
-
-
+  <div class="brand" id="goHome" style="cursor:pointer;">Home Screen</div>
+  <button id="hideNavbar" class="icon-btn" aria-pressed="false" title="Hide navbar" style="margin-left:auto;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 </header>
+
+<!-- Temporary restore button -->
+<button id="restoreLastBtn" type="button" aria-live="polite" title="Reload last site">
+  Reload last site
+</button>
 
 <nav id="sidebar" class="sidebar" hidden>
   <div class="side-hd">Free Tool Projects</div>
-
   <div class="side-search">
     <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" fill="none"/><line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor"/></svg>
     <input id="searchInput" type="search" placeholder="Search projects..." autocomplete="off" />
   </div>
-
   <ul id="projectList" class="list">
-
-  <!-- Skeleton template (shows before Firebase loads) -->
-  <div id="skeletonLoader">
-    <div class="skeleton skel-item"></div>
-    <div class="skeleton skel-item"></div>
-    <div class="skeleton skel-item"></div>
-    <div class="skeleton skel-item"></div>
-    <div class="skeleton skel-item"></div>
-  </div>
-
-</ul>
-
+    <div id="skeletonLoader">
+      <div class="skeleton skel-item"></div>
+      <div class="skeleton skel-item"></div>
+      <div class="skeleton skel-item"></div>
+      <div class="skeleton skel-item"></div>
+      <div class="skeleton skel-item"></div>
+    </div>
+  </ul>
 </nav>
 
 <main>
   <div class="frame-wrap">
-      <div id="offlineBox"
-     style="display:none; text-align:center; padding:25px; font-size:18px; color:#b91c1c;
-            background:#fee2e2; border:1px solid #fecaca;">
-  ❌ No Internet Connection
-</div>
-
+    <div id="offlineBox"
+      style="display:none; text-align:center; padding:25px; font-size:18px; color:#b91c1c;
+      background:#fee2e2; border:1px solid #fecaca;">
+      ❌ No Internet Connection
+    </div>
     <iframe id="portalFrame" class="portal"
       src="https://black-ice-3dbk.onrender.com/"
       allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera"></iframe>
@@ -284,145 +281,178 @@ nav.sidebar {
 </main>
 
 <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-    authDomain: "h-90-8a7c5.firebaseapp.com",
-    databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-    projectId: "h-90-8a7c5",
-    storageBucket: "h-90-8a7c5.firebasestorage.app",
-    messagingSenderId: "367196609301",
-    appId: "1:367196609301:web:156e24c1b4532c26af671c"
+const firebaseConfig = {
+  apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+  authDomain: "h-90-8a7c5.firebaseapp.com",
+  databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+  projectId: "h-90-8a7c5",
+  storageBucket: "h-90-8a7c5.firebasestorage.app",
+  messagingSenderId: "367196609301",
+  appId: "1:367196609301:web:156e24c1b4532c26af671c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const sidebar = document.querySelector('#sidebar');
+const toggleBtn = document.querySelector('#toggleSidebar');
+const projectList = document.querySelector('#projectList');
+const searchInput = document.querySelector('#searchInput');
+const frame = document.querySelector('#portalFrame');
+
+const setSidebar = (open)=>{
+  sidebar.classList.toggle('open', !!open);
+  sidebar.hidden = !open;
+  toggleBtn.setAttribute('aria-expanded', !!open);
+};
+setSidebar(false);
+toggleBtn.addEventListener('click', ()=> setSidebar(!sidebar.classList.contains('open')));
+
+const sanitizeHTML = (str)=>{
+  const d = document.createElement('div');
+  d.textContent = str ?? '';
+  return d.innerHTML;
+};
+const timeAgo = (ts)=>{
+  if (!ts) return '';
+  const rtf = new Intl.RelativeTimeFormat(undefined,{numeric:'auto'});
+  const diff = ts - Date.now();
+  const steps = [
+    ['year', 1000*60*60*24*365],
+    ['month', 1000*60*60*24*30],
+    ['week', 1000*60*60*24*7],
+    ['day', 1000*60*60*24],
+    ['hour', 1000*60*60],
+    ['minute', 1000*60],
+    ['second', 1000],
+  ];
+  for (const [unit, ms] of steps){
+    const val = Math.round(diff/ms);
+    if (Math.abs(val) >= 1) return rtf.format(val, unit);
+  }
+  return rtf.format(0,'second');
+};
+
+/* ---------- Restore-last-site support ---------- */
+const HOME_URL = "https://black-ice-3dbk.onrender.com/";
+const LAST_KEY = "lastPortalUrl";
+const restoreBtn = document.getElementById("restoreLastBtn");
+
+// Centralized setter so we remember non-home URLs automatically
+function setFrameSrc(url, opts = { remember: true }) {
+  frame.src = url; // programmatic iframe navigation [MDN]
+  if (opts.remember && url && url !== HOME_URL) {
+    localStorage.setItem(LAST_KEY, url); // persist last URL [MDN]
+  }
+}
+
+// Show the temporary restore button on Home; auto-hide after 7s
+function maybeShowRestore() {
+  const last = localStorage.getItem(LAST_KEY); // read last URL [MDN]
+  const current = frame.getAttribute("src");
+  if (!last || current !== HOME_URL) return;
+
+  restoreBtn.classList.add("show");
+  const t = setTimeout(() => { // schedule auto-hide [MDN]
+    restoreBtn.classList.remove("show");
+  }, 7000);
+
+  restoreBtn.onclick = () => {
+    clearTimeout(t);           // cancel hide if clicked [MDN]
+    setFrameSrc(last);         // restore previous site [MDN]
+    restoreBtn.classList.remove("show");
   };
+}
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+// Ensure the button can render immediately after DOM is parsed
+document.addEventListener("DOMContentLoaded", maybeShowRestore);
 
-  const sidebar = document.querySelector('#sidebar');
-  const toggleBtn = document.querySelector('#toggleSidebar');
-  const projectList = document.querySelector('#projectList');
-  const searchInput = document.querySelector('#searchInput');
-  const frame = document.querySelector('#portalFrame');
+/* ---------- Data + list rendering ---------- */
+let allSites = [];
+let queryText = '';
 
-  const setSidebar = (open)=>{
-    sidebar.classList.toggle('open', !!open);
-    sidebar.hidden = !open;
-    toggleBtn.setAttribute('aria-expanded', !!open);
-  };
-  setSidebar(false);
-  toggleBtn.addEventListener('click', ()=> setSidebar(!sidebar.classList.contains('open')));
-
-  const sanitizeHTML = (str)=>{
-    const d = document.createElement('div');
-    d.textContent = str ?? '';
-    return d.innerHTML;
-  };
-
-  const timeAgo = (ts)=>{
-    if (!ts) return '';
-    const rtf = new Intl.RelativeTimeFormat(undefined,{numeric:'auto'});
-    const diff = ts - Date.now();
-    const steps = [
-      ['year',   1000*60*60*24*365],
-      ['month',  1000*60*60*24*30],
-      ['week',   1000*60*60*24*7],
-      ['day',    1000*60*60*24],
-      ['hour',   1000*60*60],
-      ['minute', 1000*60],
-      ['second', 1000],
-    ];
-    for (const [unit, ms] of steps){
-      const val = Math.round(diff/ms);
-      if (Math.abs(val) >= 1) return rtf.format(val, unit);
-    }
-    return rtf.format(0,'second');
-  };
-
-  let allSites = [];
-  let queryText = '';
-
-  const renderList = ()=>{
-    let list = allSites.slice();
-
-    if (queryText){
-      const q = queryText.toLowerCase();
-      list = list.filter(s => 
-        (s.title || '').toLowerCase().includes(q) || 
-        (s.description || '').toLowerCase().includes(q)
-      );
-    }
-
-    if (!list.length){
-      projectList.innerHTML = `<li class="item"><div>No matches</div></li>`;
-      return;
-    }
-
-    projectList.innerHTML = list.map(site => {
-      const safeTitle = sanitizeHTML(site.title);
-      const safeUrl = sanitizeHTML(site.url);
-      const when = site.timestamp ? timeAgo(site.timestamp) : "";
-      return `
-        <li class="item item-row">
-          <button type="button" class="project-btn" data-url="${safeUrl}">
-            <div>
-              <div class="title">${safeTitle}</div>
-              ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
-            </div>
-          </button>
-          <button class="copy-btn" data-copy="${safeUrl}">or Copylink</button>
-        </li>
-      `;
-    }).join("");
-
-    projectList.querySelectorAll('.project-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        frame.src = btn.dataset.url;
-        projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        setSidebar(false);
+const renderList = ()=>{
+  let list = allSites.slice();
+  if (queryText){
+    const q = queryText.toLowerCase();
+    list = list.filter(s =>
+      (s.title || '').toLowerCase().includes(q) ||
+      (s.description || '').toLowerCase().includes(q)
+    );
+  }
+  if (!list.length){
+    projectList.innerHTML = `<li class="item"><div>No matches</div></li>`;
+    return;
+  }
+  projectList.innerHTML = list.map(site => {
+    const safeTitle = sanitizeHTML(site.title);
+    const safeUrl = sanitizeHTML(site.url);
+    const when = site.timestamp ? timeAgo(site.timestamp) : "";
+    return `
+<li class="item item-row">
+  <button type="button" class="project-btn" data-url="${safeUrl}">
+    <div>
+      <div class="title">${safeTitle}</div>
+      ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
+    </div>
+  </button>
+  <button class="copy-btn" data-copy="${safeUrl}">or Copylink</button>
+</li>
+`;
+  }).join("");
+  projectList.querySelectorAll('.project-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      setFrameSrc(btn.dataset.url); // remember last non-home URL
+      projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      setSidebar(false);
+    });
+  });
+  projectList.querySelectorAll('.copy-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const url = btn.dataset.copy;
+      navigator.clipboard.writeText(url).then(()=>{
+        btn.textContent = "Copied!";
+        setTimeout(()=> btn.textContent = "Copy", 900);
       });
     });
-
-    projectList.querySelectorAll('.copy-btn').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        const url = btn.dataset.copy;
-        navigator.clipboard.writeText(url).then(()=>{
-          btn.textContent = "Copied!";
-          setTimeout(()=> btn.textContent = "Copy", 900);
-        });
-      });
-    });
-  };
-
-  searchInput.addEventListener('input', (e)=>{
-    queryText = e.target.value.trim();
-    renderList();
   });
+};
 
-  onValue(ref(db, 'sites'), snapshot=>{
-    const sites = snapshot.val();
-    if (!sites){
-      projectList.innerHTML = `<li>No projects yet</li>`;
-      return;
-    }
-    allSites = Object.entries(sites).map(([id, site])=>({
-      id,
-      title: site.title || "Untitled",
-      url: site.url || "#",
-      timestamp: site.timestamp || 0,
-      description: site.description || ""
-    }));
-    allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
-    renderList();
-  });
-  document.querySelector("#goHome").addEventListener("click", () => {
-  frame.src = "https://black-ice-3dbk.onrender.com/";
+searchInput.addEventListener('input', (e)=>{
+  queryText = e.target.value.trim();
+  renderList();
 });
+
+onValue(ref(db, 'sites'), snapshot=>{
+  const sites = snapshot.val();
+  if (!sites){
+    projectList.innerHTML = `<li>No projects yet</li>`;
+    return;
+  }
+  allSites = Object.entries(sites).map(([id, site])=>({
+    id,
+    title: site.title || "Untitled",
+    url: site.url || "#",
+    timestamp: site.timestamp || 0,
+    description: site.description || ""
+  }));
+  allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
+  renderList();
+});
+
+document.querySelector("#goHome").addEventListener("click", () => {
+  setFrameSrc(HOME_URL, { remember: false }); // go Home but don't override last URL
+  // Re-evaluate showing the restore button as we just navigated to Home
+  setTimeout(maybeShowRestore, 0);
+});
+
 /* -------------------------------
-   OFFLINE + FIRST-TIME PAGE CACHE
+OFFLINE + FIRST-TIME PAGE CACHE
 -------------------------------- */
 const offlineBox = document.getElementById("offlineBox");
 const mainFrame = document.getElementById("portalFrame");
@@ -434,7 +464,6 @@ async function checkNetworkAndCache() {
     mainFrame.style.display = "none";
     return;
   }
-
   // ONLINE MODE
   offlineBox.style.display = "none";
   mainFrame.style.display = "block";
@@ -454,34 +483,22 @@ async function checkNetworkAndCache() {
 
 // Initial check
 checkNetworkAndCache();
-
 // Auto update on network changes
 window.addEventListener("online", checkNetworkAndCache);
 window.addEventListener("offline", checkNetworkAndCache);
 
-
-
 const hideBtn = document.querySelector('#hideNavbar');
-
 const setTopbarHidden = (hide) => {
   document.body.classList.toggle('nav-hidden', !!hide);
   hideBtn.setAttribute('aria-pressed', !!hide);
   hideBtn.title = hide ? 'Show navbar' : 'Hide navbar';
 };
-
 // initial state
 setTopbarHidden(false);
-
 // toggle on click
 hideBtn.addEventListener('click', () => {
   setTopbarHidden(!document.body.classList.contains('nav-hidden'));
 });
-  
-  
-  
 </script>
-  
-
-
 </body>
 </html>
