@@ -241,6 +241,48 @@ nav.sidebar {
   background: var(--surface-2);
 }
 
+/* Screenshot preview styles */
+.screenshot-preview {
+  position: relative;
+  display: inline-block;
+}
+
+.screenshot-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.screenshot-thumb:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.screenshot-large {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  z-index: 1000;
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  background: #fff;
+  object-fit: cover;
+  display: none;
+  margin-left: 10px;
+  margin-top: -20px;
+}
+
+.screenshot-preview:hover .screenshot-large {
+  display: block;
+}
+
 .title{ font-weight:600; line-height:1.25; }
 .meta{ color:var(--muted); font-size:.85rem; }
 /* Frame area */
@@ -561,10 +603,16 @@ function renderFavorites() {
     const safeTitle = sanitizeHTML(site.title);
     const safeUrl = sanitizeHTML(site.url);
     const when = site.timestamp ? timeAgo(site.timestamp) : "";
+    // Generate Microlink screenshot URL
+    const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url`;
     
     return `
       <li class="item item-row">
         <button type="button" class="project-btn" data-url="${safeUrl}">
+          <div class="screenshot-preview">
+            <img class="screenshot-thumb" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
+            <img class="screenshot-large" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
+          </div>
           <div>
             <div class="title">${safeTitle}</div>
             ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
@@ -610,10 +658,16 @@ const renderList = ()=>{
     const safeUrl = sanitizeHTML(site.url);
     const when = site.timestamp ? timeAgo(site.timestamp) : "";
     const isFav = isFavorited(site.id);
+    // Generate Microlink screenshot URL
+    const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url`;
     
     return `
       <li class="item item-row">
         <button type="button" class="project-btn" data-url="${safeUrl}">
+          <div class="screenshot-preview">
+            <img class="screenshot-thumb" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
+            <img class="screenshot-large" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
+          </div>
           <div>
             <div class="title">${safeTitle}</div>
             ${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
