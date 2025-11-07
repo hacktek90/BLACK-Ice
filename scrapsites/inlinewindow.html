@@ -335,6 +335,60 @@ iframe{
   }
 })();
 </script>
+/* ========== TOOL MODE SELECTOR ========== */
+
+(function(){
+  const params = new URLSearchParams(location.search);
+  const mode = params.get("tool");  // iframe | screenshot | history | all
+
+  // Sections
+  const iframeSec = document.querySelector(".controls").closest("section") || null;
+  const viewerSec = document.querySelector(".viewer").closest(".layout") || null;
+  const screenshotSec = document.querySelector(".screenshot-card");
+  const historySec = document.querySelector(".side").closest(".layout") || null;
+
+  function hideAll(){
+    if (iframeSec) iframeSec.style.display = "none";
+    if (viewerSec) viewerSec.style.display = "none";
+    if (screenshotSec) screenshotSec.style.display = "none";
+  }
+
+  if (mode) {
+    hideAll();
+
+    switch(mode.toLowerCase()){
+      case "iframe":
+        if (iframeSec) iframeSec.style.display = "";
+        if (viewerSec) viewerSec.style.display = "";
+        break;
+
+      case "history":
+        if (viewerSec) {
+          viewerSec.style.display = "";
+          // Hide ONLY left viewer and keep right history
+          viewerSec.querySelector(".viewer").style.display = "none";
+          viewerSec.querySelector(".side").style.display = "";
+        }
+        break;
+
+      case "screenshot":
+        if (screenshotSec) screenshotSec.style.display = "";
+        break;
+
+      case "all":
+        if (iframeSec) iframeSec.style.display = "";
+        if (viewerSec) viewerSec.style.display = "";
+        if (screenshotSec) screenshotSec.style.display = "";
+        break;
+
+      default:
+        // Unknown mode → show all
+        if (iframeSec) iframeSec.style.display = "";
+        if (viewerSec) viewerSec.style.display = "";
+        if (screenshotSec) screenshotSec.style.display = "";
+    }
+  }
+})();
 
 </body>
 </html>
