@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,9 +79,10 @@ body{
   animation: shiftHue 6s linear infinite; /* subtle continuous shift */
   cursor: pointer; /* remains clickable */
 }
-/* Right-end button */
+/* Right-end buttons */
 .icon-btn,
-#hideNavbar{
+#hideNavbar,
+#settingsBtn{
   width:40px; height:40px;
   border-radius:10px;
   background:var(--surface);
@@ -90,8 +92,8 @@ body{
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; transition:.2s;
 }
-#hideNavbar:hover{ background:var(--hover); }
-#hideNavbar:focus-visible{ outline:none; box-shadow: var(--ring); }
+#hideNavbar:hover, #settingsBtn:hover{ background:var(--hover); }
+#hideNavbar:focus-visible, #settingsBtn:focus-visible{ outline:none; box-shadow: var(--ring); }
 /* Collapse top bar */
 body.nav-hidden{ --topbar: 0px; }
 body.nav-hidden .topbar{
@@ -339,6 +341,98 @@ iframe.portal{
 #restoreLastBtn.show{ display: inline-flex; align-items: center; gap: 6px; }
 #restoreLastBtn:hover{ background-color: #0b1220; }
 #restoreLastBtn:focus-visible{ outline: none; box-shadow: var(--ring); }
+
+/* Settings Dialog */
+.settings-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+.settings-dialog.open {
+  opacity: 1;
+  visibility: visible;
+}
+.settings-content {
+  background: var(--surface);
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+.settings-dialog.open .settings-content {
+  transform: translateY(0);
+}
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.settings-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.close-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.settings-option {
+  margin-bottom: 20px;
+}
+.settings-option label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.settings-option select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 1rem;
+}
+.save-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: background 0.2s;
+}
+.save-btn:hover {
+  background: #1d4ed8;
+}
+
 /* Reduced motion: pause animated border */
 @media (prefers-reduced-motion: reduce){
   .brand{ animation: none; background-position: 100% 50%, 100% 50%; }
@@ -356,6 +450,12 @@ iframe.portal{
     </svg>
   </button>
   <div class="brand" id="goHome" title="Go Home">Home Screen</div>
+  <button id="settingsBtn" class="icon-btn" aria-label="Settings" title="Settings">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
   <button id="hideNavbar" class="icon-btn" aria-pressed="false" title="Hide navbar" style="margin-left:auto;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -367,6 +467,26 @@ iframe.portal{
 <button id="restoreLastBtn" type="button" aria-live="polite" title="Reload last site">
   Reload last site
 </button>
+
+<!-- Settings Dialog -->
+<div id="settingsDialog" class="settings-dialog">
+  <div class="settings-content">
+    <div class="settings-header">
+      <h2 class="settings-title">Settings</h2>
+      <button id="closeSettings" class="close-btn" aria-label="Close settings">&times;</button>
+    </div>
+    
+    <div class="settings-option">
+      <label for="homeScreenSelect">Set Home Screen Project:</label>
+      <select id="homeScreenSelect">
+        <option value="">Default Home Screen</option>
+        <!-- Options will be populated dynamically -->
+      </select>
+    </div>
+    
+    <button id="saveSettings" class="save-btn">Save Settings</button>
+  </div>
+</div>
 
 <nav id="sidebar" class="sidebar" hidden>
   <div class="side-hd-row">
@@ -780,6 +900,66 @@ const setTopbarHidden = (hide) => {
 setTopbarHidden(false);
 hideBtn.addEventListener('click', () => {
   setTopbarHidden(!document.body.classList.contains('nav-hidden'));
+});
+
+/* Settings Dialog */
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsDialog = document.getElementById('settingsDialog');
+const closeSettings = document.getElementById('closeSettings');
+const saveSettings = document.getElementById('saveSettings');
+const homeScreenSelect = document.getElementById('homeScreenSelect');
+
+// Populate home screen options
+function populateHomeScreenOptions() {
+  homeScreenSelect.innerHTML = '<option value="">Default Home Screen</option>';
+  allSites.forEach(site => {
+    const option = document.createElement('option');
+    option.value = site.url;
+    option.textContent = site.title;
+    if (site.url === localStorage.getItem('customHomeScreen')) {
+      option.selected = true;
+    }
+    homeScreenSelect.appendChild(option);
+  });
+}
+
+// Open settings dialog
+settingsBtn.addEventListener('click', () => {
+  populateHomeScreenOptions();
+  settingsDialog.classList.add('open');
+});
+
+// Close settings dialog
+closeSettings.addEventListener('click', () => {
+  settingsDialog.classList.remove('open');
+});
+
+// Save settings
+saveSettings.addEventListener('click', () => {
+  // Save home screen setting
+  const selectedUrl = homeScreenSelect.value;
+  if (selectedUrl) {
+    localStorage.setItem('customHomeScreen', selectedUrl);
+  } else {
+    localStorage.removeItem('customHomeScreen');
+  }
+  
+  settingsDialog.classList.remove('open');
+});
+
+// Close dialog when clicking outside
+settingsDialog.addEventListener('click', (e) => {
+  if (e.target === settingsDialog) {
+    settingsDialog.classList.remove('open');
+  }
+});
+
+// Apply custom home screen if set
+window.addEventListener('DOMContentLoaded', () => {
+  const customHome = localStorage.getItem('customHomeScreen');
+  if (customHome) {
+    frame.src = customHome;
+  }
 });
 </script>
 </body>
