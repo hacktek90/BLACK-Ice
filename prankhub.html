@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bold Text with Image Overlay</title>
+
+  <!-- Core metadata -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="fuck you images for prank" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- UI/theme metadata -->
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0b10" />
+
+  <!-- Open Graph (social sharing) -->
+  <meta property="og:title" content="Bold Text with Image Overlay" />
+  <meta property="og:description" content="Large bold typography with an overlaid image." />
+  <meta property="og:type" content="website" />
+  <!-- Replace this with your final page URL when deployed -->
+  <meta property="og:url" content="https://example.com/your-page" />
+  <meta property="og:image" content="https://i.etsystatic.com/20077298/r/il/d70df7/4290387390/il_fullxfull.4290387390_8e8u.jpg" />
+  <meta property="og:image:alt" content="Decorative overlay image" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Bold Text with Image Overlay" />
+  <meta name="twitter:description" content="Large bold typography with an overlaid image." />
+  <meta name="twitter:image" content="https://i.etsystatic.com/20077298/r/il/d70df7/4290387390/il_fullxfull.4290387390_8e8u.jpg" />
+
+  <style>
+    :root {
+      --fg: #0b0b10;
+      --bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      pointer-events: none;
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans";
+    }
+
+    
+    .stage {
+      pointer-events: none;
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 4rem 1.25rem;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    /* Big bold headline */
+    .headline {
+      pointer-events: none;
+      margin: 0;
+      max-width: 12ch;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+      font-size: clamp(3rem, 8vw, 8rem);
+      z-index: 1; /* under the image */
+    }
+
+    /* Image layered over the text */
+    .overlay-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.35;           
+      filter: saturate(1.1);    
+      z-index: 2;               
+      pointer-events: none;       
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <h1 class="headline">Fuck You</h1>
+
+    <img
+      class="overlay-img"
+      src="https://i.etsystatic.com/20077298/r/il/d70df7/4290387390/il_fullxfull.4290387390_8e8u.jpg"
+      alt="Decorative overlay image" />
+  </main>
+</body>
+</html>
