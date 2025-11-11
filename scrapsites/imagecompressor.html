@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Multi‑Image Compressor — Neon Green</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Primary SEO -->
+  <meta name="description" content="Compress and resize multiple images (JPEG, PNG, WEBP) in your browser. Fast, private, and offline-friendly—no uploads required." />
+  <link rel="canonical" href="https://black-ice-3dbk.onrender.com/scrapsites/imagecompressor.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Multi‑Image Compressor" />
+  <meta property="og:title" content="Multi‑Image Compressor — Neon Green" />
+  <meta property="og:description" content="Compress and resize multiple images (JPEG, PNG, WEBP) in your browser. Fast, private, and offline-friendly—no uploads required." />
+  <meta property="og:url" content="https://black-ice-3dbk.onrender.com/scrapsites/imagecompressor.html" />
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:image:alt" content="Multi‑Image Compressor preview" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Multi‑Image Compressor — Neon Green" />
+  <meta name="twitter:description" content="Compress and resize multiple images (JPEG, PNG, WEBP) privately in your browser—no uploads." />
+  <meta name="twitter:image" content="/og-image.png" />
+
+  <!-- Icons & PWA basics -->
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#060807" />
+  <meta name="color-scheme" content="dark light" />
+
+  <!-- Structured Data: Software Application -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Multi‑Image Compressor",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Any",
+    "description": "Compress and resize multiple images (JPEG, PNG, WEBP) in the browser with adjustable quality and max dimensions.",
+    "url": "https://example.com/",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Neon Green"
+    }
+  }
+  </script>
+  <style>
+    :root{
+      --bg:#060807; --panel:#0b100d; --text:#e9fff3; --muted:#9ec7b1;
+      --accent:#00e676; --accent2:#19c37d; --danger:#ff5577; --border:#17231b; --focus:#3cff9a55;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    header{padding:16px 20px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#060807,#0b100d)}
+    .brand{margin:0;font-weight:700;letter-spacing:.5px;
+      background:linear-gradient(90deg,var(--accent),#7affc8); -webkit-background-clip:text; background-clip:text; color:transparent}
+    main{max-width:1200px;margin:0 auto;padding:18px}
+    .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 0 0 1px #000 inset,0 8px 28px rgba(0,0,0,.35)}
+    h2{margin:0 0 10px;font-size:16px;color:var(--accent2);letter-spacing:.3px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .row-full{margin-bottom:12px}
+    @media (max-width:560px){.row{grid-template-columns:1fr}}
+    input[type="number"],select{
+      width:100%;background:#0c120e;color:var(--text);border:1px solid var(--border);
+      border-radius:10px;padding:11px 12px;outline:none
+    }
+    input[type="range"]{width:100%;touch-action:pan-y}
+    input[type="number"]:focus,select:focus{box-shadow:0 0 0 3px var(--focus);border-color:var(--accent2)}
+    .range{display:grid;grid-template-columns:84px 1fr 64px;align-items:center;gap:10px}
+    .button{display:inline-flex;justify-content:center;align-items:center;gap:8px;width:100%;
+      background:linear-gradient(180deg,#0f1a14,#0d1713);border:1px solid var(--border);color:var(--text);
+      padding:12px 14px;border-radius:12px;cursor:pointer;transition:transform .06s ease,box-shadow .12s ease}
+    .button.primary{background:linear-gradient(180deg,#0b1f16,#0c281a);border-color:#174a33}
+    .button.accent{background:linear-gradient(180deg,#0b2818,#0b311c);border-color:#1e7c4f}
+    .button:active{transform:translateY(1px)}
+    .drop{border:2px dashed #1e3c2b;background:#08120d;color:var(--muted);padding:18px;border-radius:12px;text-align:center;cursor:pointer}
+    .drop.dragover{border-color:var(--accent);color:var(--text);background:#0c1b14}
+    .hint{font-size:12px;color:var(--muted)}
+    .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .card{background:#0a120e;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .ph{aspect-ratio:1/1;display:grid;place-items:center;background:#07100d}
+    .ph canvas{max-width:100%;height:auto;display:block}
+    .meta{padding:10px;font-size:12px;color:var(--muted);display:grid;gap:6px}
+    .footer{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+    .pill{font-size:12px;border:1px solid var(--border);padding:8px 10px;border-radius:999px;text-align:center}
+    .danger{color:var(--danger)}
+    .row-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  </style>
+</head>
+<body>
+  <header><h1 class="brand">Multi‑Image Compressor</h1></header>
+  <main class="grid">
+    <section class="panel">
+      <h2>Select images</h2>
+      <div id="drop" class="drop" role="button" tabindex="0">
+        <div id="dropText">Tap to select or drag photos here</div>
+        <div class="hint">JPEG • PNG • WEBP</div>
+        <input id="file" type="file" accept="image/*" multiple hidden />
+      </div>
+
+      <h2>Compression</h2>
+      <div class="row">
+        <div>
+          <label>Output format</label>
+          <select id="fmt">
+            <option value="image/webp">WEBP</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/png">PNG (lossless)</option>
+          </select>
+        </div>
+        <div>
+          <label>Quality (lossy)</label>
+          <div class="range">
+            <span id="qLabel">0.85</span>
+            <input id="quality" type="range" min="0.1" max="1" step="0.01" value="0.85" />
+            <span class="hint">0.1–1</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>Resize</h2>
+      <div class="row">
+        <div>
+          <label>Max width (px)</label>
+          <input id="mw" type="number" min="1" placeholder="Keep if empty" />
+        </div>
+        <div>
+          <label>Max height (px)</label>
+          <input id="mh" type="number" min="1" placeholder="Keep if empty" />
+        </div>
+      </div>
+
+      <div class="row-actions">
+        <button id="compressAll" class="button primary">Compress All</button>
+        <button id="clear" class="button">Clear</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Results</h2>
+      <div id="summary" class="hint">No images yet.</div>
+      <div id="out" class="thumbs" aria-live="polite"></div>
+      <div class="footer">
+        <span class="pill" id="countPill">0 files</span>
+        <span class="pill" id="savedPill">0 KB saved</span>
+        <span class="pill danger" id="warnPill" style="display:none">PNG ignores quality (lossless)</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (s)=>document.querySelector(s);
+    const drop = $('#drop'), dropText = $('#dropText'), file = $('#file');
+    const fmt = $('#fmt'), q = $('#quality'), qLabel = $('#qLabel');
+    const mw = $('#mw'), mh = $('#mh');
+    const compressAll = $('#compressAll'), clearBtn = $('#clear');
+    const out = $('#out'), summary = $('#summary');
+    const countPill = $('#countPill'), savedPill = $('#savedPill'), warnPill = $('#warnPill');
+
+    let files = [];
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouch) dropText.textContent = 'Tap to select photos';
+
+    function human(n){ if(n<1024) return n+' B'; if(n<1024*1024) return (n/1024).toFixed(1)+' KB'; return (n/1024/1024).toFixed(2)+' MB'; }
+    function setDrag(v){ drop.classList.toggle('dragover', v); }
+    function onFiles(list){ for(const f of list){ if(f.type.startsWith('image/')) files.push(f); } updateSummary(); renderQueue(); }
+    function updateSummary(){ countPill.textContent = files.length+' files'; summary.textContent = files.length ? 'Ready to compress.' : 'No images yet.'; }
+    function clearAll(){ files=[]; out.innerHTML=''; updateSummary(); savedPill.textContent='0 KB saved'; warnPill.style.display='none'; file.value=''; }
+
+    drop.addEventListener('click', ()=>file.click());
+    drop.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); file.click(); } });
+    drop.addEventListener('dragover', (e)=>{ e.preventDefault(); setDrag(true); });
+    drop.addEventListener('dragleave', ()=>setDrag(false));
+    drop.addEventListener('drop', (e)=>{ e.preventDefault(); setDrag(false); onFiles(e.dataTransfer.files); });
+    file.addEventListener('change', (e)=>onFiles(e.target.files));
+    q.addEventListener('input', ()=>{ qLabel.textContent = Number(q.value).toFixed(2); });
+    clearBtn.addEventListener('click', clearAll);
+
+    async function decodeOriented(blob){
+      try{
+        return await createImageBitmap(blob, { imageOrientation:'from-image', resizeQuality:'high' });
+      }catch(e){
+        const url = URL.createObjectURL(blob);
+        const img = new Image(); img.decoding='async'; img.src=url; await img.decode().catch(()=>{});
+        URL.revokeObjectURL(url); return img;
+      }
+    }
+
+    function fitInside(sw, sh, mw, mh){
+      if(!mw && !mh) return {w:sw, h:sh};
+      const rx = mw ? mw/sw : Infinity;
+      const ry = mh ? mh/sh : Infinity;
+      const r = Math.min(rx, ry);
+      if(!isFinite(r) || r>=1) return {w:sw, h:sh};
+      return {w:Math.max(1, Math.round(sw*r)), h:Math.max(1, Math.round(sh*r))};
+    }
+
+    function resizeCanvas(bmp, w, h){
+      const c = document.createElement('canvas'); c.width=w; c.height=h;
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+      ctx.drawImage(bmp, 0, 0, w, h); return c;
+    }
+
+    async function encodeCanvas(canvas, type, quality){
+      const isPNG = type==='image/png';
+      let blob = await new Promise(res=>canvas.toBlob(res, type, isPNG?undefined:quality));
+      if(!blob){
+        const dataURL = canvas.toDataURL(type, isPNG?undefined:quality);
+        const bin = atob(dataURL.split(',')[1]); const arr = new Uint8Array(bin.length);
+        for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+        blob = new Blob([arr], {type});
+      }
+      return blob;
+    }
+
+    function rename(name, mime){
+      const ext = mime==='image/jpeg'?'.jpg' : mime==='image/webp'?'.webp' : '.png';
+      return name.replace(/\.[^.]+$/,'') + ext;
+    }
+
+    function thumbFrom(canvas){
+      const maxW = 1024;
+      const scale = Math.min(1, maxW/canvas.width);
+      const t = document.createElement('canvas');
+      t.width = Math.round(canvas.width*scale); t.height = Math.round(canvas.height*scale);
+      const ctx = t.getContext('2d'); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+      ctx.drawImage(canvas, 0, 0, t.width, t.height); return t;
+    }
+
+    function cardFor(name, beforeBytes, canvas, mime, quality){
+      const card = document.createElement('div'); card.className='card';
+      const ph = document.createElement('div'); ph.className='ph';
+      const preview = thumbFrom(canvas); ph.appendChild(preview);
+      const meta = document.createElement('div'); meta.className='meta';
+      const t1 = document.createElement('div'); t1.textContent = name;
+      const t2 = document.createElement('div'); t2.className='sizes'; t2.textContent = 'Encoding…';
+      const dl = document.createElement('a'); dl.className='button accent'; dl.textContent='Download'; dl.href='#'; dl.download=name;
+
+      canvas.toBlob(async () => {
+        const blob = await encodeCanvas(canvas, mime, quality);
+        t2.textContent = `Before: ${human(beforeBytes)}  After: ${human(blob.size)}`;
+        const url = URL.createObjectURL(blob);
+        dl.href = url; dl.download = name;
+      }, mime, quality);
+
+      const inner = document.createElement('div'); inner.className='inner';
+      meta.appendChild(t1); meta.appendChild(t2); meta.appendChild(dl);
+      card.appendChild(ph); card.appendChild(meta); return card;
+    }
+
+    async function compressOne(f){
+      const bmp = await decodeOriented(f);
+      const bounds = fitInside(bmp.width, bmp.height, parseInt(mw.value,10)||0, parseInt(mh.value,10)||0);
+      const cnv = resizeCanvas(bmp, bounds.w, bounds.h);
+      const mime = fmt.value;
+      if (mime==='image/png') warnPill.style.display='inline-flex';
+      return { cnv, mime, name: rename(f.name, mime), srcBytes: f.size };
+    }
+
+    async function compressAllFlow(){
+      if(!files.length) return;
+      out.innerHTML=''; let saved=0;
+      for(const f of files){
+        const { cnv, mime, name, srcBytes } = await compressOne(f);
+        const blob = await encodeCanvas(cnv, mime, parseFloat(q.value));
+        saved += Math.max(0, srcBytes - blob.size);
+
+        const t = thumbFrom(cnv);
+        const card = document.createElement('div'); card.className='card';
+        const ph = document.createElement('div'); ph.className='ph'; ph.appendChild(t);
+        const meta = document.createElement('div'); meta.className='meta';
+        const title = document.createElement('div'); title.textContent = name;
+        const sizes = document.createElement('div'); sizes.textContent = `Before: ${human(srcBytes)}  After: ${human(blob.size)}`;
+        const link = document.createElement('a'); link.className='button accent'; link.textContent='Download';
+        const url = URL.createObjectURL(blob); link.href=url; link.download=name;
+
+        meta.appendChild(title); meta.appendChild(sizes); meta.appendChild(link);
+        card.appendChild(ph); card.appendChild(meta); out.appendChild(card);
+        await new Promise(r=>setTimeout(r));
+      }
+      savedPill.textContent = human(saved) + ' saved';
+      summary.textContent = 'Done.';
+    }
+
+    function renderQueue(){
+      out.innerHTML=''; for(const f of files){
+        const card = document.createElement('div'); card.className='card';
+        const ph = document.createElement('div'); ph.className='ph'; ph.textContent='…';
+        const meta = document.createElement('div'); meta.className='meta';
+        const title = document.createElement('div'); title.textContent = f.name;
+        const sizes = document.createElement('div'); sizes.textContent = `Queued • ${human(f.size)}`;
+        meta.appendChild(title); meta.appendChild(sizes); card.appendChild(ph); card.appendChild(meta); out.appendChild(card);
+      }
+    }
+
+    compressAll.addEventListener('click', compressAllFlow);
+  </script>
+</body>
+</html>
