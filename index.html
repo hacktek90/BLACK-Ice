@@ -890,16 +890,13 @@ btn.addEventListener('keydown', (e) => {
   }
 });
 
-// ------------------------------------------------------
-// Smart redirect (domain-specific + parameter conditions)
-// ------------------------------------------------------
 (function () {
     const url = new URL(window.location.href);
     const params = url.searchParams;
 
-    // ✅ 0. Redirect ONLY on this domain
-    const targetDomain = "black-ice-3dbk.onrender.com","hacktek90.github.io/BLACK-Ice/";
-    if (window.location.hostname !== targetDomain) {
+    // ✅ 0. Redirect ONLY on these domains
+    const targetDomains = ["black-ice-3dbk.onrender.com", "hacktek90.github.io","blackice-ac.vercel.app"];
+    if (!targetDomains.includes(window.location.hostname)) {
         console.log("➡️ No redirect: different domain (" + window.location.hostname + ")");
         return;
     }
@@ -925,6 +922,7 @@ btn.addEventListener('keydown', (e) => {
     }
 
 })();
+
 </script>
 
 </div>
