@@ -58,6 +58,7 @@
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    position: relative;
   }
 
   .logo {
@@ -170,6 +171,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: transform 0.3s ease;
   }
 
   .sidebar-header {
@@ -266,6 +268,12 @@
     border-bottom: 1px solid var(--border);
     padding: 0 8px;
     flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .editor-tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .tab {
@@ -278,6 +286,7 @@
     cursor: pointer;
     transition: all 0.15s;
     font-family: var(--font-mono);
+    white-space: nowrap;
   }
 
   .tab:hover {
@@ -296,6 +305,10 @@
     font-size: 10px;
     color: var(--text-muted);
     font-family: var(--font-mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
   }
 
   /* Editor Panes */
@@ -456,36 +469,191 @@
     color: var(--accent-purple);
   }
 
-  /* Responsive */
-  @media (max-width: 960px) {
+  /* Mobile Menu Button */
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  /* Mobile Panel Toggle */
+  .mobile-panel-toggle {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 0 8px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
     .sidebar {
       width: 240px;
     }
-
+    
     .preview-panel {
-      display: none;
+      flex: 1;
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
+    .topbar {
+      flex-wrap: wrap;
+      padding: 8px 10px;
+    }
+    
+    .logo-text {
+      display: none;
+    }
+    
+    .topbar-controls {
+      flex: 1 1 100%;
+      order: 3;
+      margin-top: 8px;
+      justify-content: space-between;
+    }
+    
+    .input-group {
+      flex: 1;
+    }
+    
+    input[type="text"] {
+      min-width: 0;
+      flex: 1;
+    }
+    
+    .mobile-menu-btn {
+      display: block;
+    }
+    
     .sidebar {
       position: absolute;
       z-index: 100;
-      height: 100%;
+      height: calc(100% - 120px);
+      top: 60px;
       transform: translateX(-100%);
-      transition: transform 0.3s;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
     }
-
+    
     .sidebar.open {
       transform: translateX(0);
     }
-
-    .topbar-controls {
-      flex-wrap: wrap;
+    
+    .preview-panel {
+      position: absolute;
+      z-index: 90;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      border-left: none;
     }
+    
+    .preview-panel.open {
+      display: flex;
+    }
+    
+    .mobile-panel-toggle {
+      display: inline-flex;
+    }
+    
+    .editor-tabs {
+      padding: 0 4px;
+    }
+    
+    .tab {
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+    
+    .file-info {
+      max-width: 120px;
+      padding: 8px 6px;
+      font-size: 9px;
+    }
+    
+    .code-editor {
+      padding: 12px;
+      font-size: 12px;
+    }
+    
+    .bottom-bar {
+      padding: 6px 8px;
+    }
+    
+    .bottom-left, .bottom-right {
+      gap: 6px;
+    }
+  }
 
+  @media (max-width: 480px) {
+    .topbar {
+      padding: 6px 8px;
+    }
+    
+    .topbar-controls {
+      margin-top: 6px;
+    }
+    
+    .input-group {
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    
     input[type="text"] {
-      min-width: 140px;
+      min-width: 0;
+      width: 100%;
+    }
+    
+    button {
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+    
+    .editor-tabs {
+      gap: 0;
+    }
+    
+    .tab {
+      padding: 6px 8px;
+      font-size: 10px;
+    }
+    
+    .file-info {
+      display: none;
+    }
+    
+    .preview-header {
+      padding: 8px 10px;
+    }
+    
+    .preview-actions {
+      gap: 4px;
+    }
+    
+    .icon-btn {
+      padding: 3px 6px;
+      font-size: 10px;
+    }
+    
+    .bottom-bar {
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px;
+    }
+    
+    .bottom-left, .bottom-right {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 
@@ -498,12 +666,32 @@
     color: var(--text-muted);
     font-style: italic;
   }
+  
+  /* Overlay for mobile */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    display: none;
+  }
+  
+  .overlay.active {
+    display: block;
+  }
 </style>
 </head>
 <body>
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+  
   <!-- Top Bar -->
   <div class="topbar">
     <div class="logo">
+      <button class="mobile-menu-btn" id="menuBtn">☰</button>
       <div class="logo-icon">⚡</div>
       <div class="logo-text">GH<span>/</span>Explorer</div>
     </div>
@@ -519,7 +707,7 @@
   <!-- Main Container -->
   <div class="main-container">
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-title">Files</div>
         <div class="path-display" id="pathDisplay">/</div>
@@ -533,6 +721,7 @@
     <div class="content-area">
       <!-- Editor Tabs -->
       <div class="editor-tabs">
+        <button class="mobile-panel-toggle" id="previewToggle">📱 Preview</button>
         <button class="tab active" data-lang="html">index.html</button>
         <button class="tab" data-lang="css">style.css</button>
         <button class="tab" data-lang="js">script.js</button>
@@ -554,7 +743,7 @@
     </div>
 
     <!-- Preview Panel -->
-    <div class="preview-panel">
+    <div class="preview-panel" id="previewPanel">
       <div class="preview-header">
         <div class="preview-title">Live Preview</div>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -562,6 +751,7 @@
           <div class="preview-actions">
             <button class="icon-btn" id="downloadBtn">⬇ Save</button>
             <button class="icon-btn" id="fullscreenBtn">⛶ Full</button>
+            <button class="mobile-panel-toggle" id="editorToggle">✏️ Editor</button>
           </div>
         </div>
       </div>
@@ -587,7 +777,11 @@ const state = {
   repo: '',
   branch: 'main',
   autoPreview: true,
-  files: { html: '', css: '', js: '' }
+  files: { html: '', css: '', js: '' },
+  mobile: {
+    sidebarOpen: false,
+    previewOpen: false
+  }
 };
 
 // Elements
@@ -608,6 +802,46 @@ const autoPreviewBtn = $('autoPreviewBtn');
 const applyBtn = $('applyBtn');
 const downloadBtn = $('downloadBtn');
 const fullscreenBtn = $('fullscreenBtn');
+const sidebar = $('sidebar');
+const previewPanel = $('previewPanel');
+const menuBtn = $('menuBtn');
+const previewToggle = $('previewToggle');
+const editorToggle = $('editorToggle');
+const overlay = $('overlay');
+
+// Check if mobile
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
+// Toggle sidebar on mobile
+function toggleSidebar() {
+  if (!isMobile()) return;
+  
+  state.mobile.sidebarOpen = !state.mobile.sidebarOpen;
+  sidebar.classList.toggle('open', state.mobile.sidebarOpen);
+  overlay.classList.toggle('active', state.mobile.sidebarOpen);
+}
+
+// Toggle preview panel on mobile
+function togglePreviewPanel() {
+  if (!isMobile()) return;
+  
+  state.mobile.previewOpen = !state.mobile.previewOpen;
+  previewPanel.classList.toggle('open', state.mobile.previewOpen);
+  overlay.classList.toggle('active', state.mobile.previewOpen);
+}
+
+// Close mobile panels when clicking overlay
+overlay.addEventListener('click', () => {
+  if (isMobile()) {
+    sidebar.classList.remove('open');
+    previewPanel.classList.remove('open');
+    overlay.classList.remove('active');
+    state.mobile.sidebarOpen = false;
+    state.mobile.previewOpen = false;
+  }
+});
 
 // Tabs
 const tabs = document.querySelectorAll('.tab');
@@ -678,7 +912,13 @@ async function loadRepos() {
       const item = document.createElement('div');
       item.className = 'tree-item repo';
       item.textContent = `📦 ${repo.name}`;
-      item.onclick = () => loadRepo(repo.name, repo.default_branch || 'main');
+      item.onclick = () => {
+        loadRepo(repo.name, repo.default_branch || 'main');
+        // Close sidebar on mobile after selection
+        if (isMobile()) {
+          toggleSidebar();
+        }
+      };
       treeView.appendChild(item);
     });
 
@@ -743,7 +983,13 @@ function renderTree(items, owner, repo, container = treeView) {
         }
       };
     } else {
-      el.onclick = () => loadFile(item);
+      el.onclick = () => {
+        loadFile(item);
+        // Close sidebar on mobile after selection
+        if (isMobile()) {
+          toggleSidebar();
+        }
+      };
     }
 
     container.appendChild(el);
@@ -875,6 +1121,11 @@ fullscreenBtn.addEventListener('click', () => {
   }
 });
 
+// Mobile controls
+menuBtn.addEventListener('click', toggleSidebar);
+previewToggle.addEventListener('click', togglePreviewPanel);
+editorToggle.addEventListener('click', togglePreviewPanel);
+
 function download(content, filename, mime) {
   const blob = new Blob([content], { type: mime });
   const a = document.createElement('a');
@@ -883,6 +1134,18 @@ function download(content, filename, mime) {
   a.click();
   URL.revokeObjectURL(a.href);
 }
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  // Close mobile panels when resizing to desktop
+  if (!isMobile()) {
+    sidebar.classList.remove('open');
+    previewPanel.classList.remove('open');
+    overlay.classList.remove('active');
+    state.mobile.sidebarOpen = false;
+    state.mobile.previewOpen = false;
+  }
+});
 
 // Initialize
 ownerInput.value = 'usernamegit';
