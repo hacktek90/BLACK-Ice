@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GitHub Multi‑File Fetcher</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f5f5f5;
+      --bg-alt: #ffffff;
+      --border: #e5e7eb;
+      --border-strong: #111827;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --radius: 10px;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      --font-mono: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: var(--font-sans);
+      color: var(--text);
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1040px;
+      background: var(--bg-alt);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.4fr);
+      gap: 12px;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      padding: 12px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel-header {
+      margin-bottom: 4px;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .panel-main-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .input-row {
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .input-prefix {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+      background: #ffffff;
+      color: var(--text);
+      font-family: var(--font-sans);
+    }
+
+    input::placeholder {
+      color: #9ca3af;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+    }
+
+    select {
+      padding-right: 28px;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #6b7280 50%),
+        linear-gradient(135deg, #6b7280 50%, transparent 50%);
+      background-position: calc(100% - 14px) 50%, calc(100% - 8px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      background-color: #ffffff;
+    }
+
+    .branch-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 6px;
+    }
+
+    .field-mini-hint {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 6px;
+      align-items: center;
+    }
+
+    .file-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    button {
+      cursor: pointer;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f3f4f6;
+      color: var(--text);
+      text-transform: none;
+      min-height: 40px;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    button:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #f9fafb;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: #f9fafb;
+    }
+
+    .btn-soft {
+      background: #f3f4f6;
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--muted);
+      padding-inline: 8px;
+      min-height: 0;
+    }
+
+    .status {
+      margin-top: 8px;
+      padding: 7px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: #f9fafb;
+      color: var(--muted);
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .status.success {
+      display: block;
+      border-color: #16a34a33;
+      background: #ecfdf3;
+      color: #166534;
+    }
+
+    .status.error {
+      display: block;
+      border-color: #dc262633;
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .status.info {
+      display: block;
+      border-color: #2563eb33;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .tabs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      background: #f3f4f6;
+      padding: 3px;
+      font-size: 12px;
+    }
+
+    .tab {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #d1d5db;
+    }
+
+    .tab.active {
+      background: #ffffff;
+      color: var(--text);
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    .tab.active .tab-dot {
+      background: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .preview-wrapper {
+      position: relative;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 380px;
+      border: none;
+      background: #ffffff;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      height: 320px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 8px 9px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #111827;
+      color: #e5e7eb;
+      outline: none;
+      resize: vertical;
+    }
+
+    textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    .file-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      background: #f9fafb;
+      color: var(--muted);
+    }
+
+    .loading-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-right-color: transparent;
+      margin-left: 6px;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive adjustments */
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      iframe {
+        height: 320px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 8px;
+      }
+      .app {
+        padding: 10px;
+      }
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .button-row {
+        flex-direction: column;
+      }
+      .button-row button {
+        width: 100%;
+        justify-content: center;
+      }
+      .branch-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      textarea {
+        height: 260px;
+      }
+      iframe {
+        height: 260px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-title {
+        font-size: 14px;
+      }
+      button {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="app-header">
+      <div class="brand">
+        <button class="btn-outline" type="button" onclick="goBack()">
+          ← Back
+        </button>
+        <div class="brand-mark">GH</div>
+        <div class="brand-text">
+          <div class="brand-title">Multi‑File Fetcher</div>
+          <div class="brand-subtitle">Load HTML, CSS, JS from GitHub</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        Simple GitHub sandbox
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- Left: Inputs -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Input</div>
+          <div class="panel-main-title">GitHub source</div>
+          <div class="panel-subtitle">Public repository, branch and file paths.</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Repository
+            <span class="field-hint">username/repo-name</span>
+          </div>
+          <div class="input-row">
+            <div class="input-prefix">github.com/</div>
+            <input
+              id="repoInput"
+              placeholder="user/repo"
+              value="username/your-repo"
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Branch
+            <span class="field-hint">select or type a branch</span>
+          </div>
+          <div class="branch-row">
+            <select id="branchSelect" onchange="syncBranchInputFromSelect()">
+              <option value="">Custom</option>
+              <option value="main" selected>main</option>
+              <option value="master">master</option>
+              <option value="gh-pages">gh-pages</option>
+            </select>
+            <input
+              id="branchInput"
+              placeholder="e.g. main, dev, feature-x"
+              value="main"
+            />
+          </div>
+          <div class="field-mini-hint">
+            Changing the dropdown updates the text. Typing a name switches to “Custom”.
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            File paths
+            <span class="field-hint">leave blank to skip a file</span>
+          </div>
+          <div class="file-list">
+            <div class="file-row">
+              <div class="file-label">HTML</div>
+              <input id="htmlInput" placeholder="index.html" value="index.html" />
+            </div>
+            <div class="file-row">
+              <div class="file-label">CSS</div>
+              <input id="cssInput" placeholder="style.css or css/main.css" />
+            </div>
+            <div class="file-row">
+              <div class="file-label">JS</div>
+              <input id="jsInput" placeholder="script.js or js/main.js" />
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn-primary" type="button" onclick="fetchAllFiles()">
+            Fetch files
+          </button>
+          <button class="btn-soft" type="button" onclick="downloadAll()">
+            Download files
+          </button>
+          <button class="btn-soft" type="button" onclick="clearAll()">
+            Clear
+          </button>
+        </div>
+
+        <div id="status" class="status"></div>
+      </div>
+
+      <!-- Right: Output -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Output</div>
+          <div class="panel-main-title">Preview and code</div>
+          <div class="panel-subtitle">Render and inspect the fetched files.</div>
+        </div>
+
+        <div class="tabs-row">
+          <div class="tabs">
+            <button class="tab active" type="button" onclick="switchTab('preview')">
+              <span class="tab-dot"></span>
+              Preview
+            </button>
+            <button class="tab" type="button" onclick="switchTab('html')">
+              <span class="tab-dot"></span>
+              HTML
+            </button>
+            <button class="tab" type="button" onclick="switchTab('css')">
+              <span class="tab-dot"></span>
+              CSS
+            </button>
+            <button class="tab" type="button" onclick="switchTab('js')">
+              <span class="tab-dot"></span>
+              JS
+            </button>
+          </div>
+
+          <!-- Fullscreen toggle visible on Preview tab -->
+          <button
+            class="btn-ghost"
+            type="button"
+            id="fullscreenToggle"
+            onclick="togglePreviewFullscreen()"
+          >
+            ⛶ Full screen
+          </button>
+        </div>
+
+        <div id="previewTab" class="tab-content active">
+          <div id="previewWrapper" class="preview-wrapper">
+            <iframe id="preview" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div id="htmlTab" class="tab-content">
+          <textarea id="htmlOutput" placeholder="HTML code will appear here..."></textarea>
+          <div class="file-info">
+            <span id="htmlSize">Size: -</span>
+            <span id="htmlLines">Lines: -</span>
+          </div>
+        </div>
+
+        <div id="cssTab" class="tab-content">
+          <textarea id="cssOutput" placeholder="CSS code will appear here..."></textarea>
+          <div class="file-info">
+            <span id="cssSize">Size: -</span>
+            <span id="cssLines">Lines: -</span>
+          </div>
+        </div>
+
+        <div id="jsTab" class="tab-content">
+          <textarea id="jsOutput" placeholder="JavaScript code will appear here..."></textarea>
+          <div class="file-info">
+            <span id="jsSize">Size: -</span>
+            <span id="jsLines">Lines: -</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let fetchedFiles = {
+      html: "",
+      css: "",
+      js: "",
+    };
+
+    function goBack() {
+      window.location.href = "https://black-ice-3dbk.onrender.com/webcompiller.html";
+    }
+
+    function syncBranchInputFromSelect() {
+      const select = document.getElementById("branchSelect");
+      const input = document.getElementById("branchInput");
+      if (select.value) {
+        input.value = select.value;
+      }
+    }
+
+    document.addEventListener("input", function (e) {
+      if (e.target.id === "branchInput") {
+        const select = document.getElementById("branchSelect");
+        select.value = "";
+      }
+    });
+
+    async function fetchAllFiles() {
+      const repo = document.getElementById("repoInput").value.trim();
+      const branch = document.getElementById("branchInput").value.trim() || "main";
+      const htmlPath = document.getElementById("htmlInput").value.trim();
+      const cssPath = document.getElementById("cssInput").value.trim();
+      const jsPath = document.getElementById("jsInput").value.trim();
+
+      if (!repo) {
+        showStatus("Please enter a repository name.", "error");
+        return;
+      }
+
+      if (!htmlPath && !cssPath && !jsPath) {
+        showStatus("Please enter at least one file path.", "error");
+        return;
+      }
+
+      showStatus(
+        'Fetching from ' + repo + ' @ ' + branch + ' … <span class="loading-dot"></span>',
+        "info"
+      );
+
+      let successCount = 0;
+      let errors = [];
+
+      if (htmlPath) {
+        try {
+          const html = await fetchFile(repo, branch, htmlPath);
+          fetchedFiles.html = html;
+          document.getElementById("htmlOutput").value = html;
+          updateFileInfo("html", html);
+          successCount++;
+        } catch (err) {
+          errors.push("HTML: " + err.message);
+          fetchedFiles.html = "";
+          document.getElementById("htmlOutput").value = "";
+          updateFileInfo("html", null);
+        }
+      }
+
+      if (cssPath) {
+        try {
+          const css = await fetchFile(repo, branch, cssPath);
+          fetchedFiles.css = css;
+          document.getElementById("cssOutput").value = css;
+          updateFileInfo("css", css);
+          successCount++;
+        } catch (err) {
+          errors.push("CSS: " + err.message);
+          fetchedFiles.css = "";
+          document.getElementById("cssOutput").value = "";
+          updateFileInfo("css", null);
+        }
+      }
+
+      if (jsPath) {
+        try {
+          const js = await fetchFile(repo, branch, jsPath);
+          fetchedFiles.js = js;
+          document.getElementById("jsOutput").value = js;
+          updateFileInfo("js", js);
+          successCount++;
+        } catch (err) {
+          errors.push("JS: " + err.message);
+          fetchedFiles.js = "";
+          document.getElementById("jsOutput").value = "";
+          updateFileInfo("js", null);
+        }
+      }
+
+      if (successCount > 0) {
+        let message = "Fetched " + successCount + " file(s).";
+        if (errors.length > 0) {
+          message += " Some errors: " + errors.join(", ");
+          showStatus(message, "info");
+        } else {
+          showStatus(message, "success");
+        }
+        updatePreview();
+      } else {
+        showStatus("Failed to fetch files: " + errors.join(", "), "error");
+      }
+    }
+
+    async function fetchFile(repo, branch, filePath) {
+      const url =
+        "https://raw.githubusercontent.com/" +
+        repo +
+        "/" +
+        branch +
+        "/" +
+        filePath;
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error("File not found or repository not public.");
+      }
+
+      return await res.text();
+    }
+
+    function updatePreview() {
+      const iframe = document.getElementById("preview");
+      let html =
+        fetchedFiles.html ||
+        "<!doctype html><html><head><title>Preview</title><style>body{margin:0;font-family:system-ui,sans-serif;background:#ffffff;color:#111827;display:flex;align-items:center;justify-content:center;height:100vh;}h1{font-size:18px;font-weight:500;color:#6b7280;}</style></head><body><h1>No HTML file loaded</h1></body></html>";
+
+      let modifiedHtml = html;
+
+      if (fetchedFiles.css) {
+        const cssTag = "<style>" + fetchedFiles.css + "</style>";
+        if (modifiedHtml.includes("</head>")) {
+          modifiedHtml = modifiedHtml.replace("</head>", cssTag + "</head>");
+        } else if (modifiedHtml.includes("<body")) {
+          modifiedHtml = modifiedHtml.replace(
+            "<body",
+            "<head>" + cssTag + "</head><body"
+          );
+        } else {
+          modifiedHtml = "<head>" + cssTag + "</head>" + modifiedHtml;
+        }
+      }
+
+      if (fetchedFiles.js) {
+        const jsTag = "<script>" + fetchedFiles.js + "<\/script>";
+        if (modifiedHtml.includes("</body>")) {
+          modifiedHtml = modifiedHtml.replace("</body>", jsTag + "</body>");
+        } else {
+          modifiedHtml = modifiedHtml + jsTag;
+        }
+      }
+
+      iframe.srcdoc = modifiedHtml;
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll(".tab").forEach((t) =>
+        t.classList.remove("active")
+      );
+      document.querySelectorAll(".tab-content").forEach((c) =>
+        c.classList.remove("active")
+      );
+
+      const tabs = ["preview", "html", "css", "js"];
+      const index = tabs.indexOf(tab);
+      document.querySelectorAll(".tab")[index].classList.add("active");
+      document.getElementById(tab + "Tab").classList.add("active");
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById("status");
+      status.innerHTML = message;
+      status.className = "status " + type;
+    }
+
+    function updateFileInfo(type, code) {
+      const prefix = type;
+      if (!code) {
+        document.getElementById(prefix + "Size").textContent = "Size: -";
+        document.getElementById(prefix + "Lines").textContent = "Lines: -";
+        return;
+      }
+
+      const size = new Blob([code]).size;
+      const sizeStr =
+        size < 1024 ? size + " B" : (size / 1024).toFixed(2) + " KB";
+      const lines = code.split("\n").length;
+
+      document.getElementById(prefix + "Size").textContent =
+        "Size: " + sizeStr;
+      document.getElementById(prefix + "Lines").textContent =
+        "Lines: " + lines;
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type: type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadAll() {
+      let downloaded = 0;
+
+      if (fetchedFiles.html) {
+        downloadFile(fetchedFiles.html, "index.html", "text/html");
+        downloaded++;
+      }
+      if (fetchedFiles.css) {
+        downloadFile(fetchedFiles.css, "style.css", "text/css");
+        downloaded++;
+      }
+      if (fetchedFiles.js) {
+        downloadFile(fetchedFiles.js, "script.js", "text/javascript");
+        downloaded++;
+      }
+
+      if (downloaded > 0) {
+        showStatus("Downloaded " + downloaded + " file(s).", "success");
+      } else {
+        showStatus("No files to download.", "error");
+      }
+    }
+
+    function clearAll() {
+      fetchedFiles = { html: "", css: "", js: "" };
+      document.getElementById("htmlOutput").value = "";
+      document.getElementById("cssOutput").value = "";
+      document.getElementById("jsOutput").value = "";
+      document.getElementById("preview").srcdoc = "";
+      updateFileInfo("html", null);
+      updateFileInfo("css", null);
+      updateFileInfo("js", null);
+      showStatus("Cleared.", "success");
+    }
+
+    // Fullscreen toggle for preview
+    function togglePreviewFullscreen() {
+      const wrapper = document.getElementById("previewWrapper");
+      const btn = document.getElementById("fullscreenToggle");
+
+      const isFullscreen =
+        document.fullscreenElement === wrapper ||
+        document.webkitFullscreenElement === wrapper ||
+        document.mozFullScreenElement === wrapper ||
+        document.msFullscreenElement === wrapper;
+
+      if (!isFullscreen) {
+        if (wrapper.requestFullscreen) {
+          wrapper.requestFullscreen();
+        } else if (wrapper.webkitRequestFullscreen) {
+          wrapper.webkitRequestFullscreen();
+        } else if (wrapper.mozRequestFullScreen) {
+          wrapper.mozRequestFullScreen();
+        } else if (wrapper.msRequestFullscreen) {
+          wrapper.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener("fullscreenchange", updateFullscreenButtonText);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenButtonText);
+    document.addEventListener("mozfullscreenchange", updateFullscreenButtonText);
+    document.addEventListener("MSFullscreenChange", updateFullscreenButtonText);
+
+    function updateFullscreenButtonText() {
+      const wrapper = document.getElementById("previewWrapper");
+      const btn = document.getElementById("fullscreenToggle");
+
+      const isFullscreen =
+        document.fullscreenElement === wrapper ||
+        document.webkitFullscreenElement === wrapper ||
+        document.mozFullScreenElement === wrapper ||
+        document.msFullscreenElement === wrapper;
+
+      btn.textContent = isFullscreen ? "Exit full screen" : "⛶ Full screen";
+    }
+
+    // Allow Enter key to fetch
+    document
+      .getElementById("htmlInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") fetchAllFiles();
+      });
+    document
+      .getElementById("cssInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") fetchAllFiles();
+      });
+    document
+      .getElementById("jsInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") fetchAllFiles();
+      });
+  </script>
+</body>
+</html>
