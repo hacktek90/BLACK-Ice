@@ -1,227 +1,249 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HTML Submit Portal</title>
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 0; background: #f9f9fb; color: #222; }
-    header { background: #111; color: #fff; padding: 0.7em 1em; display: flex; align-items: center; justify-content: space-between; }
-    h1 { font-size: 1.2em; margin: 0; }
-    main { padding: 1em; display: flex; flex-direction: column; gap: 1em; }
-    input, button { font: inherit; padding: 0.5em; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
-    button { cursor: pointer; background: #111; color: white; border: none; }
-    button:hover { background: #333; }
-    .editor { height: 300px; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
-    .project-list { display: flex; flex-direction: column; gap: 1em; overflow-y: auto; max-height: 80vh; }
-    .card { background: white; padding: 1em; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    dialog { border: none; border-radius: 10px; width: 90%; max-width: 900px; padding: 0; }
-    dialog header { padding: 0.5em 1em; background: #111; color: white; display: flex; justify-content: space-between; align-items: center; }
-    dialog main { padding: 0; }
-    #adminEditor { height: 400px; }
-    .dialog-btns { display: flex; gap: 0.5em; margin-right: 1em; }
-    .row { display: flex; align-items: center; gap: 0.5em; margin-top: 0.3em; }
-    .row span { font-weight: 600; width: 100px; flex-shrink: 0; }
-    .small-btn { background: #ddd; color: #000; border: none; border-radius: 6px; padding: 0.3em 0.6em; cursor: pointer; font-size: 0.8em; }
-    .small-btn:hover { background: #ccc; }
-    img.favicon { width: 24px; height: 24px; border-radius: 4px; vertical-align: middle; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HTML Submit Portal</title>
+<style>
+body { font-family: system-ui, sans-serif; margin: 0; background: #f9f9fb; color: #222; }
+header { background: #111; color: #fff; padding: 0.7em 1em; display: flex; align-items: center; justify-content: space-between; }
+h1 { font-size: 1.2em; margin: 0; }
+main { padding: 1em; display: flex; flex-direction: column; gap: 1em; }
+input, button { font: inherit; padding: 0.5em; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
+button { cursor: pointer; background: #111; color: white; border: none; }
+button:hover { background: #333; }
+.editor { height: 300px; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
+.project-list { display: flex; flex-direction: column; gap: 1em; overflow-y: auto; max-height: 80vh; }
+.card { background: white; padding: 1em; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+dialog { border: none; border-radius: 10px; width: 90%; max-width: 900px; padding: 0; }
+dialog header { padding: 0.5em 1em; background: #111; color: white; display: flex; justify-content: space-between; align-items: center; }
+dialog main { padding: 0; }
+#adminEditor { height: 400px; }
+.dialog-btns { display: flex; gap: 0.5em; margin-right: 1em; }
+.row { display: flex; align-items: center; gap: 0.5em; margin-top: 0.3em; }
+.row span { font-weight: 600; width: 100px; flex-shrink: 0; }
+.small-btn { background: #ddd; color: #000; border: none; border-radius: 6px; padding: 0.3em 0.6em; cursor: pointer; font-size: 0.8em; }
+.small-btn:hover { background: #ccc; }
+img.favicon { width: 24px; height: 24px; border-radius: 4px; vertical-align: middle; }
 
-  <!-- Monaco Editor Loader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+/* Preview Dialog Styles */
+#previewDialog { max-width: 95%; width: 1200px; height: 90vh; }
+#previewFrame { width: 100%; height: calc(100% - 60px); border: none; background: white; }
+.preview-header { background: #1976d2; }
+.action-btn { background: #1976d2; }
+.action-btn:hover { background: #1565c0; }
+.delete-btn { background: #b71c1c !important; }
+.delete-btn:hover { background: #9a0007 !important; }
+</style>
+<!-- Monaco Editor Loader -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+const firebaseConfig = {
+apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+authDomain: "h-90-8a7c5.firebaseapp.com",
+databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+projectId: "h-90-8a7c5",
+storageBucket: "h-90-8a7c5.firebasestorage.app",
+messagingSenderId: "367196609301",
+appId: "1:367196609301:web:156e24c1b4532c26af671c",
+measurementId: "G-W5K7F4VQGP"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+window.onload = () => {
+const params = new URLSearchParams(location.search);
+const isAdmin = params.get("admin") === "elite";
+const form = document.getElementById("submitForm");
+const adminPortal = document.getElementById("adminPortal");
+const projectList = document.getElementById("projectList");
+const dialog = document.getElementById("viewDialog");
+const previewDialog = document.getElementById("previewDialog");
+const closeBtn = document.getElementById("closeDialog");
+const closePreviewBtn = document.getElementById("closePreview");
+let adminEditor;
+require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs" } });
+if (isAdmin) {
+form.style.display = "none";
+adminPortal.style.display = "block";
+const projRef = ref(db, "projects/");
+onValue(projRef, snap => {
+projectList.innerHTML = "";
+snap.forEach(child => {
+const val = child.val();
+const div = document.createElement("div");
+div.className = "card";
+div.innerHTML = `
+<div class="row"><span>Title:</span> <div>${val.title || "-"}</div>
+<button class="small-btn copy" data-copy="${val.title || ''}">Copy</button>
+</div>
+<div class="row"><span>Description:</span> <div>${val.description || "-"}</div>
+<button class="small-btn copy" data-copy="${val.description || ''}">Copy</button>
+</div>
+<div class="row"><span>Favicon:</span>
+<img src="${val.favicon || ''}" class="favicon" onerror="this.style.display='none'">
+<button class="small-btn view-favicon" data-link="${val.favicon || ''}">View</button>
+<button class="small-btn copy" data-copy="${val.favicon || ''}">Copy Link</button>
+</div>
+<div class="row"><span>Author:</span> <div>${val.author || "-"}</div></div>
+<div style="margin-top:0.5em; display: flex; gap: 0.5em;">
+<button data-id="${child.key}" class="preview action-btn">🔍 Preview</button>
+<button data-id="${child.key}" class="open">View Code</button>
+<button data-id="${child.key}" class="delete delete-btn">Delete</button>
+</div>
+`;
+projectList.appendChild(div);
+});
+// Copy buttons
+projectList.querySelectorAll(".copy").forEach(btn => {
+btn.onclick = () => {
+navigator.clipboard.writeText(btn.dataset.copy || "");
+alert("Copied!");
+};
+});
+// View favicon
+projectList.querySelectorAll(".view-favicon").forEach(btn => {
+btn.onclick = () => {
+if (!btn.dataset.link) return alert("No favicon provided.");
+window.open(btn.dataset.link, "_blank");
+};
+});
+// Preview HTML in iframe
+projectList.querySelectorAll(".preview").forEach(btn => {
+btn.onclick = () => {
+const project = snap.child(btn.dataset.id).val();
+const htmlCode = project.html || "";
+const previewFrame = document.getElementById("previewFrame");
+const previewTitle = document.getElementById("previewTitle");
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+// Update dialog title
+previewTitle.textContent = `Preview: ${project.title || "Untitled"}`;
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-      authDomain: "h-90-8a7c5.firebaseapp.com",
-      databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-      projectId: "h-90-8a7c5",
-      storageBucket: "h-90-8a7c5.firebasestorage.app",
-      messagingSenderId: "367196609301",
-      appId: "1:367196609301:web:156e24c1b4532c26af671c",
-      measurementId: "G-W5K7F4VQGP"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    window.onload = () => {
-      const params = new URLSearchParams(location.search);
-      const isAdmin = params.get("admin") === "elite";
-      const form = document.getElementById("submitForm");
-      const adminPortal = document.getElementById("adminPortal");
-      const projectList = document.getElementById("projectList");
-      const dialog = document.getElementById("viewDialog");
-      const closeBtn = document.getElementById("closeDialog");
-      let adminEditor;
-
-      require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs" } });
-
-      if (isAdmin) {
-        form.style.display = "none";
-        adminPortal.style.display = "block";
-
-        const projRef = ref(db, "projects/");
-        onValue(projRef, snap => {
-          projectList.innerHTML = "";
-          snap.forEach(child => {
-            const val = child.val();
-            const div = document.createElement("div");
-            div.className = "card";
-            div.innerHTML = `
-              <div class="row"><span>Title:</span> <div>${val.title || "-"}</div> 
-                <button class="small-btn copy" data-copy="${val.title || ''}">Copy</button>
-              </div>
-
-              <div class="row"><span>Description:</span> <div>${val.description || "-"}</div> 
-                <button class="small-btn copy" data-copy="${val.description || ''}">Copy</button>
-              </div>
-
-              <div class="row"><span>Favicon:</span> 
-                <img src="${val.favicon || ''}" class="favicon" onerror="this.style.display='none'">
-                <button class="small-btn view-favicon" data-link="${val.favicon || ''}">View</button>
-                <button class="small-btn copy" data-copy="${val.favicon || ''}">Copy Link</button>
-              </div>
-
-              <div class="row"><span>Author:</span> <div>${val.author || "-"}</div></div>
-
-              <div style="margin-top:0.5em;">
-                <button data-id="${child.key}" class="open">View Code</button>
-                <button data-id="${child.key}" class="delete" style="background:#b71c1c;">Delete</button>
-              </div>
-            `;
-            projectList.appendChild(div);
-          });
-
-          // Copy buttons
-          projectList.querySelectorAll(".copy").forEach(btn => {
-            btn.onclick = () => {
-              navigator.clipboard.writeText(btn.dataset.copy || "");
-              alert("Copied!");
-            };
-          });
-
-          // View favicon
-          projectList.querySelectorAll(".view-favicon").forEach(btn => {
-            btn.onclick = () => {
-              if (!btn.dataset.link) return alert("No favicon provided.");
-              window.open(btn.dataset.link, "_blank");
-            };
-          });
-
-          // Open Monaco code viewer
-          projectList.querySelectorAll(".open").forEach(btn => {
-            btn.onclick = () => {
-              const project = snap.child(btn.dataset.id).val();
-              dialog.showModal();
-
-              // Load Monaco once
-              if (!adminEditor) {
-                require(["vs/editor/editor.main"], () => {
-                  adminEditor = monaco.editor.create(document.getElementById("adminEditor"), {
-                    value: project.html || "",
-                    language: "html",
-                    theme: "vs-dark",
-                    readOnly: true,
-                    automaticLayout: true
-                  });
-                });
-              } else {
-                adminEditor.setValue(project.html || "");
-              }
-
-              // Copy + Download
-              document.getElementById("copyBtn").onclick = () => {
-                navigator.clipboard.writeText(adminEditor.getValue());
-                alert("Copied to clipboard!");
-              };
-              document.getElementById("downloadBtn").onclick = () => {
-                const blob = new Blob([adminEditor.getValue()], { type: "text/html" });
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `${project.title || "submission"}.html`;
-                a.click();
-              };
-            };
-          });
-
-          // Delete submission
-          projectList.querySelectorAll(".delete").forEach(btn => {
-            btn.onclick = () => {
-              if (confirm("Delete this submission?")) remove(ref(db, "projects/" + btn.dataset.id));
-            };
-          });
-        });
-
-        closeBtn.onclick = () => dialog.close();
-
-      } else {
-        // Normal user submission form
-        let editor;
-        require(["vs/editor/editor.main"], () => {
-          editor = monaco.editor.create(document.getElementById("editor"), {
-            value: "<!DOCTYPE html>\n<html>\n<head>\n<title>My Project</title>\n</head>\n<body>\nHello world\n</body>\n</html>",
-            language: "html",
-            theme: "vs-dark",
-            automaticLayout: true
-          });
-        });
-
-        form.onsubmit = e => {
-          e.preventDefault();
-          const data = {
-            title: form.title.value,
-            favicon: form.favicon.value,
-            description: form.description.value,
-            author: form.author.value,
-            html: editor.getValue()
-          };
-          push(ref(db, "projects/"), data);
-          alert("Submitted!");
-          form.reset();
-        };
-      }
-    };
-  </script>
+// Create blob URL for secure preview
+const blob = new Blob([htmlCode], { type: 'text/html' });
+const blobURL = URL.createObjectURL(blob);
+previewFrame.src = blobURL;
+previewDialog.showModal();
+// Clean up blob URL when dialog closes
+previewDialog.addEventListener('close', () => {
+URL.revokeObjectURL(blobURL);
+previewFrame.src = 'about:blank';
+}, { once: true });
+};
+});
+// Open Monaco code viewer
+projectList.querySelectorAll(".open").forEach(btn => {
+btn.onclick = () => {
+const project = snap.child(btn.dataset.id).val();
+dialog.showModal();
+// Load Monaco once
+if (!adminEditor) {
+require(["vs/editor/editor.main"], () => {
+adminEditor = monaco.editor.create(document.getElementById("adminEditor"), {
+value: project.html || "",
+language: "html",
+theme: "vs-dark",
+readOnly: true,
+automaticLayout: true
+});
+});
+} else {
+adminEditor.setValue(project.html || "");
+}
+// Copy + Download
+document.getElementById("copyBtn").onclick = () => {
+navigator.clipboard.writeText(adminEditor.getValue());
+alert("Copied to clipboard!");
+};
+document.getElementById("downloadBtn").onclick = () => {
+const blob = new Blob([adminEditor.getValue()], { type: "text/html" });
+const a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = `${project.title || "submission"}.html`;
+a.click();
+};
+};
+});
+// Delete submission
+projectList.querySelectorAll(".delete").forEach(btn => {
+btn.onclick = () => {
+if (confirm("Delete this submission?")) remove(ref(db, "projects/" + btn.dataset.id));
+};
+});
+});
+closeBtn.onclick = () => dialog.close();
+closePreviewBtn.onclick = () => previewDialog.close();
+} else {
+// Normal user submission form
+let editor;
+require(["vs/editor/editor.main"], () => {
+editor = monaco.editor.create(document.getElementById("editor"), {
+value: "<!DOCTYPE html>\n<html>\n<head>\n<title>My Project</title>\n</head>\n<body>\nHello world\n</body>\n</html>",
+language: "html",
+theme: "vs-dark",
+automaticLayout: true
+});
+});
+form.onsubmit = e => {
+e.preventDefault();
+const data = {
+title: form.title.value,
+favicon: form.favicon.value,
+description: form.description.value,
+author: form.author.value,
+html: editor.getValue()
+};
+push(ref(db, "projects/"), data);
+alert("Submitted!");
+form.reset();
+};
+}
+};
+</script>
 </head>
 <body>
-  <header><h1>HTML Submit Portal</h1></header>
-
-  <main>
-    <!-- User Form -->
-    <form id="submitForm">
-      <input name="author" placeholder="Your Name" required>
-      <input name="title" placeholder="Page Title" required>
-      <input name="favicon" placeholder="Favicon URL">
-      <input name="description" placeholder="Description">
-      <div id="editor" class="editor"></div>
-      <button type="submit">Submit</button>
-      <p>Not having a favicon url use <a href="https://imgbb.com/">imgbb.com</a> </p>
-    </form>
-
-    <!-- Admin Portal -->
-    <section id="adminPortal" style="display:none;">
-      <h2>Admin Portal</h2>
-      <div id="projectList" class="project-list"></div>
-    </section>
-
-    <!-- Dialog for Admin Code Viewer -->
-    <dialog id="viewDialog">
-      <header>
-        <span>Submission Viewer</span>
-        <div class="dialog-btns">
-          <button id="copyBtn">📋 Copy</button>
-          <button id="downloadBtn">💾 Download</button>
-          <button id="closeDialog">✖ Close</button>
-        </div>
-      </header>
-      <main><div id="adminEditor"></div></main>
-    </dialog>
-  </main>
+<header><h1>HTML Submit Portal</h1></header>
+<main>
+<!-- User Form -->
+<form id="submitForm">
+<input name="author" placeholder="Your Name" required>
+<input name="title" placeholder="Page Title" required>
+<input name="favicon" placeholder="Favicon URL">
+<input name="description" placeholder="Description">
+<div id="editor" class="editor"></div>
+<button type="submit">Submit</button>
+<p>Not having a favicon url use <a href="https://imgbb.com/">imgbb.com</a> </p>
+</form>
+<!-- Admin Portal -->
+<section id="adminPortal" style="display:none;">
+<h2>Admin Portal</h2>
+<div id="projectList" class="project-list"></div>
+</section>
+<!-- Dialog for Admin Code Viewer -->
+<dialog id="viewDialog">
+<header>
+<span>Submission Viewer</span>
+<div class="dialog-btns">
+<button id="copyBtn">📋 Copy</button>
+<button id="downloadBtn">💾 Download</button>
+<button id="closeDialog">✖ Close</button>
+</div>
+</header>
+<main><div id="adminEditor"></div></main>
+</dialog>
+<!-- Dialog for HTML Preview -->
+<dialog id="previewDialog">
+<header class="preview-header">
+<span id="previewTitle">HTML Preview</span>
+<button id="closePreview">✖ Close</button>
+</div>
+</header>
+<main>
+<iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"></iframe>
+</main>
+</dialog>
+</main>
 </body>
 </html>
