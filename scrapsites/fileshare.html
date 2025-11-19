@@ -4,156 +4,145 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>File Share</title>
-
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Poppins', sans-serif;
-        height: 100vh;
-        overflow: auto;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  overflow: auto;
+}
 
-    .wrapper {
-        position: relative; /* needed so the button can overlay inside this box */
-        width: 100%;
-        height: 100vh;
-    }
+.wrapper {
+  position: relative; /* needed so the buttons can overlay inside this box */
+  width: 100%;
+  height: 100vh;
+}
 
-    iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
-    }
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
 
-    /* Scan QR overlay button (top-left) */
-    #scanBtn {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        z-index: 10;
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: 600;
-        background: #0078ff;
-        color: white;
-    }
+/* Container for the top-left buttons */
+.top-buttons {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
 
-    /* Bar below iframe for Open Link (not overlayed) */
-    .bottom-bar {
-        width: 100%;
-        padding: 16px 10px;
-        background: #ffffff;
-        border-top: 2px solid #eee;
-        text-align: center;
-    }
+/* Scan QR button */
+#scanBtn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  background: #0078ff;
+  color: white;
+}
 
-    #openBtn {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: 600;
-        background: #18a300;
-        color: white;
-        display: none; /* shown after successful scan */
-    }
+/* Open Link button (starts hidden, appears after scan) */
+#openBtn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  background: #18a300;
+  color: white;
+  display: none; /* shown after successful scan */
+}
 
-    /* QR scanner popup */
-    #scannerPopup {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.85);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 20;
-        flex-direction: column;
-    }
+/* QR scanner popup */
+#scannerPopup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  flex-direction: column;
+}
 
-    #qr-reader {
-        width: 320px;
-        border-radius: 10px;
-        background: #fff;
-    }
+#qr-reader {
+  width: 320px;
+  border-radius: 10px;
+  background: #fff;
+}
 
-    #closeScanner {
-        margin-top: 15px;
-        padding: 8px 14px;
-        background: #ff4444;
-        color: white;
-        border-radius: 6px;
-        cursor: pointer;
-        border: none;
-        font-weight: 600;
-    }
+#closeScanner {
+  margin-top: 15px;
+  padding: 8px 14px;
+  background: #ff4444;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+}
 </style>
 </head>
 <body>
-
 <!-- Scanner Popup -->
 <div id="scannerPopup">
-    <div id="qr-reader"></div>
-    <button id="closeScanner">Close</button>
+  <div id="qr-reader"></div>
+  <button id="closeScanner">Close</button>
 </div>
 
 <div class="wrapper">
-    <iframe src="https://file.pizza"></iframe>
+  <iframe src="https://file.pizza"></iframe>
 
-    <!-- Only this button overlays on top-left of iframe -->
+  <!-- Both buttons overlay at top-left -->
+  <div class="top-buttons">
     <button id="scanBtn">Scan QR</button>
-</div>
-
-<!-- Non-overlay bar below iframe -->
-<div class="bottom-bar">
     <button id="openBtn">Open Link</button>
+  </div>
 </div>
 
 <!-- QR Scanner Library -->
 <script src="https://unpkg.com/html5-qrcode"></script>
-
 <script>
-    let scannedLink = "";
+let scannedLink = "";
+const scanBtn = document.getElementById("scanBtn");
+const openBtn = document.getElementById("openBtn");
+const scannerPopup = document.getElementById("scannerPopup");
+const closeScanner = document.getElementById("closeScanner");
 
-    const scanBtn = document.getElementById("scanBtn");
-    const openBtn = document.getElementById("openBtn");
-    const scannerPopup = document.getElementById("scannerPopup");
-    const closeScanner = document.getElementById("closeScanner");
+scanBtn.onclick = () => {
+  scannerPopup.style.display = "flex";
+  const qrReader = new Html5Qrcode("qr-reader");
+  qrReader.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    (decodedText) => {
+      scannedLink = decodedText;
+      openBtn.style.display = "inline-block"; // show beside Scan QR
+      qrReader.stop();
+      scannerPopup.style.display = "none";
+    }
+  );
+};
 
-    scanBtn.onclick = () => {
-        scannerPopup.style.display = "flex";
+openBtn.onclick = () => {
+  if (scannedLink) {
+    window.open(scannedLink, "_blank");
+  }
+};
 
-        const qrReader = new Html5Qrcode("qr-reader");
-
-        qrReader.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            (decodedText) => {
-                scannedLink = decodedText;
-                openBtn.style.display = "inline-block";
-                qrReader.stop();
-                scannerPopup.style.display = "none";
-            }
-        );
-    };
-
-    openBtn.onclick = () => {
-        if (scannedLink) {
-            window.open(scannedLink, "_blank");
-        }
-    };
-
-    closeScanner.onclick = () => {
-        scannerPopup.style.display = "none";
-    };
+closeScanner.onclick = () => {
+  scannerPopup.style.display = "none";
+};
 </script>
-
 </body>
 </html>
