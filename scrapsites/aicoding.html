@@ -35,92 +35,29 @@ align-items: center;
 gap: 12px;
 }
 header h1 { font-size: 16px; font-weight: 600; }
-
-/* Multi-Select Dropdown */
+/* Single Select Dropdown */
 .model-selector {
-position: relative;
 min-width: 280px;
 }
-.model-display {
+.model-select {
 border: 1px solid #e5e5e5;
 border-radius: 6px;
 padding: 8px 12px;
 font-size: 13px;
 background: #fff;
 cursor: pointer;
-display: flex;
-justify-content: space-between;
-align-items: center;
-gap: 8px;
-user-select: none;
+width: 100%;
+outline: none;
+font-family: inherit;
 }
-.model-display:hover {
+.model-select:hover {
 background: #f9f9f9;
+border-color: #1a1a1a;
 }
-.model-display-text {
-flex: 1;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
+.model-select:focus {
+border-color: #1a1a1a;
+box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
 }
-.model-display-arrow {
-font-size: 10px;
-transition: transform 0.2s;
-}
-.model-display-arrow.open {
-transform: rotate(180deg);
-}
-.model-dropdown {
-position: absolute;
-top: 100%;
-left: 0;
-right: 0;
-margin-top: 4px;
-background: #fff;
-border: 1px solid #e5e5e5;
-border-radius: 6px;
-box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-max-height: 300px;
-overflow-y: auto;
-z-index: 100;
-display: none;
-}
-.model-dropdown.open {
-display: block;
-}
-.model-option {
-padding: 10px 12px;
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 8px;
-font-size: 13px;
-transition: background 0.15s;
-}
-.model-option:hover {
-background: #f5f5f5;
-}
-.model-option.select-all {
-border-bottom: 1px solid #e5e5e5;
-font-weight: 600;
-background: #f9f9f9;
-}
-.model-option input[type="checkbox"] {
-cursor: pointer;
-}
-.model-option-label {
-flex: 1;
-cursor: pointer;
-}
-.model-count {
-background: #1a1a1a;
-color: #fff;
-padding: 2px 8px;
-border-radius: 12px;
-font-size: 11px;
-font-weight: 600;
-}
-
 /* Chat Area */
 #chat {
 flex: 1;
@@ -381,36 +318,13 @@ header { flex-direction: column; gap: 12px; align-items: stretch; }
 <header>
 <h1>AI Chat with Code Tools</h1>
 <div class="model-selector">
-<div class="model-display" id="modelDisplay">
-<span class="model-display-text" id="modelDisplayText">Select models...</span>
-<span class="model-display-arrow" id="modelArrow">▼</span>
-</div>
-<div class="model-dropdown" id="modelDropdown">
-<div class="model-option select-all">
-<input type="checkbox" id="selectAll" />
-<label for="selectAll" class="model-option-label">Select All Models</label>
-</div>
-<div class="model-option">
-<input type="checkbox" class="model-checkbox" value="gemini-2.0-flash" id="model1" checked />
-<label for="model1" class="model-option-label">Gemini 2.0 Flash • 1M in / 8K out</label>
-</div>
-<div class="model-option">
-<input type="checkbox" class="model-checkbox" value="claude-sonnet-4" id="model2" />
-<label for="model2" class="model-option-label">Claude Sonnet 4 • 200K in / 64K out</label>
-</div>
-<div class="model-option">
-<input type="checkbox" class="model-checkbox" value="grok-beta" id="model3" />
-<label for="model3" class="model-option-label">Grok Beta • 128K in / 8K out</label>
-</div>
-<div class="model-option">
-<input type="checkbox" class="model-checkbox" value="deepseek-reasoner" id="model4" />
-<label for="model4" class="model-option-label">DeepSeek Reasoner • 64K in / 8K out</label>
-</div>
-<div class="model-option">
-<input type="checkbox" class="model-checkbox" value="deepseek-chat" id="model5" />
-<label for="model5" class="model-option-label">DeepSeek Chat • 64K in / 8K out</label>
-</div>
-</div>
+<select id="modelSelect" class="model-select">
+<option value="gemini-2.0-flash">Gemini 2.0 Flash • 1M in / 8K out</option>
+<option value="claude-sonnet-4">Claude Sonnet 4 • 200K in / 64K out</option>
+<option value="grok-beta">Grok Beta • 128K in / 8K out</option>
+<option value="deepseek-reasoner">DeepSeek Reasoner • 64K in / 8K out</option>
+<option value="deepseek-chat">DeepSeek Chat • 64K in / 8K out</option>
+</select>
 </div>
 </header>
 <div id="chat"></div>
@@ -445,21 +359,14 @@ header { flex-direction: column; gap: 12px; align-items: stretch; }
 const chat = document.getElementById('chat');
 const input = document.getElementById('input');
 const send = document.getElementById('send');
-const modelDisplay = document.getElementById('modelDisplay');
-const modelDisplayText = document.getElementById('modelDisplayText');
-const modelArrow = document.getElementById('modelArrow');
-const modelDropdown = document.getElementById('modelDropdown');
-const selectAllCheckbox = document.getElementById('selectAll');
-const modelCheckboxes = document.querySelectorAll('.model-checkbox');
+const modelSelect = document.getElementById('modelSelect');
 const previewModal = document.getElementById('previewModal');
 const previewFrame = document.getElementById('previewFrame');
 const editorModal = document.getElementById('editorModal');
 const editorTextarea = document.getElementById('editorTextarea');
 const editorTitle = document.getElementById('editorTitle');
-
 let currentEditingBlock = null;
-let conversationHistory = {};
-
+let conversationHistory = [];
 const MODEL_NAMES = {
 'gemini-2.0-flash': 'Gemini 2.0 Flash',
 'claude-sonnet-4': 'Claude Sonnet 4',
@@ -467,9 +374,7 @@ const MODEL_NAMES = {
 'deepseek-reasoner': 'DeepSeek Reasoner',
 'deepseek-chat': 'DeepSeek Chat'
 };
-
 const SYSTEM_PROMPT = `You are an expert professional software engineer and coding assistant with deep expertise in multiple programming languages, frameworks, and best practices.
-
 Your role:
 - Provide clean, efficient, and production-ready code solutions
 - Follow industry-standard coding conventions and design patterns
@@ -478,7 +383,6 @@ Your role:
 - Suggest optimizations and improvements when relevant
 - Write comprehensive comments and documentation
 - Consider security, performance, and scalability in solutions
-
 Response guidelines:
 - Be concise and direct while remaining thorough
 - Use proper syntax highlighting for code examples
@@ -486,68 +390,12 @@ Response guidelines:
 - Include error handling and edge cases
 - Explain your reasoning for technical decisions
 - Reference official documentation when applicable`;
-
-// Multi-select functionality
-function getSelectedModels() {
-return Array.from(modelCheckboxes)
-.filter(cb => cb.checked)
-.map(cb => cb.value);
-}
-
-function updateModelDisplay() {
-const selected = getSelectedModels();
-const count = selected.length;
-if (count === 0) {
-modelDisplayText.textContent = 'Select models...';
-} else if (count === 1) {
-modelDisplayText.textContent = MODEL_NAMES[selected[0]];
-} else if (count === modelCheckboxes.length) {
-modelDisplayText.innerHTML = `All Models <span class="model-count">${count}</span>`;
-} else {
-modelDisplayText.innerHTML = `${count} Models Selected <span class="model-count">${count}</span>`;
-}
-updateSelectAllState();
-}
-
-function updateSelectAllState() {
-const selected = getSelectedModels();
-selectAllCheckbox.checked = selected.length === modelCheckboxes.length;
-selectAllCheckbox.indeterminate = selected.length > 0 && selected.length < modelCheckboxes.length;
-}
-
-modelDisplay.addEventListener('click', (e) => {
-e.stopPropagation();
-modelDropdown.classList.toggle('open');
-modelArrow.classList.toggle('open');
-});
-
-document.addEventListener('click', (e) => {
-if (!modelDisplay.contains(e.target) && !modelDropdown.contains(e.target)) {
-modelDropdown.classList.remove('open');
-modelArrow.classList.remove('open');
-}
-});
-
-selectAllCheckbox.addEventListener('change', () => {
-const isChecked = selectAllCheckbox.checked;
-modelCheckboxes.forEach(cb => cb.checked = isChecked);
-updateModelDisplay();
-});
-
-modelCheckboxes.forEach(cb => {
-cb.addEventListener('change', updateModelDisplay);
-});
-
-// Initialize display
-updateModelDisplay();
-
 function showSystemMessage() {
 const systemMsg = document.createElement('div');
 systemMsg.className = 'msg system';
-systemMsg.innerHTML = '<strong>🔧 System:</strong> AI coding assistant with integrated code tools • Multi-model support enabled';
+systemMsg.innerHTML = '<strong>🔧 System:</strong> AI coding assistant with integrated code tools • Select a model to begin';
 chat.appendChild(systemMsg);
 }
-
 function createThinkingIndicator() {
 const thinking = document.createElement('div');
 thinking.className = 'thinking';
@@ -558,7 +406,6 @@ thinking.innerHTML = `
 `;
 return thinking;
 }
-
 // Copy code
 function copyCode(button, code) {
 navigator.clipboard.writeText(code).then(() => {
@@ -571,18 +418,15 @@ button.classList.remove('copied');
 }, 2000);
 });
 }
-
 // Preview HTML
 function previewHTML(code) {
 previewFrame.srcdoc = code;
 previewModal.classList.add('active');
 }
-
 function closePreview() {
 previewModal.classList.remove('active');
 previewFrame.srcdoc = '';
 }
-
 // Download file
 function downloadFile(code, filename) {
 const blob = new Blob([code], { type: 'text/plain' });
@@ -593,7 +437,6 @@ a.download = filename;
 a.click();
 window.URL.revokeObjectURL(url);
 }
-
 // Format/Beautify code
 function beautifyCode(button, code, language) {
 let beautified;
@@ -620,7 +463,6 @@ button.classList.remove('success');
 console.error('Beautify error:', err);
 }
 }
-
 // Minify code
 function minifyCode(button, code, language) {
 let minified;
@@ -647,7 +489,6 @@ button.classList.remove('success');
 console.error('Minify error:', err);
 }
 }
-
 // Open code editor
 function openEditor(code, language) {
 currentEditingBlock = { code, language };
@@ -656,12 +497,10 @@ editorTextarea.value = code;
 editorModal.classList.add('active');
 editorTextarea.focus();
 }
-
 function closeEditor() {
 editorModal.classList.remove('active');
 currentEditingBlock = null;
 }
-
 function saveEditedCode() {
 if (currentEditingBlock) {
 const newCode = editorTextarea.value;
@@ -674,7 +513,6 @@ Prism.highlightElement(codeBlock);
 closeEditor();
 }
 }
-
 // Add action buttons
 function addCodeActions(codeBlock) {
 const language = codeBlock.className.match(/language-(\w+)/)?.[1];
@@ -684,47 +522,40 @@ wrapper.className = 'code-wrapper';
 codeBlock.dataset.lang = language;
 const actions = document.createElement('div');
 actions.className = 'code-actions';
-
 const copyBtn = document.createElement('button');
 copyBtn.className = 'code-btn';
 copyBtn.textContent = '📋 Copy';
 copyBtn.onclick = () => copyCode(copyBtn, code);
 actions.appendChild(copyBtn);
-
 if (language === 'html' || language === 'markup') {
 const previewBtn = document.createElement('button');
 previewBtn.className = 'code-btn';
 previewBtn.textContent = '👁 Preview';
 previewBtn.onclick = () => previewHTML(code);
 actions.appendChild(previewBtn);
-
 const downloadBtn = document.createElement('button');
 downloadBtn.className = 'code-btn';
 downloadBtn.textContent = '⬇ HTML';
 downloadBtn.onclick = () => downloadFile(code, 'code.html');
 actions.appendChild(downloadBtn);
 }
-
 if (['html', 'markup', 'css', 'javascript', 'js'].includes(language)) {
 const formatBtn = document.createElement('button');
 formatBtn.className = 'code-btn';
 formatBtn.textContent = '✨ Format';
 formatBtn.onclick = () => beautifyCode(formatBtn, code, language);
 actions.appendChild(formatBtn);
-
 const minifyBtn = document.createElement('button');
 minifyBtn.className = 'code-btn';
 minifyBtn.textContent = '🗜 Minify';
 minifyBtn.onclick = () => minifyCode(minifyBtn, code, language);
 actions.appendChild(minifyBtn);
-
 const editBtn = document.createElement('button');
 editBtn.className = 'code-btn';
 editBtn.textContent = '✏️ Edit';
 editBtn.onclick = () => openEditor(code, language);
 actions.appendChild(editBtn);
 }
-
 if (!['html', 'markup'].includes(language)) {
 const ext = language === 'javascript' || language === 'js' ? 'js' : language;
 const downloadBtn = document.createElement('button');
@@ -733,67 +564,44 @@ downloadBtn.textContent = `⬇ ${ext.toUpperCase()}`;
 downloadBtn.onclick = () => downloadFile(code, `code.${ext}`);
 actions.appendChild(downloadBtn);
 }
-
 const pre = codeBlock.parentElement;
 pre.parentElement.insertBefore(wrapper, pre);
 wrapper.appendChild(actions);
 wrapper.appendChild(pre);
 }
-
 async function sendMessage() {
 const text = input.value.trim();
 if (!text) return;
-
-const selectedModels = getSelectedModels();
-if (selectedModels.length === 0) {
-alert('Please select at least one model');
-return;
-}
-
+const selectedModel = modelSelect.value;
 const userMsg = document.createElement('div');
 userMsg.className = 'msg user';
 userMsg.textContent = text;
 chat.appendChild(userMsg);
-
 input.value = '';
 send.disabled = true;
-
-// Process each model
-for (const modelValue of selectedModels) {
-// Initialize conversation history for this model if needed
-if (!conversationHistory[modelValue]) {
-conversationHistory[modelValue] = [];
-}
-conversationHistory[modelValue].push({ role: 'user', content: text });
-
+conversationHistory.push({ role: 'user', content: text });
 const thinkingIndicator = createThinkingIndicator();
 chat.appendChild(thinkingIndicator);
 chat.scrollTop = chat.scrollHeight;
-
 try {
-const fullPrompt = conversationHistory[modelValue].length === 1
+const fullPrompt = conversationHistory.length === 1
 ? `${SYSTEM_PROMPT}\n\nUser: ${text}`
 : text;
-
 const response = await puter.ai.chat(fullPrompt, {
-model: modelValue,
+model: selectedModel,
 stream: true
 });
-
 chat.removeChild(thinkingIndicator);
-
 const assistantMsg = document.createElement('div');
 assistantMsg.className = 'msg assistant';
 const modelLabel = document.createElement('div');
 modelLabel.className = 'model-label';
-modelLabel.textContent = MODEL_NAMES[modelValue];
+modelLabel.textContent = MODEL_NAMES[selectedModel];
 assistantMsg.appendChild(modelLabel);
-
 const contentDiv = document.createElement('div');
 assistantMsg.appendChild(contentDiv);
 chat.appendChild(assistantMsg);
 chat.scrollTop = chat.scrollHeight;
-
 let full = '';
 for await (const part of response) {
 if (part?.text) {
@@ -808,8 +616,7 @@ addCodeActions(block);
 chat.scrollTop = chat.scrollHeight;
 }
 }
-conversationHistory[modelValue].push({ role: 'assistant', content: full });
-
+conversationHistory.push({ role: 'assistant', content: full });
 } catch (err) {
 if (chat.contains(thinkingIndicator)) {
 chat.removeChild(thinkingIndicator);
@@ -818,38 +625,31 @@ const errorMsg = document.createElement('div');
 errorMsg.className = 'msg assistant';
 const modelLabel = document.createElement('div');
 modelLabel.className = 'model-label';
-modelLabel.textContent = MODEL_NAMES[modelValue];
+modelLabel.textContent = MODEL_NAMES[selectedModel];
 errorMsg.appendChild(modelLabel);
 const errorText = document.createElement('div');
 errorText.textContent = 'Error: ' + err.message;
 errorMsg.appendChild(errorText);
 chat.appendChild(errorMsg);
 }
-}
-
 send.disabled = false;
 }
-
 send.addEventListener('click', sendMessage);
 input.addEventListener('keydown', e => {
 if (e.key === 'Enter') sendMessage();
 });
-
 document.addEventListener('keydown', e => {
 if (e.key === 'Escape') {
 if (previewModal.classList.contains('active')) closePreview();
 if (editorModal.classList.contains('active')) closeEditor();
 }
 });
-
 previewModal.addEventListener('click', e => {
 if (e.target === previewModal) closePreview();
 });
-
 editorModal.addEventListener('click', e => {
 if (e.target === editorModal) closeEditor();
 });
-
 showSystemMessage();
 </script>
 </body>
