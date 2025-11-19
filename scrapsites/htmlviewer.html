@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Viewer - Live Editor</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #334155;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body.light {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-dim: #64748b;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .menu {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .theme-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .theme-indicator {
+            width: 40px;
+            height: 20px;
+            background: #374151;
+            border-radius: 10px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .theme-indicator::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        body.light .theme-indicator {
+            background: var(--accent);
+        }
+
+        body.light .theme-indicator::after {
+            transform: translateX(20px);
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            display: flex;
+            min-width: 0;
+        }
+
+        .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .pane-header {
+            padding: 12px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pane-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+        }
+
+        .pane-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .pane-body {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        #editor {
+            position: absolute;
+            inset: 0;
+        }
+
+        .ace_editor {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+        }
+
+        /* Preview */
+        .preview-wrapper {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+        }
+
+        #preview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .preview-wrapper.mobile #preview {
+            width: 375px;
+            height: 667px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Resizer */
+        .resizer {
+            width: 4px;
+            background: var(--border);
+            cursor: col-resize;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .resizer:hover {
+            background: var(--accent);
+        }
+
+        body.resizing {
+            cursor: col-resize;
+            user-select: none;
+        }
+
+        body.resizing iframe {
+            pointer-events: none;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                flex-direction: column;
+            }
+
+            .resizer {
+                display: none;
+            }
+
+            .pane:not(.active) {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex;
+                background: var(--surface);
+                border-top: 1px solid var(--border);
+            }
+
+            .mobile-nav button {
+                flex: 1;
+                padding: 12px;
+                background: transparent;
+                border: none;
+                color: var(--text-dim);
+                font-size: 11px;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .mobile-nav button.active {
+                color: var(--accent);
+            }
+        }
+
+        .mobile-nav {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <h1>⚡ HTML Viewer</h1>
+            <p>Live Editor & Preview</p>
+        </div>
+
+        <div class="menu">
+            <div class="menu-section">
+                <span class="menu-label">Editor</span>
+                <button class="btn primary" id="format-btn">✨ Format Code</button>
+                <button class="btn" id="sample-btn">📄 Load Sample</button>
+                <button class="btn" id="clear-btn">🗑️ Clear All</button>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-label">File</span>
+                <button class="btn" id="import-btn">📁 Import HTML</button>
+                <button class="btn" id="export-btn">💾 Export HTML</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="theme-btn" id="theme-btn">
+                <span>Theme</span>
+                <div class="theme-indicator"></div>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <section class="pane active" id="editor-pane">
+            <header class="pane-header">
+                <span class="pane-title">HTML Editor</span>
+                <div class="pane-actions">
+                    <button class="icon-btn" id="copy-btn" title="Copy">📋</button>
+                    <button class="icon-btn" id="find-btn" title="Find">🔍</button>
+                </div>
+            </header>
+            <div class="pane-body">
+                <div id="editor"></div>
+            </div>
+        </section>
+
+        <div class="resizer" id="resizer"></div>
+
+        <section class="pane active" id="preview-pane">
+            <header class="pane-header">
+                <span class="pane-title">Live Preview</span>
+                <div class="pane-actions">
+                    <button class="icon-btn" id="desktop-btn" title="Desktop">🖥️</button>
+                    <button class="icon-btn" id="mobile-btn" title="Mobile">📱</button>
+                </div>
+            </header>
+            <div class="pane-body">
+                <div class="preview-wrapper" id="preview-wrapper">
+                    <iframe id="preview" title="Preview"></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="mobile-nav">
+        <button class="active" data-tab="editor">
+            <span>✏️</span>
+            <span>Editor</span>
+        </button>
+        <button data-tab="preview">
+            <span>👁️</span>
+            <span>Preview</span>
+        </button>
+        <button data-tab="menu">
+            <span>☰</span>
+            <span>Menu</span>
+        </button>
+    </nav>
+
+    <input type="file" id="file-input" accept=".html" hidden>
+
+    <!-- CDN Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.37.1/ace.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-html.min.js"></script>
+
+    <script>
+        // Initialize
+        let editor;
+        let debounceTimer;
+
+        const SAMPLE_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Card</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .card {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎨 Hello!</h1>
+        <p>Welcome to HTML Viewer. Edit this code and watch your changes appear instantly in the preview.</p>
+        <button onclick="alert('Hello World! 👋')">Click Me</button>
+    </div>
+</body>
+</html>`;
+
+        // Setup Editor
+        function initEditor() {
+            editor = ace.edit('editor');
+            editor.setTheme('ace/theme/monokai');
+            editor.session.setMode('ace/mode/html');
+            editor.setOptions({
+                fontSize: 14,
+                showPrintMargin: false,
+                enableLiveAutocompletion: true,
+                enableBasicAutocompletion: true
+            });
+            editor.session.setUseWrapMode(true);
+
+            // Load saved or sample
+            const saved = localStorage.getItem('html_code');
+            editor.setValue(saved || SAMPLE_HTML, -1);
+
+            // Auto-update preview
+            editor.session.on('change', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(updatePreview, 300);
+            });
+
+            updatePreview();
+
+            // Auto-save
+            setInterval(() => {
+                localStorage.setItem('html_code', editor.getValue());
+            }, 2000);
+        }
+
+        // Update Preview
+        function updatePreview() {
+            const iframe = document.getElementById('preview');
+            iframe.srcdoc = editor.getValue();
+        }
+
+        // Format Code
+        function formatCode() {
+            if (typeof html_beautify === 'undefined') return;
+            const code = editor.getValue();
+            if (!code.trim()) return;
+
+            try {
+                const formatted = html_beautify(code, {
+                    indent_size: 2,
+                    preserve_newlines: true,
+                    max_preserve_newlines: 2
+                });
+                const pos = editor.getCursorPosition();
+                editor.setValue(formatted, -1);
+                editor.moveCursorToPosition(pos);
+            } catch (e) {
+                console.error('Format error:', e);
+            }
+        }
+
+        // Toggle Theme
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            editor.setTheme(isLight ? 'ace/theme/chrome' : 'ace/theme/monokai');
+        }
+
+        // Import File
+        function importFile() {
+            document.getElementById('file-input').click();
+        }
+
+        // Export File
+        function exportFile() {
+            const blob = new Blob([editor.getValue()], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Resize Handler
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+
+        function startResize(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = document.getElementById('editor-pane').offsetWidth;
+            document.body.classList.add('resizing');
+        }
+
+        function resize(e) {
+            if (!isResizing) return;
+            const delta = e.clientX - startX;
+            const newWidth = Math.max(300, Math.min(startWidth + delta, window.innerWidth - 300));
+            document.getElementById('editor-pane').style.flex = `0 0 ${newWidth}px`;
+            editor.resize();
+        }
+
+        function stopResize() {
+            if (!isResizing) return;
+            isResizing = false;
+            document.body.classList.remove('resizing');
+        }
+
+        // Mobile Tabs
+        function handleMobileTabs() {
+            const tabs = document.querySelectorAll('.mobile-nav button');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const target = tab.dataset.tab;
+                    if (target === 'editor') {
+                        document.getElementById('editor-pane').classList.add('active');
+                        document.getElementById('preview-pane').classList.remove('active');
+                        editor.resize();
+                    } else if (target === 'preview') {
+                        document.getElementById('preview-pane').classList.add('active');
+                        document.getElementById('editor-pane').classList.remove('active');
+                    } else if (target === 'menu') {
+                        document.querySelector('.sidebar').style.display = 'flex';
+                    }
+                });
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initEditor();
+
+            // Load theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light');
+                editor.setTheme('ace/theme/chrome');
+            }
+
+            // Buttons
+            document.getElementById('format-btn').addEventListener('click', formatCode);
+            document.getElementById('sample-btn').addEventListener('click', () => {
+                editor.setValue(SAMPLE_HTML, -1);
+            });
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                if (confirm('Clear all code?')) editor.setValue('', -1);
+            });
+            document.getElementById('import-btn').addEventListener('click', importFile);
+            document.getElementById('export-btn').addEventListener('click', exportFile);
+            document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+            document.getElementById('copy-btn').addEventListener('click', () => {
+                navigator.clipboard.writeText(editor.getValue());
+            });
+            document.getElementById('find-btn').addEventListener('click', () => {
+                editor.execCommand('find');
+            });
+
+            // Preview buttons
+            document.getElementById('desktop-btn').addEventListener('click', () => {
+                document.getElementById('preview-wrapper').classList.remove('mobile');
+            });
+            document.getElementById('mobile-btn').addEventListener('click', () => {
+                document.getElementById('preview-wrapper').classList.add('mobile');
+            });
+
+            // File input
+            document.getElementById('file-input').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    editor.setValue(evt.target.result, -1);
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            });
+
+            // Resizer
+            document.getElementById('resizer').addEventListener('mousedown', startResize);
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+
+            // Mobile tabs
+            handleMobileTabs();
+        });
+    </script>
+</body>
+</html>
