@@ -1,385 +1,474 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Chat with Code Tools</title>
-  <script src="https://js.puter.com/v2/"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-css.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Chat with Code Tools</title>
+<script src="https://js.puter.com/v2/"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+background: #fff;
+color: #1a1a1a;
+height: 100vh;
+display: flex;
+flex-direction: column;
+}
+/* Header */
+header {
+padding: 16px 20px;
+border-bottom: 1px solid #e5e5e5;
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 12px;
+}
+header h1 { font-size: 16px; font-weight: 600; }
 
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #fff;
-      color: #1a1a1a;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* Header */
-    header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e5e5e5;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-    header h1 { font-size: 16px; font-weight: 600; }
-    select {
-      border: 1px solid #e5e5e5;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 13px;
-      background: #fff;
-      cursor: pointer;
-      min-width: 280px;
-    }
-    option { padding: 8px; font-size: 13px; }
-    
-    /* Chat Area */
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .msg {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 16px;
-      line-height: 1.5;
-    }
-    .msg.user {
-      background: #1a1a1a;
-      color: #fff;
-      margin-left: auto;
-      border-bottom-right-radius: 4px;
-    }
-    .msg.assistant {
-      background: #f5f5f5;
-      border-bottom-left-radius: 4px;
-    }
-    .msg.system {
-      background: #e0f2fe;
-      color: #0369a1;
-      font-size: 13px;
-      max-width: 100%;
-      text-align: center;
-      border-radius: 8px;
-    }
-    
-    /* Code Block Actions */
-    .code-wrapper {
-      position: relative;
-      margin: 12px 0;
-    }
-    
-    .code-actions {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      display: flex;
-      gap: 6px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      flex-wrap: wrap;
-      max-width: 400px;
-      justify-content: flex-end;
-    }
-    
-    .code-wrapper:hover .code-actions {
-      opacity: 1;
-    }
-    
-    .code-btn {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid #e5e5e5;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 11px;
-      cursor: pointer;
-      color: #1a1a1a;
-      font-weight: 500;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    
-    .code-btn:hover {
-      background: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .code-btn:active { transform: translateY(0); }
-    
-    .code-btn.copied, .code-btn.success {
-      background: #22c55e;
-      color: white;
-      border-color: #22c55e;
-    }
-    
-    /* Preview Modal */
-    .preview-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      padding: 20px;
-    }
-    
-    .preview-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .preview-content {
-      background: #fff;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 1200px;
-      height: 90%;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    
-    .preview-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e5e5e5;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .preview-header h3 {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    
-    .close-preview {
-      background: #f5f5f5;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    
-    .preview-iframe {
-      flex: 1;
-      border: none;
-      background: #fff;
-    }
-    
-    /* Code Editor Modal */
-    .editor-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1001;
-      padding: 20px;
-    }
-    
-    .editor-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .editor-content {
-      background: #1e1e1e;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 1200px;
-      height: 90%;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    
-    .editor-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #252526;
-      border-radius: 12px 12px 0 0;
-    }
-    
-    .editor-header h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-    }
-    
-    .editor-header-actions {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .editor-textarea {
-      flex: 1;
-      background: #1e1e1e;
-      color: #d4d4d4;
-      border: none;
-      padding: 20px;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 14px;
-      line-height: 1.6;
-      resize: none;
-      outline: none;
-    }
-    
-    /* Thinking Animation */
-    .thinking {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 12px 16px;
-      background: #f5f5f5;
-      border-radius: 16px;
-      border-bottom-left-radius: 4px;
-      max-width: 80px;
-    }
-    
-    .thinking-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #9ca3af;
-      animation: bounce 1.4s infinite ease-in-out;
-    }
-    
-    .thinking-dot:nth-child(1) { animation-delay: 0s; }
-    .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
-    .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
-    
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-10px); opacity: 1; }
-    }
-    
-    /* Input */
-    footer {
-      padding: 16px 20px;
-      border-top: 1px solid #e5e5e5;
-      display: flex;
-      gap: 10px;
-    }
-    input {
-      flex: 1;
-      border: 1px solid #e5e5e5;
-      border-radius: 24px;
-      padding: 10px 16px;
-      font-size: 14px;
-      outline: none;
-    }
-    input:focus { border-color: #1a1a1a; }
-    button {
-      background: #1a1a1a;
-      color: #fff;
-      border: none;
-      border-radius: 24px;
-      padding: 10px 24px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    pre { margin: 8px 0; border-radius: 8px; overflow: auto; }
-    
-    @media (max-width: 768px) {
-      .msg { max-width: 90%; }
-      header { flex-direction: column; gap: 12px; align-items: stretch; }
-      .preview-content, .editor-content { width: 95%; height: 95%; }
-      select { min-width: 100%; }
-      .code-actions { max-width: 200px; }
-    }
-  </style>
+/* Multi-Select Dropdown */
+.model-selector {
+position: relative;
+min-width: 280px;
+}
+.model-display {
+border: 1px solid #e5e5e5;
+border-radius: 6px;
+padding: 8px 12px;
+font-size: 13px;
+background: #fff;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 8px;
+user-select: none;
+}
+.model-display:hover {
+background: #f9f9f9;
+}
+.model-display-text {
+flex: 1;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+.model-display-arrow {
+font-size: 10px;
+transition: transform 0.2s;
+}
+.model-display-arrow.open {
+transform: rotate(180deg);
+}
+.model-dropdown {
+position: absolute;
+top: 100%;
+left: 0;
+right: 0;
+margin-top: 4px;
+background: #fff;
+border: 1px solid #e5e5e5;
+border-radius: 6px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+max-height: 300px;
+overflow-y: auto;
+z-index: 100;
+display: none;
+}
+.model-dropdown.open {
+display: block;
+}
+.model-option {
+padding: 10px 12px;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 13px;
+transition: background 0.15s;
+}
+.model-option:hover {
+background: #f5f5f5;
+}
+.model-option.select-all {
+border-bottom: 1px solid #e5e5e5;
+font-weight: 600;
+background: #f9f9f9;
+}
+.model-option input[type="checkbox"] {
+cursor: pointer;
+}
+.model-option-label {
+flex: 1;
+cursor: pointer;
+}
+.model-count {
+background: #1a1a1a;
+color: #fff;
+padding: 2px 8px;
+border-radius: 12px;
+font-size: 11px;
+font-weight: 600;
+}
+
+/* Chat Area */
+#chat {
+flex: 1;
+overflow-y: auto;
+padding: 20px;
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+.msg {
+max-width: 80%;
+padding: 12px 16px;
+border-radius: 16px;
+line-height: 1.5;
+}
+.msg.user {
+background: #1a1a1a;
+color: #fff;
+margin-left: auto;
+border-bottom-right-radius: 4px;
+}
+.msg.assistant {
+background: #f5f5f5;
+border-bottom-left-radius: 4px;
+}
+.msg.system {
+background: #e0f2fe;
+color: #0369a1;
+font-size: 13px;
+max-width: 100%;
+text-align: center;
+border-radius: 8px;
+}
+.model-label {
+display: inline-block;
+background: #1a1a1a;
+color: #fff;
+padding: 2px 8px;
+border-radius: 4px;
+font-size: 11px;
+font-weight: 600;
+margin-bottom: 8px;
+}
+/* Code Block Actions */
+.code-wrapper {
+position: relative;
+margin: 12px 0;
+}
+.code-actions {
+position: absolute;
+top: 8px;
+right: 8px;
+display: flex;
+gap: 6px;
+opacity: 0;
+transition: opacity 0.2s;
+flex-wrap: wrap;
+max-width: 400px;
+justify-content: flex-end;
+}
+.code-wrapper:hover .code-actions {
+opacity: 1;
+}
+.code-btn {
+background: rgba(255, 255, 255, 0.95);
+border: 1px solid #e5e5e5;
+border-radius: 6px;
+padding: 6px 10px;
+font-size: 11px;
+cursor: pointer;
+color: #1a1a1a;
+font-weight: 500;
+transition: all 0.2s;
+white-space: nowrap;
+}
+.code-btn:hover {
+background: #fff;
+transform: translateY(-1px);
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.code-btn:active { transform: translateY(0); }
+.code-btn.copied, .code-btn.success {
+background: #22c55e;
+color: white;
+border-color: #22c55e;
+}
+/* Preview Modal */
+.preview-modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.8);
+z-index: 1000;
+padding: 20px;
+}
+.preview-modal.active {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.preview-content {
+background: #fff;
+border-radius: 12px;
+width: 90%;
+max-width: 1200px;
+height: 90%;
+display: flex;
+flex-direction: column;
+box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.preview-header {
+padding: 16px 20px;
+border-bottom: 1px solid #e5e5e5;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.preview-header h3 {
+font-size: 16px;
+font-weight: 600;
+}
+.close-preview {
+background: #f5f5f5;
+border: none;
+border-radius: 6px;
+padding: 8px 16px;
+cursor: pointer;
+font-weight: 500;
+}
+.preview-iframe {
+flex: 1;
+border: none;
+background: #fff;
+}
+/* Code Editor Modal */
+.editor-modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.8);
+z-index: 1001;
+padding: 20px;
+}
+.editor-modal.active {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.editor-content {
+background: #1e1e1e;
+border-radius: 12px;
+width: 90%;
+max-width: 1200px;
+height: 90%;
+display: flex;
+flex-direction: column;
+box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.editor-header {
+padding: 16px 20px;
+border-bottom: 1px solid #333;
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: #252526;
+border-radius: 12px 12px 0 0;
+}
+.editor-header h3 {
+font-size: 16px;
+font-weight: 600;
+color: #fff;
+}
+.editor-header-actions {
+display: flex;
+gap: 8px;
+}
+.editor-textarea {
+flex: 1;
+background: #1e1e1e;
+color: #d4d4d4;
+border: none;
+padding: 20px;
+font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+font-size: 14px;
+line-height: 1.6;
+resize: none;
+outline: none;
+}
+/* Thinking Animation */
+.thinking {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+padding: 12px 16px;
+background: #f5f5f5;
+border-radius: 16px;
+border-bottom-left-radius: 4px;
+max-width: 80px;
+}
+.thinking-dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #9ca3af;
+animation: bounce 1.4s infinite ease-in-out;
+}
+.thinking-dot:nth-child(1) { animation-delay: 0s; }
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+30% { transform: translateY(-10px); opacity: 1; }
+}
+/* Input */
+footer {
+padding: 16px 20px;
+border-top: 1px solid #e5e5e5;
+display: flex;
+gap: 10px;
+}
+input {
+flex: 1;
+border: 1px solid #e5e5e5;
+border-radius: 24px;
+padding: 10px 16px;
+font-size: 14px;
+outline: none;
+}
+input:focus { border-color: #1a1a1a; }
+button {
+background: #1a1a1a;
+color: #fff;
+border: none;
+border-radius: 24px;
+padding: 10px 24px;
+font-size: 14px;
+cursor: pointer;
+font-weight: 500;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+pre { margin: 8px 0; border-radius: 8px; overflow: auto; }
+@media (max-width: 768px) {
+.msg { max-width: 90%; }
+header { flex-direction: column; gap: 12px; align-items: stretch; }
+.preview-content, .editor-content { width: 95%; height: 95%; }
+.model-selector { min-width: 100%; }
+.code-actions { max-width: 200px; }
+}
+</style>
 </head>
 <body>
-  <header>
-    <h1>AI Chat with Code Tools</h1>
-    <select id="model">
-      <option value="gemini-2.0-flash">Gemini 2.0 Flash • 1M in / 8K out</option>
-      <option value="claude-sonnet-4">Claude Sonnet 4 • 200K in / 64K out</option>
-      <option value="grok-beta">Grok Beta • 128K in / 8K out</option>
-      <option value="deepseek-reasoner">DeepSeek Reasoner • 64K in / 8K out</option>
-      <option value="deepseek-chat">DeepSeek Chat • 64K in / 8K out</option>
-    </select>
-  </header>
+<header>
+<h1>AI Chat with Code Tools</h1>
+<div class="model-selector">
+<div class="model-display" id="modelDisplay">
+<span class="model-display-text" id="modelDisplayText">Select models...</span>
+<span class="model-display-arrow" id="modelArrow">▼</span>
+</div>
+<div class="model-dropdown" id="modelDropdown">
+<div class="model-option select-all">
+<input type="checkbox" id="selectAll" />
+<label for="selectAll" class="model-option-label">Select All Models</label>
+</div>
+<div class="model-option">
+<input type="checkbox" class="model-checkbox" value="gemini-2.0-flash" id="model1" checked />
+<label for="model1" class="model-option-label">Gemini 2.0 Flash • 1M in / 8K out</label>
+</div>
+<div class="model-option">
+<input type="checkbox" class="model-checkbox" value="claude-sonnet-4" id="model2" />
+<label for="model2" class="model-option-label">Claude Sonnet 4 • 200K in / 64K out</label>
+</div>
+<div class="model-option">
+<input type="checkbox" class="model-checkbox" value="grok-beta" id="model3" />
+<label for="model3" class="model-option-label">Grok Beta • 128K in / 8K out</label>
+</div>
+<div class="model-option">
+<input type="checkbox" class="model-checkbox" value="deepseek-reasoner" id="model4" />
+<label for="model4" class="model-option-label">DeepSeek Reasoner • 64K in / 8K out</label>
+</div>
+<div class="model-option">
+<input type="checkbox" class="model-checkbox" value="deepseek-chat" id="model5" />
+<label for="model5" class="model-option-label">DeepSeek Chat • 64K in / 8K out</label>
+</div>
+</div>
+</div>
+</header>
+<div id="chat"></div>
+<footer>
+<input id="input" type="text" placeholder="Ask anything about code..." />
+<button id="send">Send</button>
+</footer>
+<!-- Preview Modal -->
+<div id="previewModal" class="preview-modal">
+<div class="preview-content">
+<div class="preview-header">
+<h3>HTML Preview</h3>
+<button class="close-preview" onclick="closePreview()">Close</button>
+</div>
+<iframe id="previewFrame" class="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+</div>
+</div>
+<!-- Code Editor Modal -->
+<div id="editorModal" class="editor-modal">
+<div class="editor-content">
+<div class="editor-header">
+<h3 id="editorTitle">Code Editor</h3>
+<div class="editor-header-actions">
+<button class="code-btn" onclick="saveEditedCode()">💾 Save</button>
+<button class="code-btn" onclick="closeEditor()">✕ Close</button>
+</div>
+</div>
+<textarea id="editorTextarea" class="editor-textarea" spellcheck="false"></textarea>
+</div>
+</div>
+<script>
+const chat = document.getElementById('chat');
+const input = document.getElementById('input');
+const send = document.getElementById('send');
+const modelDisplay = document.getElementById('modelDisplay');
+const modelDisplayText = document.getElementById('modelDisplayText');
+const modelArrow = document.getElementById('modelArrow');
+const modelDropdown = document.getElementById('modelDropdown');
+const selectAllCheckbox = document.getElementById('selectAll');
+const modelCheckboxes = document.querySelectorAll('.model-checkbox');
+const previewModal = document.getElementById('previewModal');
+const previewFrame = document.getElementById('previewFrame');
+const editorModal = document.getElementById('editorModal');
+const editorTextarea = document.getElementById('editorTextarea');
+const editorTitle = document.getElementById('editorTitle');
 
-  <div id="chat"></div>
+let currentEditingBlock = null;
+let conversationHistory = {};
 
-  <footer>
-    <input id="input" type="text" placeholder="Ask anything about code..." />
-    <button id="send">Send</button>
-  </footer>
+const MODEL_NAMES = {
+'gemini-2.0-flash': 'Gemini 2.0 Flash',
+'claude-sonnet-4': 'Claude Sonnet 4',
+'grok-beta': 'Grok Beta',
+'deepseek-reasoner': 'DeepSeek Reasoner',
+'deepseek-chat': 'DeepSeek Chat'
+};
 
-  <!-- Preview Modal -->
-  <div id="previewModal" class="preview-modal">
-    <div class="preview-content">
-      <div class="preview-header">
-        <h3>HTML Preview</h3>
-        <button class="close-preview" onclick="closePreview()">Close</button>
-      </div>
-      <iframe id="previewFrame" class="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
-    </div>
-  </div>
-
-  <!-- Code Editor Modal -->
-  <div id="editorModal" class="editor-modal">
-    <div class="editor-content">
-      <div class="editor-header">
-        <h3 id="editorTitle">Code Editor</h3>
-        <div class="editor-header-actions">
-          <button class="code-btn" onclick="saveEditedCode()">💾 Save</button>
-          <button class="code-btn" onclick="closeEditor()">✕ Close</button>
-        </div>
-      </div>
-      <textarea id="editorTextarea" class="editor-textarea" spellcheck="false"></textarea>
-    </div>
-  </div>
-
-  <script>
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('input');
-    const send = document.getElementById('send');
-    const model = document.getElementById('model');
-    const previewModal = document.getElementById('previewModal');
-    const previewFrame = document.getElementById('previewFrame');
-    const editorModal = document.getElementById('editorModal');
-    const editorTextarea = document.getElementById('editorTextarea');
-    const editorTitle = document.getElementById('editorTitle');
-
-    let currentEditingBlock = null;
-
-    const SYSTEM_PROMPT = `You are an expert professional software engineer and coding assistant with deep expertise in multiple programming languages, frameworks, and best practices.
+const SYSTEM_PROMPT = `You are an expert professional software engineer and coding assistant with deep expertise in multiple programming languages, frameworks, and best practices.
 
 Your role:
 - Provide clean, efficient, and production-ready code solutions
@@ -398,306 +487,370 @@ Response guidelines:
 - Explain your reasoning for technical decisions
 - Reference official documentation when applicable`;
 
-    let conversationHistory = [];
+// Multi-select functionality
+function getSelectedModels() {
+return Array.from(modelCheckboxes)
+.filter(cb => cb.checked)
+.map(cb => cb.value);
+}
 
-    function showSystemMessage() {
-      const systemMsg = document.createElement('div');
-      systemMsg.className = 'msg system';
-      systemMsg.innerHTML = '<strong>🔧 System:</strong> AI coding assistant with integrated code tools';
-      chat.appendChild(systemMsg);
-    }
+function updateModelDisplay() {
+const selected = getSelectedModels();
+const count = selected.length;
+if (count === 0) {
+modelDisplayText.textContent = 'Select models...';
+} else if (count === 1) {
+modelDisplayText.textContent = MODEL_NAMES[selected[0]];
+} else if (count === modelCheckboxes.length) {
+modelDisplayText.innerHTML = `All Models <span class="model-count">${count}</span>`;
+} else {
+modelDisplayText.innerHTML = `${count} Models Selected <span class="model-count">${count}</span>`;
+}
+updateSelectAllState();
+}
 
-    function createThinkingIndicator() {
-      const thinking = document.createElement('div');
-      thinking.className = 'thinking';
-      thinking.innerHTML = `
-        <div class="thinking-dot"></div>
-        <div class="thinking-dot"></div>
-        <div class="thinking-dot"></div>
-      `;
-      return thinking;
-    }
+function updateSelectAllState() {
+const selected = getSelectedModels();
+selectAllCheckbox.checked = selected.length === modelCheckboxes.length;
+selectAllCheckbox.indeterminate = selected.length > 0 && selected.length < modelCheckboxes.length;
+}
 
-    // Copy code
-    function copyCode(button, code) {
-      navigator.clipboard.writeText(code).then(() => {
-        const originalText = button.textContent;
-        button.textContent = '✓ Copied';
-        button.classList.add('copied');
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove('copied');
-        }, 2000);
-      });
-    }
+modelDisplay.addEventListener('click', (e) => {
+e.stopPropagation();
+modelDropdown.classList.toggle('open');
+modelArrow.classList.toggle('open');
+});
 
-    // Preview HTML
-    function previewHTML(code) {
-      previewFrame.srcdoc = code;
-      previewModal.classList.add('active');
-    }
+document.addEventListener('click', (e) => {
+if (!modelDisplay.contains(e.target) && !modelDropdown.contains(e.target)) {
+modelDropdown.classList.remove('open');
+modelArrow.classList.remove('open');
+}
+});
 
-    function closePreview() {
-      previewModal.classList.remove('active');
-      previewFrame.srcdoc = '';
-    }
+selectAllCheckbox.addEventListener('change', () => {
+const isChecked = selectAllCheckbox.checked;
+modelCheckboxes.forEach(cb => cb.checked = isChecked);
+updateModelDisplay();
+});
 
-    // Download file
-    function downloadFile(code, filename) {
-      const blob = new Blob([code], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
+modelCheckboxes.forEach(cb => {
+cb.addEventListener('change', updateModelDisplay);
+});
 
-    // Format/Beautify code
-    function beautifyCode(button, code, language) {
-      let beautified;
-      try {
-        if (language === 'html' || language === 'markup') {
-          beautified = html_beautify(code, { indent_size: 2 });
-        } else if (language === 'css') {
-          beautified = css_beautify(code, { indent_size: 2 });
-        } else if (language === 'javascript' || language === 'js') {
-          beautified = js_beautify(code, { indent_size: 2 });
-        } else {
-          return;
-        }
-        
-        const codeBlock = button.closest('.code-wrapper').querySelector('code');
-        codeBlock.textContent = beautified;
-        Prism.highlightElement(codeBlock);
-        
-        button.textContent = '✓ Formatted';
-        button.classList.add('success');
-        setTimeout(() => {
-          button.textContent = '✨ Format';
-          button.classList.remove('success');
-        }, 2000);
-      } catch (err) {
-        console.error('Beautify error:', err);
-      }
-    }
+// Initialize display
+updateModelDisplay();
 
-    // Minify code
-    function minifyCode(button, code, language) {
-      let minified;
-      try {
-        if (language === 'html' || language === 'markup') {
-          minified = code.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
-        } else if (language === 'css') {
-          minified = code.replace(/\s+/g, ' ').replace(/\s*([{}:;,])\s*/g, '$1').trim();
-        } else if (language === 'javascript' || language === 'js') {
-          minified = code.replace(/\s+/g, ' ').trim();
-        } else {
-          return;
-        }
-        
-        const codeBlock = button.closest('.code-wrapper').querySelector('code');
-        codeBlock.textContent = minified;
-        Prism.highlightElement(codeBlock);
-        
-        button.textContent = '✓ Minified';
-        button.classList.add('success');
-        setTimeout(() => {
-          button.textContent = '🗜 Minify';
-          button.classList.remove('success');
-        }, 2000);
-      } catch (err) {
-        console.error('Minify error:', err);
-      }
-    }
+function showSystemMessage() {
+const systemMsg = document.createElement('div');
+systemMsg.className = 'msg system';
+systemMsg.innerHTML = '<strong>🔧 System:</strong> AI coding assistant with integrated code tools • Multi-model support enabled';
+chat.appendChild(systemMsg);
+}
 
-    // Open code editor
-    function openEditor(code, language) {
-      currentEditingBlock = { code, language };
-      editorTitle.textContent = `Edit ${language.toUpperCase()} Code`;
-      editorTextarea.value = code;
-      editorModal.classList.add('active');
-      editorTextarea.focus();
-    }
+function createThinkingIndicator() {
+const thinking = document.createElement('div');
+thinking.className = 'thinking';
+thinking.innerHTML = `
+<div class="thinking-dot"></div>
+<div class="thinking-dot"></div>
+<div class="thinking-dot"></div>
+`;
+return thinking;
+}
 
-    function closeEditor() {
-      editorModal.classList.remove('active');
-      currentEditingBlock = null;
-    }
+// Copy code
+function copyCode(button, code) {
+navigator.clipboard.writeText(code).then(() => {
+const originalText = button.textContent;
+button.textContent = '✓ Copied';
+button.classList.add('copied');
+setTimeout(() => {
+button.textContent = originalText;
+button.classList.remove('copied');
+}, 2000);
+});
+}
 
-    function saveEditedCode() {
-      if (currentEditingBlock) {
-        const newCode = editorTextarea.value;
-        // Update the original code block
-        const wrapper = document.querySelector(`[data-lang="${currentEditingBlock.language}"]`)?.closest('.code-wrapper');
-        if (wrapper) {
-          const codeBlock = wrapper.querySelector('code');
-          codeBlock.textContent = newCode;
-          Prism.highlightElement(codeBlock);
-        }
-        closeEditor();
-      }
-    }
+// Preview HTML
+function previewHTML(code) {
+previewFrame.srcdoc = code;
+previewModal.classList.add('active');
+}
 
-    // Add action buttons
-    function addCodeActions(codeBlock) {
-      const language = codeBlock.className.match(/language-(\w+)/)?.[1];
-      const code = codeBlock.textContent;
-      
-      const wrapper = document.createElement('div');
-      wrapper.className = 'code-wrapper';
-      codeBlock.dataset.lang = language;
-      
-      const actions = document.createElement('div');
-      actions.className = 'code-actions';
-      
-      // Copy button
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'code-btn';
-      copyBtn.textContent = '📋 Copy';
-      copyBtn.onclick = () => copyCode(copyBtn, code);
-      actions.appendChild(copyBtn);
-      
-      // HTML-specific buttons
-      if (language === 'html' || language === 'markup') {
-        const previewBtn = document.createElement('button');
-        previewBtn.className = 'code-btn';
-        previewBtn.textContent = '👁 Preview';
-        previewBtn.onclick = () => previewHTML(code);
-        actions.appendChild(previewBtn);
-        
-        const downloadBtn = document.createElement('button');
-        downloadBtn.className = 'code-btn';
-        downloadBtn.textContent = '⬇ HTML';
-        downloadBtn.onclick = () => downloadFile(code, 'code.html');
-        actions.appendChild(downloadBtn);
-      }
-      
-      // Format button for HTML, CSS, JS
-      if (['html', 'markup', 'css', 'javascript', 'js'].includes(language)) {
-        const formatBtn = document.createElement('button');
-        formatBtn.className = 'code-btn';
-        formatBtn.textContent = '✨ Format';
-        formatBtn.onclick = () => beautifyCode(formatBtn, code, language);
-        actions.appendChild(formatBtn);
-        
-        const minifyBtn = document.createElement('button');
-        minifyBtn.className = 'code-btn';
-        minifyBtn.textContent = '🗜 Minify';
-        minifyBtn.onclick = () => minifyCode(minifyBtn, code, language);
-        actions.appendChild(minifyBtn);
-        
-        const editBtn = document.createElement('button');
-        editBtn.className = 'code-btn';
-        editBtn.textContent = '✏️ Edit';
-        editBtn.onclick = () => openEditor(code, language);
-        actions.appendChild(editBtn);
-      }
-      
-      // Download button for other languages
-      if (!['html', 'markup'].includes(language)) {
-        const ext = language === 'javascript' || language === 'js' ? 'js' : language;
-        const downloadBtn = document.createElement('button');
-        downloadBtn.className = 'code-btn';
-        downloadBtn.textContent = `⬇ ${ext.toUpperCase()}`;
-        downloadBtn.onclick = () => downloadFile(code, `code.${ext}`);
-        actions.appendChild(downloadBtn);
-      }
-      
-      const pre = codeBlock.parentElement;
-      pre.parentElement.insertBefore(wrapper, pre);
-      wrapper.appendChild(actions);
-      wrapper.appendChild(pre);
-    }
+function closePreview() {
+previewModal.classList.remove('active');
+previewFrame.srcdoc = '';
+}
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
+// Download file
+function downloadFile(code, filename) {
+const blob = new Blob([code], { type: 'text/plain' });
+const url = window.URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = filename;
+a.click();
+window.URL.revokeObjectURL(url);
+}
 
-      const userMsg = document.createElement('div');
-      userMsg.className = 'msg user';
-      userMsg.textContent = text;
-      chat.appendChild(userMsg);
-      
-      conversationHistory.push({ role: 'user', content: text });
-      input.value = '';
-      send.disabled = true;
+// Format/Beautify code
+function beautifyCode(button, code, language) {
+let beautified;
+try {
+if (language === 'html' || language === 'markup') {
+beautified = html_beautify(code, { indent_size: 2 });
+} else if (language === 'css') {
+beautified = css_beautify(code, { indent_size: 2 });
+} else if (language === 'javascript' || language === 'js') {
+beautified = js_beautify(code, { indent_size: 2 });
+} else {
+return;
+}
+const codeBlock = button.closest('.code-wrapper').querySelector('code');
+codeBlock.textContent = beautified;
+Prism.highlightElement(codeBlock);
+button.textContent = '✓ Formatted';
+button.classList.add('success');
+setTimeout(() => {
+button.textContent = '✨ Format';
+button.classList.remove('success');
+}, 2000);
+} catch (err) {
+console.error('Beautify error:', err);
+}
+}
 
-      const thinkingIndicator = createThinkingIndicator();
-      chat.appendChild(thinkingIndicator);
-      chat.scrollTop = chat.scrollHeight;
+// Minify code
+function minifyCode(button, code, language) {
+let minified;
+try {
+if (language === 'html' || language === 'markup') {
+minified = code.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+} else if (language === 'css') {
+minified = code.replace(/\s+/g, ' ').replace(/\s*([{}:;,])\s*/g, '$1').trim();
+} else if (language === 'javascript' || language === 'js') {
+minified = code.replace(/\s+/g, ' ').trim();
+} else {
+return;
+}
+const codeBlock = button.closest('.code-wrapper').querySelector('code');
+codeBlock.textContent = minified;
+Prism.highlightElement(codeBlock);
+button.textContent = '✓ Minified';
+button.classList.add('success');
+setTimeout(() => {
+button.textContent = '🗜 Minify';
+button.classList.remove('success');
+}, 2000);
+} catch (err) {
+console.error('Minify error:', err);
+}
+}
 
-      try {
-        const fullPrompt = conversationHistory.length === 1
-          ? `${SYSTEM_PROMPT}\n\nUser: ${text}`
-          : text;
+// Open code editor
+function openEditor(code, language) {
+currentEditingBlock = { code, language };
+editorTitle.textContent = `Edit ${language.toUpperCase()} Code`;
+editorTextarea.value = code;
+editorModal.classList.add('active');
+editorTextarea.focus();
+}
 
-        const response = await puter.ai.chat(fullPrompt, { 
-          model: model.value, 
-          stream: true 
-        });
+function closeEditor() {
+editorModal.classList.remove('active');
+currentEditingBlock = null;
+}
 
-        chat.removeChild(thinkingIndicator);
-        
-        const assistantMsg = document.createElement('div');
-        assistantMsg.className = 'msg assistant';
-        chat.appendChild(assistantMsg);
-        chat.scrollTop = chat.scrollHeight;
+function saveEditedCode() {
+if (currentEditingBlock) {
+const newCode = editorTextarea.value;
+const wrapper = document.querySelector(`[data-lang="${currentEditingBlock.language}"]`)?.closest('.code-wrapper');
+if (wrapper) {
+const codeBlock = wrapper.querySelector('code');
+codeBlock.textContent = newCode;
+Prism.highlightElement(codeBlock);
+}
+closeEditor();
+}
+}
 
-        let full = '';
-        for await (const part of response) {
-          if (part?.text) {
-            full += part.text;
-            assistantMsg.innerHTML = marked.parse(full);
-            
-            assistantMsg.querySelectorAll('pre code').forEach(block => {
-              Prism.highlightElement(block);
-              if (!block.closest('.code-wrapper')) {
-                addCodeActions(block);
-              }
-            });
-            
-            chat.scrollTop = chat.scrollHeight;
-          }
-        }
+// Add action buttons
+function addCodeActions(codeBlock) {
+const language = codeBlock.className.match(/language-(\w+)/)?.[1];
+const code = codeBlock.textContent;
+const wrapper = document.createElement('div');
+wrapper.className = 'code-wrapper';
+codeBlock.dataset.lang = language;
+const actions = document.createElement('div');
+actions.className = 'code-actions';
 
-        conversationHistory.push({ role: 'assistant', content: full });
+const copyBtn = document.createElement('button');
+copyBtn.className = 'code-btn';
+copyBtn.textContent = '📋 Copy';
+copyBtn.onclick = () => copyCode(copyBtn, code);
+actions.appendChild(copyBtn);
 
-      } catch (err) {
-        if (chat.contains(thinkingIndicator)) {
-          chat.removeChild(thinkingIndicator);
-        }
-        
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'msg assistant';
-        errorMsg.textContent = 'Error: ' + err.message;
-        chat.appendChild(errorMsg);
-      } finally {
-        send.disabled = false;
-      }
-    }
+if (language === 'html' || language === 'markup') {
+const previewBtn = document.createElement('button');
+previewBtn.className = 'code-btn';
+previewBtn.textContent = '👁 Preview';
+previewBtn.onclick = () => previewHTML(code);
+actions.appendChild(previewBtn);
 
-    send.addEventListener('click', sendMessage);
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') sendMessage();
-    });
+const downloadBtn = document.createElement('button');
+downloadBtn.className = 'code-btn';
+downloadBtn.textContent = '⬇ HTML';
+downloadBtn.onclick = () => downloadFile(code, 'code.html');
+actions.appendChild(downloadBtn);
+}
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        if (previewModal.classList.contains('active')) closePreview();
-        if (editorModal.classList.contains('active')) closeEditor();
-      }
-    });
+if (['html', 'markup', 'css', 'javascript', 'js'].includes(language)) {
+const formatBtn = document.createElement('button');
+formatBtn.className = 'code-btn';
+formatBtn.textContent = '✨ Format';
+formatBtn.onclick = () => beautifyCode(formatBtn, code, language);
+actions.appendChild(formatBtn);
 
-    previewModal.addEventListener('click', e => {
-      if (e.target === previewModal) closePreview();
-    });
+const minifyBtn = document.createElement('button');
+minifyBtn.className = 'code-btn';
+minifyBtn.textContent = '🗜 Minify';
+minifyBtn.onclick = () => minifyCode(minifyBtn, code, language);
+actions.appendChild(minifyBtn);
 
-    editorModal.addEventListener('click', e => {
-      if (e.target === editorModal) closeEditor();
-    });
+const editBtn = document.createElement('button');
+editBtn.className = 'code-btn';
+editBtn.textContent = '✏️ Edit';
+editBtn.onclick = () => openEditor(code, language);
+actions.appendChild(editBtn);
+}
 
-    showSystemMessage();
-  </script>
+if (!['html', 'markup'].includes(language)) {
+const ext = language === 'javascript' || language === 'js' ? 'js' : language;
+const downloadBtn = document.createElement('button');
+downloadBtn.className = 'code-btn';
+downloadBtn.textContent = `⬇ ${ext.toUpperCase()}`;
+downloadBtn.onclick = () => downloadFile(code, `code.${ext}`);
+actions.appendChild(downloadBtn);
+}
+
+const pre = codeBlock.parentElement;
+pre.parentElement.insertBefore(wrapper, pre);
+wrapper.appendChild(actions);
+wrapper.appendChild(pre);
+}
+
+async function sendMessage() {
+const text = input.value.trim();
+if (!text) return;
+
+const selectedModels = getSelectedModels();
+if (selectedModels.length === 0) {
+alert('Please select at least one model');
+return;
+}
+
+const userMsg = document.createElement('div');
+userMsg.className = 'msg user';
+userMsg.textContent = text;
+chat.appendChild(userMsg);
+
+input.value = '';
+send.disabled = true;
+
+// Process each model
+for (const modelValue of selectedModels) {
+// Initialize conversation history for this model if needed
+if (!conversationHistory[modelValue]) {
+conversationHistory[modelValue] = [];
+}
+conversationHistory[modelValue].push({ role: 'user', content: text });
+
+const thinkingIndicator = createThinkingIndicator();
+chat.appendChild(thinkingIndicator);
+chat.scrollTop = chat.scrollHeight;
+
+try {
+const fullPrompt = conversationHistory[modelValue].length === 1
+? `${SYSTEM_PROMPT}\n\nUser: ${text}`
+: text;
+
+const response = await puter.ai.chat(fullPrompt, {
+model: modelValue,
+stream: true
+});
+
+chat.removeChild(thinkingIndicator);
+
+const assistantMsg = document.createElement('div');
+assistantMsg.className = 'msg assistant';
+const modelLabel = document.createElement('div');
+modelLabel.className = 'model-label';
+modelLabel.textContent = MODEL_NAMES[modelValue];
+assistantMsg.appendChild(modelLabel);
+
+const contentDiv = document.createElement('div');
+assistantMsg.appendChild(contentDiv);
+chat.appendChild(assistantMsg);
+chat.scrollTop = chat.scrollHeight;
+
+let full = '';
+for await (const part of response) {
+if (part?.text) {
+full += part.text;
+contentDiv.innerHTML = marked.parse(full);
+contentDiv.querySelectorAll('pre code').forEach(block => {
+Prism.highlightElement(block);
+if (!block.closest('.code-wrapper')) {
+addCodeActions(block);
+}
+});
+chat.scrollTop = chat.scrollHeight;
+}
+}
+conversationHistory[modelValue].push({ role: 'assistant', content: full });
+
+} catch (err) {
+if (chat.contains(thinkingIndicator)) {
+chat.removeChild(thinkingIndicator);
+}
+const errorMsg = document.createElement('div');
+errorMsg.className = 'msg assistant';
+const modelLabel = document.createElement('div');
+modelLabel.className = 'model-label';
+modelLabel.textContent = MODEL_NAMES[modelValue];
+errorMsg.appendChild(modelLabel);
+const errorText = document.createElement('div');
+errorText.textContent = 'Error: ' + err.message;
+errorMsg.appendChild(errorText);
+chat.appendChild(errorMsg);
+}
+}
+
+send.disabled = false;
+}
+
+send.addEventListener('click', sendMessage);
+input.addEventListener('keydown', e => {
+if (e.key === 'Enter') sendMessage();
+});
+
+document.addEventListener('keydown', e => {
+if (e.key === 'Escape') {
+if (previewModal.classList.contains('active')) closePreview();
+if (editorModal.classList.contains('active')) closeEditor();
+}
+});
+
+previewModal.addEventListener('click', e => {
+if (e.target === previewModal) closePreview();
+});
+
+editorModal.addEventListener('click', e => {
+if (e.target === editorModal) closeEditor();
+});
+
+showSystemMessage();
+</script>
 </body>
 </html>
