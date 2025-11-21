@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting</title>
+    <style>
+        /* FLUENT UI DESIGN TOKENS */
+        :root {
+            --bg-color: #f3f3f3; /* Mica-like background */
+            --card-bg: #ffffff;
+            --text-primary: #201F1E;
+            --text-secondary: #605E5C;
+            --accent: #0078D4;
+            --shadow-elevation: 0 6.4px 14.4px 0 rgba(0,0,0,0.132), 0 1.2px 3.6px 0 rgba(0,0,0,0.108);
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Segoe UI Variable", "Segoe UI", -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            /* Subtle Mica Gradient Effect */
+            background-image: linear-gradient(135deg, #eff2f9 0%, #e3e7ee 100%);
+        }
+
+        /* MINIMAL CARD */
+        .fluent-card {
+            background-color: var(--card-bg);
+            width: 320px;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-elevation);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        p {
+            margin: 0 0 32px 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* FLUENT SPINNER IMPLEMENTATION */
+        /* A single ring with a gap that rotates with ease-in-out */
+        .fluent-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e1dfdd; /* Track color */
+            border-top-color: var(--accent); /* Active color */
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spinner-spin 1.5s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
+        }
+
+        @keyframes spinner-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="fluent-card">
+        <!-- Spinner -->
+        <div class="fluent-spinner"></div>
+        
+        <!-- Spacer -->
+        <div style="height: 24px"></div>
+
+        <!-- Text -->
+        <h2>One moment</h2>
+        <p>We're taking you to BlackIce OS</p>
+    </div>
+
+    <script>
+        // Redirect after 3 seconds
+        setTimeout(() => {
+            window.location.href = "https://uios-eta.vercel.app";
+        }, 1000);
+    </script>
+
+</body>
+</html>
