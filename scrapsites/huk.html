@@ -3,331 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkTree Generator</title>
+    <title>LinkFlow | Aesthetic Link-in-Bio</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+        /* --- RESET & VARIABLES --- */
         :root {
-            --bg-color: #f9fafb;
-            --card-bg: #ffffff;
-            --text-main: #111827;
-            --text-sub: #6b7280;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --danger: #ef4444;
-            --border: #e5e7eb;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-head: 'Outfit', sans-serif;
+            
+            /* Default Theme (Will be overridden by JS) */
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.8);
+            --btn-bg: rgba(255, 255, 255, 0.25);
+            --btn-hover: rgba(255, 255, 255, 0.4);
+            --btn-radius: 50px; /* Pill shape default */
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
+            font-family: var(--font-main);
+            background: var(--bg-gradient);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-color);
             min-height: 100vh;
-            padding: 2rem 1rem;
-            line-height: 1.5;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* --- Utility Classes --- */
-        .hidden { display: none !important; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-            width: 100%;
-            font-size: 0.95rem;
-        }
-        .btn-primary { background-color: var(--accent); color: white; }
-        .btn-primary:hover { background-color: var(--accent-hover); }
-        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-outline:hover { border-color: var(--text-sub); background-color: #f3f4f6; }
-        .btn-danger { background-color: #fee2e2; color: var(--danger); width: auto; padding: 0.5rem; }
-        .btn-danger:hover { background-color: #fecaca; }
-
-        /* --- CREATOR MODE STYLES --- */
-        .creator-card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-group { margin-bottom: 1.25rem; }
-        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; }
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            font-size: 1rem;
-        }
-        .form-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
-        
-        .link-row {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-            align-items: start;
-        }
-        .link-inputs { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
-        
-        .result-area {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 0.5rem;
-        }
-        .result-url {
-            word-break: break-all;
-            font-family: monospace;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            border: 1px solid #bfdbfe;
-            margin: 0.5rem 0;
-            font-size: 0.85rem;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
         }
 
-        /* --- VIEWER MODE STYLES --- */
-        .profile-header { text-align: center; margin-bottom: 2rem; }
-        .profile-img {
-            width: 100px; height: 100px;
+        /* --- UTILITY --- */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- CREATOR MODE (Form) --- */
+        #creator-app {
+            width: 100%;
+            max-width: 900px;
+            background: #ffffff;
+            color: #1f2937;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .creator-nav {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .creator-body {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .creator-body { grid-template-columns: 1fr; }
+        }
+
+        .panel { background: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; }
+        .panel h3 { margin-bottom: 1rem; font-family: var(--font-head); color: #374151; }
+
+        .form-group { margin-bottom: 1rem; }
+        .label { display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.4rem; }
+        .input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-family: inherit; transition: border 0.2s; }
+        .input:focus { outline: none; border-color: #6366f1; ring: 2px solid #e0e7ff; }
+
+        .link-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; background: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
+        .btn-icon { background: #fee2e2; color: #ef4444; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-icon:hover { background: #fecaca; }
+
+        .btn-add { width: 100%; padding: 0.75rem; background: white; border: 2px dashed #cbd5e1; color: #64748b; border-radius: 0.5rem; cursor: pointer; font-weight: 600; margin-top: 0.5rem; transition: 0.2s; }
+        .btn-add:hover { border-color: #6366f1; color: #6366f1; background: #eff6ff; }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white; border: none; padding: 1rem 2rem; border-radius: 0.75rem;
+            font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-generate:hover { transform: translateY(-2px); }
+
+        .result-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: white; padding: 2rem; border-radius: 1rem;
+            text-align: center; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- VIEWER MODE (The Result) --- */
+        #viewer-app {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .p-img-container {
+            position: relative;
+            width: 120px; height: 120px;
+            margin-bottom: 0.5rem;
+        }
+        .p-img {
+            width: 100%; height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            background-color: #ddd;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
-        .profile-name { font-size: 1.5rem; font-weight: 800; margin-top: 1rem; }
-        .profile-bio { color: var(--text-sub); margin-top: 0.5rem; }
+        .verified-badge {
+            position: absolute; bottom: 5px; right: 5px;
+            background: #3b82f6; color: white;
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; border: 2px solid white;
+        }
+
+        .p-name { font-family: var(--font-head); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .p-bio { font-size: 0.95rem; color: var(--text-sub); line-height: 1.5; max-width: 90%; }
+
+        .social-row { display: flex; gap: 1rem; justify-content: center; margin: 0.5rem 0 1.5rem 0; }
+        .social-icon {
+            color: var(--text-color); font-size: 1.5rem;
+            transition: transform 0.2s, opacity 0.2s; opacity: 0.8;
+        }
+        .social-icon:hover { transform: scale(1.2); opacity: 1; }
+
+        .links-container { width: 100%; display: flex; flex-direction: column; gap: 1rem; }
         
-        .link-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background-color: var(--card-bg);
+        .link-card {
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.2rem;
+            background: var(--btn-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--btn-radius);
+            color: var(--text-color);
             text-decoration: none;
-            color: var(--text-main);
             font-weight: 600;
-            border-radius: 0.75rem;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: transform 0.1s;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0; /* Hidden for animation */
         }
-        .link-btn:hover { transform: scale(1.02); border-color: var(--accent); color: var(--accent); }
+
+        .link-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%); transition: 0.5s;
+        }
         
-        .create-own-link {
-            text-align: center;
-            margin-top: 3rem;
-            font-size: 0.8rem;
-            opacity: 0.7;
+        .link-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: var(--btn-hover);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
-        .create-own-link a { color: var(--text-main); }
+        .link-card:hover::before { transform: translateX(100%); }
+
+        /* --- ANIMATION DELAYS --- */
+        .delay-1 { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards; }
+        .delay-2 { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s forwards; }
+        .delay-3 { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards; }
+        .delay-4 { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s forwards; }
+        .delay-5 { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s forwards; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer-credit {
+            margin-top: 2rem; font-size: 0.75rem; color: var(--text-sub); opacity: 0.6;
+        }
+        .footer-credit a { color: inherit; }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <!-- === CREATOR MODE === -->
-        <div id="creator-mode" class="creator-card">
-            <h2 style="margin-bottom: 1.5rem; text-align: center;">Create Your Link Page</h2>
-            
-            <div class="form-group">
-                <label class="form-label">Display Name</label>
-                <input type="text" id="in_name" class="form-input" placeholder="e.g. Alex Smith">
-            </div>
+    <!-- ================== CREATOR APP ================== -->
+    <div id="creator-app" class="hidden">
+        <nav class="creator-nav">
+            <div class="brand"><i class="fa-solid fa-bolt"></i> LinkFlow</div>
+            <button onclick="generate()" class="btn-generate" style="width: auto; padding: 0.75rem 1.5rem;">Get Link</button>
+        </nav>
 
-            <div class="form-group">
-                <label class="form-label">Profile Image URL</label>
-                <input type="url" id="in_img" class="form-input" placeholder="https://example.com/photo.jpg">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Bio (Optional)</label>
-                <textarea id="in_bio" class="form-input" rows="2" placeholder="Digital Creator | Coffee Lover"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Links</label>
-                <div id="link-rows-container">
-                    <!-- Dynamic rows go here -->
+        <div class="creator-body">
+            <!-- Left Col: Content -->
+            <div class="panel">
+                <h3><i class="fa-regular fa-id-card"></i> Profile & Links</h3>
+                
+                <div class="form-group">
+                    <label class="label">Display Name</label>
+                    <input type="text" id="c_name" class="input" placeholder="e.g. Sarah Designer">
                 </div>
-                <button onclick="addLinkRow()" class="btn btn-outline" style="margin-top: 0.5rem;">+ Add New Link</button>
+                
+                <div class="form-group">
+                    <label class="label">Bio</label>
+                    <input type="text" id="c_bio" class="input" placeholder="Creating digital dreams...">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Profile Picture URL</label>
+                    <input type="url" id="c_img" class="input" placeholder="https://...">
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="label">Social Icons (Optional)</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <input type="text" id="s_insta" class="input" placeholder="Instagram Username">
+                        <input type="text" id="s_twitter" class="input" placeholder="X/Twitter Username">
+                        <input type="text" id="s_linkedin" class="input" placeholder="LinkedIn Username">
+                        <input type="text" id="s_github" class="input" placeholder="GitHub Username">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="label">Main Links</label>
+                    <div id="links-wrapper"></div>
+                    <button onclick="addLinkRow()" class="btn-add">+ Add Link</button>
+                </div>
             </div>
 
-            <button onclick="generateURL()" class="btn btn-primary">Generate Shareable Link</button>
+            <!-- Right Col: Appearance -->
+            <div class="panel">
+                <h3><i class="fa-solid fa-palette"></i> Appearance</h3>
+                
+                <div class="form-group">
+                    <label class="label">Select Theme</label>
+                    <select id="c_theme" class="input">
+                        <option value="sunset">Sunset Blvd (Orange/Purple)</option>
+                        <option value="ocean">Deep Ocean (Blue/Teal)</option>
+                        <option value="midnight">Midnight (Dark/Neon)</option>
+                        <option value="cotton">Cotton Candy (Pink/Blue)</option>
+                        <option value="forest">Forest Mist (Green/Dark)</option>
+                    </select>
+                </div>
 
-            <div id="result-box" class="result-area hidden">
-                <p style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">Your Link is ready:</p>
-                <div class="result-url" id="final-url"></div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button onclick="copyLink()" class="btn btn-primary" style="padding: 0.5rem;">Copy</button>
-                    <button onclick="openLink()" class="btn btn-outline" style="padding: 0.5rem;">Open</button>
+                <div class="form-group">
+                    <label class="label">Custom Background Image (Overrides Theme)</label>
+                    <input type="url" id="c_bg_img" class="input" placeholder="https://wallpaper...">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Button Shape</label>
+                    <select id="c_shape" class="input">
+                        <option value="50px">Pill (Round)</option>
+                        <option value="12px">Soft Square</option>
+                        <option value="0px">Sharp</option>
+                    </select>
+                </div>
+                
+                <div style="margin-top: 2rem; padding: 1rem; background: #eff6ff; border-radius: 0.5rem; border: 1px solid #bfdbfe;">
+                    <p style="font-size: 0.9rem; color: #1e40af;">
+                        <i class="fa-solid fa-circle-info"></i> 
+                        <strong>How this works:</strong><br>
+                        We compress your data into the URL. No database, no login. 
+                        Just generate the link and place it in your bio!
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- === VIEWER MODE === -->
-        <div id="viewer-mode" class="hidden">
-            <div class="profile-header">
-                <img src="" id="view_img" class="profile-img">
-                <h1 id="view_name" class="profile-name"></h1>
-                <p id="view_bio" class="profile-bio"></p>
-            </div>
-            
-            <div id="view_links">
-                <!-- Links injected here -->
-            </div>
-
-            <div class="create-own-link">
-                <a href="?">Create your own page like this</a>
+        <!-- Modal for Result -->
+        <div id="result-modal" class="result-modal hidden">
+            <div class="modal-content">
+                <h2 style="margin-bottom: 1rem;">🎉 Your Link is Ready!</h2>
+                <p style="margin-bottom: 1rem; color: #666;">Copy this huge URL and paste it in your bio.</p>
+                <textarea id="final-url" class="input" rows="4" readonly style="font-size: 0.8rem; margin-bottom: 1rem;"></textarea>
+                <button onclick="copyUrl()" class="btn-generate">Copy to Clipboard</button>
+                <button onclick="closeModal()" style="background: transparent; border: none; margin-top: 1rem; cursor: pointer; color: #666;">Close</button>
             </div>
         </div>
+    </div>
 
+    <!-- ================== VIEWER APP ================== -->
+    <div id="viewer-app" class="hidden">
+        <div class="glass-card fade-in">
+            
+            <div class="p-img-container">
+                <img src="" id="v_img" class="p-img">
+                <div class="verified-badge"><i class="fa-solid fa-check"></i></div>
+            </div>
+            
+            <div>
+                <h1 id="v_name" class="p-name"></h1>
+                <p id="v_bio" class="p-bio"></p>
+            </div>
+
+            <!-- Social Icons -->
+            <div id="v_socials" class="social-row"></div>
+
+            <!-- Main Links -->
+            <div id="v_links" class="links-container"></div>
+
+            <div class="footer-credit">
+                <a href="?" style="text-decoration: none;">⚡ Created with LinkFlow</a>
+            </div>
+        </div>
     </div>
 
     <script>
-        // === LOGIC ROUTER ===
-        // Decides whether to show the Builder or the Viewer
+        // 1. ROUTER
         const params = new URLSearchParams(window.location.search);
         
-        if (params.has('name') || params.has('links')) {
-            showViewerMode();
+        // If 'data' param exists, or legacy params exist, show viewer
+        if (params.has('n') || params.has('l')) {
+            initViewer();
         } else {
-            showCreatorMode();
+            initCreator();
         }
 
-        // === CREATOR FUNCTIONS ===
-        
-        function showCreatorMode() {
-            document.getElementById('creator-mode').classList.remove('hidden');
-            addLinkRow(); // Add one empty row by default
+        // 2. CREATOR LOGIC
+        function initCreator() {
+            document.getElementById('creator-app').classList.remove('hidden');
+            document.body.style.background = "#f3f4f6"; // Reset body bg for creator mode
+            addLinkRow(); // Add first row
+            addLinkRow(); // Add second row
         }
 
         function addLinkRow() {
-            const container = document.getElementById('link-rows-container');
-            const row = document.createElement('div');
-            row.className = 'link-row';
-            row.innerHTML = `
-                <div class="link-inputs">
-                    <input type="text" class="form-input link-title" placeholder="Link Title (e.g. Instagram)">
-                    <input type="url" class="form-input link-url" placeholder="URL (https://...)">
+            const wrapper = document.getElementById('links-wrapper');
+            const div = document.createElement('div');
+            div.className = 'link-row';
+            div.innerHTML = `
+                <i class="fa-solid fa-link" style="color: #9ca3af; margin-left: 0.5rem;"></i>
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.25rem;">
+                    <input type="text" class="l-title" placeholder="Title (e.g. My Portfolio)" style="border:none; outline:none; font-weight:600; width:100%;">
+                    <input type="text" class="l-url" placeholder="https://..." style="border:none; outline:none; font-size:0.85rem; color:#6b7280; width:100%;">
                 </div>
-                <button onclick="this.parentElement.remove()" class="btn btn-danger" title="Remove">✕</button>
+                <button onclick="this.parentElement.remove()" class="btn-icon"><i class="fa-solid fa-trash"></i></button>
             `;
-            container.appendChild(row);
+            wrapper.appendChild(div);
         }
 
-        function generateURL() {
-            const name = document.getElementById('in_name').value.trim();
-            const img = document.getElementById('in_img').value.trim();
-            const bio = document.getElementById('in_bio').value.trim();
-            
-            // Collect Links
+        function generate() {
+            // Gather Data
+            const name = document.getElementById('c_name').value.trim();
+            const bio = document.getElementById('c_bio').value.trim();
+            const img = document.getElementById('c_img').value.trim();
+            const theme = document.getElementById('c_theme').value;
+            const bgImg = document.getElementById('c_bg_img').value.trim();
+            const shape = document.getElementById('c_shape').value;
+
+            // Socials
+            const s_insta = document.getElementById('s_insta').value.trim();
+            const s_twit = document.getElementById('s_twitter').value.trim();
+            const s_link = document.getElementById('s_linkedin').value.trim();
+            const s_git = document.getElementById('s_github').value.trim();
+
+            // Links
             const rows = document.querySelectorAll('.link-row');
-            let linkData = [];
-            
+            let linksArr = [];
             rows.forEach(row => {
-                const title = row.querySelector('.link-title').value.trim();
-                const url = row.querySelector('.link-url').value.trim();
-                // Simple validation: Must have title and URL, and avoid pipes in title
-                if (title && url) {
-                    // Replace pipes in title just in case, to avoid breaking parser
-                    const safeTitle = title.replace(/\|/g, '-'); 
-                    linkData.push(`${safeTitle},${url}`);
-                }
+                const t = row.querySelector('.l-title').value.trim();
+                const u = row.querySelector('.l-url').value.trim();
+                if(t && u) linksArr.push(`${t}*${u}`); // Using * as separator to avoid URL conflicts
             });
 
-            if (!name) {
-                alert("Please enter at least a name.");
-                return;
-            }
+            if(!name) { alert("Name is required!"); return; }
 
-            // Build Query String
-            const buildParams = new URLSearchParams();
-            buildParams.set('name', name);
-            if (img) buildParams.set('img', img);
-            if (bio) buildParams.set('bio', bio);
-            if (linkData.length > 0) buildParams.set('links', linkData.join('|'));
-
-            const finalURL = `${window.location.origin}${window.location.pathname}?${buildParams.toString()}`;
+            // Compress Params
+            const p = new URLSearchParams();
+            p.set('n', name); // n = Name
+            if(bio) p.set('b', bio); // b = Bio
+            if(img) p.set('i', img); // i = Image
+            p.set('t', theme); // t = Theme
+            if(bgImg) p.set('bg', bgImg); // bg = Custom BG
+            p.set('s', shape); // s = Shape (Radius)
             
-            // Display Result
-            document.getElementById('final-url').textContent = finalURL;
-            document.getElementById('result-box').classList.remove('hidden');
+            // Pack Socials
+            let socials = [];
+            if(s_insta) socials.push(`ig:${s_insta}`);
+            if(s_twit) socials.push(`tw:${s_twit}`);
+            if(s_link) socials.push(`li:${s_link}`);
+            if(s_git) socials.push(`gh:${s_git}`);
+            if(socials.length) p.set('so', socials.join(','));
+
+            if(linksArr.length) p.set('l', linksArr.join('~')); // ~ separates links
+
+            const finalUrl = `${window.location.origin}${window.location.pathname}?${p.toString()}`;
+            
+            document.getElementById('final-url').value = finalUrl;
+            document.getElementById('result-modal').classList.remove('hidden');
         }
 
-        function copyLink() {
-            const text = document.getElementById('final-url').textContent;
-            navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+        function copyUrl() {
+            const copyText = document.getElementById("final-url");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert("Copied to clipboard!");
         }
-        
-        function openLink() {
-            const text = document.getElementById('final-url').textContent;
-            window.location.href = text;
+        function closeModal() {
+            document.getElementById('result-modal').classList.add('hidden');
         }
 
-        // === VIEWER FUNCTIONS ===
 
-        function showViewerMode() {
-            document.getElementById('viewer-mode').classList.remove('hidden');
-            document.getElementById('creator-mode').classList.add('hidden');
-
-            // 1. Populate Profile
-            const name = params.get('name');
-            const img = params.get('img');
-            const bio = params.get('bio');
+        // 3. VIEWER LOGIC
+        function initViewer() {
+            document.getElementById('viewer-app').classList.remove('hidden');
             
-            document.getElementById('view_name').textContent = name;
-            document.getElementById('view_bio').textContent = bio || '';
-            
-            const imgEl = document.getElementById('view_img');
-            if (img) {
-                imgEl.src = img;
-            } else {
-                imgEl.src = `https://ui-avatars.com/api/?name=${name}&background=random&size=200`;
-            }
+            // Data
+            const n = params.get('n');
+            const b = params.get('b');
+            const i = params.get('i');
+            const t = params.get('t') || 'sunset';
+            const bg = params.get('bg');
+            const s = params.get('s') || '50px';
+            const l = params.get('l');
+            const so = params.get('so');
 
-            // 2. Populate Links
-            const linksRaw = params.get('links');
-            if (linksRaw) {
-                const container = document.getElementById('view_links');
-                const list = linksRaw.split('|');
-                
-                list.forEach(item => {
-                    // Split by first comma
-                    const splitIdx = item.indexOf(',');
-                    if (splitIdx === -1) return;
+            // Apply Content
+            document.getElementById('v_name').textContent = n;
+            document.getElementById('v_bio').textContent = b || '';
+            
+            const imgEl = document.getElementById('v_img');
+            imgEl.src = i ? i : `https://ui-avatars.com/api/?name=${n}&background=random&size=256`;
+
+            // Apply Theme Logic
+            applyTheme(t, bg, s);
+
+            // Render Socials
+            if(so) {
+                const socialBox = document.getElementById('v_socials');
+                const sList = so.split(',');
+                sList.forEach(item => {
+                    const [type, val] = item.split(':');
+                    let icon = '', url = '';
+                    if(type === 'ig') { icon = 'fa-instagram'; url = `https://instagram.com/${val}`; }
+                    if(type === 'tw') { icon = 'fa-twitter'; url = `https://twitter.com/${val}`; }
+                    if(type === 'li') { icon = 'fa-linkedin'; url = `https://linkedin.com/in/${val}`; }
+                    if(type === 'gh') { icon = 'fa-github'; url = `https://github.com/${val}`; }
                     
-                    const title = item.substring(0, splitIdx);
-                    const url = item.substring(splitIdx + 1);
-                    
-                    const a = document.createElement('a');
-                    a.className = 'link-btn';
-                    a.textContent = title;
-                    a.href = url;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    container.appendChild(a);
+                    if(icon) {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.target = "_blank";
+                        a.className = "social-icon";
+                        a.innerHTML = `<i class="fa-brands ${icon}"></i>`;
+                        socialBox.appendChild(a);
+                    }
                 });
+            }
+
+            // Render Links
+            if(l) {
+                const linkBox = document.getElementById('v_links');
+                const list = l.split('~');
+                list.forEach((item, index) => {
+                    const [title, url] = item.split('*');
+                    if(title && url) {
+                        const a = document.createElement('a');
+                        a.className = `link-card delay-${Math.min(index+1, 5)}`; // Staggered animation
+                        a.href = url;
+                        a.target = "_blank";
+                        a.innerHTML = `<span>${title}</span> <i class="fa-solid fa-arrow-up-right-from-square" style="position:absolute; right:20px; opacity:0.6; font-size:0.8em;"></i>`;
+                        linkBox.appendChild(a);
+                    }
+                });
+            }
+        }
+
+        function applyTheme(themeName, customBg, radius) {
+            const root = document.documentElement;
+            
+            // Shape
+            root.style.setProperty('--btn-radius', radius);
+
+            // Backgrounds & Colors
+            const themes = {
+                'sunset': { bg: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', txt: '#4a1e2c', glass: 'rgba(255,255,255,0.4)' },
+                'ocean': { bg: 'linear-gradient(to top, #30cfd0 0%, #330867 100%)', txt: '#ffffff', glass: 'rgba(0,0,0,0.2)' },
+                'midnight': { bg: 'linear-gradient(to right, #434343 0%, #000000 100%)', txt: '#00ffcc', glass: 'rgba(255,255,255,0.05)' },
+                'cotton': { bg: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)', txt: '#1e3a8a', glass: 'rgba(255,255,255,0.5)' },
+                'forest': { bg: 'linear-gradient(to top, #09203f 0%, #537895 100%)', txt: '#e2e8f0', glass: 'rgba(0,0,0,0.3)' }
+            };
+
+            const t = themes[themeName] || themes['sunset'];
+            
+            // Override BG if custom provided
+            if(customBg) {
+                root.style.setProperty('--bg-gradient', `url('${customBg}')`);
+                // Add a dark overlay tint to ensure text readability on custom images
+                root.style.setProperty('--glass-bg', 'rgba(0, 0, 0, 0.4)'); 
+                root.style.setProperty('--text-color', '#ffffff');
+                root.style.setProperty('--btn-bg', 'rgba(255, 255, 255, 0.15)');
+            } else {
+                root.style.setProperty('--bg-gradient', t.bg);
+                root.style.setProperty('--glass-bg', t.glass);
+                root.style.setProperty('--text-color', t.txt);
+                root.style.setProperty('--text-sub', t.txt); // Simplifying sub color
             }
         }
     </script>
