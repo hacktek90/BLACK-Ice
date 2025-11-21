@@ -6,6 +6,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -890,38 +891,48 @@ btn.addEventListener('keydown', (e) => {
   }
 });
 
-(function () {
+(function () { 
     const url = new URL(window.location.href);
     const params = url.searchParams;
 
-    // ✅ 0. Redirect ONLY on these domains
-    const targetDomains = ["black-ice-3dbk.onrender.com", "hacktek90.github.io","blackice-ac.vercel.app"];
+    // Allowed domains
+    const targetDomains = ["black-ice-3dbk.onrender.com", "hacktek90.github.io", "blackice-ac.vercel.app"];
     if (!targetDomains.includes(window.location.hostname)) {
         console.log("➡️ No redirect: different domain (" + window.location.hostname + ")");
         return;
     }
 
-    // ✅ 1. Do NOT redirect if inside an iframe
+    // Block redirect inside iframe
     if (window !== window.top) {
         console.log("➡️ No redirect: inside an iframe");
         return;
     }
 
-    // ✅ 2. Do NOT redirect if admin=elite
+    // Do NOT redirect for admin
     if (params.get("admin") === "elite") {
         console.log("➡️ No redirect: admin=elite");
         return;
     }
 
-    // ✅ 3. Only redirect when exactly on root path "/"
+    // Redirect only on root path
     const path = window.location.pathname;
     if (path === "/" || path === "") {
-        console.log("✅ Redirecting to /Home.html");
-        window.location.replace("/Home.html");
+
+        // Detect mobile
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            console.log("📱 Mobile detected → Redirecting to home.html");
+            window.location.replace("/home.html");
+        } else {
+            console.log("💻 Desktop detected → Redirecting to uios app");
+            window.location.replace("https://uios-eta.vercel.app/");
+        }
         return;
     }
 
 })();
+
 
 </script>
 
