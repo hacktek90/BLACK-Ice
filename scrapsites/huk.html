@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkTree Generator</title>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --danger: #ef4444;
+            --border: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* --- Utility Classes --- */
+        .hidden { display: none !important; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--text-sub); background-color: #f3f4f6; }
+        .btn-danger { background-color: #fee2e2; color: var(--danger); width: auto; padding: 0.5rem; }
+        .btn-danger:hover { background-color: #fecaca; }
+
+        /* --- CREATOR MODE STYLES --- */
+        .creator-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        .form-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+        
+        .link-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            align-items: start;
+        }
+        .link-inputs { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .result-area {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+        }
+        .result-url {
+            word-break: break-all;
+            font-family: monospace;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #bfdbfe;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+        }
+
+        /* --- VIEWER MODE STYLES --- */
+        .profile-header { text-align: center; margin-bottom: 2rem; }
+        .profile-img {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background-color: #ddd;
+        }
+        .profile-name { font-size: 1.5rem; font-weight: 800; margin-top: 1rem; }
+        .profile-bio { color: var(--text-sub); margin-top: 0.5rem; }
+        
+        .link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--card-bg);
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: transform 0.1s;
+        }
+        .link-btn:hover { transform: scale(1.02); border-color: var(--accent); color: var(--accent); }
+        
+        .create-own-link {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        .create-own-link a { color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- === CREATOR MODE === -->
+        <div id="creator-mode" class="creator-card">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Create Your Link Page</h2>
+            
+            <div class="form-group">
+                <label class="form-label">Display Name</label>
+                <input type="text" id="in_name" class="form-input" placeholder="e.g. Alex Smith">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Profile Image URL</label>
+                <input type="url" id="in_img" class="form-input" placeholder="https://example.com/photo.jpg">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Bio (Optional)</label>
+                <textarea id="in_bio" class="form-input" rows="2" placeholder="Digital Creator | Coffee Lover"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Links</label>
+                <div id="link-rows-container">
+                    <!-- Dynamic rows go here -->
+                </div>
+                <button onclick="addLinkRow()" class="btn btn-outline" style="margin-top: 0.5rem;">+ Add New Link</button>
+            </div>
+
+            <button onclick="generateURL()" class="btn btn-primary">Generate Shareable Link</button>
+
+            <div id="result-box" class="result-area hidden">
+                <p style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">Your Link is ready:</p>
+                <div class="result-url" id="final-url"></div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button onclick="copyLink()" class="btn btn-primary" style="padding: 0.5rem;">Copy</button>
+                    <button onclick="openLink()" class="btn btn-outline" style="padding: 0.5rem;">Open</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === VIEWER MODE === -->
+        <div id="viewer-mode" class="hidden">
+            <div class="profile-header">
+                <img src="" id="view_img" class="profile-img">
+                <h1 id="view_name" class="profile-name"></h1>
+                <p id="view_bio" class="profile-bio"></p>
+            </div>
+            
+            <div id="view_links">
+                <!-- Links injected here -->
+            </div>
+
+            <div class="create-own-link">
+                <a href="?">Create your own page like this</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // === LOGIC ROUTER ===
+        // Decides whether to show the Builder or the Viewer
+        const params = new URLSearchParams(window.location.search);
+        
+        if (params.has('name') || params.has('links')) {
+            showViewerMode();
+        } else {
+            showCreatorMode();
+        }
+
+        // === CREATOR FUNCTIONS ===
+        
+        function showCreatorMode() {
+            document.getElementById('creator-mode').classList.remove('hidden');
+            addLinkRow(); // Add one empty row by default
+        }
+
+        function addLinkRow() {
+            const container = document.getElementById('link-rows-container');
+            const row = document.createElement('div');
+            row.className = 'link-row';
+            row.innerHTML = `
+                <div class="link-inputs">
+                    <input type="text" class="form-input link-title" placeholder="Link Title (e.g. Instagram)">
+                    <input type="url" class="form-input link-url" placeholder="URL (https://...)">
+                </div>
+                <button onclick="this.parentElement.remove()" class="btn btn-danger" title="Remove">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function generateURL() {
+            const name = document.getElementById('in_name').value.trim();
+            const img = document.getElementById('in_img').value.trim();
+            const bio = document.getElementById('in_bio').value.trim();
+            
+            // Collect Links
+            const rows = document.querySelectorAll('.link-row');
+            let linkData = [];
+            
+            rows.forEach(row => {
+                const title = row.querySelector('.link-title').value.trim();
+                const url = row.querySelector('.link-url').value.trim();
+                // Simple validation: Must have title and URL, and avoid pipes in title
+                if (title && url) {
+                    // Replace pipes in title just in case, to avoid breaking parser
+                    const safeTitle = title.replace(/\|/g, '-'); 
+                    linkData.push(`${safeTitle},${url}`);
+                }
+            });
+
+            if (!name) {
+                alert("Please enter at least a name.");
+                return;
+            }
+
+            // Build Query String
+            const buildParams = new URLSearchParams();
+            buildParams.set('name', name);
+            if (img) buildParams.set('img', img);
+            if (bio) buildParams.set('bio', bio);
+            if (linkData.length > 0) buildParams.set('links', linkData.join('|'));
+
+            const finalURL = `${window.location.origin}${window.location.pathname}?${buildParams.toString()}`;
+            
+            // Display Result
+            document.getElementById('final-url').textContent = finalURL;
+            document.getElementById('result-box').classList.remove('hidden');
+        }
+
+        function copyLink() {
+            const text = document.getElementById('final-url').textContent;
+            navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+        }
+        
+        function openLink() {
+            const text = document.getElementById('final-url').textContent;
+            window.location.href = text;
+        }
+
+        // === VIEWER FUNCTIONS ===
+
+        function showViewerMode() {
+            document.getElementById('viewer-mode').classList.remove('hidden');
+            document.getElementById('creator-mode').classList.add('hidden');
+
+            // 1. Populate Profile
+            const name = params.get('name');
+            const img = params.get('img');
+            const bio = params.get('bio');
+            
+            document.getElementById('view_name').textContent = name;
+            document.getElementById('view_bio').textContent = bio || '';
+            
+            const imgEl = document.getElementById('view_img');
+            if (img) {
+                imgEl.src = img;
+            } else {
+                imgEl.src = `https://ui-avatars.com/api/?name=${name}&background=random&size=200`;
+            }
+
+            // 2. Populate Links
+            const linksRaw = params.get('links');
+            if (linksRaw) {
+                const container = document.getElementById('view_links');
+                const list = linksRaw.split('|');
+                
+                list.forEach(item => {
+                    // Split by first comma
+                    const splitIdx = item.indexOf(',');
+                    if (splitIdx === -1) return;
+                    
+                    const title = item.substring(0, splitIdx);
+                    const url = item.substring(splitIdx + 1);
+                    
+                    const a = document.createElement('a');
+                    a.className = 'link-btn';
+                    a.textContent = title;
+                    a.href = url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    container.appendChild(a);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
