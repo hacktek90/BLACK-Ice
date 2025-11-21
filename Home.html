@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -466,13 +465,7 @@ display: none;
 .tab-content.active {
 display: block;
 }
-.dashboard-section {
-margin-bottom: 24px;
-padding: 16px;
-background: var(--surface-2);
-border-radius: 12px;
-border: 1px solid var(--border);
-}
+
 .dashboard-section h3 {
 font-size: 1rem;
 font-weight: 600;
@@ -482,55 +475,17 @@ display: flex;
 align-items: center;
 gap: 8px;
 }
-.dashboard-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-gap: 12px;
-margin-bottom: 16px;
-}
-.stat-card {
-background: var(--surface);
-padding: 16px;
-border-radius: 10px;
-border: 1px solid var(--border);
-text-align: center;
-transition: all 0.2s;
-}
+
+
 .stat-card:hover {
 border-color: var(--accent);
 transform: translateY(-2px);
 box-shadow: var(--shadow-sm);
 }
-.stat-value {
-font-size: 2rem;
-font-weight: 700;
-color: var(--accent);
-display: block;
-margin-bottom: 4px;
-}
-.stat-label {
-font-size: 0.85rem;
-color: var(--muted);
-font-weight: 500;
-}
-.activity-list {
-list-style: none;
-padding: 0;
-margin: 0;
-max-height: 250px;
-overflow-y: auto;
-}
-.activity-item {
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 10px;
-background: var(--surface);
-border: 1px solid var(--border);
-border-radius: 8px;
-margin-bottom: 8px;
-transition: all 0.2s;
-}
+
+
+
+
 .activity-item:hover {
 background: var(--hover);
 border-color: var(--accent);
@@ -564,27 +519,8 @@ font-size: 0.75rem;
 font-weight: 600;
 white-space: nowrap;
 }
-.chart-container {
-height: 180px;
-background: var(--surface);
-border-radius: 8px;
-padding: 12px;
-padding-bottom: 32px;
-border: 1px solid var(--border);
-display: flex;
-align-items: flex-end;
-gap: 8px;
-justify-content: space-around;
-position: relative;
-}
-.chart-bar {
-flex: 1;
-background: linear-gradient(to top, var(--accent), #60a5fa);
-border-radius: 4px 4px 0 0;
-position: relative;
-min-height: 20px;
-transition: all 0.3s ease;
-}
+
+
 .chart-bar:hover {
 opacity: 0.8;
 transform: scaleY(1.05);
@@ -678,6 +614,39 @@ width: 95%;
 max-width: 100%;
 }
 }
+
+.os-link-section {
+margin: 16px 0;
+padding: 0 16px;
+}
+.os-link-btn {
+display: flex;
+align-items: center;
+gap: 10px;
+width: 100%;
+padding: 12px 16px;
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: 10px;
+color: var(--text);
+text-decoration: none;
+font-weight: 500;
+font-size: 0.95rem;
+transition: all 0.2s;
+cursor: pointer;
+}
+.os-link-btn:hover {
+background: var(--hover);
+border-color: var(--accent);
+transform: translateY(-1px);
+box-shadow: var(--shadow-sm);
+}
+.os-link-btn:active {
+transform: translateY(0);
+}
+.os-link-btn svg:first-child {
+flex-shrink: 0;
+}
 </style>
 </head>
 <body>
@@ -722,86 +691,11 @@ Reload last site
 </div>
     
 <div class="settings-tabs">
-<button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-<button class="tab-btn" data-tab="settings">Settings</button>
-</div>
-    
-<!-- Dashboard Tab -->
-<div id="dashboardTab" class="tab-content active">
-<!-- Overview Stats -->
-<div class="dashboard-section">
-<h3>
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-</svg>
-Overview
-</h3>
-<div class="dashboard-grid">
-<div class="stat-card">
-<span class="stat-value" id="totalProjectsCount">0</span>
-<span class="stat-label">Total Projects</span>
-</div>
-<div class="stat-card">
-<span class="stat-value" id="favoritesCount">0</span>
-<span class="stat-label">Favorites</span>
-</div>
-<div class="stat-card">
-<span class="stat-value" id="totalVisitsCount">0</span>
-<span class="stat-label">Total Visits</span>
-</div>
-<div class="stat-card">
-<span class="stat-value" id="activeToday">0</span>
-<span class="stat-label">Active Today</span>
-</div>
-</div>
-</div>
-      
-<!-- Most Visited Projects -->
-<div class="dashboard-section">
-<h3>
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-<circle cx="12" cy="12" r="3"></circle>
-</svg>
-Most Visited Projects
-</h3>
-<ul id="mostVisitedList" class="activity-list">
-<li class="empty-state">No visit data yet</li>
-</ul>
-</div>
-      
-<!-- Recent Activity -->
-<div class="dashboard-section">
-<h3>
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<circle cx="12" cy="12" r="10"></circle>
-<polyline points="12 6 12 12 16 14"></polyline>
-</svg>
-Recent Activity
-</h3>
-<ul id="recentActivityList" class="activity-list">
-<li class="empty-state">No recent activity</li>
-</ul>
-</div>
-      
-<!-- Weekly Activity Chart -->
-<div class="dashboard-section">
-<h3>
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<line x1="12" y1="20" x2="12" y2="10"></line>
-<line x1="18" y1="20" x2="18" y2="4"></line>
-<line x1="6" y1="20" x2="6" y2="16"></line>
-</svg>
-Activity This Week
-</h3>
-<div id="weeklyChart" class="chart-container"></div>
-</div>
-      
-<button id="clearTrackingData" class="clear-data-btn">Clear All Tracking Data</button>
+<button class="tab-btn active" data-tab="settings">Settings</button>
 </div>
     
 <!-- Settings Tab -->
-<div id="settingsTab" class="tab-content">
+<div id="settingsTab" class="tab-content active">
 <div class="settings-option">
 <label for="homeScreenSelect">Set Home Screen Project:</label>
 <select id="homeScreenSelect">
@@ -835,6 +729,21 @@ Favorites
 <ul id="favoritesList" class="favorites-list">
 <li class="empty-favorites">No favorites yet</li>
 </ul>
+
+<div class="os-link-section" style="margin: 16px 0; padding: 0 16px;">
+<a href="https://uios-eta.vercel.app" target="_blank" rel="noopener noreferrer" class="os-link-btn">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+<line x1="9" y1="3" x2="9" y2="21"></line>
+</svg>
+<span>OS</span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
+<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+<polyline points="15 3 21 3 21 9"></polyline>
+<line x1="10" y1="14" x2="21" y2="3"></line>
+</svg>
+</a>
+</div>
 </div>
 <div class="side-search">
 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" fill="none"/><line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor"/></svg>
@@ -939,7 +848,7 @@ timestamp: Date.now()
 if (activity.length > 50) activity.pop();
 saveActivity(activity);
   
-updateDashboard();
+// Dashboard removed
 }
 
 function getDayOfWeek(timestamp) {
@@ -1386,7 +1295,7 @@ homeScreenSelect.appendChild(option);
 settingsBtn.addEventListener('click', () => {
 populateHomeScreenOptions();
 settingsDialog.classList.add('open');
-updateDashboard();
+// Dashboard removed
 });
 
 closeSettings.addEventListener('click', () => {
@@ -1420,7 +1329,7 @@ const tabId = btn.dataset.tab + 'Tab';
 document.getElementById(tabId).classList.add('active');
     
 if (btn.dataset.tab === 'dashboard') {
-updateDashboard();
+// Dashboard removed
 }
 });
 });
@@ -1430,7 +1339,7 @@ document.getElementById('clearTrackingData').addEventListener('click', () => {
 if (confirm('Are you sure you want to clear all tracking data? This cannot be undone.')) {
 localStorage.removeItem(TRACKING_KEY);
 localStorage.removeItem(ACTIVITY_KEY);
-updateDashboard();
+// Dashboard removed
 }
 });
 
