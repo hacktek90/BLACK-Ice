@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Tool (PC Only)</title>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --surface-color: #1a1a1a;
+            --border-color: #333;
+            --accent-color: #3b82f6;
+            --danger-color: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1a1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            height: 100vh;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* --- MOBILE WARNING OVERLAY --- */
+        #mobile-warning {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        #mobile-warning h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--danger-color);
+        }
+
+        #mobile-warning p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        #mobile-warning .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* --- APP CONTENT --- */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: var(--surface-color);
+            padding: 25px;
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        
+        video {
+            width: 100%;
+            max-height: 550px;
+            background: #000;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        #startBtn {
+            background: var(--text-primary);
+            color: var(--bg-color);
+        }
+        
+        .stop-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .crop-save-btn {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .crop-cancel-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .download-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 8px;
+        }
+        
+        button:hover { transform: translateY(-1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        #cropCanvas {
+            cursor: crosshair;
+            max-width: 100%;
+            display: none;
+            margin-top: 10px;
+            border-radius: 12px;
+        }
+        
+        .crop-controls {
+            display: none;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: center;
+            background: var(--surface-color);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        
+        .cropped-item {
+            margin-bottom: 24px;
+        }
+        
+        .cropped-item img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            display: block;
+        }
+        
+        .status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Warning Overlay -->
+    <div id="mobile-warning">
+        <div class="icon">💻</div>
+        <h1>Desktop Only</h1>
+        <p>This screen sharing tool requires a PC or Laptop browser. Mobile devices do not support the necessary screen capture APIs.</p>
+        <p style="margin-top: 20px; font-size: 12px; opacity: 0.5;">Please open this link on your computer.</p>
+    </div>
+
+    <!-- Main App (Wrapped) -->
+    <div class="app-container" id="appContent">
+        <div class="main-content">
+            <div class="status">
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 600;">Screen Tool</h2>
+                    <p id="statusText" style="color: var(--text-secondary); font-size: 14px;">Ready to start</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="startBtn" onclick="startScreenShare()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Start Sharing
+                </button>
+                <button id="stopBtn" class="stop-btn" onclick="stopScreenShare()" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+                    Stop
+                </button>
+            </div>
+            
+            <video id="screenVideo" autoplay playsinline></video>
+            <canvas id="cropCanvas"></canvas>
+            
+            <div class="crop-controls" id="cropControls">
+                <button onclick="confirmCrop()" class="crop-save-btn">Save Crop</button>
+                <button onclick="cancelCrop()" class="crop-cancel-btn">Cancel</button>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <h3>Library</h3>
+            <div id="croppedImages"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- DEVICE DETECTION LOGIC ---
+        function checkDevice() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            // Also check for screen sharing support
+            const hasScreenShare = navigator.mediaDevices && 'getDisplayMedia' in navigator.mediaDevices;
+
+            if (isMobile || !hasScreenShare) {
+                document.getElementById('mobile-warning').style.display = 'flex';
+                document.getElementById('appContent').style.display = 'none';
+                return false;
+            }
+            return true;
+        }
+
+        // Run check immediately
+        if (checkDevice()) {
+            // Only initialize app logic if device is valid
+            
+            let stream = null;
+            let canvas = document.getElementById('cropCanvas');
+            let ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let startX, startY, endX, endY;
+            let currentScreenshot = null;
+            let screenshotCount = 0;
+
+            async function startScreenShare() {
+                try {
+                    stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { mediaSource: "screen" },
+                        audio: false
+                    });
+
+                    const video = document.getElementById('screenVideo');
+                    video.srcObject = stream;
+                    
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    document.getElementById('statusText').textContent = 'Capturing in 3 seconds...';
+                    document.getElementById('statusText').style.color = 'var(--accent-color)';
+
+                    setTimeout(() => takeScreenshot(), 3000);
+
+                    stream.getVideoTracks()[0].addEventListener('ended', () => stopScreenShare());
+
+                } catch (err) {
+                    console.error("Error: " + err);
+                    document.getElementById('statusText').textContent = err.message;
+                }
+            }
+
+            function takeScreenshot() {
+                const video = document.getElementById('screenVideo');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                currentScreenshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                canvas.style.display = 'block';
+                document.getElementById('cropControls').style.display = 'flex';
+                document.getElementById('statusText').textContent = 'Select area to crop';
+                document.getElementById('statusText').style.color = 'var(--text-primary)';
+                
+                setupCropSelection();
+            }
+
+            function setupCropSelection() {
+                canvas.onmousedown = (e) => {
+                    isDrawing = true;
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    startX = (e.clientX - rect.left) * scaleX;
+                    startY = (e.clientY - rect.top) * scaleY;
+                };
+
+                canvas.onmousemove = (e) => {
+                    if (!isDrawing) return;
+                    const rect = canvas.getBoundingClientRect();
+                    endX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                    endY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                    
+                    ctx.putImageData(currentScreenshot, 0, 0);
+                    const w = endX - startX;
+                    const h = endY - startY;
+                    
+                    // Darken background
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                    ctx.fillRect(0, 0, canvas.width, startY);
+                    ctx.fillRect(0, startY + h, canvas.width, canvas.height - (startY + h));
+                    ctx.fillRect(0, startY, startX, h);
+                    ctx.fillRect(startX + w, startY, canvas.width - (startX + w), h);
+
+                    // White Border
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(startX, startY, w, h);
+                    
+                    // Grid
+                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(startX + w/3, startY); ctx.lineTo(startX + w/3, endY);
+                    ctx.moveTo(startX + 2*w/3, startY); ctx.lineTo(startX + 2*w/3, endY);
+                    ctx.moveTo(startX, startY + h/3); ctx.lineTo(endX, startY + h/3);
+                    ctx.moveTo(startX, startY + 2*h/3); ctx.lineTo(endX, startY + 2*h/3);
+                    ctx.stroke();
+                };
+
+                canvas.onmouseup = () => isDrawing = false;
+            }
+
+            window.confirmCrop = function() {
+                if (!currentScreenshot || !endX || !endY) return;
+                
+                const width = Math.abs(endX - startX);
+                const height = Math.abs(endY - startY);
+                const x = Math.min(startX, endX);
+                const y = Math.min(startY, endY);
+
+                const croppedCanvas = document.createElement('canvas');
+                croppedCanvas.width = width;
+                croppedCanvas.height = height;
+                croppedCanvas.getContext('2d').drawImage(canvas, x, y, width, height, 0, 0, width, height);
+                
+                addToSidebar(croppedCanvas.toDataURL());
+                resetCropTool();
+            };
+
+            function addToSidebar(imageData) {
+                screenshotCount++;
+                const sidebar = document.getElementById('croppedImages');
+                const item = document.createElement('div');
+                item.className = 'cropped-item';
+                item.innerHTML = `
+                    <div class="meta-info">
+                        <strong>#${screenshotCount}</strong>
+                        <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <img src="${imageData}">
+                    <button class="download-btn" onclick="downloadImage('${imageData}', ${screenshotCount})">
+                        Download PNG
+                    </button>
+                `;
+                sidebar.insertBefore(item, sidebar.firstChild);
+                
+                document.getElementById('statusText').textContent = 'Saved. Next in 3s...';
+                setTimeout(() => { if (stream?.active) takeScreenshot(); }, 3000);
+            }
+
+            window.downloadImage = function(dataUrl, number) {
+                const link = document.createElement('a');
+                link.download = `capture-${number}.png`;
+                link.href = dataUrl;
+                link.click();
+            };
+
+            window.cancelCrop = function() {
+                resetCropTool();
+                document.getElementById('statusText').textContent = 'Skipped. Next in 3s...';
+                setTimeout(() => { if (stream?.active) takeScreenshot(); }, 3000);
+            };
+
+            function resetCropTool() {
+                canvas.style.display = 'none';
+                document.getElementById('cropControls').style.display = 'none';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                startX = startY = endX = endY = null;
+            }
+
+            window.stopScreenShare = function() {
+                stream?.getTracks().forEach(t => t.stop());
+                stream = null;
+                document.getElementById('screenVideo').srcObject = null;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                resetCropTool();
+                document.getElementById('statusText').textContent = 'Ready to start';
+                document.getElementById('statusText').style.color = 'var(--text-secondary)';
+            };
+        }
+    </script>
+</body>
+</html>
