@@ -30,9 +30,9 @@
             overflow: hidden;
         }
 
-        /* --- OVERLAYS (Mobile & Iframe) --- */
+        /* --- OVERLAYS --- */
         .overlay-warning {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             top: 0;
             left: 0;
@@ -65,7 +65,6 @@
             margin-bottom: 20px;
         }
 
-        /* Special button for Iframe warning */
         .open-tab-btn {
             background: var(--accent-color);
             color: white;
@@ -75,10 +74,7 @@
             font-weight: 600;
             transition: transform 0.2s;
             display: inline-block;
-        }
-        
-        .open-tab-btn:hover {
-            transform: translateY(-2px);
+            cursor: pointer;
         }
 
         /* --- APP CONTENT --- */
@@ -223,24 +219,30 @@
 </head>
 <body>
 
-    <!-- 1. IFRAME WARNING OVERLAY -->
+    <!-- 1. IFRAME WARNING -->
     <div id="iframe-warning" class="overlay-warning">
         <div class="icon">🔒</div>
         <h1>Security Restriction</h1>
-        <p>This application cannot be used inside a frame or embedded window. Please open it in a new tab to continue.</p>
-        <a id="open-tab-link" href="#" target="_blank" class="open-tab-btn">
-            Open in New Tab ↗
-        </a>
+        <p>This app cannot run inside a frame. Please open it in a new tab.</p>
+        <a id="open-tab-link" href="#" target="_blank" class="open-tab-btn">Open New Tab ↗</a>
     </div>
 
-    <!-- 2. MOBILE WARNING OVERLAY -->
+    <!-- 2. MOBILE WARNING -->
     <div id="mobile-warning" class="overlay-warning">
         <div class="icon">💻</div>
         <h1>Desktop Only</h1>
-        <p>This screen sharing tool requires a PC or Laptop browser. Mobile devices do not support the necessary screen capture APIs.</p>
+        <p>Screen sharing APIs are not supported on mobile devices. Please use a PC.</p>
     </div>
 
-    <!-- 3. MAIN APP -->
+    <!-- 3. HTTPS/FILE WARNING -->
+    <div id="protocol-warning" class="overlay-warning">
+        <div class="icon">⚠️</div>
+        <h1>Local File Detected</h1>
+        <p>Browser security blocks screen sharing on <code>file://</code> URLs. You must serve this file via a local server (localhost) or upload it to a secure website (HTTPS).</p>
+        <div style="font-size: 12px; opacity: 0.6; margin-top: 10px;">VS Code Users: Right click > "Open with Live Server"</div>
+    </div>
+
+    <!-- MAIN APP -->
     <div class="app-container" id="appContent">
         <div class="main-content">
             <div class="status">
@@ -277,202 +279,217 @@
     </div>
 
     <script>
-        // --- 1. ENVIRONMENT CHECKS ---
-        function checkEnvironment() {
+        // --- Global Variables ---
+        let stream = null;
+        let canvas = document.getElementById('cropCanvas');
+        let ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let startX, startY, endX, endY;
+        let currentScreenshot = null;
+        let screenshotCount = 0;
+
+        // --- Initialization Checks ---
+        window.onload = function() {
             const app = document.getElementById('appContent');
             
-            // A. Iframe Detection
+            // 1. Check Protocol (file:// vs https://)
+            if (window.location.protocol === 'file:') {
+                document.getElementById('protocol-warning').style.display = 'flex';
+                app.style.display = 'none';
+                return;
+            }
+
+            // 2. Check Iframe
             if (window.self !== window.top) {
                 const iframeWarning = document.getElementById('iframe-warning');
-                const link = document.getElementById('open-tab-link');
-                
-                // Set current URL dynamically
-                link.href = window.location.href;
-                
+                document.getElementById('open-tab-link').href = window.location.href;
                 iframeWarning.style.display = 'flex';
                 app.style.display = 'none';
-                return false; // Stop execution
+                return;
             }
 
-            // B. Mobile/Tablet Detection
+            // 3. Check Mobile
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const hasScreenShare = navigator.mediaDevices && 'getDisplayMedia' in navigator.mediaDevices;
-
-            if (isMobile || !hasScreenShare) {
+            if (isMobile || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 document.getElementById('mobile-warning').style.display = 'flex';
                 app.style.display = 'none';
-                return false; // Stop execution
+                return;
             }
+        };
 
-            return true; // All checks passed
+        // --- Main Functions (Global Scope) ---
+
+        async function startScreenShare() {
+            try {
+                // Explicitly ask for video stream
+                stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { 
+                        mediaSource: "screen",
+                        cursor: "always"
+                    },
+                    audio: false
+                });
+
+                const video = document.getElementById('screenVideo');
+                video.srcObject = stream;
+                
+                // UI Updates
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('statusText').textContent = 'Capturing in 3 seconds...';
+                document.getElementById('statusText').style.color = 'var(--accent-color)';
+
+                // Timer
+                setTimeout(() => takeScreenshot(), 3000);
+
+                // Handle "Stop Sharing" from browser UI
+                stream.getVideoTracks()[0].addEventListener('ended', () => stopScreenShare());
+
+            } catch (err) {
+                console.error("Screen Share Error:", err);
+                const status = document.getElementById('statusText');
+                
+                if (err.name === 'NotAllowedError') {
+                    status.textContent = '❌ Permission Denied. Please allow screen access.';
+                } else if (err.name === 'NotFoundError') {
+                    status.textContent = '❌ No screen source found.';
+                } else {
+                    status.textContent = '❌ Error: ' + err.message;
+                }
+                status.style.color = 'var(--danger-color)';
+            }
         }
 
-        // Run environment checks immediately
-        if (checkEnvironment()) {
-            
-            // --- 2. MAIN APP LOGIC ---
-            let stream = null;
-            let canvas = document.getElementById('cropCanvas');
-            let ctx = canvas.getContext('2d');
-            let isDrawing = false;
-            let startX, startY, endX, endY;
-            let currentScreenshot = null;
-            let screenshotCount = 0;
-
-            async function startScreenShare() {
-                try {
-                    stream = await navigator.mediaDevices.getDisplayMedia({
-                        video: { mediaSource: "screen" },
-                        audio: false
-                    });
-
-                    const video = document.getElementById('screenVideo');
-                    video.srcObject = stream;
-                    
-                    document.getElementById('startBtn').disabled = true;
-                    document.getElementById('stopBtn').disabled = false;
-                    document.getElementById('statusText').textContent = 'Capturing in 3 seconds...';
-                    document.getElementById('statusText').style.color = 'var(--accent-color)';
-
-                    setTimeout(() => takeScreenshot(), 3000);
-
-                    stream.getVideoTracks()[0].addEventListener('ended', () => stopScreenShare());
-
-                } catch (err) {
-                    console.error("Error: " + err);
-                    document.getElementById('statusText').textContent = err.message;
-                }
-            }
-
-            function takeScreenshot() {
-                const video = document.getElementById('screenVideo');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                currentScreenshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                
-                canvas.style.display = 'block';
-                document.getElementById('cropControls').style.display = 'flex';
-                document.getElementById('statusText').textContent = 'Select area to crop';
-                document.getElementById('statusText').style.color = 'var(--text-primary)';
-                
-                setupCropSelection();
-            }
-
-            function setupCropSelection() {
-                canvas.onmousedown = (e) => {
-                    isDrawing = true;
-                    const rect = canvas.getBoundingClientRect();
-                    const scaleX = canvas.width / rect.width;
-                    const scaleY = canvas.height / rect.height;
-                    startX = (e.clientX - rect.left) * scaleX;
-                    startY = (e.clientY - rect.top) * scaleY;
-                };
-
-                canvas.onmousemove = (e) => {
-                    if (!isDrawing) return;
-                    const rect = canvas.getBoundingClientRect();
-                    endX = (e.clientX - rect.left) * (canvas.width / rect.width);
-                    endY = (e.clientY - rect.top) * (canvas.height / rect.height);
-                    
-                    ctx.putImageData(currentScreenshot, 0, 0);
-                    const w = endX - startX;
-                    const h = endY - startY;
-                    
-                    // Darken background
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-                    ctx.fillRect(0, 0, canvas.width, startY);
-                    ctx.fillRect(0, startY + h, canvas.width, canvas.height - (startY + h));
-                    ctx.fillRect(0, startY, startX, h);
-                    ctx.fillRect(startX + w, startY, canvas.width - (startX + w), h);
-
-                    // White Border
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(startX, startY, w, h);
-                    
-                    // Grid
-                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(startX + w/3, startY); ctx.lineTo(startX + w/3, endY);
-                    ctx.moveTo(startX + 2*w/3, startY); ctx.lineTo(startX + 2*w/3, endY);
-                    ctx.moveTo(startX, startY + h/3); ctx.lineTo(endX, startY + h/3);
-                    ctx.moveTo(startX, startY + 2*h/3); ctx.lineTo(endX, startY + 2*h/3);
-                    ctx.stroke();
-                };
-
-                canvas.onmouseup = () => isDrawing = false;
-            }
-
-            window.confirmCrop = function() {
-                if (!currentScreenshot || !endX || !endY) return;
-                
-                const width = Math.abs(endX - startX);
-                const height = Math.abs(endY - startY);
-                const x = Math.min(startX, endX);
-                const y = Math.min(startY, endY);
-
-                const croppedCanvas = document.createElement('canvas');
-                croppedCanvas.width = width;
-                croppedCanvas.height = height;
-                croppedCanvas.getContext('2d').drawImage(canvas, x, y, width, height, 0, 0, width, height);
-                
-                addToSidebar(croppedCanvas.toDataURL());
-                resetCropTool();
-            };
-
-            function addToSidebar(imageData) {
-                screenshotCount++;
-                const sidebar = document.getElementById('croppedImages');
-                const item = document.createElement('div');
-                item.className = 'cropped-item';
-                item.innerHTML = `
-                    <div class="meta-info">
-                        <strong>#${screenshotCount}</strong>
-                        <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    <img src="${imageData}">
-                    <button class="download-btn" onclick="downloadImage('${imageData}', ${screenshotCount})">
-                        Download PNG
-                    </button>
-                `;
-                sidebar.insertBefore(item, sidebar.firstChild);
-                
-                document.getElementById('statusText').textContent = 'Saved. Next in 3s...';
-                setTimeout(() => { if (stream?.active) takeScreenshot(); }, 3000);
-            }
-
-            window.downloadImage = function(dataUrl, number) {
-                const link = document.createElement('a');
-                link.download = `capture-${number}.png`;
-                link.href = dataUrl;
-                link.click();
-            };
-
-            window.cancelCrop = function() {
-                resetCropTool();
-                document.getElementById('statusText').textContent = 'Skipped. Next in 3s...';
-                setTimeout(() => { if (stream?.active) takeScreenshot(); }, 3000);
-            };
-
-            function resetCropTool() {
-                canvas.style.display = 'none';
-                document.getElementById('cropControls').style.display = 'none';
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                startX = startY = endX = endY = null;
-            }
-
-            window.stopScreenShare = function() {
-                stream?.getTracks().forEach(t => t.stop());
+        function stopScreenShare() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
                 stream = null;
-                document.getElementById('screenVideo').srcObject = null;
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
-                resetCropTool();
-                document.getElementById('statusText').textContent = 'Ready to start';
-                document.getElementById('statusText').style.color = 'var(--text-secondary)';
+            }
+            
+            document.getElementById('screenVideo').srcObject = null;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            resetCropTool();
+            document.getElementById('statusText').textContent = 'Ready to start';
+            document.getElementById('statusText').style.color = 'var(--text-secondary)';
+        }
+
+        function takeScreenshot() {
+            if (!stream || !stream.active) return;
+
+            const video = document.getElementById('screenVideo');
+            
+            // Ensure video has dimensions
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                console.error("Video dimensions are zero. Stream might not be ready.");
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            currentScreenshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            canvas.style.display = 'block';
+            document.getElementById('cropControls').style.display = 'flex';
+            document.getElementById('statusText').textContent = 'Select area to crop';
+            document.getElementById('statusText').style.color = 'var(--text-primary)';
+            
+            setupCropSelection();
+        }
+
+        function setupCropSelection() {
+            canvas.onmousedown = (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                startX = (e.clientX - rect.left) * scaleX;
+                startY = (e.clientY - rect.top) * scaleY;
             };
+
+            canvas.onmousemove = (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                endX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                endY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                ctx.putImageData(currentScreenshot, 0, 0);
+                const w = endX - startX;
+                const h = endY - startY;
+                
+                // Dark overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                ctx.fillRect(0, 0, canvas.width, startY);
+                ctx.fillRect(0, startY + h, canvas.width, canvas.height - (startY + h));
+                ctx.fillRect(0, startY, startX, h);
+                ctx.fillRect(startX + w, startY, canvas.width - (startX + w), h);
+
+                // Border & Grid
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(startX, startY, w, h);
+            };
+
+            canvas.onmouseup = () => isDrawing = false;
+        }
+
+        function confirmCrop() {
+            if (!currentScreenshot || !endX || !endY) return;
+            
+            const width = Math.abs(endX - startX);
+            const height = Math.abs(endY - startY);
+            const x = Math.min(startX, endX);
+            const y = Math.min(startY, endY);
+
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = width;
+            croppedCanvas.height = height;
+            croppedCanvas.getContext('2d').drawImage(canvas, x, y, width, height, 0, 0, width, height);
+            
+            addToSidebar(croppedCanvas.toDataURL());
+            resetCropTool();
+        }
+
+        function addToSidebar(imageData) {
+            screenshotCount++;
+            const sidebar = document.getElementById('croppedImages');
+            const item = document.createElement('div');
+            item.className = 'cropped-item';
+            item.innerHTML = `
+                <div class="meta-info">
+                    <strong>#${screenshotCount}</strong>
+                    <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                </div>
+                <img src="${imageData}">
+                <button class="download-btn" onclick="downloadImage('${imageData}', ${screenshotCount})">
+                    Download PNG
+                </button>
+            `;
+            sidebar.insertBefore(item, sidebar.firstChild);
+            
+            document.getElementById('statusText').textContent = 'Saved. Next in 3s...';
+            setTimeout(() => { if (stream && stream.active) takeScreenshot(); }, 3000);
+        }
+
+        function downloadImage(dataUrl, number) {
+            const link = document.createElement('a');
+            link.download = `capture-${number}.png`;
+            link.href = dataUrl;
+            link.click();
+        }
+
+        function cancelCrop() {
+            resetCropTool();
+            document.getElementById('statusText').textContent = 'Skipped. Next in 3s...';
+            setTimeout(() => { if (stream && stream.active) takeScreenshot(); }, 3000);
+        }
+
+        function resetCropTool() {
+            canvas.style.display = 'none';
+            document.getElementById('cropControls').style.display = 'none';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            startX = startY = endX = endY = null;
         }
     </script>
 </body>
