@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!----- BASIC SEO ----->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Scanner // IP & Speed Test Tool</title>
+    <meta name="description" content="Free online tool to check your IP address, internet speed, GPS location, and device specifications. Fast, responsive, and styled with a unique comic book UI.">
+    <meta name="keywords" content="IP lookup, internet speed test, check my IP, device info, geolocation, GPS tracker, comic UI design, responsive web tool">
+    <meta name="author" content="Identity Scanner Tool">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#4db1f9">
+
+    <!-- --- SOCIAL MEDIA / OPEN GRAPH --- -->
+    <meta property="og:title" content="Identity Scanner // IP & Speed Test">
+    <meta property="og:description" content="Instantly scan your digital identity: IP, Location, Speed, and Device Info.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://black-ice-3dbk.onrender.com/scrapsites/Lookup.html">
+    <meta property="og:image" content="https://your-website-url.com/preview-image.jpg"> <!-- Replace with your actual image URL -->
+
+   
+
+    <!-- --- ICONS & FONTS --- -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- COMIC VARIABLES --- */
+        :root {
+            --paper: #fffcf2;
+            --ink: #0c0c0c;
+            --pop-yellow: #ffe900;
+            --pop-blue: #4db1f9;
+            --pop-red: #ff4d4d;
+            --pop-green: #00f5d4;
+            --pop-orange: #ff9f1c;
+            
+            --border-thick: 4px solid var(--ink);
+            --border-thin: 2px solid var(--ink);
+            --shadow-hard: 6px 6px 0px var(--ink);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--pop-blue);
+            background-image: radial-gradient(rgba(12,12,12,0.15) 20%, transparent 20%);
+            background-size: 20px 20px;
+            font-family: 'Comic Neue', cursive;
+            margin: 0;
+            padding: 1rem;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comic-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--ink);
+            padding: 8px; 
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 8px;
+            border: var(--border-thick);
+            box-shadow: 15px 15px 0px rgba(0,0,0,0.2);
+        }
+
+        .panel {
+            background: var(--paper);
+            position: relative;
+            overflow: hidden;
+            border: var(--border-thin);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* --- HEADER --- */
+        .header-panel {
+            grid-column: span 12;
+            background: var(--pop-yellow);
+            text-align: center;
+            border-bottom: 4px solid black;
+            transform: rotate(-0.5deg);
+            margin-bottom: 10px;
+        }
+
+        /* --- SPEED TEST PANEL --- */
+        .speed-panel {
+            grid-column: span 12;
+            background: var(--pop-orange);
+            min-height: 220px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .speed-readout {
+            text-align: left;
+            flex: 1;
+        }
+
+        .speed-value-box {
+            font-family: 'Bangers';
+            font-size: 5rem;
+            color: white;
+            -webkit-text-stroke: 3px var(--ink);
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+        }
+
+        .speed-unit {
+            font-size: 1.5rem;
+            color: var(--ink);
+            -webkit-text-stroke: 0;
+            background: white;
+            padding: 0 5px;
+            border: 2px solid black;
+            transform: rotate(-5deg);
+            display: inline-block;
+        }
+
+        .gauge-container {
+            width: 200px;
+            height: 20px;
+            background: white;
+            border: 3px solid black;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            background: var(--pop-red);
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        .speed-btn {
+            background: white;
+            border: 4px solid black;
+            padding: 15px;
+            font-family: 'Bangers';
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 5px 5px 0 black;
+        }
+        .speed-btn:active { transform: translate(2px,2px); box-shadow: 3px 3px 0 black; }
+
+        /* --- EXISTING PANELS --- */
+        .ip-panel { grid-column: span 6; background: #fff; }
+        .action-panel { grid-column: span 6; background: var(--pop-red); text-align: center; }
+        .gps-panel { grid-column: span 12; background: var(--pop-green); display: flex; gap:10px; flex-wrap:wrap; }
+        .tech-panel { grid-column: span 12; }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { 
+            font-family: 'Bangers', cursive;
+            font-size: 3.5rem; 
+            color: var(--pop-red);
+            text-shadow: 3px 3px 0px #fff;
+            -webkit-text-stroke: 2px var(--ink);
+            margin: 0;
+        }
+
+        .label {
+            font-size: 1rem;
+            font-weight: bold;
+            background: var(--ink);
+            color: white;
+            display: inline-block;
+            padding: 2px 8px;
+            margin-bottom: 5px;
+            font-family: 'Bangers';
+            letter-spacing: 1px;
+        }
+
+        .data-value { font-size: 1.2rem; font-weight: 700; }
+        .ip-display { font-size: 2rem; font-family: 'Bangers'; color: var(--pop-blue); -webkit-text-stroke: 1px var(--ink); }
+        
+        .gps-box {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid black;
+            padding: 8px;
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* --- SCAN BUTTON --- */
+        .scan-btn {
+            background: var(--pop-yellow);
+            border: 4px solid black;
+            padding: 1rem 2rem;
+            font-family: 'Bangers';
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 5px 5px 0 black;
+            width: 100%;
+        }
+        .scan-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 black; }
+
+        @media (max-width: 768px) {
+            .comic-container { grid-template-columns: 1fr; }
+            .speed-panel { flex-direction: column; text-align: center; gap: 20px; }
+            .speed-readout { text-align: center; }
+            .ip-panel, .action-panel { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="comic-container">
+        
+        <header class="panel header-panel">
+            <h1>DIAGNOSTICS // HUB</h1>
+        </header>
+
+        <!-- SPEED TEST PANEL -->
+        <section class="panel speed-panel">
+            <div class="speed-readout">
+                <h2 class="label" style="background: white; color:black; margin:0;">CONNECTION SPEED</h2>
+                <br>
+                <div class="speed-value-box" id="speed-value">0.0</div>
+                <div class="speed-unit">Mbps</div>
+                
+                <div class="gauge-container">
+                    <div class="gauge-fill" id="gauge-fill"></div>
+                </div>
+                <div style="margin-top:5px; font-weight:bold; font-size:0.9rem;" id="net-type">NET TYPE: DETECTING...</div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="speed-btn" onclick="runSpeedTest()" id="speed-btn-text">RUN SPEED TEST</button>
+            </div>
+        </section>
+
+        <!-- IP INFO -->
+        <section class="panel ip-panel">
+            <h2 class="label">NETWORK ID</h2>
+            <div class="ip-display" id="ip-text">?.?.?.?</div>
+            <div id="isp-text" style="font-weight:bold; color:#666;">ISP: WAIT</div>
+        </section>
+
+        <!-- MAIN SCAN BUTTON -->
+        <section class="panel action-panel">
+            <button class="scan-btn" onclick="fullScan()">FULL SYSTEM SCAN</button>
+        </section>
+
+        <!-- GPS -->
+        <section class="panel gps-panel">
+            <div class="gps-box">
+                <div class="label" style="background:var(--pop-red);">LAT</div>
+                <div id="lat-text">0.00</div>
+            </div>
+            <div class="gps-box">
+                <div class="label" style="background:var(--pop-red);">LONG</div>
+                <div id="long-text">0.00</div>
+            </div>
+            <div class="gps-box">
+                <div class="label" style="background:white; color:black;">ACCURACY</div>
+                <div id="acc-text">--</div>
+            </div>
+            <a id="map-link" style="display:none; font-weight:bold; color:black; border:2px solid black; padding:5px; background:white; text-decoration:none;" target="_blank" href="#" rel="noopener noreferrer">MAP ➜</a>
+        </section>
+
+        <!-- SPECS -->
+        <section class="panel tech-panel">
+            <h2 class="label">HARDWARE</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 10px;">
+                <div><small>OS:</small> <b id="os-text">-</b></div>
+                <div><small>BROWSER:</small> <b id="browser-text">-</b></div>
+                <div><small>RES:</small> <b id="screen-text">-</b></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 1. SPEED TEST LOGIC ---
+        async function runSpeedTest() {
+            const speedVal = document.getElementById('speed-value');
+            const gauge = document.getElementById('gauge-fill');
+            const btn = document.getElementById('speed-btn-text');
+            const netType = document.getElementById('net-type');
+
+            btn.disabled = true;
+            btn.innerText = "TESTING...";
+            speedVal.innerText = "0.0";
+            gauge.style.width = "0%";
+
+            // Quick API Check (Network Info API)
+            if (navigator.connection) {
+                const type = navigator.connection.effectiveType || 'Unknown';
+                const downlink = navigator.connection.downlink || '?';
+                netType.innerText = `NET TYPE: ${type.toUpperCase()} (~${downlink} Mbps est.)`;
+            }
+
+            // Real Download Test
+            // We use a random image from Wikimedia (high availability) to avoid caching (cache busting)
+            const startTime = new Date().getTime();
+            // Use a larger file for better accuracy, approx 1-2MB
+            const testUrl = "https://upload.wikimedia.org/wikipedia/commons/3/3d/LARGE_elevation.jpg?t=" + startTime; 
+            
+            try {
+                const response = await fetch(testUrl);
+                const reader = response.body.getReader();
+                const contentLength = +response.headers.get('Content-Length');
+                
+                let receivedLength = 0;
+                
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    receivedLength += value.length;
+                    
+                    if(contentLength) {
+                        const pct = (receivedLength / contentLength) * 100;
+                        gauge.style.width = pct + "%";
+                    }
+                }
+
+                const endTime = new Date().getTime();
+                const duration = (endTime - startTime) / 1000; // seconds
+                const bitsLoaded = receivedLength * 8;
+                const speedBps = bitsLoaded / duration;
+                const speedMbps = (speedBps / 1024 / 1024).toFixed(2);
+
+                speedVal.innerText = speedMbps;
+                gauge.style.width = "100%";
+                btn.innerText = "TEST AGAIN";
+                btn.disabled = false;
+
+            } catch (e) {
+                speedVal.innerText = "ERR";
+                btn.innerText = "RETRY";
+                btn.disabled = false;
+            }
+        }
+
+        // --- 2. FULL SCAN LOGIC ---
+        async function fullScan() {
+            // IP & ISP
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                document.getElementById('ip-text').innerText = data.ip || 'Unavailable';
+                document.getElementById('isp-text').innerText = data.org || 'Unknown ISP';
+            } catch(e) { 
+                document.getElementById('ip-text').innerText = "ERR"; 
+            }
+
+            // Device Info
+            document.getElementById('os-text').innerText = getOS();
+            document.getElementById('browser-text').innerText = getBrowser();
+            document.getElementById('screen-text').innerText = `${window.screen.width}x${window.screen.height}`;
+
+            // GPS
+            if("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude.toFixed(5);
+                    const long = pos.coords.longitude.toFixed(5);
+                    document.getElementById('lat-text').innerText = lat;
+                    document.getElementById('long-text').innerText = long;
+                    document.getElementById('acc-text').innerText = Math.round(pos.coords.accuracy) + "m";
+                    
+                    const map = document.getElementById('map-link');
+                    map.style.display = "block";
+                    map.href = `https://www.google.com/maps?q=${lat},${long}`;
+                }, err => {
+                    document.getElementById('lat-text').innerText = "DENIED";
+                    document.getElementById('long-text').innerText = "DENIED";
+                });
+            } else {
+                 document.getElementById('lat-text').innerText = "N/A";
+            }
+        }
+
+        // Helpers
+        function getOS() {
+            if (navigator.userAgent.indexOf("Win")!=-1) return "WIN";
+            if (navigator.userAgent.indexOf("Mac")!=-1) return "MAC";
+            if (navigator.userAgent.indexOf("Linux")!=-1) return "LINUX";
+            if (navigator.userAgent.indexOf("Android")!=-1) return "ANDROID";
+            if (navigator.userAgent.indexOf("like Mac")!=-1) return "IOS";
+            return "UNK";
+        }
+        function getBrowser() {
+            if (navigator.userAgent.indexOf("Chrome")!=-1) return "CHROME";
+            if (navigator.userAgent.indexOf("Firefox")!=-1) return "FIREFOX";
+            if (navigator.userAgent.indexOf("Safari")!=-1) return "SAFARI";
+            return "UNK";
+        }
+    </script>
+</body>
+</html>
