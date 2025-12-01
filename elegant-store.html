@@ -394,6 +394,6 @@ if(confirm('Delete this site permanently?')){
 try{ await remove(ref(db, `sites/${id}`)) }catch(e){ alert('Error deleting: '+ e.message) }
 }
 };
-</script>
+</script><script> document.addEventListener('contextmenu', event => event.preventDefault()); </script>
 </body>
 </html>
