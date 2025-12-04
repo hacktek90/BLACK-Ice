@@ -738,7 +738,11 @@ let full = '';
 for await (const part of response) {
 if (part?.text) {
 full += part.text;
-contentDiv.innerHTML = marked.parse(full);
+// Use DOMPurify sanitize: false to preserve code blocks
+contentDiv.innerHTML = marked.parse(full, {
+mangle: false,
+headerIds: false
+});
 contentDiv.querySelectorAll('pre code').forEach(block => {
 Prism.highlightElement(block);
 if (!block.closest('.code-wrapper')) {
