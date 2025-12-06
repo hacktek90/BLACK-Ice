@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Full GrapesJS Builder</title>
+
+  <!-- Core & preset CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css">
+  <!-- Code editor plugin CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs-component-code-editor/dist/grapesjs-component-code-editor.min.css">
+
+  <!-- Core & preset JS -->
+  <script src="https://unpkg.com/grapesjs"></script>
+  <script src="https://unpkg.com/grapesjs-preset-webpage"></script>
+
+  <!-- Extra plugins JS -->
+  <script src="https://unpkg.com/grapesjs-component-code-editor"></script>
+  <script src="https://unpkg.com/grapesjs-blocks-basic"></script>
+  <script src="https://unpkg.com/grapesjs-plugin-forms"></script>
+  <script src="https://unpkg.com/grapesjs-navbar"></script>
+  <script src="https://unpkg.com/grapesjs-tabs"></script>
+
+  <style>
+    html, body { margin: 0; height: 100%; }
+  </style>
+</head>
+<body>
+  <!-- Canvas / initial content -->
+  <div id="gjs" style="height:100%;">
+    <header class="hero-header">
+      <h1>GrapesJS Full Builder</h1>
+      <p>Select any element and use the right panels or the Code button to edit.</p>
+    </header>
+
+    <section class="hero-section">
+      <h2>Start building</h2>
+      <p>Drag blocks from the left panel: basic blocks, forms, navbar, tabs and more.</p>
+    </section>
+
+    <style>
+      body { font-family: sans-serif; }
+      .hero-header {
+        padding: 40px;
+        text-align: center;
+        background: #222;
+        color: #fff;
+      }
+      .hero-section {
+        padding: 40px;
+        text-align: center;
+      }
+    </style>
+  </div>
+
+  <script>
+    const editor = grapesjs.init({
+      container: '#gjs',
+      height: '100%',
+      fromElement: true,
+      storageManager: false,
+
+      plugins: [
+        'gjs-preset-webpage',           // full website preset
+        'grapesjs-component-code-editor',
+        'gjs-blocks-basic',             // extra layout & media blocks [web:28]
+        'grapesjs-plugin-forms',        // form fields & form blocks [web:77]
+        'grapesjs-navbar',              // responsive navbar block [web:82]
+        'grapesjs-tabs'                 // tabs component/block [web:76][web:84]
+      ],
+
+      pluginsOpts: {
+        'grapesjs-component-code-editor': {
+          codeViewOptions: {
+            theme: 'hopscotch',
+            readOnly: false
+          },
+          clearData: false,
+          editJs: false
+        },
+        'gjs-blocks-basic': {
+          flexGrid: true
+        },
+        'grapesjs-plugin-forms': {
+          blocks: ['form', 'input', 'textarea', 'select', 'button',
+                   'label', 'checkbox', 'radio']
+        },
+        'grapesjs-navbar': {
+          // defaults are fine
+        },
+        'grapesjs-tabs': {
+          // defaults are fine
+        }
+      }
+    });
+
+    // Add a Code Editor button into the existing "views" panel (top-right)
+    editor.on('load', () => {
+      const pn = editor.Panels;
+
+      pn.addButton('views', {
+        id: 'open-code',
+        className: 'fa fa-file-code-o',
+        command: 'open-code',          // command from code-editor plugin [web:47]
+        attributes: { title: 'Open Code Editor' }
+      });
+    });
+  </script>
+</body>
+</html>
