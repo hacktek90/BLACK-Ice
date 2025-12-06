@@ -1,8 +1,4 @@
 User-agent: *
-Disallow:
+Allow: /
+Sitemap: https://blackice-ac.vercel.app/sitemap.xml
 
-# If you have an admin area or backend paths you don’t want indexed, you can add:
-# Disallow: /admin/
-# Disallow: /api/
-
-Sitemap: https://black-ice-3dbk.onrender.com/sitemap.xml
