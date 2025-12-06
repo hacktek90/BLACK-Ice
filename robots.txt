@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://blackice-ac.vercel.app/sitemap.xml
+https://black-ice-3dbk.onrender.com/sitemap.xml
 
