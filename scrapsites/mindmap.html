@@ -1140,29 +1140,6 @@
     }
 
     window.addEventListener('load', init);
-  </script><script>
-(function () {
-    const mobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-    );
-
-    const mobileURL = "https://black-ice-3dbk.onrender.com/scrapsites/mindmap.html";
-    const desktopURL = "https://black-ice-3dbk.onrender.com/scrapsites/mindv2.html";
-
-    try {
-        // If inside iframe → redirect parent
-        if (window.top !== window.self) {
-            window.top.location.href = mobile ? mobileURL : desktopURL;
-        } else {
-            // If NOT inside iframe → normal redirect
-            window.location.href = mobile ? mobileURL : desktopURL;
-        }
-    } catch (e) {
-        // If cross-origin block occurs → fallback method
-        window.location.href = mobile ? mobileURL : desktopURL;
-    }
-})();
-</script>
-
+  </script>
 </body>
 </html>
