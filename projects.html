@@ -436,7 +436,16 @@
       });
     });
   </script>
- 
+ <script>
+(function() {
+  // If the window is NOT inside an iframe
+  if (window.self === window.top) {
+    // Redirect
+    window.location.href = "https://blackice-ac.vercel.app/";
+  }
+})();
+</script>
+
 
 </body>
 </html>
