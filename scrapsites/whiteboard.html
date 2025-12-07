@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
 
-  <title>Online Whiteboard – Instant Drawing Board</title>
-  <meta name="description" content="Instant online whiteboard powered by Excalidraw and tldraw." />
-  <meta name="keywords" content="online whiteboard, excalidraw, tldraw, drawing board" />
+  <title>Online Whiteboard – Multi Board</title>
+  <meta name="description" content="Online whiteboard launcher powered by Excalidraw and tldraw." />
+  <meta name="keywords" content="online whiteboard, excalidraw, tldraw, drawing tool" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -22,11 +22,12 @@
       overflow: hidden;
     }
 
+    /* Modern modal */
     .modal {
       position: fixed;
       inset: 0;
       background: rgba(2, 6, 23, 0.85);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(18px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -39,15 +40,14 @@
       padding: 26px 22px;
       width: 92%;
       max-width: 440px;
-      border-radius: 24px;
+      border-radius: 26px;
       text-align: center;
-      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
     }
 
     .card h1 {
       font-size: 1.4rem;
       margin-bottom: 10px;
-      letter-spacing: 0.4px;
     }
 
     .subtitle {
@@ -67,7 +67,7 @@
       cursor: pointer;
       background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: white;
-      transition: transform 0.15s ease;
+      transition: transform .15s ease;
     }
 
     .btn:active {
@@ -81,81 +81,90 @@
       line-height: 1.4;
     }
 
+    /* Draggable close button */
     .close-btn {
       position: fixed;
       top: 16px;
       left: 16px;
       z-index: 2000;
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
       display: none;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
-      cursor: pointer;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-size: 1.5rem;
+      cursor: grab;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.2);
       backdrop-filter: blur(10px);
+      user-select: none;
     }
 
-    .frame {
+    /* Frames */
+    .frame, .preload {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100vh;
       border: none;
+    }
+
+    .frame {
       display: none;
       z-index: 10;
     }
 
     .preload {
-      position: fixed;
       width: 1px;
       height: 1px;
       opacity: 0;
       pointer-events: none;
       z-index: -1;
     }
+
+    @media (max-width: 600px) {
+      .card h1 { font-size: 1.25rem; }
+    }
   </style>
 </head>
 <body>
 
-<div class="close-btn" id="closeBtn" onclick="showMenu()">✕</div>
+<!-- Draggable close button -->
+<div class="close-btn" id="closeBtn">✕</div>
 
-<!-- Preload -->
+<!-- Preload frames -->
 <iframe class="preload" src="https://excalidraw.com"></iframe>
 <iframe class="preload" src="https://www.tldraw.com"></iframe>
 
+<!-- Active frames -->
 <iframe class="frame" id="excalidrawFrame" src="https://excalidraw.com"></iframe>
 <iframe class="frame" id="tldrawFrame" src="https://www.tldraw.com"></iframe>
 
-<!-- Mode Selector -->
+<!-- Mode selector -->
 <div class="modal" id="modeModal">
   <div class="card">
     <h1>Online Whiteboard</h1>
     <div class="subtitle">
-      Choose your drawing engine to get started
+      Choose your preferred drawing board to begin
     </div>
 
-    <button class="btn" onclick="showBoard('excalidraw')">
-      Excalidraw Board
-    </button>
-    <button class="btn" onclick="showBoard('tldraw')">
-      tldraw Board
-    </button>
+    <button class="btn" onclick="showBoard('excalidraw')">Excalidraw</button>
+    <button class="btn" onclick="showBoard('tldraw')">tldraw</button>
 
     <div class="powered">
-      This tool acts as a launcher interface only.<br>
-      Full drawing experience is powered by Excalidraw and tldraw.
+      This interface is independently built.<br>
+      Drawing boards are powered by Excalidraw and tldraw.
     </div>
   </div>
 </div>
 
 <script>
-function showBoard(type){
+/* Switching logic */
+function showBoard(type) {
   document.getElementById("modeModal").style.display = "none";
-  document.getElementById("closeBtn").style.display = "flex";
+  const closeBtn = document.getElementById("closeBtn");
+  closeBtn.style.display = "flex";
 
   const excal = document.getElementById("excalidrawFrame");
   const tld = document.getElementById("tldrawFrame");
@@ -163,17 +172,67 @@ function showBoard(type){
   excal.style.display = "none";
   tld.style.display = "none";
 
-  if(type === "excalidraw") excal.style.display = "block";
-  if(type === "tldraw") tld.style.display = "block";
+  if (type === "excalidraw") excal.style.display = "block";
+  if (type === "tldraw") tld.style.display = "block";
 }
 
-function showMenu(){
+function showMenu() {
   document.getElementById("modeModal").style.display = "flex";
   document.getElementById("closeBtn").style.display = "none";
 
   document.getElementById("excalidrawFrame").style.display = "none";
   document.getElementById("tldrawFrame").style.display = "none";
 }
+
+/* Make close button clickable */
+const closeBtn = document.getElementById("closeBtn");
+closeBtn.addEventListener("click", showMenu);
+
+/* Make close button draggable */
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+// Mouse
+closeBtn.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  closeBtn.style.cursor = "grabbing";
+  offsetX = e.clientX - closeBtn.offsetLeft;
+  offsetY = e.clientY - closeBtn.offsetTop;
+});
+
+// Touch
+closeBtn.addEventListener("touchstart", (e) => {
+  isDragging = true;
+  const t = e.touches[0];
+  offsetX = t.clientX - closeBtn.offsetLeft;
+  offsetY = t.clientY - closeBtn.offsetTop;
+}, { passive: true });
+
+// Mouse move
+document.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+  closeBtn.style.left = (e.clientX - offsetX) + "px";
+  closeBtn.style.top = (e.clientY - offsetY) + "px";
+});
+
+// Touch move
+document.addEventListener("touchmove", (e) => {
+  if (!isDragging) return;
+  const t = e.touches[0];
+  closeBtn.style.left = (t.clientX - offsetX) + "px";
+  closeBtn.style.top = (t.clientY - offsetY) + "px";
+}, { passive: true });
+
+// Release
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+  closeBtn.style.cursor = "grab";
+});
+
+document.addEventListener("touchend", () => {
+  isDragging = false;
+});
 </script>
 
 </body>
