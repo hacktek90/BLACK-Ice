@@ -28,29 +28,434 @@
 <body>
   <!-- Canvas / initial content -->
   <div id="gjs" style="height:100%;">
-    <header class="hero-header">
-      <h1>GrapesJS Full Builder</h1>
-      <p>Select any element and use the right panels or the Code button to edit.</p>
-    </header>
 
-    <section class="hero-section">
-      <h2>Start building</h2>
-      <p>Drag blocks from the left panel: basic blocks, forms, navbar, tabs and more.</p>
-    </section>
+    <!-- START modern long template -->
+    <div class="main-container">
+      <!-- Navigation -->
+      <nav class="navbar">
+        <div class="logo">MINIMAL.</div>
+        <div class="nav-links">
+          <a href="#" class="nav-link">Work</a>
+          <a href="#" class="nav-link">Services</a>
+          <a href="#" class="nav-link">About</a>
+          <a href="#" class="nav-link primary-link">Get in Touch</a>
+        </div>
+      </nav>
 
+      <!-- Hero -->
+      <header class="hero">
+        <div class="hero-content">
+          <span class="badge">New Collection 2025</span>
+          <h1 class="hero-title">Design that<br>Speaks Volumes.</h1>
+          <p class="hero-subtitle">
+            We craft digital experiences that strip away the unnecessary, leaving only what matters.
+            Pure, functional, and timeless.
+          </p>
+          <div class="hero-actions">
+            <a href="#" class="btn-primary">View Projects</a>
+            <a href="#" class="btn-text">Read Manifest &rarr;</a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Logos strip -->
+      <section class="logo-strip">
+        <p class="strip-label">Trusted by forward-thinking companies</p>
+        <div class="logos-grid">
+          <div class="logo-item">ACME Corp</div>
+          <div class="logo-item">Stripe</div>
+          <div class="logo-item">Linear</div>
+          <div class="logo-item">Vercel</div>
+          <div class="logo-item">Framer</div>
+        </div>
+      </section>
+
+      <!-- Split section -->
+      <section class="split-section">
+        <div class="split-text">
+          <h2 class="section-title">Form Follows Function</h2>
+          <p class="section-desc">
+            Great design feels effortless. It works so well you barely notice it,
+            because every detail is aligned with user needs.
+          </p>
+          <ul class="feature-list">
+            <li>Strategic user experience flows</li>
+            <li>Performance-first front-end</li>
+            <li>Scalable design systems</li>
+          </ul>
+        </div>
+        <div class="split-image"></div>
+      </section>
+
+      <!-- Stats -->
+      <section class="stats-section">
+        <div class="stat-item">
+          <span class="stat-number">150+</span>
+          <span class="stat-label">Projects Launched</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">40%</span>
+          <span class="stat-label">Avg. Conversion Lift</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">10yr</span>
+          <span class="stat-label">Industry Experience</span>
+        </div>
+      </section>
+
+      <!-- Services / Bento -->
+      <section class="services-section">
+        <div class="section-header">
+          <h2 class="section-title">Our Expertise</h2>
+          <p class="section-desc">Comprehensive design and development for modern brands.</p>
+        </div>
+        <div class="bento-grid">
+          <div class="bento-card large">
+            <h3>Brand Identity</h3>
+            <p>Logos, typography, and visual systems that stay timeless.</p>
+          </div>
+          <div class="bento-card">
+            <h3>Web Design</h3>
+            <p>Interfaces that feel clean, intentional, and fast.</p>
+          </div>
+          <div class="bento-card">
+            <h3>Development</h3>
+            <p>Modern stacks: JAMstack, SPAs, and static sites.</p>
+          </div>
+          <div class="bento-card wide">
+            <h3>Content Strategy</h3>
+            <p>Voice, tone, and structure that support your product story.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="cta-section">
+        <div class="cta-content">
+          <h2>Ready to elevate your brand?</h2>
+          <p>Share your idea, and get a tailored concept within days.</p>
+          <a href="#" class="btn-white">Start a Project</a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-grid">
+          <div class="footer-col brand-col">
+            <div class="logo">MINIMAL.</div>
+            <p>Designing the future, one pixel at a time.</p>
+          </div>
+          <div class="footer-col">
+            <h4>Sitemap</h4>
+            <a href="#">Home</a>
+            <a href="#">Work</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+          </div>
+          <div class="footer-col">
+            <h4>Social</h4>
+            <a href="#">Twitter / X</a>
+            <a href="#">Instagram</a>
+            <a href="#">LinkedIn</a>
+          </div>
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 Minimal Studio. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Page styles inside canvas so they are editable via code editor -->
     <style>
-      body { font-family: sans-serif; }
-      .hero-header {
-        padding: 40px;
-        text-align: center;
-        background: #222;
-        color: #fff;
+      :root {
+        --bg-color: #ffffff;
+        --bg-alt: #f9f9f9;
+        --text-main: #111111;
+        --text-muted: #666666;
+        --accent: #000000;
+        --border-color: #eaeaea;
       }
-      .hero-section {
-        padding: 40px;
+
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px 80px;
+      }
+
+      h1, h2, h3, h4 {
+        margin-top: 0;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      /* Nav */
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 0;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: -1px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+      .nav-link {
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+      .nav-link:hover { color: var(--text-main); }
+      .primary-link { color: var(--text-main); font-weight: 600; }
+
+      /* Hero */
+      .hero { padding: 120px 0 80px; max-width: 900px; }
+      .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f0f0f0;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 24px;
+      }
+      .hero-title { font-size: 4.5rem; font-weight: 700; margin-bottom: 24px; }
+      .hero-subtitle {
+        font-size: 1.35rem;
+        color: var(--text-muted);
+        margin-bottom: 40px;
+        max-width: 600px;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      .btn-primary {
+        padding: 18px 36px;
+        background-color: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+      .btn-text {
+        text-decoration: none;
+        color: var(--text-main);
+        font-weight: 600;
+      }
+
+      /* Logo strip */
+      .logo-strip {
+        padding: 60px 0;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+      }
+      .strip-label {
         text-align: center;
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .logos-grid {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        opacity: 0.5;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #ccc;
+      }
+
+      /* Split section */
+      .split-section {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 60px;
+        padding: 80px 0;
+        align-items: center;
+      }
+      .section-title { font-size: 2.4rem; margin-bottom: 20px; }
+      .section-desc { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 30px; }
+      .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .feature-list li {
+        margin-bottom: 12px;
+        padding-left: 18px;
+        position: relative;
+      }
+      .feature-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+      }
+      .split-image {
+        height: 320px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #111, #444);
+      }
+
+      /* Stats */
+      .stats-section {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        padding: 80px 0;
+        background: var(--bg-alt);
+        border-radius: 20px;
+        text-align: center;
+        margin: 40px 0 80px;
+      }
+      .stat-number {
+        display: block;
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 10px;
+      }
+      .stat-label { color: var(--text-muted); }
+
+      /* Services / Bento */
+      .services-section { padding-bottom: 80px; }
+      .section-header { margin-bottom: 50px; max-width: 600px; }
+      .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: minmax(220px, auto);
+        gap: 24px;
+      }
+      .bento-card {
+        background: #f5f5f5;
+        padding: 32px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .bento-card.large { grid-row: span 2; background: #e0e0e0; }
+      .bento-card.wide { grid-column: span 2; background: #111; color: white; }
+      .bento-card.wide p { color: #999; }
+      .bento-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
+      .bento-card p { margin: 0; color: #666; }
+
+      /* CTA */
+      .cta-section {
+        padding: 100px 0;
+        background: #000;
+        color: white;
+        text-align: center;
+        border-radius: 20px;
+        margin-bottom: 80px;
+      }
+      .cta-content h2 {
+        font-size: 2.6rem;
+        margin-bottom: 16px;
+      }
+      .cta-content p {
+        color: #b3b3b3;
+        margin-bottom: 32px;
+        font-size: 1.1rem;
+      }
+      .btn-white {
+        background: white;
+        color: black;
+        padding: 14px 28px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+
+      /* Footer */
+      .footer {
+        padding: 80px 0 40px;
+        border-top: 1px solid var(--border-color);
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 60px;
+      }
+      .brand-col p {
+        color: var(--text-muted);
+        max-width: 220px;
+        margin-top: 20px;
+      }
+      .footer-col h4 {
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .footer-col a {
+        display: block;
+        color: var(--text-muted);
+        text-decoration: none;
+        margin-bottom: 10px;
+      }
+      .footer-col a:hover { color: var(--text-main); }
+      .footer-bottom {
+        text-align: center;
+        color: #ccc;
+        font-size: 0.9rem;
+        padding-top: 40px;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      /* Responsive */
+      @media (max-width: 960px) {
+        .hero-title { font-size: 3.4rem; }
+        .split-section {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .split-image {
+          order: -1;
+          height: 260px;
+        }
+        .stats-section,
+        .bento-grid,
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .hero-title { font-size: 2.6rem; }
+        .navbar {
+          flex-direction: column;
+          gap: 16px;
+        }
       }
     </style>
+    <!-- END modern long template -->
+
   </div>
 
   <script>
@@ -63,10 +468,10 @@
       plugins: [
         'gjs-preset-webpage',           // full website preset
         'grapesjs-component-code-editor',
-        'gjs-blocks-basic',             // extra layout & media blocks [web:28]
-        'grapesjs-plugin-forms',        // form fields & form blocks [web:77]
-        'grapesjs-navbar',              // responsive navbar block [web:82]
-        'grapesjs-tabs'                 // tabs component/block [web:76][web:84]
+        'gjs-blocks-basic',
+        'grapesjs-plugin-forms',
+        'grapesjs-navbar',
+        'grapesjs-tabs'
       ],
 
       pluginsOpts: {
@@ -101,7 +506,7 @@
       pn.addButton('views', {
         id: 'open-code',
         className: 'fa fa-file-code-o',
-        command: 'open-code',          // command from code-editor plugin [web:47]
+        command: 'open-code',          // command from code-editor plugin
         attributes: { title: 'Open Code Editor' }
       });
     });
