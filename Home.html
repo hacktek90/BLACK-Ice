@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -708,7 +709,23 @@ transform: translateY(0);
 }
 .os-link-btn svg:first-child {
 flex-shrink: 0;
+}.settings-full-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  margin-right: 4px;
 }
+
+.settings-full-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
 </style>
 </head>
 <body>
@@ -750,9 +767,17 @@ Reload last site
 <div id="settingsDialog" class="settings-dialog">
 <div class="settings-content">
 <div class="settings-header">
-<h2 class="settings-title">Settings & Dashboard</h2>
-<button id="closeSettings" class="close-btn" aria-label="Close settings">&times;</button>
+  <h2 class="settings-title">Settings Dashboard</h2>
+
+  <button id="fullscreenSettingsBtn"
+          class="settings-full-btn"
+          aria-label="Enter fullscreen">
+    ⛶
+  </button>
+
+  <button id="closeSettings" class="close-btn" aria-label="Close settings">&times;</button>
 </div>
+
 <div class="settings-tabs">
 <button class="tab-btn active" data-tab="settings">Settings</button>
 </div>
@@ -1280,6 +1305,42 @@ const settingsDialog = document.getElementById('settingsDialog');
 const closeSettings = document.getElementById('closeSettings');
 const saveSettings = document.getElementById('saveSettings');
 const homeScreenSelect = document.getElementById('homeScreenSelect');
+const fullscreenSettingsBtn = document.getElementById("fullscreenSettingsBtn");
+
+function toggleSiteFullscreen() {
+  const doc = window.document;
+  const docEl = doc.documentElement;
+
+  const requestFullScreen =
+    docEl.requestFullscreen ||
+    docEl.webkitRequestFullscreen ||
+    docEl.mozRequestFullScreen ||
+    docEl.msRequestFullscreen;
+
+  const cancelFullScreen =
+    doc.exitFullscreen ||
+    doc.webkitExitFullscreen ||
+    doc.mozCancelFullScreen ||
+    doc.msExitFullscreen;
+
+  if (!doc.fullscreenElement &&
+      !doc.webkitFullscreenElement &&
+      !doc.mozFullScreenElement &&
+      !doc.msFullscreenElement) {
+    if (requestFullScreen) {
+      requestFullScreen.call(docEl);
+    }
+  } else if (cancelFullScreen) {
+    cancelFullScreen.call(doc);
+  }
+}
+
+if (fullscreenSettingsBtn) {
+  fullscreenSettingsBtn.addEventListener("click", () => {
+    toggleSiteFullscreen();
+  });
+}
+
 function populateHomeScreenOptions() {
 homeScreenSelect.innerHTML = '<option value="">Default Home Screen</option>';
 allSites.forEach(site => {
