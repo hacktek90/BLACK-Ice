@@ -1,148 +1,619 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>File Share</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+  />
+  <title>File Share Companion</title>
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Poppins', sans-serif;
-  height: 100vh;
-  overflow: auto;
-}
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
 
-.wrapper {
-  position: relative; /* needed so the buttons can overlay inside this box */
-  width: 100%;
-  height: 100vh;
-}
+  <!-- Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-}
+  <!-- QR Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-/* Container for the top-left buttons */
-.top-buttons {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 10;
-  display: flex;
-  gap: 8px;
-}
+  <style>
+    :root {
+      --glass-surface: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --glass-blur: blur(24px);
 
-/* Scan QR button */
-#scanBtn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-  background: #0078ff;
-  color: white;
-}
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text-main: #1e293b;
+      --text-sub: #64748b;
+      --danger: #ef4444;
 
-/* Open Link button (starts hidden, appears after scan) */
-#openBtn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-  background: #18a300;
-  color: white;
-  display: none; /* shown after successful scan */
-}
+      --radius-dock: 24px;
+      --radius-btn: 14px;
+      --shadow-dock: 0 12px 40px rgba(0, 0, 0, 0.12);
+      --dock-width: 500px;
+    }
 
-/* QR scanner popup */
-#scannerPopup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 20;
-  flex-direction: column;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-#qr-reader {
-  width: 320px;
-  border-radius: 10px;
-  background: #fff;
-}
+    body {
+      font-family: "Inter", sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      background: #f8fafc;
+      color: var(--text-main);
+    }
 
-#closeScanner {
-  margin-top: 15px;
-  padding: 8px 14px;
-  background: #ff4444;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  font-weight: 600;
-}
-</style>
+    #host-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
+      background: white;
+    }
+
+    .dock-container {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: 92%;
+      max-width: var(--dock-width);
+      display: flex;
+      justify-content: center;
+    }
+
+    .glass-dock {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--glass-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      padding: 10px;
+      border-radius: var(--radius-dock);
+      box-shadow: var(--shadow-dock);
+      width: 100%;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius-btn);
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .input-wrapper:focus-within {
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .icon-left {
+      position: absolute;
+      left: 12px;
+      color: var(--text-sub);
+      font-size: 18px;
+    }
+
+    .dock-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 12px 12px 12px 40px;
+      font-size: 14px;
+      color: var(--text-main);
+      border-radius: var(--radius-btn);
+    }
+    .dock-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .action-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-btn);
+      border: none;
+      background: rgba(255, 255, 255, 0.5);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      flex-shrink: 0;
+    }
+    .action-btn:hover {
+      background: white;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.1);
+      margin: 0 2px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: white;
+      padding: 24px;
+      width: 90%;
+      max-width: 380px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-weight: 600;
+      font-size: 18px;
+      color: var(--text-main);
+    }
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-sub);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    #qr-reader {
+      width: 100%;
+      height: 280px;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    
+    #qr-reader video {
+        object-fit: cover;
+        border-radius: 16px;
+    }
+
+    .info-text {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.5;
+      text-align: left;
+    }
+    .info-text strong {
+      color: var(--text-main);
+    }
+
+    .powered-by {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 12px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(15, 23, 42, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 300;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+      .dock-container {
+        bottom: 20px;
+      }
+      .glass-dock {
+        padding: 8px;
+        gap: 8px;
+      }
+      .action-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      .dock-input {
+        font-size: 13px;
+        padding-left: 36px;
+      }
+      .icon-left {
+        font-size: 16px;
+        left: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-<!-- Scanner Popup -->
-<div id="scannerPopup">
-  <div id="qr-reader"></div>
-  <button id="closeScanner">Close</button>
-</div>
+  <iframe
+    id="host-frame"
+    src="https://krakenfiles.com"
+    allow="clipboard-read; clipboard-write"
+  ></iframe>
 
-<div class="wrapper">
-  <iframe src="https://file.pizza"></iframe>
-
-  <!-- Both buttons overlay at top-left -->
-  <div class="top-buttons">
-    <button id="scanBtn">Scan QR</button>
-    <button id="openBtn">Open Link</button>
+  <div class="toast" id="toast">
+    <i class="ph ph-check-circle"></i>
+    <span id="toast-msg">Notification</span>
   </div>
-</div>
 
-<!-- QR Scanner Library -->
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-let scannedLink = "";
-const scanBtn = document.getElementById("scanBtn");
-const openBtn = document.getElementById("openBtn");
-const scannerPopup = document.getElementById("scannerPopup");
-const closeScanner = document.getElementById("closeScanner");
+  <div class="dock-container">
+    <div class="glass-dock">
+      <button class="action-btn" onclick="resetHome()" title="Upload new file">
+        <i class="ph ph-upload-simple"></i>
+      </button>
 
-scanBtn.onclick = () => {
-  scannerPopup.style.display = "flex";
-  const qrReader = new Html5Qrcode("qr-reader");
-  qrReader.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },
-    (decodedText) => {
-      scannedLink = decodedText;
-      openBtn.style.display = "inline-block"; // show beside Scan QR
-      qrReader.stop();
-      scannerPopup.style.display = "none";
+      <div class="divider"></div>
+
+      <div class="input-wrapper">
+        <i class="ph ph-link icon-left"></i>
+        <input
+          type="text"
+          id="linkInput"
+          class="dock-input"
+          placeholder="Paste file link..."
+          onkeypress="handleEnter(event)"
+        />
+      </div>
+
+      <button
+        class="action-btn btn-primary"
+        onclick="generateQR()"
+        title="Share via QR"
+      >
+        <i class="ph ph-qr-code"></i>
+      </button>
+
+      <button class="action-btn" onclick="initScanner()" title="Scan to download">
+        <i class="ph ph-scan"></i>
+      </button>
+
+      <button class="action-btn" onclick="openModal('infoModal')" title="Info">
+        <i class="ph ph-info"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title">Share File</span>
+        <button class="btn-close" onclick="closeAll()">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <canvas id="qrCanvas"></canvas>
+      <p style="margin-top: 12px; font-size: 13px; color: var(--text-sub)">
+        Scan this code on another device to download.
+      </p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="scanModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title">Scan QR</span>
+        <button class="btn-close" onclick="closeAll()">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div id="qr-reader"></div>
+      <p id="scan-status" style="font-size: 12px; color: var(--text-sub)">
+        Waiting for camera permissions...
+      </p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="infoModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title">How this tool works</span>
+        <button class="btn-close" onclick="closeAll()">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="info-text">
+        <p style="margin-bottom: 8px">
+          <strong>1. Upload:</strong> Use the background site to upload your
+          file.
+        </p>
+        <p style="margin-bottom: 8px">
+          <strong>2. Share:</strong> Copy the file link, paste it in the bar,
+          then tap <i class="ph ph-qr-code"></i> to create a QR code.
+        </p>
+        <p style="margin-bottom: 8px">
+          <strong>3. Receive:</strong> Tap <i class="ph ph-scan"></i> to scan
+          someone else’s QR and open their file link.
+        </p>
+        <p
+          style="
+            margin-top: 10px;
+            font-size: 12px;
+            background: #eff6ff;
+            padding: 8px;
+            border-radius: 8px;
+            color: #1d4ed8;
+          "
+        >
+          Note: Camera access needs HTTPS or localhost. If it fails, check your
+          browser permissions.
+        </p>
+      </div>
+      <div class="powered-by">
+        Powered by <strong>ModernWeb</strong> • QR scanning by
+        <strong>html5-qrcode</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const iframe = document.getElementById("host-frame");
+    const linkInput = document.getElementById("linkInput");
+    const toastEl = document.getElementById("toast");
+    const toastMsg = document.getElementById("toast-msg");
+    const scanStatus = document.getElementById("scan-status");
+
+    let html5QrCode = null;
+    let isScanning = false;
+
+    const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
+      const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+      const size = Math.floor(minEdge * 0.7);
+      return { width: size, height: size };
+    };
+
+    function resetHome() {
+      iframe.src = "https://krakenfiles.com";
+      linkInput.value = "";
+      showToast("Ready to upload new file");
     }
-  );
-};
 
-openBtn.onclick = () => {
-  if (scannedLink) {
-    window.open(scannedLink, "_blank");
-  }
-};
+    function handleEnter(e) {
+      if (e.key === "Enter") {
+        let url = linkInput.value.trim();
+        if (!url) return;
+        if (!url.startsWith("http")) url = "https://" + url;
+        iframe.src = url;
+        showToast("Opening link...");
+      }
+    }
 
-closeScanner.onclick = () => {
-  scannerPopup.style.display = "none";
-};
-</script>
+    function generateQR() {
+      const url = linkInput.value.trim();
+      if (!url) {
+        showToast("Paste a file link first");
+        linkInput.parentElement.style.borderColor = "var(--danger)";
+        setTimeout(
+          () => (linkInput.parentElement.style.borderColor = "transparent"),
+          500
+        );
+        return;
+      }
+      QRCode.toCanvas(
+        document.getElementById("qrCanvas"),
+        url,
+        {
+          width: 220,
+          margin: 1,
+          color: { dark: "#1e293b", light: "#ffffff" },
+        },
+        (err) => {
+          if (!err) openModal("shareModal");
+        }
+      );
+    }
+
+    // --- OPTIMIZED SCANNER INIT ---
+    function initScanner() {
+      if (location.protocol === "file:") {
+        alert("Camera will not work on file://. Use localhost or HTTPS.");
+        return;
+      }
+
+      openModal("scanModal");
+      if (isScanning) return;
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader", {
+          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        });
+      }
+
+      scanStatus.innerText = "Starting camera...";
+
+      // Optimized for performance (Lag Fix)
+      const config = {
+        fps: 10, // Lower FPS (10 is enough for QR) to reduce lag
+        qrbox: qrboxFunction,
+        aspectRatio: 1.0,
+        videoConstraints: {
+          facingMode: "environment",
+          // Lower resolution: 1280 (720p) is faster than 1920 (1080p)
+          width: { min: 640, ideal: 1280, max: 1920 },
+          focusMode: "continuous",
+        },
+      };
+
+      html5QrCode
+        .start({ facingMode: "environment" }, config, onScanSuccess, onScanError)
+        .then(() => {
+          isScanning = true;
+          scanStatus.innerText = "Scanning...";
+          applyAdvancedCameraSettings();
+        })
+        .catch((err) => {
+          console.warn("Back camera failed, trying user camera...", err);
+          html5QrCode
+            .start({ facingMode: "user" }, config, onScanSuccess, onScanError)
+            .then(() => {
+              isScanning = true;
+              scanStatus.innerText = "Using Front Camera";
+            })
+            .catch((err2) => {
+              console.error("All cameras failed", err2);
+              scanStatus.innerHTML =
+                `<span style='color:red'>Camera Error: ${err2.name || err2}</span>`;
+            });
+        });
+    }
+
+    function applyAdvancedCameraSettings() {
+       setTimeout(() => {
+          if (!html5QrCode || !isScanning) return;
+          const track = html5QrCode.getRunningTrackCameraCapabilities();
+          if (track && track.zoom) {
+             html5QrCode.applyVideoConstraints({
+                focusMode: "continuous",
+                advanced: [{ zoom: 2.0 }],
+             }).catch(e => console.log("Zoom not supported", e));
+          }
+       }, 2000);
+    }
+
+    function onScanSuccess(decodedText) {
+      stopScanner().then(() => {
+        closeAll();
+        linkInput.value = decodedText;
+
+        if (decodedText.startsWith("http") || decodedText.includes(".")) {
+          const url = decodedText.startsWith("http")
+            ? decodedText
+            : "https://" + decodedText;
+          iframe.src = url;
+          showToast("Opening scanned link...");
+        } else {
+          showToast("Scanned: " + decodedText);
+        }
+      });
+    }
+
+    function onScanError(_msg) {
+      // ignore
+    }
+
+    function stopScanner() {
+      if (html5QrCode && isScanning) {
+        return html5QrCode
+          .stop()
+          .then(() => {
+            isScanning = false;
+            html5QrCode.clear();
+          })
+          .catch((err) => console.error("Stop failed:", err));
+      }
+      return Promise.resolve();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("active");
+    }
+
+    function closeAll() {
+      document
+        .querySelectorAll(".modal-overlay")
+        .forEach((el) => el.classList.remove("active"));
+      stopScanner();
+    }
+
+    function showToast(msg) {
+      toastMsg.innerText = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 3000);
+    }
+
+    document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeAll();
+      });
+    });
+  </script>
 </body>
 </html>
