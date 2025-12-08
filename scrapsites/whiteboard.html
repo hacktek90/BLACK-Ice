@@ -1,239 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+<meta charset="utf-8">
+<title>Online Whiteboard – Multi Board</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+/* --- CORE STYLES --- */
+* { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+body {
+    margin: 0;
+    background: radial-gradient(circle at 50% 0%, #1e293b, #020617);
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+}
 
-  <title>Online Whiteboard – Multi Board</title>
-  <meta name="description" content="Online whiteboard launcher powered by Excalidraw and tldraw." />
-  <meta name="keywords" content="online whiteboard, excalidraw, tldraw, drawing tool" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+/* --- BENTO MODE SELECTOR UI --- */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
+.card-container {
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+}
 
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #020617, #000);
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-    }
+.modal-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+}
 
-    /* Modern modal */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 6, 23, 0.85);
-      backdrop-filter: blur(18px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
+.modal-subtitle {
+    color: #94a3b8;
+    margin-bottom: 40px;
+    font-size: 1rem;
+    font-weight: 400;
+}
 
-    .card {
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      padding: 26px 22px;
-      width: 92%;
-      max-width: 440px;
-      border-radius: 26px;
-      text-align: center;
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-    }
+.bento-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
 
-    .card h1 {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-    }
+/* Interactive Cards */
+.bento-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 32px 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
 
-    .subtitle {
-      font-size: 0.9rem;
-      color: #94a3b8;
-      margin-bottom: 18px;
-      line-height: 1.4;
-    }
+.bento-card:hover {
+    transform: translateY(-6px);
+    background: linear-gradient(145deg, rgba(51, 65, 85, 0.7), rgba(30, 41, 59, 0.9));
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px -5px rgba(0,0,0,0.4);
+}
 
-    .btn {
-      width: 100%;
-      padding: 16px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 16px;
-      font-size: 1rem;
-      cursor: pointer;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      color: white;
-      transition: transform .15s ease;
-    }
+/* Brand Colors */
+.bento-card.excalidraw:hover { 
+    box-shadow: 0 15px 35px -5px rgba(168, 85, 247, 0.25); 
+    border-color: rgba(168, 85, 247, 0.4);
+}
+.bento-card.tldraw:hover { 
+    box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.25); 
+    border-color: rgba(59, 130, 246, 0.4); 
+}
 
-    .btn:active {
-      transform: scale(0.98);
-    }
+.card-icon { font-size: 2.8rem; }
+.card-name { font-size: 1.25rem; font-weight: 700; color: #f1f5f9; }
+.card-desc { font-size: 0.85rem; color: #94a3b8; line-height: 1.4; }
 
-    .powered {
-      margin-top: 14px;
-      font-size: 0.8rem;
-      color: #64748b;
-      line-height: 1.4;
-    }
+.footer-text {
+    font-size: 0.8rem;
+    color: #475569;
+    margin-top: 24px;
+    letter-spacing: 0.02em;
+}
 
-    /* Draggable close button */
-    .close-btn {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 2000;
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      cursor: grab;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      backdrop-filter: blur(10px);
-      user-select: none;
-    }
+/* --- VISIBILITY FIX: SMOKED GLASS BUTTON --- */
+.close-btn-smoked {
+    position: fixed;
+    top: 24px; left: 24px; z-index: 2000;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+    font-size: 1.6rem; 
+    
+    /* THE FIX: Dark background for white canvas, Glass blur for modern feel */
+    background: rgba(15, 23, 42, 0.85); /* Deep dark blue, high opacity */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    
+    /* Borders and Shadows for separation */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Top highlight */
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4), /* Deep shadow */
+        0 0 0 1px rgba(0,0,0,0.1); /* Dark edge definition */
+        
+    color: #f8fafc; /* Bright White Icon */
+    cursor: grab;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+}
 
-    /* Frames */
-    .frame, .preload {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100vh;
-      border: none;
-    }
+.close-btn-smoked:hover {
+    background: rgba(15, 23, 42, 0.95); /* Almost solid on hover */
+    transform: scale(1.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.close-btn-smoked:active { transform: scale(0.95); }
 
-    .frame {
-      display: none;
-      z-index: 10;
-    }
+/* Utility */
+.grabbing { cursor: grabbing !important; transform: scale(0.95) !important; }
+.frame, .preload { position: fixed; inset: 0; width: 100%; height: 100%; border: none; }
+.frame { display: none; z-index: 10; }
+.preload { opacity: 0; pointer-events: none; z-index: -1; }
 
-    .preload {
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    @media (max-width: 600px) {
-      .card h1 { font-size: 1.25rem; }
-    }
-  </style>
+@media (max-width: 600px) {
+    .bento-grid { grid-template-columns: 1fr; gap: 14px; }
+    .modal-title { font-size: 1.75rem; }
+    .close-btn-smoked { width: 50px; height: 50px; top: 16px; left: 16px; font-size: 1.4rem; }
+}
+</style>
 </head>
 <body>
 
-<!-- Draggable close button -->
-<div class="close-btn" id="closeBtn">✕</div>
+<!-- Using the new "Smoked Glass" button class for maximum visibility -->
+<div class="close-btn-smoked" id="closeBtn">✕</div>
 
-<!-- Preload frames -->
 <iframe class="preload" src="https://excalidraw.com"></iframe>
 <iframe class="preload" src="https://www.tldraw.com"></iframe>
 
-<!-- Active frames -->
 <iframe class="frame" id="excalidrawFrame" src="https://excalidraw.com"></iframe>
 <iframe class="frame" id="tldrawFrame" src="https://www.tldraw.com"></iframe>
 
-<!-- Mode selector -->
 <div class="modal" id="modeModal">
-  <div class="card">
-    <h1>Online Whiteboard</h1>
-    <div class="subtitle">
-      Choose your preferred drawing board to begin
-    </div>
+    <div class="card-container">
+        <h1 class="modal-title">Select Workspace</h1>
+        <p class="modal-subtitle">Choose your preferred drawing engine</p>
+        
+        <div class="bento-grid">
+            <div class="bento-card excalidraw" onclick="showBoard('excalidraw')">
+                <div class="card-icon">✏️</div>
+                <div class="card-name">Excalidraw</div>
+                <div class="card-desc">Hand-drawn style for brainstorming</div>
+            </div>
 
-    <button class="btn" onclick="showBoard('excalidraw')">Excalidraw</button>
-    <button class="btn" onclick="showBoard('tldraw')">tldraw</button>
+            <div class="bento-card tldraw" onclick="showBoard('tldraw')">
+                <div class="card-icon">📐</div>
+                <div class="card-name">tldraw</div>
+                <div class="card-desc">Infinite canvas with sticky notes</div>
+            </div>
+        </div>
 
-    <div class="powered">
-      This interface is independently built.<br>
-      Drawing boards are powered by Excalidraw and tldraw.
+        <div class="footer-text">
+            Drag the cross button to move it • Auto-tap protected
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-/* Switching logic */
-function showBoard(type) {
-  document.getElementById("modeModal").style.display = "none";
-  const closeBtn = document.getElementById("closeBtn");
-  closeBtn.style.display = "flex";
+    function showBoard(type) {
+        document.getElementById("modeModal").style.display = "none";
+        const closeBtn = document.getElementById("closeBtn");
+        closeBtn.style.display = "flex";
+        
+        const excal = document.getElementById("excalidrawFrame");
+        const tld = document.getElementById("tldrawFrame");
+        
+        excal.style.display = "none";
+        tld.style.display = "none";
+        
+        if (type === "excalidraw") excal.style.display = "block";
+        if (type === "tldraw") tld.style.display = "block";
+    }
 
-  const excal = document.getElementById("excalidrawFrame");
-  const tld = document.getElementById("tldrawFrame");
+    function showMenu() {
+        document.getElementById("modeModal").style.display = "flex";
+        document.getElementById("closeBtn").style.display = "none";
+        document.getElementById("excalidrawFrame").style.display = "none";
+        document.getElementById("tldrawFrame").style.display = "none";
+    }
 
-  excal.style.display = "none";
-  tld.style.display = "none";
+    /* DRAG LOGIC WITH TAP PROTECTION */
+    const closeBtn = document.getElementById("closeBtn");
+    let isDragging = false;
+    let hasMoved = false;
+    let startX, startY, offsetX, offsetY;
+    const DRAG_THRESHOLD = 5;
 
-  if (type === "excalidraw") excal.style.display = "block";
-  if (type === "tldraw") tld.style.display = "block";
-}
+    // Mouse
+    closeBtn.addEventListener("mousedown", (e) => {
+        isDragging = true; hasMoved = false;
+        closeBtn.classList.add("grabbing");
+        startX = e.clientX; startY = e.clientY;
+        offsetX = e.clientX - closeBtn.offsetLeft;
+        offsetY = e.clientY - closeBtn.offsetTop;
+        e.preventDefault(); 
+    });
 
-function showMenu() {
-  document.getElementById("modeModal").style.display = "flex";
-  document.getElementById("closeBtn").style.display = "none";
+    document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        const dx = Math.abs(e.clientX - startX);
+        const dy = Math.abs(e.clientY - startY);
+        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) hasMoved = true;
+        
+        if (hasMoved) {
+            closeBtn.style.left = (e.clientX - offsetX) + "px";
+            closeBtn.style.top = (e.clientY - offsetY) + "px";
+        }
+    });
 
-  document.getElementById("excalidrawFrame").style.display = "none";
-  document.getElementById("tldrawFrame").style.display = "none";
-}
+    document.addEventListener("mouseup", () => {
+        if (isDragging && !hasMoved) showMenu(); // It was a click
+        isDragging = false; hasMoved = false;
+        closeBtn.classList.remove("grabbing");
+    });
 
-/* Make close button clickable */
-const closeBtn = document.getElementById("closeBtn");
-closeBtn.addEventListener("click", showMenu);
+    // Touch
+    closeBtn.addEventListener("touchstart", (e) => {
+        isDragging = true; hasMoved = false;
+        const t = e.touches[0];
+        startX = t.clientX; startY = t.clientY;
+        offsetX = t.clientX - closeBtn.offsetLeft;
+        offsetY = t.clientY - closeBtn.offsetTop;
+    }, { passive: true });
 
-/* Make close button draggable */
-let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
+    document.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        const t = e.touches[0];
+        const dx = Math.abs(t.clientX - startX);
+        const dy = Math.abs(t.clientY - startY);
+        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) hasMoved = true;
+        
+        if (hasMoved) {
+            closeBtn.style.left = (t.clientX - offsetX) + "px";
+            closeBtn.style.top = (t.clientY - offsetY) + "px";
+        }
+    }, { passive: true });
 
-// Mouse
-closeBtn.addEventListener("mousedown", (e) => {
-  isDragging = true;
-  closeBtn.style.cursor = "grabbing";
-  offsetX = e.clientX - closeBtn.offsetLeft;
-  offsetY = e.clientY - closeBtn.offsetTop;
-});
-
-// Touch
-closeBtn.addEventListener("touchstart", (e) => {
-  isDragging = true;
-  const t = e.touches[0];
-  offsetX = t.clientX - closeBtn.offsetLeft;
-  offsetY = t.clientY - closeBtn.offsetTop;
-}, { passive: true });
-
-// Mouse move
-document.addEventListener("mousemove", (e) => {
-  if (!isDragging) return;
-  closeBtn.style.left = (e.clientX - offsetX) + "px";
-  closeBtn.style.top = (e.clientY - offsetY) + "px";
-});
-
-// Touch move
-document.addEventListener("touchmove", (e) => {
-  if (!isDragging) return;
-  const t = e.touches[0];
-  closeBtn.style.left = (t.clientX - offsetX) + "px";
-  closeBtn.style.top = (t.clientY - offsetY) + "px";
-}, { passive: true });
-
-// Release
-document.addEventListener("mouseup", () => {
-  isDragging = false;
-  closeBtn.style.cursor = "grab";
-});
-
-document.addEventListener("touchend", () => {
-  isDragging = false;
-});
+    document.addEventListener("touchend", () => {
+        if (isDragging && !hasMoved) showMenu();
+        isDragging = false; hasMoved = false;
+    });
 </script>
-
 </body>
 </html>
