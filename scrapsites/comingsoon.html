@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon | Brand Name</title>
+    <style>
+        /* --- CSS Reset & Base Styles --- */
+        :root {
+            --bg-color: #fcfcfc;       /* Off-white background for reduced eye strain */
+            --text-main: #1a1a1a;      /* Nearly black for high contrast */
+            --text-muted: #666666;     /* Grey for secondary text */
+            --accent: #2d2d2d;         /* Dark accent for buttons */
+            --radius: 8px;             /* Consistent corner rounding */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            max-width: 580px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease-out; /* Subtle entry animation */
+        }
+
+        /* --- Typography --- */
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        p.subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* --- Input Form --- */
+        .newsletter-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input[type="email"] {
+            flex: 1;
+            min-width: 260px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--radius);
+            background: #fff;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        input[type="email"]:focus {
+            border-color: var(--text-main);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: transform 0.1s ease, opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 3rem;
+            font-size: 0.85rem;
+            color: #999;
+            letter-spacing: 0.02em;
+        }
+
+        /* --- Animation --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Mobile Tweaks --- */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Optional Logo Placeholder 
+        <img src="logo.png" alt="Logo" style="height: 40px; margin-bottom: 2rem;"> 
+        -->
+        
+        <h1>We’re nearly there.</h1>
+        
+        <p class="subtitle">
+            We are building a new digital experience. Join the waitlist to get early access and updates before anyone else.
+        </p>
+
+        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thanks for subscribing!');">
+            <input type="email" placeholder="email@example.com" required aria-label="Email Address">
+            <button type="submit">Notify Me</button>
+        </form>
+    </div>
+
+   
+</body>
+</html>
