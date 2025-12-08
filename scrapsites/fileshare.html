@@ -11,7 +11,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
 
@@ -26,7 +26,7 @@
     :root {
       --glass-surface: rgba(255, 255, 255, 0.85);
       --glass-border: rgba(255, 255, 255, 0.6);
-      --glass-blur: blur(24px);
+      --glass-blur: blur(20px);
 
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
@@ -36,7 +36,7 @@
 
       --radius-dock: 24px;
       --radius-btn: 14px;
-      --shadow-dock: 0 12px 40px rgba(0, 0, 0, 0.12);
+      --shadow-dock: 0 8px 32px rgba(0, 0, 0, 0.12);
       --dock-width: 500px;
     }
 
@@ -54,8 +54,11 @@
       overflow: hidden;
       background: #f8fafc;
       color: var(--text-main);
+      /* Prevent scrolling on mobile while dragging */
+      touch-action: none; 
     }
 
+    /* 1. Host Iframe */
     #host-frame {
       position: absolute;
       top: 0;
@@ -63,20 +66,94 @@
       width: 100%;
       height: 100%;
       border: none;
-      z-index: 1;
+      z-index: 0;
       background: white;
     }
 
+    /* 2. Top Title Bar */
+    .title-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      background: var(--glass-surface);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--glass-border);
+      
+      padding: 16px 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: var(--text-main);
+    }
+    
+    .brand-icon {
+      color: var(--primary);
+      font-size: 22px;
+    }
+
+    .brand-text-muted {
+      color: var(--text-sub);
+      font-weight: 400;
+    }
+
+    .brand-text-bold {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .status-badge {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+    }
+
+    /* 3. Bottom Dock (Draggable) */
     .dock-container {
       position: fixed;
-      bottom: 32px;
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 100;
+      z-index: 1000; /* High Z to float over everything */
       width: 92%;
       max-width: var(--dock-width);
       display: flex;
       justify-content: center;
+      
+      /* Prepare for dragging */
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .dock-container:active {
+      cursor: grabbing;
     }
 
     .glass-dock {
@@ -91,20 +168,25 @@
       border-radius: var(--radius-dock);
       box-shadow: var(--shadow-dock);
       width: 100%;
+      
+      /* Smooth transitions for hover effects, but NOT position (handled by JS) */
+      transition: background 0.3s ease, box-shadow 0.3s ease; 
     }
 
+    /* Input & Controls */
     .input-wrapper {
       flex: 1;
       position: relative;
       display: flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.4);
       border-radius: var(--radius-btn);
       border: 1px solid transparent;
       transition: all 0.2s ease;
+      cursor: text; /* Override drag cursor */
     }
     .input-wrapper:focus-within {
-      background: white;
+      background: rgba(255, 255, 255, 0.9);
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
@@ -125,22 +207,20 @@
       color: var(--text-main);
       border-radius: var(--radius-btn);
     }
-    .dock-input::placeholder {
-      color: #94a3b8;
-    }
+    .dock-input::placeholder { color: #94a3b8; }
 
     .action-btn {
       width: 44px;
       height: 44px;
       border-radius: var(--radius-btn);
       border: none;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.4);
       color: var(--text-main);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 20px;
-      cursor: pointer;
+      cursor: pointer; /* Override drag cursor */
       transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
       flex-shrink: 0;
     }
@@ -149,17 +229,10 @@
       transform: translateY(-3px);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     }
-    .action-btn:active {
-      transform: scale(0.95);
-    }
+    .action-btn:active { transform: scale(0.95); }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
 
     .divider {
       width: 1px;
@@ -168,6 +241,7 @@
       margin: 0 2px;
     }
 
+    /* Modals */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -176,7 +250,7 @@
       height: 100%;
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(8px);
-      z-index: 200;
+      z-index: 2000; /* Higher than dock */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -184,10 +258,7 @@
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
     .modal-card {
       background: white;
@@ -203,9 +274,7 @@
       align-items: center;
       text-align: center;
     }
-    .modal-overlay.active .modal-card {
-      transform: scale(1);
-    }
+    .modal-overlay.active .modal-card { transform: scale(1); }
 
     .modal-header {
       width: 100%;
@@ -214,11 +283,7 @@
       align-items: center;
       margin-bottom: 16px;
     }
-    .modal-title {
-      font-weight: 600;
-      font-size: 18px;
-      color: var(--text-main);
-    }
+    .modal-title { font-weight: 600; font-size: 18px; color: var(--text-main); }
     .btn-close {
       background: none;
       border: none;
@@ -238,22 +303,11 @@
       border: 1px solid rgba(0, 0, 0, 0.1);
       position: relative;
     }
+    #qr-reader video { object-fit: cover; border-radius: 16px; }
+
+    .info-text { font-size: 14px; color: var(--text-sub); line-height: 1.5; text-align: left; }
+    .info-text strong { color: var(--text-main); }
     
-    #qr-reader video {
-        object-fit: cover;
-        border-radius: 16px;
-    }
-
-    .info-text {
-      font-size: 14px;
-      color: var(--text-sub);
-      line-height: 1.5;
-      text-align: left;
-    }
-    .info-text strong {
-      color: var(--text-main);
-    }
-
     .powered-by {
       margin-top: 16px;
       font-size: 12px;
@@ -266,7 +320,7 @@
 
     .toast {
       position: fixed;
-      top: 24px;
+      top: 80px;
       left: 50%;
       transform: translateX(-50%) translateY(-20px);
       background: rgba(15, 23, 42, 0.9);
@@ -277,54 +331,57 @@
       font-weight: 500;
       opacity: 0;
       transition: all 0.3s;
-      z-index: 300;
+      z-index: 3000;
       pointer-events: none;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
     @media (max-width: 480px) {
-      .dock-container {
-        bottom: 20px;
-      }
-      .glass-dock {
-        padding: 8px;
-        gap: 8px;
-      }
-      .action-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-      }
-      .dock-input {
-        font-size: 13px;
-        padding-left: 36px;
-      }
-      .icon-left {
-        font-size: 16px;
-        left: 10px;
-      }
+      .title-bar { padding: 12px 16px; }
+      .app-brand { font-size: 14px; }
+      .status-badge { font-size: 10px; }
+      .glass-dock { padding: 8px; gap: 8px; }
+      .action-btn { width: 40px; height: 40px; font-size: 18px; }
+      .dock-input { font-size: 13px; padding-left: 36px; }
+      .icon-left { font-size: 16px; left: 10px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Iframe Host -->
   <iframe
     id="host-frame"
     src="https://krakenfiles.com"
     allow="clipboard-read; clipboard-write"
   ></iframe>
 
+  <!-- Toast -->
   <div class="toast" id="toast">
     <i class="ph ph-check-circle"></i>
     <span id="toast-msg">Notification</span>
   </div>
 
-  <div class="dock-container">
+  <!-- TITLE BAR -->
+  <div class="title-bar">
+    <div class="app-brand">
+      <i class="ph ph-cloud-arrow-up brand-icon"></i>
+      <div>
+        <span class="brand-text-muted">Powered by</span>
+        <span class="brand-text-bold">KrakenFiles</span>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      Active
+    </div>
+  </div>
+
+  <!-- DRAGGABLE DOCK -->
+  <div class="dock-container" id="draggableDock">
     <div class="glass-dock">
       <button class="action-btn" onclick="resetHome()" title="Upload new file">
         <i class="ph ph-upload-simple"></i>
@@ -361,6 +418,7 @@
     </div>
   </div>
 
+  <!-- MODALS -->
   <div class="modal-overlay" id="shareModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -394,41 +452,24 @@
   <div class="modal-overlay" id="infoModal">
     <div class="modal-card">
       <div class="modal-header">
-        <span class="modal-title">How this tool works</span>
+        <span class="modal-title">Info</span>
         <button class="btn-close" onclick="closeAll()">
           <i class="ph ph-x"></i>
         </button>
       </div>
       <div class="info-text">
         <p style="margin-bottom: 8px">
-          <strong>1. Upload:</strong> Use the background site to upload your
-          file.
+          <strong>1. Upload:</strong> Use site background.
         </p>
         <p style="margin-bottom: 8px">
-          <strong>2. Share:</strong> Copy the file link, paste it in the bar,
-          then tap <i class="ph ph-qr-code"></i> to create a QR code.
+          <strong>2. Share:</strong> Paste link + tap <i class="ph ph-qr-code"></i>.
         </p>
         <p style="margin-bottom: 8px">
-          <strong>3. Receive:</strong> Tap <i class="ph ph-scan"></i> to scan
-          someone else’s QR and open their file link.
-        </p>
-        <p
-          style="
-            margin-top: 10px;
-            font-size: 12px;
-            background: #eff6ff;
-            padding: 8px;
-            border-radius: 8px;
-            color: #1d4ed8;
-          "
-        >
-          Note: Camera access needs HTTPS or localhost. If it fails, check your
-          browser permissions.
+          <strong>3. Receive:</strong> Tap <i class="ph ph-scan"></i>.
         </p>
       </div>
       <div class="powered-by">
-        Powered by <strong>ModernWeb</strong> • QR scanning by
-        <strong>html5-qrcode</strong>
+        Powered by <strong>ModernWeb</strong>
       </div>
     </div>
   </div>
@@ -439,9 +480,74 @@
     const toastEl = document.getElementById("toast");
     const toastMsg = document.getElementById("toast-msg");
     const scanStatus = document.getElementById("scan-status");
+    const dock = document.getElementById("draggableDock");
 
     let html5QrCode = null;
     let isScanning = false;
+
+    // --- DRAG LOGIC ---
+    let isDragging = false;
+    let dragStartX, dragStartY;
+    let initialLeft, initialTop;
+
+    const startDrag = (e) => {
+      // Don't drag if touching input or buttons directly (optional check)
+      if(e.target.closest('button') || e.target.closest('input')) return;
+
+      isDragging = true;
+      dock.style.transition = 'none'; // Disable laggy transitions during drag
+      
+      const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+      // Calculate the offset from the element's current position
+      const rect = dock.getBoundingClientRect();
+      
+      // Fix width so it doesn't shrink when we remove transform
+      dock.style.width = rect.width + 'px';
+      dock.style.maxWidth = 'none';
+      
+      // Switch from bottom/transform positioning to top/left positioning
+      dock.style.bottom = 'auto';
+      dock.style.transform = 'none';
+      dock.style.left = rect.left + 'px';
+      dock.style.top = rect.top + 'px';
+
+      dragStartX = clientX;
+      dragStartY = clientY;
+      initialLeft = rect.left;
+      initialTop = rect.top;
+    };
+
+    const drag = (e) => {
+      if (!isDragging) return;
+      e.preventDefault(); // Stop scrolling on mobile
+
+      const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+      const deltaX = clientX - dragStartX;
+      const deltaY = clientY - dragStartY;
+
+      dock.style.left = `${initialLeft + deltaX}px`;
+      dock.style.top = `${initialTop + deltaY}px`;
+    };
+
+    const endDrag = () => {
+      isDragging = false;
+      // Re-enable hover effects if needed, but keep position fixed
+    };
+
+    // Attach Drag Events
+    dock.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+
+    dock.addEventListener('touchstart', startDrag, { passive: false });
+    document.addEventListener('touchmove', drag, { passive: false });
+    document.addEventListener('touchend', endDrag);
+
+    // --- APP LOGIC ---
 
     const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
       const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
@@ -490,7 +596,6 @@
       );
     }
 
-    // --- OPTIMIZED SCANNER INIT ---
     function initScanner() {
       if (location.protocol === "file:") {
         alert("Camera will not work on file://. Use localhost or HTTPS.");
@@ -509,14 +614,12 @@
 
       scanStatus.innerText = "Starting camera...";
 
-      // Optimized for performance (Lag Fix)
       const config = {
-        fps: 10, // Lower FPS (10 is enough for QR) to reduce lag
+        fps: 10,
         qrbox: qrboxFunction,
         aspectRatio: 1.0,
         videoConstraints: {
           facingMode: "environment",
-          // Lower resolution: 1280 (720p) is faster than 1920 (1080p)
           width: { min: 640, ideal: 1280, max: 1920 },
           focusMode: "continuous",
         },
@@ -527,7 +630,14 @@
         .then(() => {
           isScanning = true;
           scanStatus.innerText = "Scanning...";
-          applyAdvancedCameraSettings();
+          setTimeout(() => {
+              if(!html5QrCode || !isScanning) return;
+              const caps = html5QrCode.getRunningTrackCameraCapabilities();
+              if(caps && caps.zoom) {
+                 html5QrCode.applyVideoConstraints({ advanced: [{ zoom: 2.0 }] })
+                    .catch(e => console.log(e));
+              }
+          }, 2000);
         })
         .catch((err) => {
           console.warn("Back camera failed, trying user camera...", err);
@@ -543,19 +653,6 @@
                 `<span style='color:red'>Camera Error: ${err2.name || err2}</span>`;
             });
         });
-    }
-
-    function applyAdvancedCameraSettings() {
-       setTimeout(() => {
-          if (!html5QrCode || !isScanning) return;
-          const track = html5QrCode.getRunningTrackCameraCapabilities();
-          if (track && track.zoom) {
-             html5QrCode.applyVideoConstraints({
-                focusMode: "continuous",
-                advanced: [{ zoom: 2.0 }],
-             }).catch(e => console.log("Zoom not supported", e));
-          }
-       }, 2000);
     }
 
     function onScanSuccess(decodedText) {
@@ -575,9 +672,7 @@
       });
     }
 
-    function onScanError(_msg) {
-      // ignore
-    }
+    function onScanError(_msg) { /* ignore */ }
 
     function stopScanner() {
       if (html5QrCode && isScanning) {
