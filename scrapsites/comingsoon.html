@@ -7,11 +7,11 @@
     <style>
         /* --- CSS Reset & Base Styles --- */
         :root {
-            --bg-color: #fcfcfc;       /* Off-white background for reduced eye strain */
-            --text-main: #1a1a1a;      /* Nearly black for high contrast */
-            --text-muted: #666666;     /* Grey for secondary text */
-            --accent: #2d2d2d;         /* Dark accent for buttons */
-            --radius: 8px;             /* Consistent corner rounding */
+            --bg-color: #fcfcfc;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --accent: #2d2d2d;
+            --radius: 8px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,12 +29,11 @@
             line-height: 1.5;
         }
 
-        /* --- Main Layout --- */
         .container {
             max-width: 580px;
             width: 100%;
             text-align: center;
-            animation: fadeIn 1s ease-out; /* Subtle entry animation */
+            animation: fadeIn 1s ease-out;
         }
 
         /* --- Typography --- */
@@ -60,7 +59,7 @@
         .newsletter-form {
             display: flex;
             gap: 12px;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem; /* Increased margin to separate from home button */
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -83,7 +82,7 @@
             box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
         }
 
-        button {
+        button.primary-btn {
             padding: 14px 28px;
             font-size: 1rem;
             font-weight: 600;
@@ -95,38 +94,69 @@
             transition: transform 0.1s ease, opacity 0.2s;
         }
 
-        button:hover {
+        button.primary-btn:hover {
             opacity: 0.9;
             transform: translateY(-1px);
+        }
+
+        /* --- New Home Action Section --- */
+        .home-action {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eaeaea; /* Subtle separator line */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .home-msg {
+            font-size: 0.9rem;
+            color: #999;
+            margin: 0;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 50px; /* Pill shape for distinction */
+            background-color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .btn-home:hover {
+            background-color: #f5f5f5;
+            border-color: #d0d0d0;
         }
 
         /* --- Footer --- */
         footer {
             margin-top: 3rem;
             font-size: 0.85rem;
-            color: #999;
-            letter-spacing: 0.02em;
+            color: #ccc;
         }
 
-        /* --- Animation --- */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- Mobile Tweaks --- */
         @media (max-width: 600px) {
             h1 { font-size: 2.5rem; }
-            button { width: 100%; }
+            button.primary-btn { width: 100%; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Optional Logo Placeholder 
-        <img src="logo.png" alt="Logo" style="height: 40px; margin-bottom: 2rem;"> 
-        -->
         
         <h1>We’re nearly there.</h1>
         
@@ -136,10 +166,18 @@
 
         <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thanks for subscribing!');">
             <input type="email" placeholder="email@example.com" required aria-label="Email Address">
-            <button type="submit">Notify Me</button>
+            <button type="submit" class="primary-btn">Notify Me</button>
         </form>
+
+        <!-- New Secondary Action -->
+        <div class="home-action">
+            <p class="home-msg">For now, tap the Home Button</p>
+           
+        </div>
+
     </div>
 
    
+
 </body>
 </html>
