@@ -6,16 +6,7 @@
   <title>Projects — BlackICE Academy</title>
  <link rel="icon" href="/output-onlinepngtools.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script>
-function openParentSidebar() {
-  // Only works when inside iframe
-  if (window.self !== window.top) {
-    window.parent.postMessage("open-sidebar", "*");
-  } else {
-    alert("This works only inside the workspace frame.");
-  }
-}
-</script>
+
 
 
   <style>
@@ -417,7 +408,14 @@ function openParentSidebar() {
     <span class="tag">Iframe</span>
   </div>
 
-  <button class="card-link" onclick="openParentSidebar()">Open Sidebar →</button>
+ <button id="openSidebarBtn">Open Sidebar</button>
+
+<script>
+document.getElementById("openSidebarBtn").onclick = () => {
+  window.parent.postMessage("open-sidebar", window.location.origin);
+};
+</script>
+
 </div>
 
 
