@@ -6,6 +6,17 @@
   <title>Projects — BlackICE Academy</title>
  <link rel="icon" href="/output-onlinepngtools.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script>
+function openParentSidebar() {
+  // Only works when inside iframe
+  if (window.self !== window.top) {
+    window.parent.postMessage("open-sidebar", "*");
+  } else {
+    alert("This works only inside the workspace frame.");
+  }
+}
+</script>
+
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -392,7 +403,23 @@
           <span class="tag">Vision</span>
         </div>
         <a href="visiondraw.html" class="card-link">Draw →</a>
-      </div>
+      </div><!-- Free Workspace Project -->
+<div class="project-card" data-tags="tools education">
+  <div class="card-border"></div>
+  <span class="card-icon">🧩</span>
+  <h3 class="card-title">Free Workspace</h3>
+  <p class="card-desc">
+    Open your personal workspace with quick access tools and a collapsible sidebar.
+  </p>
+
+  <div class="card-tags">
+    <span class="tag featured">Workspace</span>
+    <span class="tag">Iframe</span>
+  </div>
+
+  <button class="card-link" onclick="openParentSidebar()">Open Sidebar →</button>
+</div>
+
 
       <div class="project-card" data-tags="tools">
   <div class="card-border"></div>
