@@ -242,17 +242,13 @@ fullscreenBtn.onclick = toggleFullscreen;
 
 // Toast Logic
 window.addEventListener('load', () => {
-  // Show toast
   setTimeout(() => {
     toast.style.opacity = '1';
-
-    // Hide toast after 3s
     setTimeout(() => {
       toast.style.opacity = '0';
-      // Remove from DOM to prevent interference
       setTimeout(() => toast.remove(), 500);
     }, 3000);
-  }, 500); // Slight delay on load
+  }, 500);
 });
 
 function toggleSidebar(show) {
@@ -267,7 +263,17 @@ function toggleSidebar(show) {
   }
 }
 
-menuBtn.onclick = () => toggleSidebar(true);
+// MOBILE MENU BUTTON CLICK HANDLER (UPDATED)
+menuBtn.onclick = () => {
+  // Toggle sidebar
+  toggleSidebar(true);
+
+  // Auto fullscreen on mobile
+  if (window.innerWidth < 768) {
+    toggleFullscreen();
+  }
+};
+
 mobileOverlay.onclick = () => toggleSidebar(false);
 
 function showLoader() {
@@ -333,7 +339,6 @@ onValue(ref(db, 'sites'), (snapshot) => {
 
     btn.className = `project-card w-full text-left p-2 rounded-lg mb-1 flex items-center gap-3 border border-transparent select-none group`;
 
-    // Manually create icons for dynamic content since Lucide runs once at start
     btn.innerHTML = `
       <div class="w-8 h-8 rounded bg-surface border border-border overflow-hidden shrink-0 relative">
         <img src="${screenshot}" 
