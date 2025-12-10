@@ -1,1407 +1,300 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Home Screen</title>
-<link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
-<link rel="preconnect" href="https://black-ice-3dbk.onrender.com/" crossorigin>
-<link rel="dns-prefetch" href="https://black-ice-3dbk.onrender.com/">
-<style>
-:root{
---topbar: 56px;
---bg: #f7f8fb;
---surface: #ffffff;
---surface-2: #fafbff;
---text: #111827;
---muted: #6b7280;
---border: #e5e7eb;
---hover: #f3f4f6;
---accent: #2563eb;
---ring: 0 0 0 4px rgba(37,99,235,.18);
---shadow-sm: 0 1px 2px rgba(0,0,0,.06);
---shadow-md: 0 10px 24px rgba(0,0,0,.12);
---radius: 14px;
---sidebar-w: 300px;
---rgb-gradient: linear-gradient(90deg, #ff0040, #ffd500, #00ff85, #00c3ff, #7a00ff, #ff00c8, #ff0040);
-}
-@keyframes shiftHue {
-0% { background-position: 0% 50%; }
-100% { background-position: 200% 50%; }
-}
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-body{
-margin:0;
-background:var(--bg);
-color:var(--text);
-font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial;
-line-height:1.45;
-}
-.topbar{
-height: var(--topbar);
-position: sticky; top:0; z-index: 100;
-display:flex; align-items:center; gap:12px;
-padding:10px 16px;
-background:var(--surface);
-border-bottom:1px solid var(--border);
-box-shadow: var(--shadow-sm);
-}
+  <meta charset="UTF-8">
+  <title>Project Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* --- MODIFIED TOGGLE SIDEBAR STYLES --- */
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
+  <!-- Tailwind + Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-#toggleSidebar{
-  width:40px; height:40px;
-  /* Removed standard border to allow animated gradient */
-  border: none; 
-  position: relative;
-  background: transparent;
-  color:var(--text);
-  font-size:20px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:.2s;
-  flex-shrink: 0;
-  border-radius: 10px;
-  overflow: visible; /* Ensure glow is visible */
-}
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Satoshi', 'sans-serif'] },
+          colors: {
+            background: '#09090b', 
+            surface: '#18181b',
+            border: '#27272a',
+            primary: '#3b82f6',
+            text: '#e4e4e7',
+            muted: '#a1a1aa'
+          }
+        }
+      }
+    }
+  </script>
 
-/* Gradient Rotating Border */
-#toggleSidebar::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  z-index: -1;
-  background: conic-gradient(
-    from var(--angle), 
-    transparent 70%, 
-    #ff0040, 
-    #00ff85, 
-    #00c3ff, 
-    #ff0040
-  );
-  border-radius: 12px;
-  animation: rotateBorder 3s linear infinite;
-}
+  <style>
+    body { background: #09090b; color: #e4e4e7; overflow: hidden; }
 
-/* Glow Effect */
-#toggleSidebar::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  z-index: -2;
-  background: conic-gradient(
-    from var(--angle), 
-    transparent 70%, 
-    #ff0040, 
-    #00ff85, 
-    #00c3ff, 
-    #ff0040
-  );
-  border-radius: 12px;
-  filter: blur(10px);
-  opacity: 0.6;
-  animation: rotateBorder 3s linear infinite;
-}
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-@keyframes rotateBorder {
-  0% { --angle: 0deg; }
-  100% { --angle: 360deg; }
-}
+    .glass {
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+    }
 
-/* Inner Background Mask */
-#toggleSidebar .inner-bg {
-  position: absolute;
-  inset: 2px;
-  background: var(--surface);
-  border-radius: 9px;
-  z-index: 0;
-}
+    .project-card {
+      transition: all 0.2s ease;
+      position: relative;
+    }
 
-/* Icon positioning */
-#toggleSidebar img {
-  position: relative;
-  z-index: 1;
-}
+    .project-card:hover {
+      background: #27272a;
+    }
 
-#toggleSidebar:focus-visible{ outline:none; box-shadow: var(--ring); }
-/* ------------------------------------- */
+    .project-card.active {
+      background: rgba(59, 130, 246, 0.08);
+    }
 
-.brand-container {
-display: flex;
-align-items: center;
-gap: 8px;
-flex: 1;
-min-width: 0;
-}
-.brand{
-position: relative;
-font-weight:650;
-letter-spacing:.2px;
-padding: 6px 12px;
-border-radius: 12px;
-border: 2px solid transparent;
-background:
-linear-gradient(var(--surface), var(--surface)) padding-box,
-var(--rgb-gradient) border-box;
-background-size: 100% 100%, 200% 200%;
-animation: shiftHue 6s linear infinite;
-cursor: pointer;
-flex-shrink: 0;
-white-space: nowrap;
-}
-.project-name-display {
-display: flex;
-align-items: center;
-gap: 8px;
-padding: 6px 12px;
-background: var(--surface-2);
-border: 1px solid var(--border);
-border-radius: 10px;
-color: var(--text);
-font-weight: 500;
-font-size: 0.9rem;
-max-width: 300px;
-overflow: hidden;
-transition: all 0.3s ease;
-opacity: 0;
-transform: translateX(-10px);
-}
-.project-name-display.visible {
-opacity: 1;
-transform: translateX(0);
-}
-.project-name-display .separator {
-color: var(--muted);
-font-weight: 400;
-}
-.project-name-display .name {
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
-color: var(--accent);
-}
-.project-name-display .close-project {
-width: 20px;
-height: 20px;
-display: flex;
-align-items: center;
-justify-content: center;
-border-radius: 50%;
-background: transparent;
-border: none;
-color: var(--muted);
-cursor: pointer;
-flex-shrink: 0;
-transition: all 0.2s;
-padding: 0;
-margin-left: auto;
-}
-.project-name-display .close-project:hover {
-background: var(--hover);
-color: var(--text);
-}
-.icon-btn,
-#hideNavbar,
-#settingsBtn{
-width:40px; height:40px;
-border-radius:10px;
-background:var(--surface);
-border:1px solid var(--border);
-color:var(--text);
-font-size:20px;
-display:flex; align-items:center; justify-content:center;
-cursor:pointer; transition:.2s;
-flex-shrink: 0;
-}
-#hideNavbar:hover, #settingsBtn:hover{ background:var(--hover); }
-#hideNavbar:focus-visible, #settingsBtn:focus-visible{ outline:none; box-shadow: var(--ring); }
-body.nav-hidden{ --topbar: 0px; }
-body.nav-hidden .topbar{
-padding:0; border:0; box-shadow:none; overflow:hidden;
-}
-body.nav-hidden #hideNavbar{
-position: fixed; top: 8px; right: 16px; z-index: 130;
-}
-nav.sidebar.open{ transform: translateX(0); }
-nav.sidebar {
-position: fixed;
-inset: var(--topbar) auto 0 0;
-width: var(--sidebar-w);
-z-index: 120;
-background:var(--surface);
-border-right: 1px solid var(--border);
-padding: 16px;
-overflow-y: auto;
-transform: translateX(-100%);
-transition: transform .3s ease;
-box-shadow: var(--shadow-md);
-}
-.side-hd{ font-weight:650; margin-bottom:8px; }
-.side-hd-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:8px;
-margin-bottom:8px;
-}
-.side-add-btn{
-width:34px; height:34px;
-border-radius:10px;
-background:var(--surface-2);
-border:1px solid var(--border);
-color:var(--text);
-display:flex; align-items:center; justify-content:center;
-cursor:pointer; transition:.2s;
-}
-.side-add-btn:hover{ background:var(--hover); }
-.side-add-btn:focus-visible{ outline:none; box-shadow: var(--ring); }
-.side-search{ position:relative; margin-bottom:12px; }
-.side-search input{
-width:100%; height:38px; padding:0 12px 0 40px;
-border:1px solid var(--border); border-radius:10px;
-background:var(--surface-2); color:var(--text);
-}
-.side-search input:focus{ outline:none; border-color:var(--accent); box-shadow: var(--ring); }
-.side-search .icon{
-position:absolute; top:10px; left:12px; width:18px; height:18px; color:#6b7280;
-pointer-events:none;
-}
-.favorites-section {
-margin-bottom: 12px;
-border-bottom: 1px solid var(--border);
-padding-bottom: 12px;
-}
-.favorites-label {
-font-weight: 650;
-color: var(--muted);
-font-size: 0.85rem;
-margin-bottom: 8px;
-display: flex;
-align-items: center;
-gap: 6px;
-}
-.favorites-list {
-display: flex;
-flex-direction: column;
-gap: 6px;
-}
-.list{ list-style:none; padding:0; margin:0; }
-.item-row{
-display:flex;
-align-items:flex-start;
-justify-content:space-between;
-gap:8px;
-}
-.item button.project-btn{
-flex:1;
-display:flex; align-items:start; gap:10px;
-padding:10px 10px;
-border-radius:10px;
-background:transparent;
-color:var(--text);
-border:1px solid transparent;
-cursor:pointer; text-align:left;
-transition:.15s;
-}
-.item button.project-btn:hover{
-background:var(--hover); border-color:var(--border);
-}
-.item button.project-btn.active{
-background:var(--hover); border-color:var(--accent);
-}
-.copy-btn{
-font-size:.75rem;
-padding:4px 8px;
-border-radius:8px;
-border:1px solid var(--border);
-background:var(--surface-2);
-cursor:pointer;
-color:var(--muted);
-white-space:nowrap;
-margin-top:10px;
-}
-.copy-btn:hover{
-background:var(--hover);
-color:var(--text);
-}
-.copy-btn:focus-visible{
-outline:none;
-box-shadow:var(--ring);
-}
-.favorite-btn {
-width: 28px;
-height: 28px;
-display: flex;
-align-items: center;
-justify-content: center;
-margin-left: auto;
-border-radius: 8px;
-border: none;
-background: transparent;
-color: #ddd;
-cursor: pointer;
-transition: all 0.2s ease;
-}
-.favorite-btn:hover {
-background: var(--surface-2);
-color: #ffa500;
-}
-.favorite-btn.favorited {
-color: #ffa500;
-}
-.favorite-btn.favorited:hover {
-background: var(--surface-2);
-}
-.screenshot-preview {
-position: relative;
-display: inline-block;
-}
-.screenshot-thumb {
-width: 32px;
-height: 32px;
-border-radius: 6px;
-object-fit: cover;
-border: 1px solid var(--border);
-cursor: pointer;
-transition: all 0.2s ease;
-}
-.screenshot-thumb:hover {
-border-color: var(--accent);
-transform: scale(1.05);
-}
-.screenshot-large {
-position: absolute;
-top: 0;
-left: 100%;
-z-index: 1000;
-width: 200px;
-height: 150px;
-border-radius: 8px;
-border: 1px solid var(--border);
-box-shadow: var(--shadow-md);
-background: #fff;
-object-fit: cover;
-display: none;
-margin-left: 10px;
-margin-top: -20px;
-}
-.screenshot-preview:hover .screenshot-large {
-display: block;
-}
-.title{ font-weight:600; line-height:1.25; }
-.meta{ color:var(--muted); font-size:.85rem; }
-.frame-wrap{
-position:relative;
-height: calc(100vh - var(--topbar));
-background:#fff;
-}
-iframe.portal{
-position:absolute; inset:0;
-width:100%; height:100%;
-border:0; display:block; background:#fff;
-}
-.frame-loader {
-position: absolute;
-inset: 0;
-background: rgba(255,255,254,0.8);
-display: none;
-align-items: center;
-justify-content: center;
-z-index: 10;
-}
-.frame-loader::before {
-content: "";
-width: 40px;
-height: 40px;
-border: 4px solid #e5e7eb;
-border-top-color: #2563eb;
-border-radius: 50%;
-animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.skeleton {
-background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 37%, #eeeeee 63%);
-background-size: 400% 100%;
-animation: skeleton-loading 1.4s ease infinite;
-}
-@keyframes skeleton-loading {
-0% { background-position: 100% 0; }
-100% { background-position: -100% 0; }
-}
-.skel-item { height: 48px; border-radius: 10px; margin-bottom: 10px; }
-.skel-copy { height: 18px; width: 70px; border-radius: 8px; margin-top: -4px; }
-#restoreLastBtn{
-position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-z-index: 140; display: none; padding: 8px 12px;
-border-radius: 999px; background-color: #111827; border: 1px solid #0b1220;
-color: #ffffff; box-shadow: var(--shadow-md); cursor: pointer;
-transition: background-color .15s ease, opacity .15s ease;
-}
-#restoreLastBtn.show{ display: inline-flex; align-items: center; gap: 6px; }
-#restoreLastBtn:hover{ background-color: #0b1220; }
-#restoreLastBtn:focus-visible{ outline: none; box-shadow: var(--ring); }
-.settings-dialog {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0, 0, 0, 0.5);
-display: flex;
-align-items: center;
-justify-content: center;
-z-index: 1000;
-opacity: 0;
-visibility: hidden;
-transition: all 0.3s ease;
-}
-.settings-dialog.open {
-opacity: 1;
-visibility: visible;
-}
-.settings-content {
-background: var(--surface);
-border-radius: var(--radius);
-width: 90%;
-max-width: 600px;
-max-height: 85vh;
-overflow-y: auto;
-padding: 24px;
-box-shadow: var(--shadow-md);
-position: relative;
-transform: translateY(20px);
-transition: transform 0.3s ease;
-}
-.settings-dialog.open .settings-content {
-transform: translateY(0);
-}
-.settings-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 20px;
-}
-.settings-title {
-font-size: 1.25rem;
-font-weight: 600;
-margin: 0;
-}
-.close-btn {
-background: none;
-border: none;
-font-size: 1.5rem;
-cursor: pointer;
-color: var(--muted);
-padding: 4px;
-border-radius: 6px;
-transition: all 0.2s;
-}
-.close-btn:hover {
-background: var(--hover);
-color: var(--text);
-}
-.settings-tabs {
-display: flex;
-gap: 8px;
-margin-bottom: 20px;
-border-bottom: 2px solid var(--border);
-padding-bottom: 0;
-}
-.tab-btn {
-background: none;
-border: none;
-padding: 10px 16px;
-cursor: pointer;
-font-weight: 500;
-color: var(--muted);
-border-bottom: 2px solid transparent;
-margin-bottom: -2px;
-transition: all 0.2s;
-}
-.tab-btn:hover {
-color: var(--text);
-}
-.tab-btn.active {
-color: var(--accent);
-border-bottom-color: var(--accent);
-}
-.tab-content {
-display: none;
-}
-.tab-content.active {
-display: block;
-}
-.dashboard-section h3 {
-font-size: 1rem;
-font-weight: 600;
-margin: 0 0 12px 0;
-color: var(--text);
-display: flex;
-align-items: center;
-gap: 8px;
-}
-.stat-card:hover {
-border-color: var(--accent);
-transform: translateY(-2px);
-box-shadow: var(--shadow-sm);
-}
-.activity-item:hover {
-background: var(--hover);
-border-color: var(--accent);
-}
-.activity-info {
-flex: 1;
-min-width: 0;
-}
-.activity-title {
-font-weight: 600;
-color: var(--text);
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
-font-size: 0.9rem;
-}
-.activity-meta {
-display: flex;
-align-items: center;
-gap: 8px;
-font-size: 0.75rem;
-color: var(--muted);
-margin-top: 2px;
-}
-.activity-count {
-background: var(--accent);
-color: white;
-padding: 4px 10px;
-border-radius: 12px;
-font-size: 0.75rem;
-font-weight: 600;
-white-space: nowrap;
-}
-.chart-bar:hover {
-opacity: 0.8;
-transform: scaleY(1.05);
-}
-.chart-label {
-position: absolute;
-bottom: -24px;
-left: 50%;
-transform: translateX(-50%);
-font-size: 0.7rem;
-color: var(--muted);
-white-space: nowrap;
-}
-.chart-value {
-position: absolute;
-top: -20px;
-left: 50%;
-transform: translateX(-50%);
-font-size: 0.75rem;
-font-weight: 600;
-color: var(--text);
-}
-.empty-state {
-text-align: center;
-padding: 24px;
-color: var(--muted);
-font-size: 0.9rem;
-}
-.clear-data-btn {
-background: #ef4444;
-color: white;
-border: none;
-padding: 10px 20px;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 500;
-font-size: 0.9rem;
-transition: background 0.2s;
-width: 100%;
-}
-.clear-data-btn:hover {
-background: #dc2626;
-}
-.settings-option {
-margin-bottom: 20px;
-}
-.settings-option label {
-display: block;
-margin-bottom: 8px;
-font-weight: 500;
-}
-.settings-option select {
-width: 100%;
-padding: 10px;
-border-radius: 8px;
-border: 1px solid var(--border);
-background: var(--surface-2);
-color: var(--text);
-font-size: 1rem;
-}
-.save-btn {
-background: var(--accent);
-color: white;
-border: none;
-padding: 10px 20px;
-border-radius: 8px;
-cursor: pointer;
-font-weight: 500;
-width: 100%;
-transition: background 0.2s;
-}
-.save-btn:hover {
-background: #1d4ed8;
-}
-@media (prefers-reduced-motion: reduce){
-.brand{ animation: none; background-position: 100% 50%, 100% 50%; }
-}
-@media (max-width: 768px) {
-.project-name-display {
-max-width: 150px;
-}
-.brand {
-font-size: 0.9rem;
-padding: 5px 10px;
-}
-.dashboard-grid {
-grid-template-columns: repeat(2, 1fr);
-}
-.settings-content {
-width: 95%;
-max-width: 100%;
-}
-}
-.os-link-section {
-margin: 16px 0;
-padding: 0 16px;
-}
-.os-link-btn {
-display: flex;
-align-items: center;
-gap: 10px;
-width: 100%;
-padding: 12px 16px;
-background: var(--surface);
-border: 1px solid var(--border);
-border-radius: 10px;
-color: var(--text);
-text-decoration: none;
-font-weight: 500;
-font-size: 0.95rem;
-transition: all 0.2s;
-cursor: pointer;
-}
-.os-link-btn:hover {
-background: var(--hover);
-border-color: var(--accent);
-transform: translateY(-1px);
-box-shadow: var(--shadow-sm);
-}
-.os-link-btn:active {
-transform: translateY(0);
-}
-.os-link-btn svg:first-child {
-flex-shrink: 0;
-}.settings-full-btn {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  cursor: pointer;
-  color: var(--muted);
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
-  margin-right: 4px;
-}
+    .project-card.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: #3b82f6;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
 
-.settings-full-btn:hover {
-  background: var(--hover);
-  color: var(--text);
-}
+    .project-card.active .title-text {
+      color: #60a5fa;
+      font-weight: 700;
+    }
 
-</style>
+    .screenshot-img { opacity: 0; transition: opacity 0.3s; }
+    .screenshot-img.loaded { opacity: 1; }
+
+    /* Home Button Hover Effect */
+    .home-btn:hover svg {
+      transform: scale(1.1);
+    }
+  </style>
 </head>
-<body>
-<header class="topbar">
-<button id="toggleSidebar" aria-label="Toggle project list" aria-expanded="false">
-<!-- ADDED INNER BG SPAN -->
-<span class="inner-bg"></span>
-<img src="https://cdn-icons-png.flaticon.com/512/14234/14234656.png" width="30" height="30" alt="" title="" class="img-small">
-</button>
-<div class="brand-container">
-<div class="brand" id="goHome" title="Go Home">Home Screen</div>
-<div class="project-name-display" id="projectNameDisplay">
-<span class="separator">›</span>
-<span class="name" id="currentProjectName"></span>
-<button class="close-project" id="closeProject" title="Close project" aria-label="Close project">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-<line x1="18" y1="6" x2="6" y2="18"></line>
-<line x1="6" y1="6" x2="18" y2="18"></line>
-</svg>
-</button>
-</div>
-</div>
-<button id="settingsBtn" class="icon-btn" aria-label="Settings" title="Settings">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-ircle cx="12" cy="12" r="3"></circle>
-<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-</svg>
-</button>
-<button id="hideNavbar" class="icon-btn" aria-pressed="false" title="Hide navbar" style="margin-left:auto;">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-<polyline points="18 15 12 9 6 15"></polyline>
-</svg>
-</button>
-</header>
-<button id="restoreLastBtn" type="button" aria-live="polite" title="Reload last site">
-Reload last site
-</button>
-<div id="settingsDialog" class="settings-dialog">
-<div class="settings-content">
-<div class="settings-header">
-  <h2 class="settings-title">Settings Dashboard</h2>
 
-  <button id="fullscreenSettingsBtn"
-          class="settings-full-btn"
-          aria-label="Enter fullscreen">
-    ⛶
+<body class="h-screen w-screen flex flex-col md:flex-row">
+
+<!-- Mobile Header -->
+<div class="md:hidden h-14 glass flex items-center justify-between px-4 z-50 shrink-0">
+  <span class="font-bold text-lg tracking-tight">Project Portal</span>
+  <button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
+    <i class="fa-solid fa-bars text-xl"></i>
   </button>
-
-  <button id="closeSettings" class="close-btn" aria-label="Close settings">&times;</button>
 </div>
 
-<div class="settings-tabs">
-<button class="tab-btn active" data-tab="settings">Settings</button>
-</div>
-<!-- Settings Tab -->
-<div id="settingsTab" class="tab-content active">
-<div class="settings-option">
-<label for="homeScreenSelect">Set Home Screen Project:</label>
-<select id="homeScreenSelect">
-<option value="">Default Home Screen</option>
-</select>
-</div>
-<button id="saveSettings" class="save-btn">Save Settings</button>
-</div>
-</div>
-</div>
-<nav id="sidebar" class="sidebar" hidden>
-<div class="side-hd-row">
-<div class="side-hd">Free Tool Projects</div>
-<button
-id="openStoreBtn"
-class="side-add-btn"
-type="button"
-aria-label="Open Elegant Store">
-<svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
-<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-</svg>
-</button>
-</div>
-<div class="favorites-section">
-<div class="favorites-label">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-</svg>
-Favorites
-</div>
-<ul id="favoritesList" class="favorites-list">
-<li class="empty-favorites">No favorites yet</li>
-</ul>
-<div class="os-link-section" style="margin: 16px 0; padding: 0 16px;">
-<a href="https://black-ice-3dbk.onrender.com/scrapsites/osapk.html" target="_blank" rel="noopener noreferrer" class="os-link-btn">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-<line x1="9" y1="3" x2="9" y2="21"></line>
-</svg>
-<span>WebOS & APK</span>
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
-<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-<polyline points="15 3 21 3 21 9"></polyline>
-<line x1="10" y1="14" x2="21" y2="3"></line>
-</svg>
-</a>
-</div>
-</div>
-<div class="side-search">
-<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">ircle cx="11" cy="11" r="7" stroke="currentColor" fill="none"/><line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor"/></svg>
-<input id="searchInput" type="search" placeholder="Search projects..." autocomplete="off" />
-</div>
-<ul id="projectList" class="list">
-<div id="skeletonLoader">
-<div class="skeleton skel-item"></div>
-<div class="skeleton skel-item"></div>
-<div class="skeleton skel-item"></div>
-<div class="skeleton skel-item"></div>
-<div class="skeleton skel-item"></div>
-</div>
-</ul>
-</nav>
-<main>
-<div class="frame-wrap">
-<div id="offlineBox"
-style="display:none; text-align:center; padding:25px; font-size:18px; color:#b91c1c;
-background:#fee2e2; border:1px solid #fecaca;">
-❌ No Internet Connection
-</div>
-<div id="frameLoader" class="frame-loader" aria-live="polite" aria-busy="true"></div>
-<iframe id="portalFrame" class="portal"
-src="https://black-ice-3dbk.onrender.com/"
-allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera"></iframe>
-</div>
+<!-- Sidebar Overlay -->
+<div id="mobileOverlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[260px] bg-background border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-2xl md:shadow-none">
+
+  <!-- Header -->
+  <div class="p-4 border-b border-border/50">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-lg font-bold tracking-tight">Project Portal</h1>
+      <button id="osApkBtn" class="text-[10px] font-bold px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1.5" title="Open Web OS & APK">
+        <i class="fa-brands fa-android"></i>
+        WEB OS & APK
+      </button>
+    </div>
+
+    <div class="relative">
+      <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
+      <input id="searchInput" 
+             placeholder="Search projects..." 
+             class="w-full bg-surface border border-border rounded-lg pl-8 pr-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
+    </div>
+  </div>
+
+  <!-- Project List -->
+  <div id="projectList" class="flex-1 overflow-y-auto p-2 space-y-1">
+    <div class="animate-pulse space-y-2 p-1">
+      <div class="h-10 bg-surface rounded-lg w-full"></div>
+      <div class="h-10 bg-surface rounded-lg w-full"></div>
+      <div class="h-10 bg-surface rounded-lg w-full"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-1 flex flex-col relative h-full bg-surface overflow-hidden">
+
+  <!-- Loader -->
+  <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-background flex flex-col items-center justify-center">
+    <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+    <span class="text-sm text-muted animate-pulse">Loading application...</span>
+  </div>
+
+  <!-- Iframe -->
+  <iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="absolute inset-0 bg-background flex flex-col items-center justify-center text-center p-6 z-10">
+    <div class="w-16 h-16 bg-surface rounded-2xl border border-border flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+      <i class="fa-solid fa-layer-group text-2xl text-primary"></i>
+    </div>
+    <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
+    <p class="text-muted max-w-sm mb-6">Select a project from the sidebar to launch your workspace instantly.</p>
+    <p class="text-muted max-w-sm mb-6 font-medium text-xs uppercase tracking-wide opacity-50">or</p>
+
+    <!-- Go to Home Button -->
+    <button id="goHomeBtn" class="home-btn group flex items-center gap-2.5 px-5 py-2.5 bg-surface hover:bg-border border border-border hover:border-primary/50 rounded-xl transition-all duration-200 shadow-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+      <svg class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      <span class="text-sm font-semibold text-text group-hover:text-primary transition-colors">Go to Home</span>
+    </button>
+  </div>
+
 </main>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
 const firebaseConfig = {
-apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-authDomain: "h-90-8a7c5.firebaseapp.com",
-databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-projectId: "h-90-8a7c5",
-storageBucket: "h-90-8a7c5.firebasestorage.app",
-messagingSenderId: "367196609301",
-appId: "1:367196609301:web:156e24c1b4532c26af671c"
+  apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+  authDomain: "h-90-8a7c5.firebaseapp.com",
+  databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+  projectId: "h-90-8a7c5",
+  storageBucket: "h-90-8a7c5.firebasestorage.app",
+  messagingSenderId: "367196609301",
+  appId: "1:367196609301:web:156e24c1b4532c26af671c"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const sidebar = document.querySelector('#sidebar');
-const toggleBtn = document.querySelector('#toggleSidebar');
-const projectList = document.querySelector('#projectList');
-const favoritesList = document.querySelector('#favoritesList');
-const searchInput = document.querySelector('#searchInput');
-const frame = document.querySelector('#portalFrame');
-const frameLoader = document.querySelector('#frameLoader');
-const projectNameDisplay = document.querySelector('#projectNameDisplay');
-const currentProjectName = document.querySelector('#currentProjectName');
-const closeProjectBtn = document.querySelector('#closeProject');
-let currentProject = null;
-// ==================== TRACKING SYSTEM ====================
-const TRACKING_KEY = 'projectTracking';
-const ACTIVITY_KEY = 'projectActivity';
-function getTracking() {
-return JSON.parse(localStorage.getItem(TRACKING_KEY) || '{}');
-}
-function saveTracking(data) {
-localStorage.setItem(TRACKING_KEY, JSON.stringify(data));
-}
-function getActivity() {
-return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]');
-}
-function saveActivity(data) {
-localStorage.setItem(ACTIVITY_KEY, JSON.stringify(data));
-}
-function trackProjectVisit(projectId, projectTitle, projectUrl) {
-const tracking = getTracking();
-if (!tracking[projectId]) {
-tracking[projectId] = {
-id: projectId,
-title: projectTitle,
-url: projectUrl,
-visits: 0,
-firstVisit: Date.now(),
-lastVisit: Date.now()
-};
-}
-tracking[projectId].visits++;
-tracking[projectId].lastVisit = Date.now();
-saveTracking(tracking);
-const activity = getActivity();
-activity.unshift({
-projectId,
-title: projectTitle,
-url: projectUrl,
-timestamp: Date.now()
-});
-if (activity.length > 50) activity.pop();
-saveActivity(activity);
-// Dashboard removed
-}
-function getDayOfWeek(timestamp) {
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-return days[new Date(timestamp).getDay()];
-}
-function getWeeklyActivity() {
-const activity = getActivity();
-const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-const weeklyData = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
-activity
-.filter(a => a.timestamp > weekAgo)
-.forEach(a => {
-const day = getDayOfWeek(a.timestamp);
-weeklyData[day]++;
-});
-return weeklyData;
-}
-function updateDashboard() {
-const tracking = getTracking();
-const activity = getActivity();
-const trackingArray = Object.values(tracking);
-document.getElementById('totalProjectsCount').textContent = allSites.length;
-document.getElementById('favoritesCount').textContent = favorites.length;
-document.getElementById('totalVisitsCount').textContent =
-trackingArray.reduce((sum, p) => sum + p.visits, 0);
-const today = new Date().setHours(0, 0, 0, 0);
-const activeToday = activity.filter(a => a.timestamp >= today).length;
-document.getElementById('activeToday').textContent = activeToday;
-const mostVisited = trackingArray
-.sort((a, b) => b.visits - a.visits)
-.slice(0, 5);
-const mostVisitedList = document.getElementById('mostVisitedList');
-if (mostVisited.length === 0) {
-mostVisitedList.innerHTML = '<li class="empty-state">No visit data yet</li>';
-} else {
-mostVisitedList.innerHTML = mostVisited.map(p => `
-<li class="activity-item">
-<div class="activity-info">
-<div class="activity-title">${sanitizeHTML(p.title)}</div>
-<div class="activity-meta">
-<span>Last: ${timeAgo(p.lastVisit)}</span>
-</div>
-</div>
-<span class="activity-count">${p.visits} visits</span>
-</li>
-`).join('');
-}
-const recentActivity = activity.slice(0, 10);
-const recentActivityList = document.getElementById('recentActivityList');
-if (recentActivity.length === 0) {
-recentActivityList.innerHTML = '<li class="empty-state">No recent activity</li>';
-} else {
-recentActivityList.innerHTML = recentActivity.map(a => `
-<li class="activity-item">
-<div class="activity-info">
-<div class="activity-title">${sanitizeHTML(a.title)}</div>
-<div class="activity-meta">
-<span>${timeAgo(a.timestamp)}</span>
-</div>
-</div>
-</li>
-`).join('');
-}
-const weeklyData = getWeeklyActivity();
-const maxVisits = Math.max(...Object.values(weeklyData), 1);
-const weeklyChart = document.getElementById('weeklyChart');
-weeklyChart.innerHTML = Object.entries(weeklyData).map(([day, count]) => {
-const height = (count / maxVisits) * 100;
-return `
-<div class="chart-bar" style="height: ${height}%;" title="${day}: ${count} visits">
-<span class="chart-value">${count}</span>
-<span class="chart-label">${day}</span>
-</div>
-`;
-}).join('');
-}
-function updateProjectNameDisplay(projectTitle) {
-if (projectTitle && projectTitle !== "Home Screen") {
-currentProjectName.textContent = projectTitle;
-projectNameDisplay.classList.add('visible');
-currentProject = projectTitle;
-} else {
-projectNameDisplay.classList.remove('visible');
-currentProject = null;
-}
-}
-closeProjectBtn.addEventListener('click', (e) => {
-e.stopPropagation();
-setFrameSrc(HOME_URL, { remember: false });
-updateProjectNameDisplay(null);
-projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-setTimeout(maybeShowRestore, 0);
-});
-const setSidebar = (open)=>{
-sidebar.classList.toggle('open', !!open);
-sidebar.hidden = !open;
-toggleBtn.setAttribute('aria-expanded', !!open);
-};
-setSidebar(false);
-toggleBtn.addEventListener('click', ()=> setSidebar(!sidebar.classList.contains('open')));
-const sanitizeHTML = (str)=>{
-const d = document.createElement('div');
-d.textContent = str ?? '';
-return d.innerHTML;
-};
-const timeAgo = (ts)=>{
-if (!ts) return '';
-const rtf = new Intl.RelativeTimeFormat(undefined,{numeric:'auto'});
-const diff = ts - Date.now();
-const steps = [
-['year', 1000*60*60*24*365],
-['month', 1000*60*60*24*30],
-['week', 1000*60*60*24*7],
-['day', 1000*60*60*24],
-['hour', 1000*60*60],
-['minute', 1000*60],
-['second', 1000],
-];
-for (const [unit, ms] of steps){
-const val = Math.round(diff/ms);
-if (Math.abs(val) >= 1) return rtf.format(val, unit);
-}
-return rtf.format(0,'second');
-};
-const HOME_URL = "https://black-ice-3dbk.onrender.com/";
-const LAST_KEY = "lastPortalUrl";
-const restoreBtn = document.getElementById("restoreLastBtn");
-const offlineBox = document.getElementById("offlineBox");
-function showFrameLoader() {
-if (offlineBox.style.display === "block") return;
-frameLoader.style.display = 'flex';
-}
-function hideFrameLoader() {
-frameLoader.style.display = 'none';
-}
-function setFrameSrc(url, opts = { remember: true, projectTitle: null }) {
-showFrameLoader();
-frame.src = url;
-if (opts.remember && url && url !== HOME_URL) {
-localStorage.setItem(LAST_KEY, url);
-if (opts.projectTitle) {
-localStorage.setItem('lastProjectTitle', opts.projectTitle);
-// Track the visit
-const project = allSites.find(s => s.url === url);
-if (project) {
-trackProjectVisit(project.id, opts.projectTitle, url);
-}
-}
-}
-updateProjectNameDisplay(opts.projectTitle);
-}
-frame.addEventListener('load', hideFrameLoader);
-function maybeShowRestore() {
-const last = localStorage.getItem(LAST_KEY);
-const current = frame.getAttribute("src");
-if (!last || current !== HOME_URL) return;
-restoreBtn.classList.add("show");
-const t = setTimeout(() => {
-restoreBtn.classList.remove("show");
-}, 7000);
-restoreBtn.onclick = () => {
-clearTimeout(t);
-const lastTitle = localStorage.getItem('lastProjectTitle');
-setFrameSrc(last, { projectTitle: lastTitle });
-restoreBtn.classList.remove("show");
-};
-}
-document.addEventListener("DOMContentLoaded", () => {
-showFrameLoader();
-maybeShowRestore();
-});
-const STORE_URL = "https://black-ice-3dbk.onrender.com/elegant-store.html";
-const openStoreBtn = document.getElementById('openStoreBtn');
-if (openStoreBtn) {
-openStoreBtn.addEventListener('click', () => {
-setFrameSrc(STORE_URL, { projectTitle: "Elegant Store" });
-setSidebar(false);
-});
-}
-let allSites = [];
-let favorites = JSON.parse(localStorage.getItem('favoriteProjects') || '[]');
-let queryText = '';
-function saveFavorites() {
-localStorage.setItem('favoriteProjects', JSON.stringify(favorites));
-}
-function isFavorited(siteId) {
-return favorites.includes(siteId);
-}
-function addToFavorites(siteId) {
-if (!favorites.includes(siteId)) {
-favorites.push(siteId);
-saveFavorites();
-return true;
-}
-return false;
-}
-function removeFromFavorites(siteId) {
-const index = favorites.indexOf(siteId);
-if (index > -1) {
-favorites.splice(index, 1);
-saveFavorites();
-return true;
-}
-return false;
-}
-function toggleFavorite(siteId, buttonEl) {
-if (isFavorited(siteId)) {
-removeFromFavorites(siteId);
-buttonEl.classList.remove('favorited');
-} else {
-addToFavorites(siteId);
-buttonEl.classList.add('favorited');
-}
-renderFavorites();
-renderList();
-}
-function renderFavorites() {
-if (favorites.length === 0) {
-favoritesList.innerHTML = '<li class="empty-favorites">No favorites yet</li>';
-return;
-}
-const favoritedSites = allSites
-.filter(site => favorites.includes(site.id))
-.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-favoritesList.innerHTML = favoritedSites.map(site => {
-const safeTitle = sanitizeHTML(site.title);
-const safeUrl = sanitizeHTML(site.url);
-const when = site.timestamp ? timeAgo(site.timestamp) : "";
-const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url`;
-return `
-<li class="item item-row">
-<button type="button" class="project-btn" data-url="${safeUrl}" data-title="${safeTitle}">
-<div class="screenshot-preview">
-<img class="screenshot-thumb" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
-<img class="screenshot-large" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
-</div>
-<div>
-<div class="title">${safeTitle}</div>
-${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
-</div>
-</button>
-</li>
-`;
-}).join("");
-favoritesList.querySelectorAll('.project-btn').forEach(btn => {
-btn.addEventListener('click', () => {
-setFrameSrc(btn.dataset.url, { projectTitle: btn.dataset.title });
-setSidebar(false);
-});
-});
-}
-const renderList = ()=>{
-let list = allSites.slice();
-if (queryText){
-const q = queryText.toLowerCase();
-list = list.filter(s =>
-(s.title || '').toLowerCase().includes(q) ||
-(s.description || '').toLowerCase().includes(q)
-);
-}
-if (!list.length){
-projectList.innerHTML = `<li class="item"><div>No matches</div></li>`;
-return;
-}
-projectList.innerHTML = list.map(site => {
-const safeTitle = sanitizeHTML(site.title);
-const safeUrl = sanitizeHTML(site.url);
-const when = site.timestamp ? timeAgo(site.timestamp) : "";
-const isFav = isFavorited(site.id);
-const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url`;
-return `
-<li class="item item-row">
-<button type="button" class="project-btn" data-url="${safeUrl}" data-title="${safeTitle}">
-<div class="screenshot-preview">
-<img class="screenshot-thumb" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
-<img class="screenshot-large" src="${screenshotUrl}" alt="Preview of ${safeTitle}" loading="lazy" />
-</div>
-<div>
-<div class="title">${safeTitle}</div>
-${when ? `<div class="meta">${sanitizeHTML(when)}</div>` : ""}
-</div>
-</button>
-<button class="copy-btn" data-copy="${safeUrl}">Copy</button>
-<button class="favorite-btn${isFav ? ' favorited' : ''}"
-data-id="${site.id}"
-aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-</svg>
-</button>
-</li>
-`;
-}).join("");
-projectList.querySelectorAll('.project-btn').forEach(btn=>{
-btn.addEventListener('click', ()=>{
-setFrameSrc(btn.dataset.url, { projectTitle: btn.dataset.title });
-projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-setSidebar(false);
-});
-});
-projectList.querySelectorAll('.copy-btn').forEach(btn=>{
-btn.addEventListener('click', (e)=>{
-e.stopPropagation();
-const url = btn.dataset.copy;
-navigator.clipboard.writeText(url).then(()=>{
-btn.textContent = "Copied!";
-setTimeout(()=> btn.textContent = "Copy", 900);
-});
-});
-});
-projectList.querySelectorAll('.favorite-btn').forEach(btn => {
-btn.addEventListener('click', (e) => {
-e.stopPropagation();
-e.preventDefault();
-toggleFavorite(btn.dataset.id, btn);
-});
-});
-};
-searchInput.addEventListener('input', (e)=>{
-queryText = e.target.value.trim();
-renderList();
-});
-onValue(ref(db, 'sites'), snapshot=>{
-const sites = snapshot.val();
-if (!sites){
-projectList.innerHTML = `<li>No projects yet</li>`;
-return;
-}
-allSites = Object.entries(sites).map(([id, site])=>({
-id,
-title: site.title || "Untitled",
-url: site.url || "#",
-timestamp: site.timestamp || 0,
-description: site.description || ""
-}));
-allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
-renderList();
-renderFavorites();
-});
-document.querySelector("#goHome").addEventListener("click", () => {
-setFrameSrc(HOME_URL, { remember: false, projectTitle: null });
-projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-setTimeout(maybeShowRestore, 0);
-});
-const mainFrame = document.getElementById("portalFrame");
-async function checkNetworkAndCache() {
-if (!navigator.onLine) {
-offlineBox.style.display = "block";
-mainFrame.style.display = "none";
-hideFrameLoader();
-return;
-}
-offlineBox.style.display = "none";
-mainFrame.style.display = "block";
-showFrameLoader();
-if (!localStorage.getItem("cachedHome")) {
-try {
-const res = await fetch("https://black-ice-3dbk.onrender.com/");
-const html = await res.text();
-localStorage.setItem("cachedHome", html);
-} catch (err) { /* ignore */ }
-}
-}
-checkNetworkAndCache();
-window.addEventListener("online", checkNetworkAndCache);
-window.addEventListener("offline", checkNetworkAndCache);
-const hideBtn = document.querySelector('#hideNavbar');
-const setTopbarHidden = (hide) => {
-document.body.classList.toggle('nav-hidden', !!hide);
-hideBtn.setAttribute('aria-pressed', !!hide);
-hideBtn.title = hide ? 'Show navbar' : 'Hide navbar';
-};
-setTopbarHidden(false);
-hideBtn.addEventListener('click', () => {
-setTopbarHidden(!document.body.classList.contains('nav-hidden'));
-});
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsDialog = document.getElementById('settingsDialog');
-const closeSettings = document.getElementById('closeSettings');
-const saveSettings = document.getElementById('saveSettings');
-const homeScreenSelect = document.getElementById('homeScreenSelect');
-const fullscreenSettingsBtn = document.getElementById("fullscreenSettingsBtn");
 
-function toggleSiteFullscreen() {
-  const doc = window.document;
-  const docEl = doc.documentElement;
+const sidebar = document.getElementById('sidebar');
+const menuBtn = document.getElementById('menuBtn');
+const mobileOverlay = document.getElementById('mobileOverlay');
+const projectList = document.getElementById('projectList');
+const frame = document.getElementById('portalFrame');
+const loader = document.getElementById('frameLoader');
+const emptyState = document.getElementById('emptyState');
+const searchInput = document.getElementById('searchInput');
+const goHomeBtn = document.getElementById('goHomeBtn');
+const osApkBtn = document.getElementById('osApkBtn');
 
-  const requestFullScreen =
-    docEl.requestFullscreen ||
-    docEl.webkitRequestFullscreen ||
-    docEl.mozRequestFullScreen ||
-    docEl.msRequestFullscreen;
-
-  const cancelFullScreen =
-    doc.exitFullscreen ||
-    doc.webkitExitFullscreen ||
-    doc.mozCancelFullScreen ||
-    doc.msExitFullscreen;
-
-  if (!doc.fullscreenElement &&
-      !doc.webkitFullscreenElement &&
-      !doc.mozFullScreenElement &&
-      !doc.msFullscreenElement) {
-    if (requestFullScreen) {
-      requestFullScreen.call(docEl);
-    }
-  } else if (cancelFullScreen) {
-    cancelFullScreen.call(doc);
+function toggleSidebar(show) {
+  if(show) {
+    sidebar.classList.remove('-translate-x-full');
+    mobileOverlay.classList.remove('hidden');
+    setTimeout(() => mobileOverlay.classList.remove('opacity-0'), 10);
+  } else {
+    sidebar.classList.add('-translate-x-full');
+    mobileOverlay.classList.add('opacity-0');
+    setTimeout(() => mobileOverlay.classList.add('hidden'), 300);
   }
 }
 
-if (fullscreenSettingsBtn) {
-  fullscreenSettingsBtn.addEventListener("click", () => {
-    toggleSiteFullscreen();
-  });
+menuBtn.onclick = () => toggleSidebar(true);
+mobileOverlay.onclick = () => toggleSidebar(false);
+
+function showLoader() {
+  loader.classList.remove('hidden');
+  emptyState.classList.add('hidden');
 }
 
-function populateHomeScreenOptions() {
-homeScreenSelect.innerHTML = '<option value="">Default Home Screen</option>';
-allSites.forEach(site => {
-const option = document.createElement('option');
-option.value = site.url;
-option.textContent = site.title;
-if (site.url === localStorage.getItem('customHomeScreen')) {
-option.selected = true;
+function hideLoader() {
+  loader.classList.add('hidden');
 }
-homeScreenSelect.appendChild(option);
-});
+
+function convertToLocalHostUrl(url) {
+  try {
+    const u = new URL(url);
+    if (window.location.protocol === 'file:') {
+      return u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+    }
+    return window.location.origin + u.pathname;
+  } catch { return url; }
 }
-settingsBtn.addEventListener('click', () => {
-populateHomeScreenOptions();
-settingsDialog.classList.add('open');
-// Dashboard removed
-});
-closeSettings.addEventListener('click', () => {
-settingsDialog.classList.remove('open');
-});
-saveSettings.addEventListener('click', () => {
-const selectedUrl = homeScreenSelect.value;
-if (selectedUrl) {
-localStorage.setItem('customHomeScreen', selectedUrl);
-} else {
-localStorage.removeItem('customHomeScreen');
+
+function loadProject(url, btnElement) {
+  showLoader();
+
+  document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
+  if(btnElement) btnElement.classList.add('active');
+
+  frame.src = convertToLocalHostUrl(url);
+
+  if(window.innerWidth < 768) toggleSidebar(false);
 }
-settingsDialog.classList.remove('open');
+
+// Go to Home Button Handler
+goHomeBtn.onclick = () => {
+  showLoader();
+  document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
+  frame.src = 'index.html';
+};
+
+// OS & APK Button Handler
+osApkBtn.onclick = () => {
+  const osUrl = window.location.origin + '/scrapsites/osapk.html';
+  window.open(osUrl, '_blank');
+};
+
+frame.onload = hideLoader;
+
+onValue(ref(db, 'sites'), (snapshot) => {
+  const data = snapshot.val();
+  projectList.innerHTML = '';
+
+  if(!data) {
+    projectList.innerHTML = '<div class="p-4 text-center text-xs text-muted">No projects found</div>';
+    return;
+  }
+
+  const sites = Object.values(data).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+  sites.forEach(site => {
+    const btn = document.createElement('button');
+    const title = site.title || 'Untitled';
+    const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
+
+    btn.className = `project-card w-full text-left p-2 rounded-lg mb-1 flex items-center gap-3 border border-transparent select-none group`;
+
+    btn.innerHTML = `
+      <div class="w-8 h-8 rounded bg-surface border border-border overflow-hidden shrink-0 relative">
+        <img src="${screenshot}" 
+             class="screenshot-img w-full h-full object-cover" 
+             loading="lazy" 
+             onload="this.classList.add('loaded')"
+             onerror="this.style.display='none'">
+        <div class="absolute inset-0 flex items-center justify-center bg-surface -z-10">
+          <i class="fa-solid fa-cube text-[10px] text-muted"></i>
+        </div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="title-text text-sm font-medium truncate leading-tight group-hover:text-white transition-colors">${title}</div>
+        <div class="text-[10px] text-muted truncate mt-0.5 group-hover:text-gray-300">Project</div>
+      </div>
+    `;
+
+    btn.onclick = () => loadProject(site.url, btn);
+    projectList.appendChild(btn);
+  });
 });
-settingsDialog.addEventListener('click', (e) => {
-if (e.target === settingsDialog) {
-settingsDialog.classList.remove('open');
-}
-});
-// Tab switching
-document.querySelectorAll('.tab-btn').forEach(btn => {
-btn.addEventListener('click', () => {
-document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-btn.classList.add('active');
-const tabId = btn.dataset.tab + 'Tab';
-document.getElementById(tabId).classList.add('active');
-if (btn.dataset.tab === 'dashboard') {
-// Dashboard removed
-}
-});
-});
-// Clear tracking data
-document.getElementById('clearTrackingData').addEventListener('click', () => {
-if (confirm('Are you sure you want to clear all tracking data? This cannot be undone.')) {
-localStorage.removeItem(TRACKING_KEY);
-localStorage.removeItem(ACTIVITY_KEY);
-// Dashboard removed
-}
-});
-window.addEventListener('DOMContentLoaded', () => {
-const customHome = localStorage.getItem('customHomeScreen');
-if (customHome) {
-frame.src = customHome;
-}
-});
-</script><script> document.addEventListener('contextmenu', event => event.preventDefault()); </script>
+
+searchInput.oninput = (e) => {
+  const q = e.target.value.toLowerCase();
+  projectList.querySelectorAll('button').forEach(btn => {
+    btn.style.display = btn.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+  });
+};
+</script>
+
 </body>
 </html>
