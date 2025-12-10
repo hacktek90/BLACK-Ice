@@ -102,7 +102,13 @@
 
   <!-- Header -->
   <div class="p-4 border-b border-border/50">
-    <h1 class="text-lg font-bold tracking-tight mb-4 hidden md:block">Project Portal</h1>
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-lg font-bold tracking-tight">Project Portal</h1>
+      <button id="osApkBtn" class="text-[10px] font-bold px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1.5" title="Open Web OS & APK">
+        <i class="fa-brands fa-android"></i>
+        WEB OS & APK
+      </button>
+    </div>
 
     <div class="relative">
       <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
@@ -141,7 +147,7 @@
     </div>
     <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
     <p class="text-muted max-w-sm mb-6">Select a project from the sidebar to launch your workspace instantly.</p>
-    <p class="text-muted max-w-sm mb-6">or</p>
+    <p class="text-muted max-w-sm mb-6 font-medium text-xs uppercase tracking-wide opacity-50">or</p>
 
     <!-- Go to Home Button -->
     <button id="goHomeBtn" class="home-btn group flex items-center gap-2.5 px-5 py-2.5 bg-surface hover:bg-border border border-border hover:border-primary/50 rounded-xl transition-all duration-200 shadow-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]">
@@ -180,6 +186,7 @@ const loader = document.getElementById('frameLoader');
 const emptyState = document.getElementById('emptyState');
 const searchInput = document.getElementById('searchInput');
 const goHomeBtn = document.getElementById('goHomeBtn');
+const osApkBtn = document.getElementById('osApkBtn');
 
 function toggleSidebar(show) {
   if(show) {
@@ -231,6 +238,12 @@ goHomeBtn.onclick = () => {
   showLoader();
   document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
   frame.src = 'index.html';
+};
+
+// OS & APK Button Handler
+osApkBtn.onclick = () => {
+  const osUrl = window.location.origin + '/scrapsites/osapk.html';
+  window.open(osUrl, '_blank');
 };
 
 frame.onload = hideLoader;
