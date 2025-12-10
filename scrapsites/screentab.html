@@ -299,14 +299,10 @@
                 return;
             }
 
-            // 2. Check Iframe
-            if (window.self !== window.top) {
-                const iframeWarning = document.getElementById('iframe-warning');
-                document.getElementById('open-tab-link').href = window.location.href;
-                iframeWarning.style.display = 'flex';
-                app.style.display = 'none';
-                return;
-            }
+           // 2. Allow iframe usage (no restriction)
+if (window.self !== window.top) {
+    console.log("Running inside iframe — allowed.");
+}
 
             // 3. Check Mobile
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
