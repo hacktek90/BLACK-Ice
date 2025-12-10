@@ -1,553 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
   <title>Project Portal</title>
-  <style>
-    :root{
-      --bg:#071029; --panel:#071428; --muted:#94a3b8; --accent:#38bdf8; --card:#0b1220;
-      --glass: rgba(255,255,255,0.03);
-      --radius:10px;
-    }
-    *{box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
-    body{margin:0;background:linear-gradient(180deg,#021026 0%, #071428 100%);color:#e6eef8;min-height:100vh;display:flex}
-    header{height:56px;display:flex;align-items:center;padding:0 12px;gap:8px;background:var(--panel);border-bottom:1px solid rgba(255,255,255,0.03)}
-    .btn{background:transparent;border:0;color:inherit;padding:8px;border-radius:8px;cursor:pointer}
-    .btn:hover{background:rgba(255,255,255,0.02)}
-    #sidebar{width:300px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-right:1px solid rgba(255,255,255,0.02);height:calc(100vh - 56px);overflow:auto}
-    #main{flex:1;display:flex;flex-direction:column;height:calc(100vh - 56px)}
-    h3{margin:6px 0 12px 0;color:var(--accent)}
-    #projectList, #favoritesList{list-style:none;padding:0;margin:0;display:block}
-    .item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;margin-bottom:8px;background:var(--card);border:1px solid rgba(255,255,255,0.02);cursor:default}
-    .project-btn{all:unset;cursor:pointer;display:flex;flex:1;gap:8px;align-items:center}
-    .title{font-weight:600}
-    .meta{font-size:12px;color:var(--muted)}
-    #contentTop{display:flex;gap:10px;align-items:center;padding:10px;border-bottom:1px solid rgba(255,255,255,0.02);background:transparent}
-    #searchInput{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);background:transparent;color:inherit}
-    #portalFrame{flex:1;border:0;background:white;display:block}
-    #frameLoader{display:none;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,0.4);color:var(--accent)}
-    #emptyState{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted)}
-    .side-section{margin-bottom:14px}
-    aside .small{font-size:12px;color:var(--muted);margin-bottom:8px}
-    .favorite-btn{background:transparent;border:0;cursor:pointer;padding:6px;border-radius:6px}
-    .favorited{color:gold}
-    /* basic settings dialog */
-    #settingsDialog{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5)}
-    #settingsDialog.open{display:flex}
-    .dialog{background:var(--panel);padding:16px;border-radius:12px;max-width:520px;width:94%}
-    .dialog h4{margin:0 0 8px 0}
-    .dialog .row{display:flex;gap:8px;align-items:center;margin-top:8px}
-    #offlineBox{display:none;padding:10px;background:#2b2b2b;color:#fff;text-align:center}
-    .hidden{display:none}
-    footer{height:28px;background:transparent;border-top:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;padding:4px 10px;color:var(--muted);font-size:13px}
-    /* responsive */
-    @media(max-width:880px){
-      #sidebar{display:none;position:fixed;left:0;top:56px;z-index:50;height:calc(100vh - 56px)}
-      body.nav-hidden header{display:flex}
-    }
-  </style>
-</head>
-<body>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <header>
-    <button id="toggleSidebar" class="btn" title="Toggle sidebar">☰</button>
-    <strong id="projectNameDisplay">Project Portal</strong>
-    <div style="flex:1"></div>
-    <div id="frameLoader">⏳ Loading frame...</div>
-    <button id="openStoreBtn" class="btn" title="Open store">Store</button>
-    <button id="settingsBtn" class="btn" title="Settings">⚙️</button>
-    <button id="hideNavbar" class="btn" title="Hide navbar">⇧</button>
-  </header>
+  <!-- Tailwind + Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <div id="sidebar" role="navigation" aria-label="Sidebar">
-    <h3>Projects</h3>
-    <div id="contentTop">
-      <input id="searchInput" placeholder="Search projects..." />
-      <button id="goHome" class="btn" title="Go home">🏠</button>
-    </div>
-
-    <div class="side-section">
-      <div class="small">Favorites</div>
-      <ul id="favoritesList"></ul>
-    </div>
-
-    <div class="side-section">
-      <div class="small">All projects</div>
-      <ul id="projectList"></ul>
-    </div>
-
-    <div class="side-section">
-      <div class="small">Dashboard</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <div style="padding:8px;background:var(--glass);border-radius:8px">Total: <span id="totalProjectsCount">0</span></div>
-        <div style="padding:8px;background:var(--glass);border-radius:8px">Favs: <span id="favoritesCount">0</span></div>
-        <div style="padding:8px;background:var(--glass);border-radius:8px">Visits: <span id="totalVisitsCount">0</span></div>
-      </div>
-      <div style="margin-top:8px">
-        <ul id="mostVisitedList" style="padding-left:0;margin:0"></ul>
-      </div>
-    </div>
-
-    <div style="margin-top:12px">
-      <button id="restoreLastBtn" class="btn">Restore last</button>
-      <button id="clearTrackingData" class="btn">Clear tracking</button>
-    </div>
-  </div>
-
-  <div id="main">
-    <div id="offlineBox">You appear offline. Showing cached home when available.</div>
-    <div id="emptyState">Select a project to load it in the frame</div>
-    <iframe id="portalFrame" title="Portal frame" src=""></iframe>
-    <footer>
-      <div id="currentProjectName">No project loaded</div>
-      <div style="flex:1"></div>
-      <div id="activeToday">0 active today</div>
-    </footer>
-  </div>
-
-  <!-- Settings dialog -->
-  <div id="settingsDialog" role="dialog" aria-modal="true">
-    <div class="dialog">
-      <h4>Settings</h4>
-      <div class="row">
-        <label for="homeScreenSelect">Home screen</label>
-        <select id="homeScreenSelect" style="flex:1"></select>
-      </div>
-      <div class="row" style="justify-content:flex-end;margin-top:12px">
-        <button id="closeSettings" class="btn">Close</button>
-        <button id="saveSettings" class="btn">Save</button>
-        <button id="fullscreenSettingsBtn" class="btn">Fullscreen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hidden elements used by script (close project etc) -->
-  <button id="closeProject" class="hidden">Close</button>
-
-  <!-- Firebase & app script -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-    // ---------- CONFIG ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-      authDomain: "h-90-8a7c5.firebaseapp.com",
-      databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-      projectId: "h-90-8a7c5",
-      storageBucket: "h-90-8a7c5.firebasestorage.app",
-      messagingSenderId: "367196609301",
-      appId: "1:367196609301:web:156e24c1b4532c26af671c"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // ---------- DOM refs ----------
-    const sidebar = document.querySelector('#sidebar');
-    const toggleBtn = document.querySelector('#toggleSidebar') || document.createElement('button');
-    const projectList = document.querySelector('#projectList');
-    const favoritesList = document.querySelector('#favoritesList');
-    const searchInput = document.querySelector('#searchInput');
-    const frame = document.querySelector('#portalFrame');
-    const frameLoader = document.querySelector('#frameLoader');
-    const projectNameDisplay = document.querySelector('#projectNameDisplay');
-    const currentProjectName = document.querySelector('#currentProjectName');
-    const closeProjectBtn = document.querySelector('#closeProject');
-    const restoreBtn = document.getElementById("restoreLastBtn");
-    const offlineBox = document.getElementById("offlineBox");
-    const goHomeBtn = document.getElementById("goHome");
-    const hideBtn = document.querySelector('#hideNavbar');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const settingsDialog = document.getElementById('settingsDialog');
-    const closeSettings = document.getElementById('closeSettings');
-    const saveSettings = document.getElementById('saveSettings');
-    const homeScreenSelect = document.getElementById('homeScreenSelect');
-    const fullscreenSettingsBtn = document.getElementById("fullscreenSettingsBtn");
-    const openStoreBtn = document.getElementById('openStoreBtn');
-
-    // ---------- State & constants ----------
-    const TRACKING_KEY = 'projectTracking';
-    const ACTIVITY_KEY = 'projectActivity';
-    const HOME_URL = "https://black-ice-3dbk.onrender.com/";
-    const LAST_KEY = "lastPortalUrl";
-
-    let allSites = [];
-    let favorites = JSON.parse(localStorage.getItem('favoriteProjects') || '[]');
-    let queryText = '';
-    let currentProject = null;
-
-    // ---------- Utilities ----------
-    function getTracking(){ return JSON.parse(localStorage.getItem(TRACKING_KEY) || '{}'); }
-    function saveTracking(data){ localStorage.setItem(TRACKING_KEY, JSON.stringify(data)); }
-    function getActivity(){ return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); }
-    function saveActivity(data){ localStorage.setItem(ACTIVITY_KEY, JSON.stringify(data)); }
-
-    function sanitizeHTML(str){ const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
-
-    function timeAgo(ts){
-      if(!ts) return '';
-      const diffMs = Date.now() - ts;
-      const seconds = Math.floor(diffMs/1000);
-      if(seconds < 60) return `${seconds}s`;
-      const minutes = Math.floor(seconds/60);
-      if(minutes < 60) return `${minutes}m`;
-      const hours = Math.floor(minutes/60);
-      if(hours < 24) return `${hours}h`;
-      const days = Math.floor(hours/24);
-      return `${days}d`;
-    }
-
-    function getDayOfWeek(timestamp) {
-      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      return days[new Date(timestamp).getDay()];
-    }
-
-    // ---------- Tracking ----------
-    function trackProjectVisit(projectId, projectTitle, projectUrl){
-      const tracking = getTracking();
-      if(!tracking[projectId]){
-        tracking[projectId] = { id: projectId, title: projectTitle, url: projectUrl, visits:0, firstVisit:Date.now(), lastVisit:Date.now() };
-      }
-      tracking[projectId].visits++;
-      tracking[projectId].lastVisit = Date.now();
-      saveTracking(tracking);
-
-      const activity = getActivity();
-      activity.unshift({ projectId, title: projectTitle, url: projectUrl, timestamp: Date.now() });
-      if(activity.length > 50) activity.pop();
-      saveActivity(activity);
-    }
-
-    function getWeeklyActivity(){
-      const activity = getActivity();
-      const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-      const weeklyData = { Sun:0,Mon:0,Tue:0,Wed:0,Thu:0,Fri:0,Sat:0 };
-      activity.filter(a=>a.timestamp > weekAgo).forEach(a=>{
-        weeklyData[getDayOfWeek(a.timestamp)]++;
-      });
-      return weeklyData;
-    }
-
-    function updateDashboard(){
-      const trackingArray = Object.values(getTracking());
-      document.getElementById('totalProjectsCount').textContent = allSites.length || 0;
-      document.getElementById('favoritesCount').textContent = favorites.length || 0;
-      document.getElementById('totalVisitsCount').textContent = trackingArray.reduce((s,p)=>s+(p.visits||0),0);
-      document.getElementById('activeToday').textContent = getActivity().filter(a => {
-        const t = new Date(); t.setHours(0,0,0,0); return a.timestamp >= t.getTime();
-      }).length;
-
-      const mostVisited = trackingArray.sort((a,b)=> (b.visits||0)-(a.visits||0)).slice(0,5);
-      const mostVisitedList = document.getElementById('mostVisitedList');
-      if(mostVisited.length === 0){
-        mostVisitedList.innerHTML = '<li class="item">No visit data yet</li>';
-      } else {
-        mostVisitedList.innerHTML = mostVisited.map(p=>`<li class="item"><div class="title">${sanitizeHTML(p.title)} <div class="meta">${timeAgo(p.lastVisit)}</div></div><div style="margin-left:auto">${p.visits} visits</div></li>`).join('');
-      }
-    }
-
-    // ---------- Frame helpers ----------
-    function showFrameLoader(){ if(offlineBox.style.display === "block") return; frameLoader.style.display = 'flex'; }
-    function hideFrameLoader(){ frameLoader.style.display = 'none'; }
-
-    // Convert firebase url -> current origin + path
-    function convertToLocalHostUrl(firebaseUrl){
-      try{
-        const u = new URL(firebaseUrl);
-        const path = u.pathname || '/';
-        const origin = window.location.origin;
-        return origin + path;
-      } catch(e){
-        console.warn("convertToLocalHostUrl failed for:", firebaseUrl, e);
-        return firebaseUrl;
-      }
-    }
-
-    function setFrameSrc(url, opts = { remember: true, projectTitle: null }){
-      showFrameLoader();
-      const finalUrl = convertToLocalHostUrl(url);
-      frame.src = finalUrl;
-
-      if(opts.remember && finalUrl && finalUrl !== HOME_URL){
-        localStorage.setItem(LAST_KEY, finalUrl);
-        if(opts.projectTitle){
-          localStorage.setItem('lastProjectTitle', opts.projectTitle);
-          const project = allSites.find(s => s.url === url); // find by original stored url
-          if(project){
-            trackProjectVisit(project.id, opts.projectTitle, finalUrl);
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Satoshi', 'sans-serif'] },
+          colors: {
+            background: '#09090b', /* Very dark background like BicoChat */
+            surface: '#18181b',    /* Slightly lighter for cards */
+            border: '#27272a',     /* Dark border */
+            primary: '#3b82f6',    /* Blue accent */
+            text: '#e4e4e7',       /* Light gray text */
+            muted: '#a1a1aa'       /* Muted text */
+          },
+          boxShadow: {
+            'glow': '0 0 20px rgba(59, 130, 246, 0.15)'
           }
         }
       }
-      updateProjectNameDisplay(opts.projectTitle);
     }
-
-    frame.addEventListener('load', () => {
-      hideFrameLoader();
-    });
-
-    // ---------- UI helpers ----------
-    function updateProjectNameDisplay(projectTitle){
-      if(projectTitle && projectTitle !== "Home Screen"){
-        currentProjectName.textContent = projectTitle;
-        projectNameDisplay.classList.add('visible');
-        currentProject = projectTitle;
-      } else {
-        projectNameDisplay.classList.remove('visible');
-        currentProject = null;
-        currentProjectName.textContent = 'No project loaded';
-      }
-    }
-
-    document.getElementById('closeProject').addEventListener('click', (e) => {
-      e.stopPropagation();
-      setFrameSrc(HOME_URL, { remember: false });
-      updateProjectNameDisplay(null);
-      projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-    });
-
-    function setSidebar(open){
-      sidebar.classList.toggle('open', !!open);
-      sidebar.hidden = !open;
-      toggleBtn.setAttribute('aria-expanded', !!open);
-    }
-    setSidebar(false);
-    toggleBtn.addEventListener('click', ()=> setSidebar(!sidebar.classList.contains('open')));
-
-    function maybeShowRestore(){
-      const last = localStorage.getItem(LAST_KEY);
-      const current = frame.getAttribute("src");
-      if(!last || current !== HOME_URL) return;
-      restoreBtn.classList.add("show");
-      const t = setTimeout(()=> restoreBtn.classList.remove("show"), 7000);
-      restoreBtn.onclick = () => {
-        clearTimeout(t);
-        const lastTitle = localStorage.getItem('lastProjectTitle');
-        setFrameSrc(last, { projectTitle: lastTitle });
-        restoreBtn.classList.remove("show");
-      };
-    }
-
-    // ---------- Favorites ----------
-    function saveFavorites(){ localStorage.setItem('favoriteProjects', JSON.stringify(favorites)); }
-    function isFavorited(siteId){ return favorites.includes(siteId); }
-    function addToFavorites(siteId){ if(!favorites.includes(siteId)){ favorites.push(siteId); saveFavorites(); return true;} return false; }
-    function removeFromFavorites(siteId){ const i = favorites.indexOf(siteId); if(i>-1){ favorites.splice(i,1); saveFavorites(); return true;} return false; }
-    function toggleFavorite(siteId, buttonEl){ if(isFavorited(siteId)){ removeFromFavorites(siteId); buttonEl.classList.remove('favorited'); } else { addToFavorites(siteId); buttonEl.classList.add('favorited'); } renderFavorites(); renderList(); }
-
-    function renderFavorites(){
-      if(favorites.length === 0){ favoritesList.innerHTML = '<li class="item">No favorites yet</li>'; return; }
-      const favoritedSites = allSites.filter(s => favorites.includes(s.id)).sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
-      favoritesList.innerHTML = favoritedSites.map(site=> {
-        const safeTitle = sanitizeHTML(site.title);
-        const safeUrl = sanitizeHTML(site.url);
-        const when = site.timestamp ? timeAgo(site.timestamp) : "";
-        return `<li class="item item-row">
-          <button type="button" class="project-btn" data-url="${safeUrl}" data-title="${safeTitle}">
-            <div style="flex:1">
-              <div class="title">${safeTitle}</div>
-              <div class="meta">${when}</div>
-            </div>
-          </button>
-        </li>`;
-      }).join('');
-      favoritesList.querySelectorAll('.project-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          setFrameSrc(btn.dataset.url, { projectTitle: btn.dataset.title });
-          setSidebar(false);
-        });
-      });
-    }
-
-    function renderList(){
-      let list = allSites.slice();
-      if(queryText){
-        const q = queryText.toLowerCase();
-        list = list.filter(s => (s.title||'').toLowerCase().includes(q) || (s.description||'').toLowerCase().includes(q));
-      }
-      if(!list.length){
-        projectList.innerHTML = `<li class="item">No matches</li>`;
-        return;
-      }
-      projectList.innerHTML = list.map(site => {
-        const safeTitle = sanitizeHTML(site.title);
-        const safeUrl = sanitizeHTML(site.url);
-        const when = site.timestamp ? timeAgo(site.timestamp) : "";
-        const isFav = isFavorited(site.id);
-        return `<li class="item item-row">
-          <button type="button" class="project-btn" data-url="${safeUrl}" data-title="${safeTitle}">
-            <div style="flex:1">
-              <div class="title">${safeTitle}</div>
-              ${when ? `<div class="meta">${when}</div>` : ''}
-            </div>
-          </button>
-          <button class="copy-btn btn" data-copy="${safeUrl}">Copy</button>
-          <button class="favorite-btn ${isFav ? 'favorited' : ''}" data-id="${site.id}" aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">★</button>
-        </li>`;
-      }).join('');
-
-      projectList.querySelectorAll('.project-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          setFrameSrc(btn.dataset.url, { projectTitle: btn.dataset.title });
-          projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          setSidebar(false);
-        });
-      });
-
-      projectList.querySelectorAll('.copy-btn').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          const url = btn.dataset.copy;
-          navigator.clipboard?.writeText(url).then(()=> {
-            btn.textContent = "Copied!";
-            setTimeout(()=> btn.textContent = "Copy", 900);
-          });
-        });
-      });
-
-      projectList.querySelectorAll('.favorite-btn').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          e.preventDefault();
-          toggleFavorite(btn.dataset.id, btn);
-        });
-      });
-    }
-
-    // ---------- Firebase listener ----------
-    onValue(ref(db, 'sites'), snapshot=>{
-      const sites = snapshot.val();
-      if(!sites){
-        projectList.innerHTML = `<li class="item">No projects yet</li>`;
-        return;
-      }
-
-      allSites = Object.entries(sites).map(([id, site]) => ({
-        id,
-        title: site.title || "Untitled",
-        url: site.url || "#",
-        timestamp: site.timestamp || 0,
-        description: site.description || ""
-      }));
-
-      allSites.sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0));
-      renderList();
-      renderFavorites();
-      updateDashboard();
-      populateHomeScreenOptions();
-    });
-
-    // ---------- events & misc ----------
-    searchInput.addEventListener('input', (e)=> { queryText = e.target.value.trim(); renderList(); });
-
-    goHomeBtn.addEventListener('click', ()=> {
-      setFrameSrc(HOME_URL, { remember: false, projectTitle: null });
-      projectList.querySelectorAll('.project-btn.active').forEach(b=>b.classList.remove('active'));
-      setTimeout(maybeShowRestore, 0);
-    });
-
-    // offline & cache
-    async function checkNetworkAndCache(){
-      if(!navigator.onLine){
-        offlineBox.style.display = "block";
-        frame.style.display = "none";
-        hideFrameLoader();
-        return;
-      }
-      offlineBox.style.display = "none";
-      frame.style.display = "block";
-      showFrameLoader();
-      if(!localStorage.getItem("cachedHome")){
-        try{
-          const res = await fetch(HOME_URL);
-          const html = await res.text();
-          localStorage.setItem("cachedHome", html);
-        }catch(err){}
-      }
-    }
-    checkNetworkAndCache();
-    window.addEventListener("online", checkNetworkAndCache);
-    window.addEventListener("offline", checkNetworkAndCache);
-
-    // sidebar hide
-    const setTopbarHidden = (hide) => {
-      document.body.classList.toggle('nav-hidden', !!hide);
-      hideBtn.setAttribute('aria-pressed', !!hide);
-      hideBtn.title = hide ? 'Show navbar' : 'Hide navbar';
-    };
-    setTopbarHidden(false);
-    hideBtn.addEventListener('click', ()=> setTopbarHidden(!document.body.classList.contains('nav-hidden')));
-
-    // settings
-    function populateHomeScreenOptions(){
-      homeScreenSelect.innerHTML = '<option value="">Default Home Screen</option>';
-      allSites.forEach(site => {
-        const option = document.createElement('option');
-        option.value = site.url;
-        option.textContent = site.title;
-        if(site.url === localStorage.getItem('customHomeScreen')) option.selected = true;
-        homeScreenSelect.appendChild(option);
-      });
-    }
-    settingsBtn.addEventListener('click', ()=>{
-      populateHomeScreenOptions();
-      settingsDialog.classList.add('open');
-    });
-    closeSettings.addEventListener('click', ()=> settingsDialog.classList.remove('open'));
-    saveSettings.addEventListener('click', ()=>{
-      const selectedUrl = homeScreenSelect.value;
-      if(selectedUrl) localStorage.setItem('customHomeScreen', selectedUrl);
-      else localStorage.removeItem('customHomeScreen');
-      settingsDialog.classList.remove('open');
-    });
-    settingsDialog.addEventListener('click', (e)=> { if(e.target === settingsDialog) settingsDialog.classList.remove('open'); });
-
-    function toggleSiteFullscreen(){
-      const doc = window.document;
-      const docEl = doc.documentElement;
-      const requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-      const cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
-      if(!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.mozFullScreenElement && !doc.msFullscreenElement){
-        if(requestFullScreen) requestFullScreen.call(docEl);
-      } else if(cancelFullScreen) cancelFullScreen.call(doc);
-    }
-    if(fullscreenSettingsBtn) fullscreenSettingsBtn.addEventListener('click', toggleSiteFullscreen);
-
-    // store button
-    if(openStoreBtn) openStoreBtn.addEventListener('click', ()=>{
-      setFrameSrc("https://black-ice-3dbk.onrender.com/elegant-store.html", { projectTitle: "Elegant Store" });
-      setSidebar(false);
-    });
-
-    // restore last logic
-    window.addEventListener('DOMContentLoaded', ()=>{
-      showFrameLoader();
-      maybeShowRestore();
-      const customHome = localStorage.getItem('customHomeScreen');
-      if(customHome){
-        frame.src = convertToLocalHostUrl(customHome);
-      } else {
-        const last = localStorage.getItem(LAST_KEY);
-        if(last) frame.src = last;
-      }
-    });
-
-    // clear tracking
-    document.getElementById('clearTrackingData').addEventListener('click', ()=>{
-      if(confirm('Are you sure you want to clear all tracking data? This cannot be undone.')){
-        localStorage.removeItem(TRACKING_KEY);
-        localStorage.removeItem(ACTIVITY_KEY);
-        updateDashboard();
-      }
-    });
-
-    // initial render placeholders
-    renderList();
-    renderFavorites();
-    updateDashboard();
-
   </script>
+
+  <style>
+    body { background: #09090b; color: #e4e4e7; overflow: hidden; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+    /* Glass Effect for Mobile Menu */
+    .glass {
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+    }
+
+    /* Card Hover Effect */
+    .project-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .project-card:hover {
+      background: #27272a;
+      transform: translateY(-1px);
+    }
+    .project-card.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    /* Screenshot Fade In */
+    .screenshot-img { opacity: 0; transition: opacity 0.3s; }
+    .screenshot-img.loaded { opacity: 1; }
+  </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col md:flex-row">
+
+<!-- Mobile Header (Visible only on mobile) -->
+<div class="md:hidden h-14 glass flex items-center justify-between px-4 z-50 shrink-0">
+  <span class="font-bold text-lg tracking-tight">Project Portal</span>
+  <button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
+    <i class="fa-solid fa-bars text-xl"></i>
+  </button>
+</div>
+
+<!-- Sidebar Overlay (Mobile) -->
+<div id="mobileOverlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[260px] bg-background border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-2xl md:shadow-none">
+
+  <!-- Header -->
+  <div class="p-4 border-b border-border/50">
+    <h1 class="text-lg font-bold tracking-tight mb-4 hidden md:block">Project Portal</h1>
+
+    <!-- Search Input -->
+    <div class="relative">
+      <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
+      <input id="searchInput" 
+             placeholder="Search projects..." 
+             class="w-full bg-surface border border-border rounded-lg pl-8 pr-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
+    </div>
+  </div>
+
+  <!-- Project List -->
+  <div id="projectList" class="flex-1 overflow-y-auto p-2 space-y-1">
+    <!-- Loading Skeleton -->
+    <div class="animate-pulse space-y-2 p-1">
+      <div class="h-10 bg-surface rounded-lg w-full"></div>
+      <div class="h-10 bg-surface rounded-lg w-full"></div>
+      <div class="h-10 bg-surface rounded-lg w-full"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-1 flex flex-col relative h-full bg-surface overflow-hidden">
+
+  <!-- Loader -->
+  <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-background flex flex-col items-center justify-center">
+    <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+    <span class="text-sm text-muted animate-pulse">Loading application...</span>
+  </div>
+
+  <!-- Iframe -->
+  <iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
+
+  <!-- Empty State (Initial) -->
+  <div id="emptyState" class="absolute inset-0 bg-background flex flex-col items-center justify-center text-center p-6 z-10">
+    <div class="w-16 h-16 bg-surface rounded-2xl border border-border flex items-center justify-center mb-6 shadow-glow">
+      <i class="fa-solid fa-layer-group text-2xl text-primary"></i>
+    </div>
+    <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
+    <p class="text-muted max-w-sm">Select a project from the sidebar to launch your workspace instantly.</p>
+  </div>
+
+  <!-- Close Button (Floating) -->
+  <button id="closeProject" class="hidden absolute top-4 right-4 md:right-6 bg-surface/90 backdrop-blur border border-border text-muted hover:text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg transition-all z-30 flex items-center gap-2 hover:border-red-500/50 hover:bg-red-500/10">
+    <span>Close</span>
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+  authDomain: "h-90-8a7c5.firebaseapp.com",
+  databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+  projectId: "h-90-8a7c5",
+  storageBucket: "h-90-8a7c5.firebasestorage.app",
+  messagingSenderId: "367196609301",
+  appId: "1:367196609301:web:156e24c1b4532c26af671c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// DOM Elements
+const sidebar = document.getElementById('sidebar');
+const menuBtn = document.getElementById('menuBtn');
+const mobileOverlay = document.getElementById('mobileOverlay');
+const projectList = document.getElementById('projectList');
+const frame = document.getElementById('portalFrame');
+const loader = document.getElementById('frameLoader');
+const emptyState = document.getElementById('emptyState');
+const closeBtn = document.getElementById('closeProject');
+const searchInput = document.getElementById('searchInput');
+
+// Mobile Menu Logic
+function toggleSidebar(show) {
+  if(show) {
+    sidebar.classList.remove('-translate-x-full');
+    mobileOverlay.classList.remove('hidden');
+    // small delay to allow display:block to apply before opacity transition
+    setTimeout(() => mobileOverlay.classList.remove('opacity-0'), 10);
+  } else {
+    sidebar.classList.add('-translate-x-full');
+    mobileOverlay.classList.add('opacity-0');
+    setTimeout(() => mobileOverlay.classList.add('hidden'), 300);
+  }
+}
+
+menuBtn.onclick = () => toggleSidebar(true);
+mobileOverlay.onclick = () => toggleSidebar(false);
+
+// Frame Logic
+function showLoader() {
+  loader.classList.remove('hidden');
+  emptyState.classList.add('hidden');
+  closeBtn.classList.remove('hidden');
+}
+
+function hideLoader() {
+  loader.classList.add('hidden');
+}
+
+function convertToLocalHostUrl(url) {
+  try {
+    const u = new URL(url);
+    if (window.location.protocol === 'file:') {
+      return u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+    }
+    return window.location.origin + u.pathname;
+  } catch { return url; }
+}
+
+function loadProject(url, btnElement) {
+  showLoader();
+
+  // Active State
+  document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
+  if(btnElement) btnElement.classList.add('active');
+
+  frame.src = convertToLocalHostUrl(url);
+
+  // Close sidebar on mobile after selection
+  if(window.innerWidth < 768) toggleSidebar(false);
+}
+
+frame.onload = hideLoader;
+
+closeBtn.onclick = () => {
+  frame.src = 'about:blank';
+  emptyState.classList.remove('hidden');
+  closeBtn.classList.add('hidden');
+  document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
+};
+
+// Data Loading
+onValue(ref(db, 'sites'), (snapshot) => {
+  const data = snapshot.val();
+  projectList.innerHTML = '';
+
+  if(!data) {
+    projectList.innerHTML = '<div class="p-4 text-center text-xs text-muted">No projects found</div>';
+    return;
+  }
+
+  const sites = Object.values(data).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+  sites.forEach(site => {
+    const btn = document.createElement('button');
+    const title = site.title || 'Untitled';
+    const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
+
+    btn.className = `project-card w-full text-left p-2 rounded-lg mb-1 flex items-center gap-3 border border-transparent select-none group`;
+
+    btn.innerHTML = `
+      <div class="w-8 h-8 rounded bg-surface border border-border overflow-hidden shrink-0 relative">
+        <img src="${screenshot}" 
+             class="screenshot-img w-full h-full object-cover" 
+             loading="lazy" 
+             onload="this.classList.add('loaded')"
+             onerror="this.style.display='none'">
+        <div class="absolute inset-0 flex items-center justify-center bg-surface -z-10">
+          <i class="fa-solid fa-cube text-[10px] text-muted"></i>
+        </div>
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="text-sm font-medium truncate leading-tight group-hover:text-white">${title}</div>
+        <div class="text-[10px] text-muted truncate mt-0.5 group-hover:text-gray-300">Project</div>
+      </div>
+    `;
+
+    btn.onclick = () => loadProject(site.url, btn);
+    projectList.appendChild(btn);
+  });
+});
+
+// Search
+searchInput.oninput = (e) => {
+  const q = e.target.value.toLowerCase();
+  projectList.querySelectorAll('button').forEach(btn => {
+    btn.style.display = btn.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+  });
+};
+</script>
+
 </body>
 </html>
