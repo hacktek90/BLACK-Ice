@@ -17,15 +17,12 @@
         extend: {
           fontFamily: { sans: ['Satoshi', 'sans-serif'] },
           colors: {
-            background: '#09090b', /* Very dark background like BicoChat */
-            surface: '#18181b',    /* Slightly lighter for cards */
-            border: '#27272a',     /* Dark border */
-            primary: '#3b82f6',    /* Blue accent */
-            text: '#e4e4e7',       /* Light gray text */
-            muted: '#a1a1aa'       /* Muted text */
-          },
-          boxShadow: {
-            'glow': '0 0 20px rgba(59, 130, 246, 0.15)'
+            background: '#09090b', 
+            surface: '#18181b',
+            border: '#27272a',
+            primary: '#3b82f6',
+            text: '#e4e4e7',
+            muted: '#a1a1aa'
           }
         }
       }
@@ -35,13 +32,11 @@
   <style>
     body { background: #09090b; color: #e4e4e7; overflow: hidden; }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-    /* Glass Effect for Mobile Menu */
     .glass {
       background: rgba(24, 24, 27, 0.8);
       backdrop-filter: blur(12px);
@@ -49,21 +44,37 @@
       border-bottom: 1px solid #27272a;
     }
 
-    /* Card Hover Effect */
     .project-card {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .project-card:hover {
-      background: #27272a;
-      transform: translateY(-1px);
-    }
-    .project-card.active {
-      background: #2563eb;
-      border-color: #2563eb;
-      color: white;
+      transition: all 0.2s ease;
+      position: relative;
     }
 
-    /* Screenshot Fade In */
+    .project-card:hover {
+      background: #27272a;
+    }
+
+    /* Modern Minimal Active State */
+    .project-card.active {
+      background: rgba(59, 130, 246, 0.08); /* Very subtle blue tint */
+    }
+
+    .project-card.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: #3b82f6;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .project-card.active .title-text {
+      color: #60a5fa; /* Lighter blue text */
+      font-weight: 700;
+    }
+
     .screenshot-img { opacity: 0; transition: opacity 0.3s; }
     .screenshot-img.loaded { opacity: 1; }
   </style>
@@ -71,7 +82,7 @@
 
 <body class="h-screen w-screen flex flex-col md:flex-row">
 
-<!-- Mobile Header (Visible only on mobile) -->
+<!-- Mobile Header -->
 <div class="md:hidden h-14 glass flex items-center justify-between px-4 z-50 shrink-0">
   <span class="font-bold text-lg tracking-tight">Project Portal</span>
   <button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
@@ -79,7 +90,7 @@
   </button>
 </div>
 
-<!-- Sidebar Overlay (Mobile) -->
+<!-- Sidebar Overlay -->
 <div id="mobileOverlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
 
 <!-- Sidebar -->
@@ -89,7 +100,6 @@
   <div class="p-4 border-b border-border/50">
     <h1 class="text-lg font-bold tracking-tight mb-4 hidden md:block">Project Portal</h1>
 
-    <!-- Search Input -->
     <div class="relative">
       <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
       <input id="searchInput" 
@@ -100,7 +110,6 @@
 
   <!-- Project List -->
   <div id="projectList" class="flex-1 overflow-y-auto p-2 space-y-1">
-    <!-- Loading Skeleton -->
     <div class="animate-pulse space-y-2 p-1">
       <div class="h-10 bg-surface rounded-lg w-full"></div>
       <div class="h-10 bg-surface rounded-lg w-full"></div>
@@ -121,20 +130,14 @@
   <!-- Iframe -->
   <iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
 
-  <!-- Empty State (Initial) -->
+  <!-- Empty State -->
   <div id="emptyState" class="absolute inset-0 bg-background flex flex-col items-center justify-center text-center p-6 z-10">
-    <div class="w-16 h-16 bg-surface rounded-2xl border border-border flex items-center justify-center mb-6 shadow-glow">
+    <div class="w-16 h-16 bg-surface rounded-2xl border border-border flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
       <i class="fa-solid fa-layer-group text-2xl text-primary"></i>
     </div>
     <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
     <p class="text-muted max-w-sm">Select a project from the sidebar to launch your workspace instantly.</p>
   </div>
-
-  <!-- Close Button (Floating) -->
-  <button id="closeProject" class="hidden absolute top-4 right-4 md:right-6 bg-surface/90 backdrop-blur border border-border text-muted hover:text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg transition-all z-30 flex items-center gap-2 hover:border-red-500/50 hover:bg-red-500/10">
-    <span>Close</span>
-    <i class="fa-solid fa-xmark"></i>
-  </button>
 
 </main>
 
@@ -155,7 +158,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// DOM Elements
 const sidebar = document.getElementById('sidebar');
 const menuBtn = document.getElementById('menuBtn');
 const mobileOverlay = document.getElementById('mobileOverlay');
@@ -163,15 +165,12 @@ const projectList = document.getElementById('projectList');
 const frame = document.getElementById('portalFrame');
 const loader = document.getElementById('frameLoader');
 const emptyState = document.getElementById('emptyState');
-const closeBtn = document.getElementById('closeProject');
 const searchInput = document.getElementById('searchInput');
 
-// Mobile Menu Logic
 function toggleSidebar(show) {
   if(show) {
     sidebar.classList.remove('-translate-x-full');
     mobileOverlay.classList.remove('hidden');
-    // small delay to allow display:block to apply before opacity transition
     setTimeout(() => mobileOverlay.classList.remove('opacity-0'), 10);
   } else {
     sidebar.classList.add('-translate-x-full');
@@ -183,11 +182,9 @@ function toggleSidebar(show) {
 menuBtn.onclick = () => toggleSidebar(true);
 mobileOverlay.onclick = () => toggleSidebar(false);
 
-// Frame Logic
 function showLoader() {
   loader.classList.remove('hidden');
   emptyState.classList.add('hidden');
-  closeBtn.classList.remove('hidden');
 }
 
 function hideLoader() {
@@ -207,26 +204,17 @@ function convertToLocalHostUrl(url) {
 function loadProject(url, btnElement) {
   showLoader();
 
-  // Active State
+  // Minimal Modern Active State Logic
   document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
   if(btnElement) btnElement.classList.add('active');
 
   frame.src = convertToLocalHostUrl(url);
 
-  // Close sidebar on mobile after selection
   if(window.innerWidth < 768) toggleSidebar(false);
 }
 
 frame.onload = hideLoader;
 
-closeBtn.onclick = () => {
-  frame.src = 'about:blank';
-  emptyState.classList.remove('hidden');
-  closeBtn.classList.add('hidden');
-  document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
-};
-
-// Data Loading
 onValue(ref(db, 'sites'), (snapshot) => {
   const data = snapshot.val();
   projectList.innerHTML = '';
@@ -257,7 +245,7 @@ onValue(ref(db, 'sites'), (snapshot) => {
         </div>
       </div>
       <div class="min-w-0 flex-1">
-        <div class="text-sm font-medium truncate leading-tight group-hover:text-white">${title}</div>
+        <div class="title-text text-sm font-medium truncate leading-tight group-hover:text-white transition-colors">${title}</div>
         <div class="text-[10px] text-muted truncate mt-0.5 group-hover:text-gray-300">Project</div>
       </div>
     `;
@@ -267,7 +255,6 @@ onValue(ref(db, 'sites'), (snapshot) => {
   });
 });
 
-// Search
 searchInput.oninput = (e) => {
   const q = e.target.value.toLowerCase();
   projectList.querySelectorAll('button').forEach(btn => {
