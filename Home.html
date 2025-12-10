@@ -200,9 +200,17 @@ function toggleSidebar(show) {
     setTimeout(() => mobileOverlay.classList.add('hidden'), 300);
   }
 }
+  
 
 menuBtn.onclick = () => toggleSidebar(true);
 mobileOverlay.onclick = () => toggleSidebar(false);
+  /* Allow iframe to open sidebar */
+window.addEventListener("message",(e)=>{
+  if(e.origin !== location.origin) return;
+  if(e.data==="open-sidebar") toggleSidebar(true);
+  if(e.data==="close-sidebar") toggleSidebar(false);
+});
+window.toggleSidebar = toggleSidebar; // direct access for same-origin iframe
 
 function showLoader() {
   loader.classList.remove('hidden');
@@ -296,6 +304,8 @@ searchInput.oninput = (e) => {
   });
 };
 </script>
+
+
 
 </body>
 </html>
