@@ -53,9 +53,8 @@
       background: #27272a;
     }
 
-    /* Modern Minimal Active State */
     .project-card.active {
-      background: rgba(59, 130, 246, 0.08); /* Very subtle blue tint */
+      background: rgba(59, 130, 246, 0.08);
     }
 
     .project-card.active::before {
@@ -71,12 +70,17 @@
     }
 
     .project-card.active .title-text {
-      color: #60a5fa; /* Lighter blue text */
+      color: #60a5fa;
       font-weight: 700;
     }
 
     .screenshot-img { opacity: 0; transition: opacity 0.3s; }
     .screenshot-img.loaded { opacity: 1; }
+
+    /* Home Button Hover Effect */
+    .home-btn:hover svg {
+      transform: scale(1.1);
+    }
   </style>
 </head>
 
@@ -136,7 +140,16 @@
       <i class="fa-solid fa-layer-group text-2xl text-primary"></i>
     </div>
     <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
-    <p class="text-muted max-w-sm">Select a project from the sidebar to launch your workspace instantly.</p>
+    <p class="text-muted max-w-sm mb-6">Select a project from the sidebar to launch your workspace instantly.</p>
+    <p class="text-muted max-w-sm mb-6">or</p>
+
+    <!-- Go to Home Button -->
+    <button id="goHomeBtn" class="home-btn group flex items-center gap-2.5 px-5 py-2.5 bg-surface hover:bg-border border border-border hover:border-primary/50 rounded-xl transition-all duration-200 shadow-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+      <svg class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      <span class="text-sm font-semibold text-text group-hover:text-primary transition-colors">Go to Home</span>
+    </button>
   </div>
 
 </main>
@@ -166,6 +179,7 @@ const frame = document.getElementById('portalFrame');
 const loader = document.getElementById('frameLoader');
 const emptyState = document.getElementById('emptyState');
 const searchInput = document.getElementById('searchInput');
+const goHomeBtn = document.getElementById('goHomeBtn');
 
 function toggleSidebar(show) {
   if(show) {
@@ -204,7 +218,6 @@ function convertToLocalHostUrl(url) {
 function loadProject(url, btnElement) {
   showLoader();
 
-  // Minimal Modern Active State Logic
   document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
   if(btnElement) btnElement.classList.add('active');
 
@@ -212,6 +225,13 @@ function loadProject(url, btnElement) {
 
   if(window.innerWidth < 768) toggleSidebar(false);
 }
+
+// Go to Home Button Handler
+goHomeBtn.onclick = () => {
+  showLoader();
+  document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
+  frame.src = 'index.html';
+};
 
 frame.onload = hideLoader;
 
