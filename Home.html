@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <title>Project Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
 
   <!-- Tailwind + Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script>
     tailwind.config = {
@@ -24,6 +26,20 @@
             primary: '#3b82f6',
             text: '#e4e4e7',
             muted: '#a1a1aa'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'slide-up': 'slideUp 0.5s ease-out'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(10px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            }
           }
         }
       }
@@ -87,11 +103,22 @@
 
 <body class="h-screen w-screen flex flex-col md:flex-row">
 
+<!-- Toast Notification -->
+<div id="fullscreenToast" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 bg-surface/90 backdrop-blur border border-border px-4 py-3 rounded-xl shadow-2xl animate-slide-up pointer-events-none transition-opacity duration-500">
+  <div class="p-1.5 bg-primary/10 rounded-lg text-primary">
+    <i data-lucide="maximize" class="w-4 h-4"></i>
+  </div>
+  <div>
+    <h4 class="text-sm font-semibold text-white">Go Fullscreen</h4>
+    <p class="text-xs text-muted">Tap the icon for the best experience</p>
+  </div>
+</div>
+
 <!-- Mobile Header -->
 <div class="md:hidden h-14 glass flex items-center justify-between px-4 z-50 shrink-0">
   <span class="font-bold text-lg tracking-tight">Project Portal</span>
   <button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
-    <i class="fa-solid fa-bars text-xl"></i>
+    <i data-lucide="menu" class="w-5 h-5"></i>
   </button>
 </div>
 
@@ -104,18 +131,24 @@
   <!-- Header -->
   <div class="p-4 border-b border-border/50">
     <div class="flex items-center justify-between mb-4">
-      <h1 class="text-lg font-bold tracking-tight">Project Portal</h1>
+      <div class="flex items-center gap-2">
+        <h1 class="text-lg font-bold tracking-tight">Project Portal</h1>
+        <button id="fullscreenBtn" class="p-1.5 rounded-lg hover:bg-surface text-muted hover:text-white transition-colors" title="Toggle Fullscreen">
+          <i data-lucide="expand" class="w-4 h-4"></i>
+        </button>
+      </div>
+
       <button id="osApkBtn" class="text-[10px] font-bold px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1.5" title="Open Web OS & APK">
-        <i class="fa-brands fa-android"></i>
-        WEB OS & APK
+        <i data-lucide="smartphone" class="w-3 h-3"></i>
+        OS & APK
       </button>
     </div>
 
     <div class="relative">
-      <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
+      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted w-3.5 h-3.5"></i>
       <input id="searchInput" 
              placeholder="Search projects..." 
-             class="w-full bg-surface border border-border rounded-lg pl-8 pr-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
+             class="w-full bg-surface border border-border rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
     </div>
   </div>
 
@@ -144,7 +177,7 @@
   <!-- Empty State -->
   <div id="emptyState" class="absolute inset-0 bg-background flex flex-col items-center justify-center text-center p-6 z-10">
     <div class="w-16 h-16 bg-surface rounded-2xl border border-border flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-      <i class="fa-solid fa-layer-group text-2xl text-primary"></i>
+      <i data-lucide="layers" class="w-8 h-8 text-primary"></i>
     </div>
     <h2 class="text-2xl font-bold mb-2">Welcome Back</h2>
     <p class="text-muted max-w-sm mb-6">Select a project from the sidebar to launch your workspace instantly.</p>
@@ -152,9 +185,7 @@
 
     <!-- Go to Home Button -->
     <button id="goHomeBtn" class="home-btn group flex items-center gap-2.5 px-5 py-2.5 bg-surface hover:bg-border border border-border hover:border-primary/50 rounded-xl transition-all duration-200 shadow-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]">
-      <svg class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
+      <i data-lucide="home" class="w-4 h-4 text-muted group-hover:text-primary transition-colors"></i>
       <span class="text-sm font-semibold text-text group-hover:text-primary transition-colors">Go to Home</span>
     </button>
   </div>
@@ -188,6 +219,41 @@ const emptyState = document.getElementById('emptyState');
 const searchInput = document.getElementById('searchInput');
 const goHomeBtn = document.getElementById('goHomeBtn');
 const osApkBtn = document.getElementById('osApkBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const toast = document.getElementById('fullscreenToast');
+
+// Initialize Lucide Icons
+lucide.createIcons();
+
+// Fullscreen Logic
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.log(`Error attempting to enable fullscreen: ${err.message}`);
+    });
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
+
+fullscreenBtn.onclick = toggleFullscreen;
+
+// Toast Logic
+window.addEventListener('load', () => {
+  // Show toast
+  setTimeout(() => {
+    toast.style.opacity = '1';
+
+    // Hide toast after 3s
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      // Remove from DOM to prevent interference
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }, 500); // Slight delay on load
+});
 
 function toggleSidebar(show) {
   if(show) {
@@ -200,17 +266,9 @@ function toggleSidebar(show) {
     setTimeout(() => mobileOverlay.classList.add('hidden'), 300);
   }
 }
-  
 
 menuBtn.onclick = () => toggleSidebar(true);
 mobileOverlay.onclick = () => toggleSidebar(false);
-  /* Allow iframe to open sidebar */
-window.addEventListener("message",(e)=>{
-  if(e.origin !== location.origin) return;
-  if(e.data==="open-sidebar") toggleSidebar(true);
-  if(e.data==="close-sidebar") toggleSidebar(false);
-});
-window.toggleSidebar = toggleSidebar; // direct access for same-origin iframe
 
 function showLoader() {
   loader.classList.remove('hidden');
@@ -275,6 +333,7 @@ onValue(ref(db, 'sites'), (snapshot) => {
 
     btn.className = `project-card w-full text-left p-2 rounded-lg mb-1 flex items-center gap-3 border border-transparent select-none group`;
 
+    // Manually create icons for dynamic content since Lucide runs once at start
     btn.innerHTML = `
       <div class="w-8 h-8 rounded bg-surface border border-border overflow-hidden shrink-0 relative">
         <img src="${screenshot}" 
@@ -283,7 +342,8 @@ onValue(ref(db, 'sites'), (snapshot) => {
              onload="this.classList.add('loaded')"
              onerror="this.style.display='none'">
         <div class="absolute inset-0 flex items-center justify-center bg-surface -z-10">
-          <i class="fa-solid fa-cube text-[10px] text-muted"></i>
+          <!-- Fallback icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
         </div>
       </div>
       <div class="min-w-0 flex-1">
@@ -304,8 +364,6 @@ searchInput.oninput = (e) => {
   });
 };
 </script>
-
-
 
 </body>
 </html>
