@@ -14,6 +14,9 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
     }
     .container {
       text-align: center;
@@ -22,6 +25,7 @@
       border-radius: 20px;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(10px);
+      margin-bottom: 40px;
     }
     h1 {
       margin-bottom: 30px;
@@ -43,14 +47,74 @@
       background: #3a3a3a;
       transform: translateY(-3px);
     }
+
+    .info-box {
+      max-width: 700px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      line-height: 1.6;
+    }
+    .info-box h2 {
+      margin-bottom: 15px;
+      font-size: 1.6rem;
+    }
+    .info-box p {
+      margin: 10px 0;
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+    .info-box a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 16px;
+      background: #242424;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .info-box a:hover {
+      background: #3a3a3a;
+      transform: translateY(-3px);
+    }
   </style>
+
+  <!-- LogRocket (Session Replay + Performance Monitoring) -->
+  <script>
+    window.LogRocket = window.LogRocket || function(){(LogRocket.q = LogRocket.q || []).push(arguments)};
+    LogRocket.init("your/logrocket-id"); 
+  </script>
+
+  <!-- Microsoft Clarity (Heatmaps + User Recording) -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "YOUR_CLARITY_ID");
+  </script>
 </head>
+
 <body>
+
   <div class="container">
     <h1>Hosted Platforms</h1>
     <a href="https://blackice-ac.vercel.app/" target="_blank">Vercel</a>
     <a href="https://black-ice-3dbk.onrender.com/" target="_blank">Onrender</a>
     <a href="https://blackiceac.netlify.app/" target="_blank">Netlify</a>
   </div>
+
+  <div class="info-box">
+    <h2>Analytics & User Experience Tracking</h2>
+
+    <p><b>LogRocket</b> helps you record system performance, console errors, network logs, and full session replay (like a CCTV for your website).</p>
+    <a href="https://logrocket.com" target="_blank">LogRocket Website</a>
+
+    <p style="margin-top:20px;"><b>Microsoft Clarity</b> gives heatmaps, user clicks, scroll behavior, and unlimited session recordings for free.</p>
+    <a href="https://clarity.microsoft.com" target="_blank">Microsoft Clarity Website</a>
+  </div>
+
 </body>
 </html>
