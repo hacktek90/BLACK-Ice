@@ -45,6 +45,35 @@
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "ttffac9pwv");
 </script>
+  <script>
+(function () { 
+    const params = new URLSearchParams(location.search);
+
+    // ❗ If this page is inside an iframe
+    if (window !== window.top) {
+
+        // Check if parent domain is blackice-ac.vercel.app
+        try {
+            const parentHost = window.top.location.hostname;
+            if (parentHost === "blackice-ac.vercel.app") {
+                return; // ❌ No redirect when embedded under this domain
+            }
+        } catch (e) {
+            // If cross-domain iframe blocks access → treat as different domain → REDIRECT
+        }
+    }
+
+    // Redirect only on root or index.html
+    const path = location.pathname;
+    const isRoot = (path === "/" || path === "/index.html");
+
+    if (isRoot) {
+        location.href = "/Home.html";
+    }
+
+})();
+</script>
+
  
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -892,52 +921,6 @@ btn.addEventListener('keydown', (e) => {
   }
 });
 
-(function () { 
-    const url = new URL(window.location.href);
-    const params = url.searchParams;
-
-    // Allowed domains (domains only)
-    const targetDomains = [
-        "black-ice-3dbk.onrender.com",
-        "hacktek90.github.io",
-        "blackice-ac.vercel.app"
-    ];
-
-    if (!targetDomains.includes(window.location.hostname)) {
-        console.log("➡️ No redirect: different domain (" + window.location.hostname + ")");
-        return;
-    }
-
-    // Block redirect inside iframe
-    if (window !== window.top) {
-        console.log("➡️ No redirect: inside an iframe");
-        return;
-    }
-
-    // Do NOT redirect for admin
-    if (params.get("admin") === "elite") {
-        console.log("➡️ No redirect: admin=elite");
-        return;
-    }
-
-    // Redirect only on root OR index.html
-    const path = window.location.pathname;
-    const isRoot = (path === "/" || path === "/index.html");
-
-    if (isRoot) {
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-            .test(navigator.userAgent);
-
-        if (isMobile) {
-            console.log("📱 Mobile detected → Redirecting to Home.html");
-            window.location.replace("/Home.html");
-        } else {
-            console.log("💻 Desktop detected → Redirecting to uios app");
-            window.location.replace("/Home.html");
-        }
-    }
-
-})();
 
 
 
