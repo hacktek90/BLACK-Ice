@@ -64,7 +64,7 @@
 
     /* SOLID UTILITY CLASS (Replaced Glass) */
     .solid-panel {
-      background: #18181b; /* Surface color */
+      background: #18181b; 
       border-bottom: 1px solid #27272a;
     }
 
@@ -122,7 +122,7 @@
 
 <body class="h-screen w-screen flex flex-col md:flex-row bg-transparent">
 
-<!-- FEATURE: Command Palette Modal (Solid BG) -->
+<!-- FEATURE: Command Palette Modal -->
 <div id="cmdPalette" class="fixed inset-0 z-[100] bg-[#09090b] hidden flex items-start justify-center pt-[15vh] transition-all">
     <div class="w-full max-w-lg bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="cmdContent">
         <div class="p-3 border-b border-[#27272a] flex items-center gap-2">
@@ -141,7 +141,7 @@
     </div>
 </div>
 
-<!-- Mobile Header (Solid) -->
+<!-- Mobile Header -->
 <div class="md:hidden h-14 solid-panel flex items-center justify-between px-4 z-50 shrink-0">
   <span class="font-bold text-lg tracking-tight text-white">BlackICE</span>
   <button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
@@ -152,7 +152,7 @@
 <!-- Sidebar Overlay -->
 <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
-<!-- Sidebar (REDUCED WIDTH: 240px, Solid BG) -->
+<!-- Sidebar (240px) -->
 <aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-surface border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-2xl md:shadow-none">
 
   <!-- Header -->
@@ -218,7 +218,7 @@
 <!-- Main Content -->
 <main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
 
-  <!-- FEATURE: History Breadcrumb Bar (Solid) -->
+  <!-- FEATURE: History Breadcrumb Bar -->
   <div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] flex items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden md:flex">
     <div class="flex items-center gap-1.5 text-muted">
         <i data-lucide="clock" class="w-3 h-3"></i>
@@ -229,7 +229,7 @@
     </div>
   </div>
 
-  <!-- Circuit Board Loader (Solid BG) -->
+  <!-- Circuit Board Loader -->
   <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-background flex flex-col items-center justify-center">
     <div class="main-container flex flex-col items-center justify-center w-full max-w-lg">
         <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -254,7 +254,7 @@
   <!-- Iframe -->
   <iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
 
-  <!-- Empty State (Solid elements) -->
+  <!-- Empty State -->
   <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
     <div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
         <div class="w-20 h-20 bg-surface rounded-3xl border border-border flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
@@ -419,7 +419,7 @@ function addToHistory(title, url) {
 // --- Main App Logic ---
 function loadProject(url, btnElement) {
     els.loader.classList.remove('hidden');
-    els.empty.classList.add('hidden');
+    els.empty.classList.add('hidden'); // Ensures empty state is hidden when loading projects
     
     document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
@@ -518,9 +518,10 @@ els.search.oninput = (e) => {
 // UI Handlers
 els.frame.onload = () => els.loader.classList.add('hidden');
 
+// FIX: Explicitly hide empty state when Dashboard is clicked
 document.getElementById('goHomeBtn').onclick = () => {
     els.loader.classList.remove('hidden');
-    // Mainframe Host + Index.html
+    els.empty.classList.add('hidden'); // <--- ADDED THIS LINE
     els.frame.src = window.location.origin + '/index.html';
 };
 
