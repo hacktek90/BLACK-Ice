@@ -62,12 +62,21 @@
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-    /* SOLID UTILITY CLASS (Replaced Glass) */
+    /* SOLID UTILITY CLASS */
     .solid-panel {
       background: #18181b; 
       border-bottom: 1px solid #27272a;
     }
 
+    /* Sidebar Transitions */
+    #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    /* Collapsed State Styles */
+    .sidebar-collapsed .hide-on-collapse { display: none !important; opacity: 0; pointer-events: none; }
+    .sidebar-collapsed { width: 60px !important; }
+    .sidebar-collapsed .project-card { padding: 8px; justify-content: center; }
+    .sidebar-collapsed .center-on-collapse { justify-content: center; margin: 0; }
+    
     /* FEATURE: Spotlight Glow */
     .project-card {
       transition: background 0.2s ease, transform 0.1s;
@@ -152,13 +161,13 @@
 <!-- Sidebar Overlay -->
 <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
-<!-- Sidebar (240px) -->
-<aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-surface border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-2xl md:shadow-none">
+<!-- Sidebar (Initial Width 240px) -->
+<aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-surface border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 shadow-2xl md:shadow-none overflow-hidden">
 
   <!-- Header -->
-  <div class="p-3 border-b border-border">
-    <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-1.5">
+  <div class="p-3 border-b border-border min-h-[57px]">
+    <div class="flex items-center justify-between mb-3 center-on-collapse">
+      <div class="flex items-center gap-1.5 hide-on-collapse">
         <h1 class="text-base font-bold tracking-tight text-white">Portal</h1>
         <div class="flex gap-0.5">
             <button id="fullscreenBtn" class="p-1 rounded hover:bg-[#27272a] text-muted hover:text-white transition-colors" title="Toggle Fullscreen">
@@ -169,18 +178,29 @@
             </button>
         </div>
       </div>
-      <button id="osApkBtn" class="text-[9px] font-bold px-1.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1">
+      
+      <!-- MINIMIZE TOGGLE BUTTON -->
+      <button id="sidebarToggle" class="hidden md:flex p-1 rounded hover:bg-[#27272a] text-muted hover:text-white transition-colors" title="Collapse Sidebar">
+         <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+      </button>
+
+      <button id="osApkBtn" class="hide-on-collapse text-[9px] font-bold px-1.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1">
         <i data-lucide="smartphone" class="w-3 h-3"></i> OS
       </button>
     </div>
 
     <!-- Search Input -->
-    <div class="relative group">
+    <div class="relative group hide-on-collapse">
       <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted w-3.5 h-3.5 group-focus-within:text-primary transition-colors"></i>
       <input id="searchInput" 
              placeholder="Search..." 
              class="w-full bg-[#09090b] border border-border rounded-lg pl-8 pr-7 py-1.5 text-xs text-text outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
       <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-muted border border-border px-1 rounded bg-[#27272a] hidden md:block">⌘K</span>
+    </div>
+    
+    <!-- Mini Search Icon (Collapsed Mode Only) -->
+    <div class="hidden md:hidden w-full justify-center py-2 text-muted hover:text-white cursor-pointer" onclick="document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'k', 'metaKey': true}))" id="miniSearchBtn">
+         <i data-lucide="search" class="w-4 h-4"></i>
     </div>
   </div>
 
@@ -189,14 +209,14 @@
     
     <!-- FEATURE: Pinned Section -->
     <div id="pinnedSection" class="hidden mb-3">
-        <div class="px-2 mb-1 text-[9px] uppercase font-bold text-muted tracking-wider flex items-center gap-1">
+        <div class="px-2 mb-1 text-[9px] uppercase font-bold text-muted tracking-wider flex items-center gap-1 hide-on-collapse">
             <i data-lucide="pin" class="w-2.5 h-2.5"></i> Pinned
         </div>
         <div id="pinnedList" class="space-y-1"></div>
-        <div class="h-px bg-border mx-2 my-2"></div>
+        <div class="h-px bg-border mx-2 my-2 hide-on-collapse"></div>
     </div>
 
-    <div class="px-2 mb-1 text-[9px] uppercase font-bold text-muted tracking-wider">All Projects</div>
+    <div class="px-2 mb-1 text-[9px] uppercase font-bold text-muted tracking-wider hide-on-collapse">All Projects</div>
     <div id="projectList" class="space-y-1">
       <div class="animate-pulse space-y-2 p-1">
         <div class="h-9 bg-[#1e1e22] rounded-lg w-full"></div>
@@ -206,12 +226,12 @@
   </div>
 
   <!-- FEATURE: Connection Status -->
-  <div class="p-2.5 border-t border-border bg-[#121214] flex items-center justify-between">
+  <div class="p-2.5 border-t border-border bg-[#121214] flex items-center justify-between center-on-collapse">
       <div class="flex items-center gap-1.5">
         <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
-        <span id="pingText" class="text-[9px] font-mono text-muted">ONLINE</span>
+        <span id="pingText" class="hide-on-collapse text-[9px] font-mono text-muted">ONLINE</span>
       </div>
-      <span class="text-[8px] text-muted/50 font-mono">v2.4</span>
+      <span class="hide-on-collapse text-[8px] text-muted/50 font-mono">v2.4</span>
   </div>
 </aside>
 
@@ -276,6 +296,27 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
+// --- FEATURE: Sidebar Toggle Logic ---
+const sidebar = document.getElementById('sidebar');
+const toggleBtn = document.getElementById('sidebarToggle');
+let isCollapsed = false;
+
+if (toggleBtn) {
+    toggleBtn.onclick = () => {
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+            sidebar.classList.add('sidebar-collapsed');
+            toggleBtn.innerHTML = '<i data-lucide="panel-left-open" class="w-4 h-4"></i>';
+            document.getElementById('miniSearchBtn').classList.remove('hidden');
+        } else {
+            sidebar.classList.remove('sidebar-collapsed');
+            toggleBtn.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"></i>';
+            document.getElementById('miniSearchBtn').classList.add('hidden');
+        }
+        lucide.createIcons();
+    };
+}
+
 // --- FEATURE: Connection Status ---
 function updateStatus() {
     const d = document.getElementById('statusDot');
@@ -283,11 +324,11 @@ function updateStatus() {
     if (navigator.onLine) {
         d.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]";
         t.innerText = "ONLINE";
-        t.className = "text-[9px] font-mono text-green-500";
+        t.className = "text-[9px] font-mono text-green-500 hide-on-collapse";
     } else {
         d.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]";
         t.innerText = "OFFLINE";
-        t.className = "text-[9px] font-mono text-red-500";
+        t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
     }
 }
 window.addEventListener('online', updateStatus);
@@ -419,7 +460,7 @@ function addToHistory(title, url) {
 // --- Main App Logic ---
 function loadProject(url, btnElement) {
     els.loader.classList.remove('hidden');
-    els.empty.classList.add('hidden'); // Ensures empty state is hidden when loading projects
+    els.empty.classList.add('hidden');
     
     document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
@@ -453,12 +494,12 @@ function createCard(site, isPinned) {
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
         </div>
       </div>
-      <div class="min-w-0 flex-1">
+      <div class="min-w-0 flex-1 hide-on-collapse">
         <div class="title-text text-xs font-medium truncate leading-tight group-hover:text-white transition-colors">${site.title || 'Untitled'}</div>
         <div class="text-[9px] text-muted truncate mt-0.5 group-hover:text-gray-300">Project</div>
       </div>
       
-      <div onclick="togglePin('${site.id || site.url}', event)" class="p-0.5 rounded hover:bg-[#3f3f46] text-muted hover:text-white opacity-0 group-hover:opacity-100 transition-opacity ${isPinned ? 'opacity-100 text-primary' : ''}">
+      <div onclick="togglePin('${site.id || site.url}', event)" class="p-0.5 rounded hover:bg-[#3f3f46] text-muted hover:text-white opacity-0 group-hover:opacity-100 transition-opacity hide-on-collapse ${isPinned ? 'opacity-100 text-primary' : ''}">
         <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i>
       </div>
     `;
@@ -518,10 +559,9 @@ els.search.oninput = (e) => {
 // UI Handlers
 els.frame.onload = () => els.loader.classList.add('hidden');
 
-// FIX: Explicitly hide empty state when Dashboard is clicked
 document.getElementById('goHomeBtn').onclick = () => {
     els.loader.classList.remove('hidden');
-    els.empty.classList.add('hidden'); // <--- ADDED THIS LINE
+    els.empty.classList.add('hidden');
     els.frame.src = window.location.origin + '/index.html';
 };
 
