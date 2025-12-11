@@ -62,10 +62,9 @@
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-    .glass {
-      background: rgba(24, 24, 27, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    /* SOLID UTILITY CLASS (Replaced Glass) */
+    .solid-panel {
+      background: #18181b; /* Surface color */
       border-bottom: 1px solid #27272a;
     }
 
@@ -123,8 +122,8 @@
 
 <body class="h-screen w-screen flex flex-col md:flex-row bg-transparent">
 
-<!-- FEATURE: Command Palette Modal -->
-<div id="cmdPalette" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-start justify-center pt-[15vh] transition-all">
+<!-- FEATURE: Command Palette Modal (Solid BG) -->
+<div id="cmdPalette" class="fixed inset-0 z-[100] bg-[#09090b] hidden flex items-start justify-center pt-[15vh] transition-all">
     <div class="w-full max-w-lg bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="cmdContent">
         <div class="p-3 border-b border-[#27272a] flex items-center gap-2">
             <i data-lucide="terminal" class="w-5 h-5 text-primary"></i>
@@ -142,8 +141,8 @@
     </div>
 </div>
 
-<!-- Mobile Header -->
-<div class="md:hidden h-14 glass flex items-center justify-between px-4 z-50 shrink-0">
+<!-- Mobile Header (Solid) -->
+<div class="md:hidden h-14 solid-panel flex items-center justify-between px-4 z-50 shrink-0">
   <span class="font-bold text-lg tracking-tight text-white">BlackICE</span>
   <button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
     <i data-lucide="menu" class="w-5 h-5"></i>
@@ -151,21 +150,21 @@
 </div>
 
 <!-- Sidebar Overlay -->
-<div id="mobileOverlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+<div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
-<!-- Sidebar (REDUCED WIDTH: 240px) -->
-<aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-surface/95 border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-2xl md:shadow-none backdrop-blur-sm">
+<!-- Sidebar (REDUCED WIDTH: 240px, Solid BG) -->
+<aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-surface border-r border-border flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-2xl md:shadow-none">
 
   <!-- Header -->
-  <div class="p-3 border-b border-border/50">
+  <div class="p-3 border-b border-border">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-1.5">
         <h1 class="text-base font-bold tracking-tight text-white">Portal</h1>
         <div class="flex gap-0.5">
-            <button id="fullscreenBtn" class="p-1 rounded hover:bg-surface text-muted hover:text-white transition-colors" title="Toggle Fullscreen">
+            <button id="fullscreenBtn" class="p-1 rounded hover:bg-[#27272a] text-muted hover:text-white transition-colors" title="Toggle Fullscreen">
                 <i data-lucide="expand" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'k', 'metaKey': true}))" class="md:hidden p-1 rounded hover:bg-surface text-muted hover:text-white transition-colors" title="Command Palette">
+            <button onclick="document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'k', 'metaKey': true}))" class="md:hidden p-1 rounded hover:bg-[#27272a] text-muted hover:text-white transition-colors" title="Command Palette">
                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
             </button>
         </div>
@@ -175,12 +174,12 @@
       </button>
     </div>
 
-    <!-- Search Input with Keyboard Shortcut hint -->
+    <!-- Search Input -->
     <div class="relative group">
       <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted w-3.5 h-3.5 group-focus-within:text-primary transition-colors"></i>
       <input id="searchInput" 
              placeholder="Search..." 
-             class="w-full bg-[#1e1e22] border border-border rounded-lg pl-8 pr-7 py-1.5 text-xs text-text outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
+             class="w-full bg-[#09090b] border border-border rounded-lg pl-8 pr-7 py-1.5 text-xs text-text outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted/60">
       <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-muted border border-border px-1 rounded bg-[#27272a] hidden md:block">⌘K</span>
     </div>
   </div>
@@ -194,7 +193,7 @@
             <i data-lucide="pin" class="w-2.5 h-2.5"></i> Pinned
         </div>
         <div id="pinnedList" class="space-y-1"></div>
-        <div class="h-px bg-border/50 mx-2 my-2"></div>
+        <div class="h-px bg-border mx-2 my-2"></div>
     </div>
 
     <div class="px-2 mb-1 text-[9px] uppercase font-bold text-muted tracking-wider">All Projects</div>
@@ -207,7 +206,7 @@
   </div>
 
   <!-- FEATURE: Connection Status -->
-  <div class="p-2.5 border-t border-border/50 bg-[#121214] flex items-center justify-between">
+  <div class="p-2.5 border-t border-border bg-[#121214] flex items-center justify-between">
       <div class="flex items-center gap-1.5">
         <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
         <span id="pingText" class="text-[9px] font-mono text-muted">ONLINE</span>
@@ -219,8 +218,8 @@
 <!-- Main Content -->
 <main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
 
-  <!-- FEATURE: History Breadcrumb Bar -->
-  <div id="historyBar" class="h-9 bg-[#09090b]/90 backdrop-blur border-b border-[#27272a] flex items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden md:flex">
+  <!-- FEATURE: History Breadcrumb Bar (Solid) -->
+  <div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] flex items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden md:flex">
     <div class="flex items-center gap-1.5 text-muted">
         <i data-lucide="clock" class="w-3 h-3"></i>
     </div>
@@ -230,8 +229,8 @@
     </div>
   </div>
 
-  <!-- Circuit Board Loader -->
-  <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center">
+  <!-- Circuit Board Loader (Solid BG) -->
+  <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-background flex flex-col items-center justify-center">
     <div class="main-container flex flex-col items-center justify-center w-full max-w-lg">
         <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
             <defs>
@@ -255,10 +254,10 @@
   <!-- Iframe -->
   <iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
 
-  <!-- Empty State -->
+  <!-- Empty State (Solid elements) -->
   <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
     <div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
-        <div class="w-20 h-20 bg-surface/50 backdrop-blur-sm rounded-3xl border border-border flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+        <div class="w-20 h-20 bg-surface rounded-3xl border border-border flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
         <i data-lucide="layers" class="w-10 h-10 text-primary"></i>
         </div>
         <h2 class="text-3xl font-black mb-2 text-white tracking-tight">Welcome Back</h2>
@@ -423,10 +422,7 @@ function loadProject(url, btnElement) {
     els.empty.classList.add('hidden');
     
     document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
-    
-    if (btnElement) {
-        btnElement.classList.add('active');
-    }
+    if (btnElement) btnElement.classList.add('active');
 
     els.frame.src = convertToLocalHostUrl(url);
     if(window.innerWidth < 768) toggleSidebar(false);
@@ -524,7 +520,8 @@ els.frame.onload = () => els.loader.classList.add('hidden');
 
 document.getElementById('goHomeBtn').onclick = () => {
     els.loader.classList.remove('hidden');
-    els.frame.src = 'index.html';
+    // Mainframe Host + Index.html
+    els.frame.src = window.location.origin + '/index.html';
 };
 
 document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
