@@ -4,39 +4,30 @@
   <meta charset="UTF-8">
   <title>BlackICE Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
 
-  <!-- Tailwind + Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
-
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- quicklink -->
   <script src="https://unpkg.com/quicklink/dist/quicklink.umd.js"></script>
   <script>
     window.addEventListener('load', () => window.quicklink && quicklink());
   </script>
 
-  <!-- LogRocket -->
   <script src="https://cdn.lgrckt-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
   <script>window.LogRocket && window.LogRocket.init('r3bczh/blackice-portal');</script>
 
-  <!-- Clarity -->
+  <script type="module">
+    import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate@1.0.0/index.min.js';
+    window.autoAnimate = autoAnimate;
+  </script>
+
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
       c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
       t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "ujy4ecml45");
-  </script>
-
-  <!-- AutoAnimate -->
-  <script type="module">
-    import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate@1.0.0/index.min.js';
-    window.autoAnimate = autoAnimate;
   </script>
 
   <script>
@@ -59,148 +50,138 @@
   </script>
 
   <style>
-    body {
-      background-color: #050505;
-      color: #e4e4e7;
-      overflow: hidden;
+    body{
+      background-color:#050505;
+      color:#e4e4e7;
+      overflow:hidden;
       background-image:
-        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-      background-size: 30px 30px;
+        linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+      background-size:30px 30px;
     }
 
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+    ::-webkit-scrollbar{width:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:10px;}
+    ::-webkit-scrollbar-thumb:hover{background:#52525b;}
 
-    .solid-panel {
-      background: #18181b;
-      border-bottom: 1px solid #27272a;
-    }
+    .solid-panel{background:#18181b;border-bottom:1px solid #27272a;}
+    #sidebar{transition:width .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);}
 
-    #sidebar {
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    .sidebar-collapsed .hide-on-collapse{display:none !important;opacity:0;pointer-events:none;}
+    .sidebar-collapsed{width:60px !important;}
+    .sidebar-collapsed .project-card{padding:8px;justify-content:center;}
+    .sidebar-collapsed .center-on-collapse{justify-content:center;margin:0;}
 
-    .sidebar-collapsed .hide-on-collapse { display: none !important; opacity: 0; pointer-events: none; }
-    .sidebar-collapsed { width: 60px !important; }
-    .sidebar-collapsed .project-card { padding: 8px; justify-content: center; }
-    .sidebar-collapsed .center-on-collapse { justify-content: center; margin: 0; }
+    .project-card{
+      transition:background .2s ease, transform .1s;
+      position:relative;
+      overflow:hidden;
+    }
+    .project-card::after{
+      content:"";
+      position:absolute;
+      top:var(--y,0);
+      left:var(--x,0);
+      width:250px;height:250px;
+      background:radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
+      transform:translate(-50%,-50%);
+      opacity:0;
+      transition:opacity .3s;
+      pointer-events:none;
+      z-index:1;
+    }
+    .project-card:hover::after{opacity:1;}
+    .project-card > *{position:relative;z-index:2;}
+    .project-card:hover{background:#27272a;}
+    .project-card.active{
+      background:rgba(59,130,246,0.08);
+      border:1px solid rgba(59,130,246,0.2);
+    }
+    .project-card.active::before{
+      content:'';
+      position:absolute;
+      left:0; top:6px; bottom:6px; width:3px;
+      background:#3b82f6;
+      border-radius:0 4px 4px 0;
+      box-shadow:0 0 10px rgba(59,130,246,0.5);
+      z-index:3;
+    }
+    .project-card.active .title-text{color:#60a5fa;font-weight:700;}
 
-    .project-card {
-      transition: background 0.2s ease, transform 0.1s;
-      position: relative;
-      overflow: hidden;
-    }
-    .project-card::after {
-      content: "";
-      position: absolute;
-      top: var(--y, 0);
-      left: var(--x, 0);
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 70%);
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      z-index: 1;
-    }
-    .project-card:hover::after { opacity: 1; }
-    .project-card > * { position: relative; z-index: 2; }
-    .project-card:hover { background: #27272a; }
-    .project-card.active {
-      background: rgba(59, 130, 246, 0.08);
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-    .project-card.active::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 6px; bottom: 6px; width: 3px;
-      background: #3b82f6;
-      border-radius: 0 4px 4px 0;
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-      z-index: 3;
-    }
-    .project-card.active .title-text { color: #60a5fa; font-weight: 700; }
-    .screenshot-img { opacity: 0; transition: opacity 0.3s; }
-    .screenshot-img.loaded { opacity: 1; }
+    .screenshot-img{opacity:0;transition:opacity .3s;}
+    .screenshot-img.loaded{opacity:1;}
 
     /* Loader */
-    .trace-bg { stroke: #27272a; stroke-width: 2; fill: none; opacity: 0.5; }
-    .trace-flow { stroke-width: 2; fill: none; stroke-dasharray: 40 400; stroke-dashoffset: 440; stroke-linecap: round; animation: flow 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-    .yellow { stroke: #fbbf24; }
-    .blue { stroke: #3b82f6; }
-    .purple { stroke: #8b5cf6; }
-    @keyframes flow { 0% { stroke-dashoffset: 440; opacity: 0; } 10% { opacity: 1; } 80% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+    .trace-bg{stroke:#27272a;stroke-width:2;fill:none;opacity:0.5;}
+    .trace-flow{stroke-width:2;fill:none;stroke-dasharray:40 400;stroke-dashoffset:440;stroke-linecap:round;animation:flow 2.5s cubic-bezier(0.4,0,0.2,1) infinite;}
+    .yellow{stroke:#fbbf24;}
+    .blue{stroke:#3b82f6;}
+    .purple{stroke:#8b5cf6;}
+    @keyframes flow{0%{stroke-dashoffset:440;opacity:0;}10%{opacity:1;}80%{opacity:1;}100%{stroke-dashoffset:0;opacity:0;}}
 
     /* Split view */
-    .split-pane {
-      position: relative;
-      overflow: hidden;
-      height: 100%;
-      transition: opacity 0.2s ease;
+    .split-pane{
+      position:relative;
+      overflow:hidden;
+      height:100%;
+      transition:opacity .2s ease;
     }
-    .split-pane.inactive { opacity: 0.45; } /* IMPORTANT: keep clickable */
-    .split-pane.active { opacity: 1; }
+    .split-pane.inactive{opacity:0.45;} /* keep clickable */
+    .split-pane.active{opacity:1;}
 
-    .pane-indicator {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 30;
-      background: rgba(9, 9, 11, 0.75);
-      border: 1px solid #27272a;
-      color: #a1a1aa;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      display: none;
-      pointer-events: none;
-      backdrop-filter: blur(4px);
+    .pane-indicator{
+      position:absolute;
+      top:10px; right:10px;
+      z-index:30;
+      background:rgba(9,9,11,0.75);
+      border:1px solid #27272a;
+      color:#a1a1aa;
+      padding:4px 10px;
+      border-radius:8px;
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:0.08em;
+      display:none;
+      pointer-events:none;
+      backdrop-filter:blur(4px);
     }
-    .split-view-active .pane-indicator { display: block; }
-    .split-pane.active .pane-indicator {
-      border-color: rgba(59,130,246,0.35);
-      background: rgba(59,130,246,0.12);
-      color: #60a5fa;
+    .split-view-active .pane-indicator{display:block;}
+    .split-pane.active .pane-indicator{
+      border-color:rgba(59,130,246,0.35);
+      background:rgba(59,130,246,0.12);
+      color:#60a5fa;
     }
 
-    .split-resizer {
-      width: 6px;
-      background: #18181b;
-      cursor: col-resize;
-      flex: 0 0 auto;
-      border-left: 1px solid #27272a;
-      border-right: 1px solid #27272a;
-      position: relative;
-      z-index: 50;
+    .split-resizer{
+      width:6px;
+      background:#18181b;
+      cursor:col-resize;
+      flex:0 0 auto;
+      border-left:1px solid #27272a;
+      border-right:1px solid #27272a;
+      position:relative;
+      z-index:50;
     }
-    .split-resizer:hover, .split-resizer.dragging {
-      background: #3b82f6;
-      border-color: #3b82f6;
+    .split-resizer:hover,.split-resizer.dragging{
+      background:#3b82f6;
+      border-color:#3b82f6;
     }
-    .split-resizer::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 4px;
-      height: 26px;
-      background: #52525b;
-      border-radius: 999px;
+    .split-resizer::after{
+      content:'';
+      position:absolute;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:4px; height:26px;
+      background:#52525b;
+      border-radius:999px;
     }
-    .split-resizer:hover::after, .split-resizer.dragging::after { background: #fff; }
+    .split-resizer:hover::after,.split-resizer.dragging::after{background:#fff;}
 
-    /* Mobile: force single pane */
-    @media (max-width: 768px) {
-      #splitResizer { display: none !important; }
-      #rightPane { display: none !important; }
-      #leftPane { width: 100% !important; }
+    @media (max-width: 768px){
+      #splitResizer{display:none !important;}
+      #rightPane{display:none !important;}
+      #leftPane{width:100% !important;}
     }
   </style>
 </head>
@@ -232,7 +213,6 @@
     </button>
   </div>
 
-  <!-- Overlay -->
   <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
 
   <!-- Sidebar -->
@@ -241,17 +221,29 @@
       <div class="flex items-center justify-between mb-3 center-on-collapse">
         <div class="flex items-center gap-1.5 hide-on-collapse">
           <h1 class="text-base font-bold tracking-tight text-white">Portal</h1>
-          <div class="flex gap-0.5">
+
+          <div class="flex gap-1 items-center">
+            <!-- Split View -->
             <button id="splitViewBtn" class="hidden md:flex p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Split View">
               <i data-lucide="columns-2" class="w-3.5 h-3.5"></i>
             </button>
+
+            <!-- Target Pane Buttons (reliable, no iframe clicking) -->
+            <div class="hidden md:flex items-center gap-1" id="paneTargetBtns">
+              <button id="targetLeftBtn"
+                class="px-2 py-1 text-[10px] rounded border border-[#27272a] text-white bg-[#18181b] hover:border-primary/50 transition-colors"
+                title="Open next project in LEFT">
+                LEFT
+              </button>
+              <button id="targetRightBtn"
+                class="px-2 py-1 text-[10px] rounded border border-[#27272a] text-[#a1a1aa] bg-[#09090b] hover:border-primary/50 transition-colors"
+                title="Open next project in RIGHT (Secondary)">
+                RIGHT
+              </button>
+            </div>
+
             <button id="fullscreenBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Fullscreen">
               <i data-lucide="expand" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'k', 'metaKey': true}))"
-                    class="md:hidden p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors"
-                    title="Command Palette">
-              <i data-lucide="search" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         </div>
@@ -271,15 +263,8 @@
                class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#e4e4e7] outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-[#a1a1aa]/60">
         <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-[#a1a1aa] border border-[#27272a] px-1 rounded bg-[#27272a] hidden md:block">⌘K</span>
       </div>
-
-      <div class="hidden md:hidden w-full justify-center py-2 text-[#a1a1aa] hover:text-white cursor-pointer"
-           onclick="document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'k', 'metaKey': true}))"
-           id="miniSearchBtn">
-        <i data-lucide="search" class="w-4 h-4"></i>
-      </div>
     </div>
 
-    <!-- Project List -->
     <div class="flex-1 overflow-y-auto p-2 scroll-smooth">
       <div id="pinnedSection" class="hidden mb-3">
         <div class="px-2 mb-1 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider flex items-center gap-1 hide-on-collapse">
@@ -299,19 +284,17 @@
       </div>
     </div>
 
-    <!-- Status -->
     <div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse">
       <div class="flex items-center gap-1.5">
         <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
         <span id="pingText" class="hide-on-collapse text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
       </div>
-      <span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.4</span>
+      <span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
     </div>
   </aside>
 
   <!-- Main -->
   <main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
-
     <div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] flex items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden md:flex">
       <div class="flex items-center gap-1.5 text-[#a1a1aa]">
         <i data-lucide="clock" class="w-3 h-3"></i>
@@ -321,7 +304,6 @@
       </div>
     </div>
 
-    <!-- Loader -->
     <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
       <div class="flex flex-col items-center justify-center w-full max-w-lg">
         <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -351,30 +333,26 @@
     <!-- Split container -->
     <div id="splitContainer" class="flex-1 relative flex w-full h-full">
       <div id="leftPane" class="split-pane active" style="width: 100%;">
-        <div class="pane-indicator">PRIMARY</div>
+        <div class="pane-indicator">LEFT</div>
         <iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
       </div>
 
       <div id="splitResizer" class="split-resizer hidden"></div>
 
       <div id="rightPane" class="split-pane inactive hidden" style="width: 0%;">
-        <div class="pane-indicator">SECONDARY</div>
+        <div class="pane-indicator">RIGHT</div>
         <iframe id="portalFrame2" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
       </div>
     </div>
 
-    <!-- Empty -->
+    <!-- Empty state -->
     <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
       <div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
         <div class="w-20 h-20 bg-[#18181b] rounded-3xl border border-[#27272a] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
           <i data-lucide="layers" class="w-10 h-10 text-primary"></i>
         </div>
         <h2 class="text-3xl font-black mb-2 text-white tracking-tight">Welcome Back</h2>
-        <p class="text-[#a1a1aa] mb-8 text-sm">
-          Select a tool from the sidebar or press
-          <kbd class="bg-[#27272a] px-1.5 py-0.5 rounded border border-[#27272a] text-white font-sans text-xs mx-1">⌘K</kbd>
-          to search.
-        </p>
+        <p class="text-[#a1a1aa] mb-8 text-sm">Select a tool from the sidebar.</p>
         <button id="goHomeBtn" class="group flex items-center gap-3 px-6 py-3 bg-[#18181b] hover:bg-[#1e1e22] border border-[#27272a] hover:border-primary/50 rounded-xl transition-all duration-200 shadow-xl hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] pointer-events-auto">
           <i data-lucide="home" class="w-4 h-4 text-[#a1a1aa] group-hover:text-primary transition-colors"></i>
           <span class="text-sm font-bold text-[#e4e4e7] group-hover:text-primary transition-colors">Go to Dashboard</span>
@@ -387,55 +365,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('sidebarToggle');
-    let isCollapsed = false;
-
-    if (toggleBtn) {
-      toggleBtn.onclick = () => {
-        isCollapsed = !isCollapsed;
-        if (isCollapsed) {
-          sidebar.classList.add('sidebar-collapsed');
-          toggleBtn.innerHTML = '<i data-lucide="panel-left-open" class="w-4 h-4"></i>';
-          const mini = document.getElementById('miniSearchBtn');
-          if (mini) mini.classList.remove('hidden');
-        } else {
-          sidebar.classList.remove('sidebar-collapsed');
-          toggleBtn.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"></i>';
-          const mini = document.getElementById('miniSearchBtn');
-          if (mini) mini.classList.add('hidden');
-        }
-        lucide.createIcons();
-      };
-    }
-
-    function updateStatus() {
-      const d = document.getElementById('statusDot');
-      const t = document.getElementById('pingText');
-      if (!d || !t) return;
-
-      if (navigator.onLine) {
-        d.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]";
-        t.innerText = "ONLINE";
-        t.className = "text-[9px] font-mono text-green-500 hide-on-collapse";
-      } else {
-        d.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]";
-        t.innerText = "OFFLINE";
-        t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
-      }
-    }
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
-    updateStatus();
-
-    document.addEventListener('mousemove', (e) => {
-      document.querySelectorAll('.project-card').forEach(card => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--x', `${e.clientX - rect.left}px`);
-        card.style.setProperty('--y', `${e.clientY - rect.top}px`);
-      });
-    });
-
+    // Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
       authDomain: "h-90-8a7c5.firebaseapp.com",
@@ -445,12 +375,13 @@
       messagingSenderId: "367196609301",
       appId: "1:367196609301:web:156e24c1b4532c26af671c"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Elements
     const els = {
       sidebar: document.getElementById('sidebar'),
+      sidebarToggle: document.getElementById('sidebarToggle'),
       menuBtn: document.getElementById('menuBtn'),
       overlay: document.getElementById('mobileOverlay'),
       list: document.getElementById('projectList'),
@@ -471,24 +402,59 @@
       splitContainer: document.getElementById('splitContainer'),
       leftPane: document.getElementById('leftPane'),
       rightPane: document.getElementById('rightPane'),
-      splitResizer: document.getElementById('splitResizer')
+      splitResizer: document.getElementById('splitResizer'),
+
+      targetLeftBtn: document.getElementById('targetLeftBtn'),
+      targetRightBtn: document.getElementById('targetRightBtn')
     };
 
+    // AutoAnimate
     if (window.autoAnimate && els.list) window.autoAnimate(els.list);
     if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
 
+    // Icons
     lucide.createIcons();
 
+    // Status
+    function updateStatus() {
+      const d = document.getElementById('statusDot');
+      const t = document.getElementById('pingText');
+      if (!d || !t) return;
+      if (navigator.onLine) {
+        d.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]";
+        t.innerText = "ONLINE";
+        t.className = "text-[9px] font-mono text-green-500 hide-on-collapse";
+      } else {
+        d.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]";
+        t.innerText = "OFFLINE";
+        t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
+      }
+    }
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+
+    // Spotlight
+    document.addEventListener('mousemove', (e) => {
+      document.querySelectorAll('.project-card').forEach(card => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--y', `${e.clientY - rect.top}px`);
+      });
+    });
+
+    // State
     let allSites = [];
     let pinnedIds = JSON.parse(localStorage.getItem('pinnedProjects') || '[]');
     let history = [];
 
-    // Split view state
+    // Split state
     let splitViewActive = false;
-    let activePane = 'left';
+    let activePane = 'left'; // best default for modern UX
     let isDragging = false;
 
     function setIframePointerEvents(value) {
+      // Workaround: iframes can swallow mouse events; disable during drag to keep smooth resize [web:45][web:27]
       if (els.frame) els.frame.style.pointerEvents = value;
       if (els.frame2) els.frame2.style.pointerEvents = value;
     }
@@ -510,6 +476,31 @@
       }
     }
 
+    function setActivePane(pane) {
+      activePane = pane;
+
+      const leftOn = pane === 'left';
+      const rightOn = pane === 'right';
+
+      if (els.targetLeftBtn && els.targetRightBtn) {
+        els.targetLeftBtn.classList.toggle('text-white', leftOn);
+        els.targetLeftBtn.classList.toggle('bg-[#18181b]', leftOn);
+        els.targetLeftBtn.classList.toggle('text-[#a1a1aa]', !leftOn);
+        els.targetLeftBtn.classList.toggle('bg-[#09090b]', !leftOn);
+
+        els.targetRightBtn.classList.toggle('text-white', rightOn);
+        els.targetRightBtn.classList.toggle('bg-[#18181b]', rightOn);
+        els.targetRightBtn.classList.toggle('text-[#a1a1aa]', !rightOn);
+        els.targetRightBtn.classList.toggle('bg-[#09090b]', !rightOn);
+      }
+
+      updatePaneVisuals();
+    }
+
+    els.targetLeftBtn && (els.targetLeftBtn.onclick = () => setActivePane('left'));
+    els.targetRightBtn && (els.targetRightBtn.onclick = () => setActivePane('right'));
+
+    // Split toggle
     if (els.splitBtn) {
       els.splitBtn.onclick = () => {
         if (window.innerWidth < 768) return;
@@ -520,14 +511,13 @@
           els.splitContainer.classList.add('split-view-active');
 
           els.leftPane.style.width = '50%';
-
           els.rightPane.classList.remove('hidden');
           els.rightPane.style.width = '50%';
 
           els.splitResizer.classList.remove('hidden');
-
           els.splitBtn.classList.add('text-primary', 'bg-primary/10');
 
+          // keep current target; visuals update
           updatePaneVisuals();
         } else {
           els.splitContainer.classList.remove('split-view-active');
@@ -538,11 +528,9 @@
           els.rightPane.style.width = '0%';
 
           els.splitResizer.classList.add('hidden');
-
           els.splitBtn.classList.remove('text-primary', 'bg-primary/10');
 
-          activePane = 'left';
-          updatePaneVisuals();
+          setActivePane('left');
           setIframePointerEvents('auto');
         }
 
@@ -550,27 +538,21 @@
       };
     }
 
-    els.leftPane.addEventListener('click', () => { if (splitViewActive) { activePane = 'left'; updatePaneVisuals(); } });
-    els.rightPane.addEventListener('click', () => { if (splitViewActive) { activePane = 'right'; updatePaneVisuals(); } });
-
+    // Resizer
     els.splitResizer.addEventListener('mousedown', () => {
       if (!splitViewActive) return;
       isDragging = true;
       els.splitResizer.classList.add('dragging');
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
-
-      // Workaround: iframe can swallow mouseup/mousemove, so disable pointer events while dragging [web:27][web:45]
       setIframePointerEvents('none');
     });
 
     document.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
-
       const rect = els.splitContainer.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const pct = (x / rect.width) * 100;
-
       if (pct > 20 && pct < 80) {
         els.leftPane.style.width = `${pct}%`;
         els.rightPane.style.width = `${100 - pct}%`;
@@ -580,11 +562,9 @@
     document.addEventListener('mouseup', () => {
       if (!isDragging) return;
       isDragging = false;
-
       els.splitResizer.classList.remove('dragging');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
-
       setIframePointerEvents('auto');
       updatePaneVisuals();
     });
@@ -592,30 +572,28 @@
     window.addEventListener('resize', () => {
       if (window.innerWidth < 768 && splitViewActive) {
         splitViewActive = false;
-
         els.splitContainer.classList.remove('split-view-active');
         els.leftPane.style.width = '100%';
         els.rightPane.classList.add('hidden');
         els.rightPane.style.width = '0%';
         els.splitResizer.classList.add('hidden');
-        if (els.splitBtn) els.splitBtn.classList.remove('text-primary', 'bg-primary/10');
-
-        activePane = 'left';
-        updatePaneVisuals();
+        els.splitBtn && els.splitBtn.classList.remove('text-primary', 'bg-primary/10');
+        setActivePane('left');
         setIframePointerEvents('auto');
       }
     });
 
+    // Pinning
     function togglePin(id, e) {
       e.stopPropagation();
       if (pinnedIds.includes(id)) pinnedIds = pinnedIds.filter(pid => pid !== id);
       else pinnedIds.push(id);
-
       localStorage.setItem('pinnedProjects', JSON.stringify(pinnedIds));
       renderProjects();
     }
     window.togglePin = togglePin;
 
+    // Command palette
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -648,6 +626,7 @@
 
     window.loadProjectFromCmd = (url) => { loadProject(url); closeCmd(); };
 
+    // History
     function addToHistory(title, url) {
       history = history.filter(h => h.url !== url);
       history.unshift({ title, url });
@@ -673,6 +652,7 @@
       }
     }
 
+    // Load project (respects LEFT/RIGHT target)
     function loadProject(url, btnElement) {
       els.loader.classList.remove('hidden');
       els.empty.classList.add('hidden');
@@ -683,7 +663,6 @@
       const targetFrame = (splitViewActive && activePane === 'right') ? els.frame2 : els.frame;
       targetFrame.src = convertToLocalHostUrl(url);
 
-      // safer than overwriting onload repeatedly
       targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
 
       if (window.innerWidth < 768) toggleSidebar(false);
@@ -697,6 +676,7 @@
       const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
       const btn = document.createElement('button');
       btn.className = 'project-card w-full text-left p-1.5 rounded-lg mb-1 flex items-center gap-2 border border-transparent select-none group';
+
       btn.innerHTML = `
         <div class="w-7 h-7 rounded bg-[#18181b] border border-[#27272a] overflow-hidden shrink-0 relative">
           <img src="${screenshot}" class="screenshot-img w-full h-full object-cover" loading="lazy"
@@ -707,15 +687,18 @@
             </svg>
           </div>
         </div>
+
         <div class="min-w-0 flex-1 hide-on-collapse">
           <div class="title-text text-xs font-medium truncate leading-tight group-hover:text-white transition-colors">${site.title || 'Untitled'}</div>
           <div class="text-[9px] text-[#a1a1aa] truncate mt-0.5 group-hover:text-gray-300">Project</div>
         </div>
+
         <div onclick="togglePin('${site.id || site.url}', event)"
              class="p-0.5 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity hide-on-collapse ${isPinned ? 'opacity-100 text-primary' : ''}">
           <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i>
         </div>
       `;
+
       btn.onclick = () => loadProject(site.url, btn);
       return btn;
     }
@@ -744,20 +727,20 @@
       lucide.createIcons();
     }
 
+    // Firebase listener
     onValue(ref(db, 'sites'), (snapshot) => {
       const data = snapshot.val();
       if (!data) {
         els.list.innerHTML = '<div class="p-3 text-center text-[10px] text-[#a1a1aa]">No projects found</div>';
         return;
       }
-
       allSites = Object.entries(data)
         .map(([key, value]) => ({ ...value, id: key || value.url }))
         .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-
       renderProjects();
     });
 
+    // Search
     els.search.oninput = (e) => {
       const q = e.target.value.toLowerCase();
       document.querySelectorAll('.project-card').forEach(btn => {
@@ -766,21 +749,7 @@
       });
     };
 
-    // Home + OS
-    document.getElementById('goHomeBtn').onclick = () => {
-      els.loader.classList.remove('hidden');
-      els.empty.classList.add('hidden');
-      els.frame.src = window.location.origin + '/index.html';
-    };
-    document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
-
-    // Fullscreen
-    document.getElementById('fullscreenBtn').onclick = () => {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
-      else if (document.exitFullscreen) document.exitFullscreen();
-    };
-
-    // Mobile sidebar
+    // Sidebar mobile
     function toggleSidebar(show) {
       if (show) {
         els.sidebar.classList.remove('-translate-x-full');
@@ -792,8 +761,36 @@
         setTimeout(() => els.overlay.classList.add('hidden'), 300);
       }
     }
-    els.menuBtn.onclick = () => toggleSidebar(true);
-    els.overlay.onclick = () => toggleSidebar(false);
+    els.menuBtn && (els.menuBtn.onclick = () => toggleSidebar(true));
+    els.overlay && (els.overlay.onclick = () => toggleSidebar(false));
+
+    // Sidebar collapse
+    let isCollapsed = false;
+    if (els.sidebarToggle) {
+      els.sidebarToggle.onclick = () => {
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+          els.sidebar.classList.add('sidebar-collapsed');
+          els.sidebarToggle.innerHTML = '<i data-lucide="panel-left-open" class="w-4 h-4"></i>';
+        } else {
+          els.sidebar.classList.remove('sidebar-collapsed');
+          els.sidebarToggle.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"></i>';
+        }
+        lucide.createIcons();
+      };
+    }
+
+    // Buttons
+    document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
+    document.getElementById('goHomeBtn').onclick = () => {
+      els.loader.classList.remove('hidden');
+      els.empty.classList.add('hidden');
+      els.frame.src = window.location.origin + '/index.html';
+    };
+    document.getElementById('fullscreenBtn').onclick = () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+      else if (document.exitFullscreen) document.exitFullscreen();
+    };
   </script>
 </body>
 </html>
