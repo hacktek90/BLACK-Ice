@@ -82,7 +82,7 @@
 </head>
 <body class="min-h-screen w-screen overflow-x-hidden relative flex flex-col">
 
-    <!-- GRID LINES (Hidden on mobile to reduce noise) -->
+    <!-- GRID LINES -->
     <div class="hidden md:block grid-line top-0 bottom-0 left-[25%] w-px"></div>
     <div class="hidden md:block grid-line top-0 bottom-0 left-[50%] w-px"></div>
     <div class="hidden md:block grid-line top-0 bottom-0 left-[75%] w-px"></div>
@@ -107,7 +107,7 @@
             </div>
         </header>
 
-        <!-- LEFT COLUMN: CONTROLS (Mobile: First Section) -->
+        <!-- LEFT COLUMN: CONTROLS -->
         <section class="col-span-4 md:col-span-1 px-6 md:px-12 py-8 md:py-12 border-b md:border-b-0 md:border-r border-black/5 flex flex-col gap-8 bg-swiss-bg">
             
             <!-- Connection Box -->
@@ -130,7 +130,7 @@
                 </div>
             </div>
 
-            <!-- Status (Hidden on very small screens if needed, but useful) -->
+            <!-- Status -->
             <div class="hidden md:block">
                 <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">02 / Status</h2>
                 <div id="status" class="text-sm font-medium">System Ready</div>
@@ -140,21 +140,20 @@
                 Status: System Ready
             </div>
 
-            <!-- Actions (Collapsible or Scrollable on mobile) -->
+            <!-- Actions -->
             <div class="flex flex-row md:flex-col gap-2 md:gap-3 mt-auto overflow-x-auto md:overflow-visible pb-2 md:pb-0">
                 <button id="toggleAudio" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider bg-white md:bg-transparent border md:border-0 border-black/10 hover:text-swiss-red md:border-b md:border-black/5">Mute Mic</button>
                 <button id="toggleVideo" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider bg-white md:bg-transparent border md:border-0 border-black/10 hover:text-swiss-red md:border-b md:border-black/5">Disable Cam</button>
                 <button id="shareScreen" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider bg-white md:bg-transparent border md:border-0 border-black/10 hover:text-swiss-red md:border-b md:border-black/5">Share Screen</button>
                 <a href="https://github.com/hacktek90/BLACK-Ice/releases/download/apk/app-release.apk" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider text-blue-600 bg-white md:bg-transparent border md:border-0 border-blue-100 md:mt-4">Get App</a>
-                <button id="stopScreen" class="hidden" disabled></button> <!-- Hidden logic button -->
+                <button id="stopScreen" class="hidden" disabled></button>
             </div>
 
         </section>
 
-        <!-- RIGHT COLUMN: VIDEO GRID (Mobile: Bottom Section, fills remaining height) -->
+        <!-- RIGHT COLUMN: REMOTE VIDEO ONLY -->
         <section class="col-span-4 md:col-span-3 bg-white relative h-[50vh] md:h-auto min-h-[300px]">
             
-            <!-- Remote Video (Main) -->
             <div class="absolute inset-0 z-0">
                 <div class="video-box w-full h-full bg-gray-100 flex items-center justify-center">
                     <video id="remote" autoplay playsinline class="bg-[#111]"></video>
@@ -167,14 +166,8 @@
                 </div>
             </div>
 
-            <!-- Local Video (PIP) -->
-            <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-10 w-28 md:w-64 aspect-[4/3] shadow-lg border border-white/10">
-                <div class="video-box w-full h-full">
-                    <video id="local" autoplay muted playsinline class="bg-[#222]"></video>
-                    <div class="fs-btn" data-video="local">⛶</div>
-                </div>
-                <div class="absolute top-1 left-1 md:top-2 md:left-2 text-[8px] md:text-[10px] text-white/50 uppercase tracking-widest mix-blend-difference">Local</div>
-            </div>
+            <!-- Local Video Element (Hidden in DOM but required for logic) -->
+            <video id="local" autoplay muted playsinline class="hidden"></video>
 
         </section>
 
@@ -200,7 +193,8 @@
     const remoteIdInput = document.getElementById('remoteId');
     const callBtn = document.getElementById('callBtn');
     const hangupBtn = document.getElementById('hangupBtn');
-    const localVideo = document.getElementById('local');
+    // NOTE: localVideo still exists in JS but is hidden in HTML
+    const localVideo = document.getElementById('local'); 
     const remoteVideo = document.getElementById('remote');
     const statusDiv = document.getElementById('status');
     const mobileStatusDiv = document.getElementById('mobile-status');
@@ -256,7 +250,7 @@
         if (currentCall) return call.close(); // Busy
         try {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            localVideo.srcObject = localStream;
+            localVideo.srcObject = localStream; // Logic requires this, but user won't see it
             call.answer(localStream);
             setupCall(call);
         } catch (e) {
@@ -329,7 +323,6 @@
     function updateStatus(msg, err=false) {
         statusDiv.textContent = msg;
         statusDiv.className = err ? "text-sm font-medium text-swiss-red" : "text-sm font-medium text-black";
-        // Sync mobile status
         mobileStatusDiv.textContent = `Status: ${msg}`;
         mobileStatusDiv.style.color = err ? '#FF3333' : '#666';
     }
