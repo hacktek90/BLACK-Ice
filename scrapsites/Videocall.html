@@ -1,320 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Video Call</title>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Call // Swiss Minimal</title>
+    <meta name="theme-color" content="#F4F4F4">
     
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #f9f9fb;
-      color: #1d1d1f;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      box-sizing: border-box;
-    }
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter Tight"', 'sans-serif'],
+                    },
+                    colors: {
+                        'swiss-red': '#FF3333',
+                        'swiss-bg': '#F4F4F4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: var(--swiss-bg); color: #111; }
+        
+        .grid-line {
+            position: absolute;
+            background-color: rgba(0,0,0,0.06);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-    h1 {
-      font-weight: 600;
-      font-size: 24px;
-      margin: 0 0 12px;
-      text-align: center;
-      letter-spacing: -0.2px;
-    }
+        /* Video Containers */
+        .video-box {
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0; /* Swiss style prefers sharp edges, but minimal radius is ok */
+        }
+        
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
-    .peer-id {
-      font-size: 13px;
-      color: #86868b;
-      margin-bottom: 18px;
-      text-align: center;
-      padding: 0 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+        /* Input Styling */
+        .minimal-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+            border-radius: 0;
+            padding: 12px 0;
+            outline: none;
+            font-family: 'Inter Tight', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .minimal-input:focus { border-bottom-color: #000; }
+        
+        /* Button Hover Line */
+        .btn-line {
+            position: relative;
+        }
+        .btn-line::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0%;
+            height: 1px;
+            background-color: currentColor;
+            transition: width 0.3s;
+        }
+        .btn-line:hover::after { width: 100%; }
 
-    .copy-btn {
-      background: #f0f0f5;
-      border: none;
-      border-radius: 8px;
-      padding: 4px 10px;
-      font-size: 12px;
-      color: #1d1d1f;
-      cursor: pointer;
-      min-height: 28px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .copy-btn:hover {
-      background: #e5e5ea;
-    }
-
-    .copy-btn:active {
-      transform: scale(0.96);
-    }
-
-    .copy-feedback {
-      font-size: 12px;
-      color: #0071e3;
-      min-width: 60px;
-      text-align: center;
-      height: 20px;
-      display: inline-block;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-      width: 100%;
-      max-width: 340px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    input {
-      padding: 12px 16px;
-      border: 1px solid #d2d2d7;
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-      flex: 1;
-      min-width: 180px;
-      max-width: 240px;
-    }
-
-    input:focus {
-      border-color: #0071e3;
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
-    }
-
-    button {
-      padding: 12px 18px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 44px;
-    }
-
-    .primary { background: #0071e3; color: white; }
-    .primary:hover { background: #0077ed; }
-
-    .danger { background: #ff3b30; color: white; }
-    .danger:hover { background: #ff453a; }
-
-    .secondary {
-      background: #f0f0f5;
-      color: #1d1d1f;
-    }
-    .secondary:hover { background: #e5e5ea; }
-
-    button:active {
-      transform: scale(0.97);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    #hangupBtn {
-      margin: 12px 0;
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .call-actions {
-      display: flex;
-      gap: 10px;
-      margin: 12px 0 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .call-actions button {
-      padding: 10px 12px;
-      font-size: 14px;
-      flex: 1;
-      min-width: 120px;
-    }
-
-    .status {
-      font-size: 14px;
-      color: #86868b;
-      margin-bottom: 16px;
-      min-height: 1.4em;
-      text-align: center;
-      padding: 0 8px;
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .videos {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      align-items: center;
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .video-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1d1d1f;
-      margin-bottom: 6px;
-      align-self: flex-start;
-      margin-left: 4px;
-    }
-
-    .video-wrapper {
-      position: relative;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      background: #000;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      max-width: 340px;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .fullscreen-btn {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: rgba(0, 0, 0, 0.6);
-      border: none;
-      border-radius: 10px;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-      z-index: 10;
-    }
-
-    .video-wrapper:hover .fullscreen-btn,
-    .video-wrapper:focus-within .fullscreen-btn {
-      opacity: 1;
-    }
-
-    @media (hover: none) and (pointer: coarse) {
-      .video-wrapper:hover .fullscreen-btn {
-        opacity: 0.9;
-      }
-    }
-
-    @media (max-height: 700px) {
-      body { padding: 12px 10px; }
-      .videos { margin-top: 10px; }
-    }
-  </style>
+        /* Fullscreen Button */
+        .fs-btn {
+            position: absolute;
+            bottom: 16px; right: 16px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            width: 32px; height: 32px;
+            display: flex; alignItems: center; justifyContent: center;
+            opacity: 0; transition: opacity 0.3s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .video-box:hover .fs-btn { opacity: 1; }
+    </style>
 </head>
-<body>
-  <h1>Video Call</h1>
-  
-  <div class="peer-id">
-    Your ID: <span id="my-id">…</span>
-    <button id="copyIdBtn" class="copy-btn">📋 Copy</button>
-    <span id="copyFeedback" class="copy-feedback"></span>
-  </div>
+<body class="min-h-screen w-screen overflow-x-hidden relative flex flex-col">
 
-   <div class="input-group">
-    <input id="remoteId" placeholder="Remote peer ID" autocomplete="off" />
-    <button id="callBtn" class="primary">CallCheck</button>
-  </div>
+    <!-- GRID LINES -->
+    <div class="hidden md:block grid-line top-0 bottom-0 left-[25%] w-px"></div>
+    <div class="hidden md:block grid-line top-0 bottom-0 left-[50%] w-px"></div>
+    <div class="hidden md:block grid-line top-0 bottom-0 left-[75%] w-px"></div>
+    <div class="grid-line left-0 right-0 top-[100px] h-px"></div>
 
-  <button id="hangupBtn" class="danger" disabled>Hang Up</button>
+    <!-- MAIN WRAPPER -->
+    <main class="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:grid md:grid-cols-4 md:grid-rows-[100px_1fr]">
 
-  <div class="call-actions">
-    <button id="toggleAudio" class="secondary">🔇 Mute Mic</button>
-    <button id="toggleVideo" class="secondary">📹 Turn Off Camera</button>
-    <button id="shareScreen" class="secondary">🖥️ Share Screen</button>
-    <button id="stopScreen" class="secondary" disabled>⏹️ Stop Sharing</button>
-     <a href="https://github.com/hacktek90/BLACK-Ice/releases/download/apk/app-release.apk" >Download apk</a>
-  </div>
+        <!-- HEADER -->
+        <header class="col-span-4 h-[100px] px-6 md:px-12 flex items-center justify-between border-b border-black/5 bg-swiss-bg">
+            <div class="flex items-center gap-3">
+                <span class="w-3 h-3 bg-swiss-red rounded-full animate-pulse" id="live-dot"></span>
+                <h1 class="text-sm font-medium tracking-tight uppercase">Video Bridge v1.0</h1>
+            </div>
+            
+            <!-- ID DISPLAY -->
+            <div class="flex items-center gap-4 text-sm font-mono">
+                <span class="text-gray-400 uppercase hidden sm:inline">My Identity:</span>
+                <span id="my-id" class="font-medium bg-black/5 px-2 py-1">Connecting...</span>
+                <button id="copyIdBtn" class="text-xs uppercase hover:text-swiss-red transition-colors">Copy</button>
+                <span id="copyFeedback" class="text-xs text-swiss-red min-w-[50px]"></span>
+            </div>
+        </header>
 
-  <div class="status" id="status">Ready</div>
+        <!-- LEFT COLUMN: CONTROLS (Mobile: Top, Desktop: Side) -->
+        <section class="col-span-4 md:col-span-1 px-6 md:px-12 py-8 md:py-12 border-b md:border-b-0 md:border-r border-black/5 flex flex-col gap-8 bg-swiss-bg">
+            
+            <!-- Connection Box -->
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">01 / Connect</h2>
+                <div class="flex flex-col gap-4">
+                    <input id="remoteId" class="minimal-input text-lg w-full placeholder-gray-300" placeholder="Enter Remote ID..." autocomplete="off" />
+                    
+                    <button id="callBtn" class="group flex items-center gap-3 text-sm font-medium hover:text-black transition-colors py-2">
+                        <span class="w-6 h-px bg-black group-hover:bg-swiss-red transition-colors"></span>
+                        Initiate Call
+                    </button>
+                    
+                    <button id="hangupBtn" class="group flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-swiss-red transition-colors py-2" disabled>
+                        <span class="w-6 h-px bg-gray-300 group-hover:bg-swiss-red transition-colors"></span>
+                        Terminate
+                    </button>
+                </div>
+            </div>
 
-  <div class="videos">
-    <div>
-      <div class="video-label">You</div>
-      <div class="video-wrapper">
-        <video id="local" autoplay muted playsinline></video>
-        <button class="fullscreen-btn" data-video="local">⛶</button>
-      </div>
-    </div>
-    <div>
-      <div class="video-label">Remote</div>
-      <div class="video-wrapper">
-        <video id="remote" autoplay playsinline></video>
-        <button class="fullscreen-btn" data-video="remote">⛶</button>
-      </div>
-    </div>
-  </div>
+            <!-- Status -->
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">02 / Status</h2>
+                <div id="status" class="text-sm font-medium">System Ready</div>
+            </div>
 
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  <script>
-    // === HUMAN-READABLE PEER ID GENERATOR ===
-    const words1 = [
-      "aqua","amber","azure","blaze","bold","brisk","bright","calm","clever","crimson",
-      "cosmic","crystal","daring","dark","deep","divine","dream","dusty","electric","ember",
-      "eternal","fast","fierce","frozen","gentle","golden","grand","happy","hollow","icy",
-      "iron","lazy","light","lunar","lucky","magic","mellow","misty","mystic","neon",
-      "noble","ocean","peace","pink","proud","pure","quiet","rapid","red","royal",
-      "shadow","shiny","silent","silver","sky","smart","solar","sonic","spicy","spring",
-      "steady","storm","strong","sunny","swift","tiny","wild","wise","winter","zen"
-    ];
+            <!-- Actions -->
+            <div class="flex flex-col gap-3 mt-auto">
+                <button id="toggleAudio" class="text-left text-xs uppercase tracking-wider hover:text-swiss-red py-2 border-b border-black/5">Mute Microphone</button>
+                <button id="toggleVideo" class="text-left text-xs uppercase tracking-wider hover:text-swiss-red py-2 border-b border-black/5">Disable Camera</button>
+                <button id="shareScreen" class="text-left text-xs uppercase tracking-wider hover:text-swiss-red py-2 border-b border-black/5">Share Screen</button>
+                <button id="stopScreen" class="text-left text-xs uppercase tracking-wider text-gray-400 py-2 border-b border-black/5" disabled>Stop Sharing</button>
+                <a href="https://github.com/hacktek90/BLACK-Ice/releases/download/apk/app-release.apk" class="text-left text-xs uppercase tracking-wider text-blue-600 hover:text-blue-800 py-4 mt-4">Download .APK →</a>
+            </div>
 
-    const words2 = [
-      "ant","bear","bee","bird","breeze","brook","cat","cloud","comet","coyote",
-      "crane","deer","dolphin","dragon","eagle","falcon","firefly","flame","fox","frog",
-      "hawk","jaguar","koala","leaf","lion","lizard","lynx","meteor","moon","moth",
-      "otter","owl","panther","panda","phoenix","raven","river","shell","snake","sparrow",
-      "spirit","star","stone","storm","sun","tiger","tree","viper","wave","wolf"
-    ];
+        </section>
 
-    function generateReadableId() {
-      const w1 = words1[Math.floor(Math.random() * words1.length)];
-      const w2 = words2[Math.floor(Math.random() * words2.length)];
-      const num = Math.floor(Math.random() * 100);
-      return `${w1}-${w2}-${num}`;
+        <!-- RIGHT COLUMN: VIDEO GRID -->
+        <section class="col-span-4 md:col-span-3 bg-white relative">
+            
+            <!-- Remote Video (Main) -->
+            <div class="absolute inset-0 z-0">
+                <div class="video-box w-full h-full bg-gray-100 flex items-center justify-center">
+                    <video id="remote" autoplay playsinline class="bg-[#111]"></video>
+                    <div class="fs-btn" data-video="remote">⛶</div>
+                    
+                    <!-- Placeholder Text -->
+                    <div id="remote-placeholder" class="absolute text-gray-300 uppercase tracking-widest text-sm pointer-events-none">
+                        Remote Feed Inactive
+                    </div>
+                </div>
+            </div>
+
+            <!-- Local Video (PIP) -->
+            <div class="absolute bottom-6 right-6 z-10 w-32 md:w-64 aspect-[4/3] shadow-lg border border-white/10">
+                <div class="video-box w-full h-full">
+                    <video id="local" autoplay muted playsinline class="bg-[#222]"></video>
+                    <div class="fs-btn" data-video="local">⛶</div>
+                </div>
+                <div class="absolute top-2 left-2 text-[10px] text-white/50 uppercase tracking-widest mix-blend-difference">Local</div>
+            </div>
+
+        </section>
+
+    </main>
+
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script>
+    // === 1. ID GENERATOR ===
+    const words1 = ["alpha","beta","gamma","delta","neon","cyber","flux","zero","core","nova"];
+    const words2 = ["link","node","grid","mesh","wave","pulse","sync","data","flow","base"];
+    function generateId() {
+        const w1 = words1[Math.floor(Math.random() * words1.length)];
+        const w2 = words2[Math.floor(Math.random() * words2.length)];
+        const num = Math.floor(Math.random() * 999);
+        return `${w1}-${w2}-${num}`;
     }
+    const customPeerId = generateId();
 
-    // Generate a readable ID once on load
-    const customPeerId = generateReadableId();
-
-    // === DOM ELEMENTS ===
+    // === 2. DOM ELEMENTS ===
     const myIdSpan = document.getElementById('my-id');
     const copyIdBtn = document.getElementById('copyIdBtn');
     const copyFeedback = document.getElementById('copyFeedback');
@@ -324,203 +213,197 @@
     const localVideo = document.getElementById('local');
     const remoteVideo = document.getElementById('remote');
     const statusDiv = document.getElementById('status');
+    const liveDot = document.getElementById('live-dot');
+    
+    // Controls
     const toggleAudioBtn = document.getElementById('toggleAudio');
     const toggleVideoBtn = document.getElementById('toggleVideo');
     const shareScreenBtn = document.getElementById('shareScreen');
     const stopScreenBtn = document.getElementById('stopScreen');
 
-    // Display the readable ID immediately
     myIdSpan.textContent = customPeerId;
 
-    // === COPY BUTTON ===
+    // === 3. COPY FUNCTION ===
     copyIdBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(customPeerId);
-        copyFeedback.textContent = 'Copied!';
-        setTimeout(() => copyFeedback.textContent = '', 1500);
-      } catch (err) {
-        copyFeedback.textContent = 'Failed';
-        setTimeout(() => copyFeedback.textContent = '', 1500);
-        console.error('Copy failed:', err);
-      }
-    });
-
-    // === FULLSCREEN TOGGLE (unchanged) ===
-    document.querySelectorAll('.fullscreen-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const video = document.getElementById(e.target.dataset.video);
-        if (!video) return;
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
-          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-        } else {
-          video.requestFullscreen?.() || video.webkitRequestFullscreen?.();
+        try {
+            await navigator.clipboard.writeText(customPeerId);
+            copyFeedback.textContent = 'Copied';
+            setTimeout(() => copyFeedback.textContent = '', 2000);
+        } catch (err) {
+            copyFeedback.textContent = 'Err';
         }
-      });
     });
 
-    const updateFSBtns = () => {
-      document.querySelectorAll('.fullscreen-btn').forEach(btn => {
-        const v = document.getElementById(btn.dataset.video);
-        const active = document.fullscreenElement === v || document.webkitFullscreenElement === v;
-        btn.textContent = active ? '❐' : '⛶';
-      });
-    };
-    ['fullscreenchange', 'webkitfullscreenchange'].forEach(e => document.addEventListener(e, updateFSBtns));
+    // === 4. FULLSCREEN ===
+    document.querySelectorAll('.fs-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const v = document.getElementById(e.target.dataset.video);
+            if (!v) return;
+            if (document.fullscreenElement) document.exitFullscreen();
+            else v.requestFullscreen();
+        });
+    });
 
-    // === PEERJS WITH CUSTOM ID ===
+    // === 5. PEERJS LOGIC ===
     let peer, currentCall, localStream, isAudioEnabled = true, isVideoEnabled = true, isScreenSharing = false;
 
-    // Initialize Peer with our readable ID
-    peer = new Peer(customPeerId, {
-      debug: 2,
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' }
-        ]
-      }
-    });
+    peer = new Peer(customPeerId);
 
     peer.on('open', (id) => {
-      // Should match customPeerId
-      console.log('Peer ID:', id);
+        console.log('ID:', id);
+        updateStatus('Ready to Connect');
+        liveDot.classList.remove('bg-swiss-red');
+        liveDot.classList.add('bg-green-500');
     });
 
     peer.on('error', (err) => {
-      console.error('PeerJS Error:', err);
-      updateStatus(`Error: ${err.message}`, true);
+        updateStatus('Connection Error', true);
     });
 
-    // === REST OF PEERJS LOGIC (UNCHANGED) ===
+    // Incoming Call
     peer.on('call', async (call) => {
-      if (currentCall) return call.close();
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localVideo.srcObject = localStream;
-        call.answer(localStream);
-        setupCall(call);
-      } catch (e) {
-        updateStatus('Camera/mic access denied', true);
-      }
+        if (currentCall) return call.close(); // Busy
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
+            call.answer(localStream);
+            setupCall(call);
+        } catch (e) {
+            updateStatus('Perms Denied', true);
+        }
     });
 
+    // Outgoing Call
     callBtn.onclick = async () => {
-      const remoteId = remoteIdInput.value.trim();
-      if (!remoteId) return alert('Enter a peer ID');
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localVideo.srcObject = localStream;
-        currentCall = peer.call(remoteId, localStream);
-        setupCall(currentCall);
-        updateStatus(`Calling ${remoteId}…`);
-        callBtn.disabled = true;
-        hangupBtn.disabled = false;
-      } catch (e) {
-        updateStatus('Call failed: ' + (e.message || 'unknown'), true);
-      }
+        const remoteId = remoteIdInput.value.trim();
+        if (!remoteId) return;
+        
+        try {
+            updateStatus('Requesting Media...');
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
+            
+            updateStatus(`Dialing ${remoteId}...`);
+            currentCall = peer.call(remoteId, localStream);
+            setupCall(currentCall);
+            
+            callBtn.disabled = true;
+            hangupBtn.disabled = false;
+        } catch (e) {
+            updateStatus('Call Failed', true);
+        }
     };
 
+    // Hangup
     hangupBtn.onclick = endCall;
 
-    toggleAudioBtn.onclick = () => {
-      if (!localStream) return;
-      isAudioEnabled = !isAudioEnabled;
-      localStream.getAudioTracks().forEach(t => t.enabled = isAudioEnabled);
-      toggleAudioBtn.innerHTML = isAudioEnabled ? '🔇 Mute Mic' : '🔊 Unmute Mic';
-    };
-
-    toggleVideoBtn.onclick = () => {
-      if (!localStream || isScreenSharing) return;
-      isVideoEnabled = !isVideoEnabled;
-      localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-      toggleVideoBtn.innerHTML = isVideoEnabled ? '📹 Turn Off Camera' : '🎥 Turn On Camera';
-    };
-
-    shareScreenBtn.onclick = async () => {
-      if (isScreenSharing) return;
-      try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-        isScreenSharing = true;
-        replaceTrack(stream.getVideoTracks()[0], 'video');
-        localVideo.srcObject = stream;
-        if (localStream) localStream.getVideoTracks().forEach(t => t.stop());
-        localStream = stream;
-        toggleVideoBtn.disabled = true;
-        stopScreenBtn.disabled = false;
-        updateStatus('Sharing screen');
-      } catch (e) {
-        updateStatus('Screen share denied', true);
-      }
-    };
-
-    stopScreenBtn.onclick = async () => {
-      if (!isScreenSharing) return;
-      try {
-        const cam = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        isScreenSharing = false;
-        replaceTrack(cam.getVideoTracks()[0], 'video');
-        if (localStream?.getAudioTracks().length) cam.addTrack(localStream.getAudioTracks()[0]);
-        localVideo.srcObject = cam;
-        localStream = cam;
-        toggleVideoBtn.disabled = false;
-        stopScreenBtn.disabled = true;
-        updateStatus('Camera restored');
-      } catch (e) {
-        updateStatus('Failed to restore camera', true);
-      }
-    };
-
-    function replaceTrack(newTrack, kind) {
-      const sender = currentCall?.peerConnection?.getSenders().find(s => s.track?.kind === kind);
-      sender?.replaceTrack(newTrack);
-    }
-
     function setupCall(call) {
-      currentCall = call;
-      call.on('stream', (remoteStream) => {
-        remoteVideo.srcObject = remoteStream;
-        updateStatus('Connected!');
-      });
-      call.on('close', endCall);
-      call.on('error', (err) => {
-        console.error('Call error:', err);
-        updateStatus('Call error', true);
-        endCall();
-      });
+        currentCall = call;
+        call.on('stream', (remoteStream) => {
+            remoteVideo.srcObject = remoteStream;
+            document.getElementById('remote-placeholder').style.display = 'none';
+            updateStatus('Signal Established');
+            hangupBtn.disabled = false;
+            callBtn.disabled = true;
+        });
+        call.on('close', endCall);
+        call.on('error', () => { endCall(); updateStatus('Call Error', true); });
     }
 
     function endCall() {
-      if (currentCall) {
-        currentCall.close();
+        if (currentCall) currentCall.close();
+        if (localStream) localStream.getTracks().forEach(t => t.stop());
+        
+        localVideo.srcObject = null;
+        remoteVideo.srcObject = null;
         currentCall = null;
-      }
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
         localStream = null;
-      }
-      localVideo.srcObject = null;
-      remoteVideo.srcObject = null;
-      isScreenSharing = false;
-      isAudioEnabled = true;
-      isVideoEnabled = true;
-      callBtn.disabled = false;
-      hangupBtn.disabled = true;
-      toggleVideoBtn.disabled = false;
-      stopScreenBtn.disabled = true;
-      toggleAudioBtn.innerHTML = '🔇 Mute Mic';
-      toggleVideoBtn.innerHTML = '📹 Turn Off Camera';
-      updateStatus('Call ended');
+        
+        document.getElementById('remote-placeholder').style.display = 'block';
+        updateStatus('Call Terminated');
+        
+        callBtn.disabled = false;
+        hangupBtn.disabled = true;
+        
+        // Reset buttons
+        isScreenSharing = false;
+        isAudioEnabled = true;
+        isVideoEnabled = true;
+        toggleAudioBtn.innerText = 'Mute Microphone';
+        toggleVideoBtn.innerText = 'Disable Camera';
+        toggleVideoBtn.disabled = false;
+        stopScreenBtn.disabled = true;
     }
 
-    function updateStatus(message, isError = false) {
-      statusDiv.textContent = message;
-      statusDiv.style.color = isError ? '#ff3b30' : '#86868b';
+    function updateStatus(msg, err=false) {
+        statusDiv.textContent = msg;
+        statusDiv.className = err ? "text-sm font-medium text-swiss-red" : "text-sm font-medium text-black";
     }
 
-    window.addEventListener('beforeunload', () => {
-      if (peer) peer.destroy();
-      if (localStream) localStream.getTracks().forEach(t => t.stop());
-    });
-  </script>
+    // === 6. MEDIA CONTROLS ===
+    toggleAudioBtn.onclick = () => {
+        if (!localStream) return;
+        isAudioEnabled = !isAudioEnabled;
+        localStream.getAudioTracks().forEach(t => t.enabled = isAudioEnabled);
+        toggleAudioBtn.innerText = isAudioEnabled ? 'Mute Microphone' : 'Unmute Microphone';
+        toggleAudioBtn.style.color = isAudioEnabled ? 'black' : '#FF3333';
+    };
+
+    toggleVideoBtn.onclick = () => {
+        if (!localStream || isScreenSharing) return;
+        isVideoEnabled = !isVideoEnabled;
+        localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
+        toggleVideoBtn.innerText = isVideoEnabled ? 'Disable Camera' : 'Enable Camera';
+        toggleVideoBtn.style.color = isVideoEnabled ? 'black' : '#FF3333';
+    };
+
+    shareScreenBtn.onclick = async () => {
+        if (isScreenSharing || !currentCall) return;
+        try {
+            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            isScreenSharing = true;
+            
+            // Replace video track
+            const videoTrack = stream.getVideoTracks()[0];
+            const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+            sender.replaceTrack(videoTrack);
+            
+            // Local preview
+            localVideo.srcObject = stream;
+            
+            // Track clean up when user clicks "Stop Sharing" on browser UI
+            videoTrack.onended = () => stopScreenBtn.click();
+            
+            toggleVideoBtn.disabled = true;
+            stopScreenBtn.disabled = false;
+            updateStatus('Sharing Screen');
+        } catch (e) {
+            updateStatus('Screen Share Cancelled');
+        }
+    };
+
+    stopScreenBtn.onclick = async () => {
+        if (!isScreenSharing) return;
+        try {
+            // Revert to camera
+            const camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const videoTrack = camStream.getVideoTracks()[0];
+            
+            const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+            sender.replaceTrack(videoTrack);
+            
+            localVideo.srcObject = camStream;
+            localStream = camStream; // Update reference
+            
+            isScreenSharing = false;
+            toggleVideoBtn.disabled = false;
+            stopScreenBtn.disabled = true;
+            updateStatus('Camera Restored');
+        } catch (e) {
+            updateStatus('Error Restoring Camera', true);
+        }
+    };
+
+</script>
 </body>
 </html>
