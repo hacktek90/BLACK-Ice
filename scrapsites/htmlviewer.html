@@ -1,1160 +1,488 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Viewer - Live Editor</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor Studio</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+/* --- RESET & VARIABLES --- */
+* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+
+:root {
+    /* Dark Theme */
+    --bg-app: #09090b;
+    --bg-sidebar: #18181b;
+    --bg-panel: #18181b;
+    --border: #27272a;
+    --border-subtle: #3f3f46;
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    --text-main: #f4f4f5;
+    --text-muted: #a1a1aa;
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-text: #ffffff;
+    
+    --hover-bg: #27272a;
+    
+    --font-ui: 'Inter', sans-serif;
+    --font-code: 'JetBrains Mono', 'Menlo', monospace;
+}
 
-        :root {
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --surface-hover: #334155;
-            --border: #334155;
-            --text: #e2e8f0;
-            --text-dim: #94a3b8;
-            --accent: #6366f1;
-            --accent-hover: #4f46e5;
-            --success: #10b981;
-            --danger: #ef4444;
-        }
+body.light {
+    --bg-app: #ffffff;
+    --bg-sidebar: #f4f4f5;
+    --bg-panel: #ffffff;
+    --border: #e4e4e7;
+    --border-subtle: #d4d4d8;
+    
+    --text-main: #18181b;
+    --text-muted: #71717a;
+    
+    --primary: #2563eb;
+    --hover-bg: #e4e4e7;
+}
 
-        body.light {
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --surface-hover: #f1f5f9;
-            --border: #e2e8f0;
-            --text: #0f172a;
-            --text-dim: #64748b;
-        }
+html, body { height: 100%; overflow: hidden; }
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
+body {
+    background: var(--bg-app);
+    color: var(--text-main);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    display: flex;
+}
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-        }
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 64px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 16px 0;
+    transition: width 0.3s ease;
+}
 
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
+.brand { margin-bottom: 24px; display: flex; justify-content: center; }
 
-        .logo {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-        }
+.brand-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--primary), #60a5fa);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 20px;
+}
 
-        .logo h1 {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
+.menu {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;
+}
 
-        .logo p {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
+.nav-btn {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: none; border-radius: 8px;
+    color: var(--text-muted); font-size: 20px;
+    cursor: pointer; transition: all 0.2s; position: relative;
+    text-decoration: none;
+}
 
-        .menu {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-        }
+.nav-btn:hover { background: var(--hover-bg); color: var(--text-main); }
+.nav-btn.primary-action { background: rgba(59, 130, 246, 0.15); color: var(--primary); }
+.nav-btn.primary-action:hover { background: var(--primary); color: white; }
 
-        .menu-section {
-            margin-bottom: 24px;
-        }
+.nav-btn::after {
+    content: attr(title); position: absolute; left: 48px;
+    background: var(--bg-app); border: 1px solid var(--border);
+    color: var(--text-main); padding: 4px 8px; border-radius: 4px;
+    font-size: 11px; white-space: nowrap; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s; z-index: 100;
+}
+.nav-btn:hover::after { opacity: 1; }
 
-        .menu-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-            display: block;
-        }
+.sidebar-footer { padding-top: 12px; width: 100%; display: flex; justify-content: center; }
+.theme-toggle {
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    background: transparent; border: none; border-radius: 8px;
+    cursor: pointer; color: var(--text-muted); font-size: 20px;
+}
+.theme-toggle:hover { background: var(--hover-bg); color: var(--text-main); }
 
-        .btn {
-            width: 100%;
-            padding: 10px 14px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
-            font-family: inherit;
-        }
+/* --- MAIN LAYOUT --- */
+.main-area { flex: 1; display: flex; min-width: 0; background: var(--bg-app); }
+.pane { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 
-        .btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
+.pane-header {
+    height: 40px; padding: 0 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-panel); border-bottom: 1px solid var(--border);
+}
 
-        .btn.primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
+.pane-title {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 8px;
+}
 
-        .btn.primary:hover {
-            background: var(--accent-hover);
-        }
+/* Device Selector Styling */
+.pane-actions { display: flex; gap: 8px; align-items: center; }
 
-        .footer {
-            padding: 16px;
-            border-top: 1px solid var(--border);
-        }
+.device-select {
+    appearance: none;
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    height: 28px;
+    display: none; /* Hidden by default */
+}
+.device-select:hover { border-color: var(--text-muted); color: var(--text-main); }
+.device-select.visible { display: block; }
 
-        .theme-btn {
-            width: 100%;
-            padding: 10px;
-            background: var(--surface-hover);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.icon-btn {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: none; border-radius: 4px;
+    color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+}
+.icon-btn:hover { background: var(--hover-bg); color: var(--text-main); }
+.icon-btn.active { color: var(--primary); background: rgba(59, 130, 246, 0.1); }
 
-        .theme-indicator {
-            width: 40px;
-            height: 20px;
-            background: #374151;
-            border-radius: 10px;
-            position: relative;
-            transition: background 0.3s;
-        }
+/* --- EDITOR --- */
+.pane-content { flex: 1; position: relative; background: var(--bg-app); }
+#editor { position: absolute; inset: 0; }
+.ace_editor { font-family: var(--font-code) !important; font-size: 13px !important; line-height: 1.6 !important; }
+.ace_gutter { background: var(--bg-app) !important; color: var(--text-muted) !important; border-right: 1px solid var(--border); }
 
-        .theme-indicator::after {
-            content: '';
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
-        }
+/* --- PREVIEW --- */
+.preview-container {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: #000; padding: 0; transition: all 0.3s; overflow: hidden;
+}
+body.light .preview-container { background: #f1f5f9; }
 
-        body.light .theme-indicator {
-            background: var(--accent);
-        }
+iframe#preview {
+    width: 100%; height: 100%; border: none; background: white;
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+}
 
-        body.light .theme-indicator::after {
-            transform: translateX(20px);
-        }
+/* Mobile Simulation */
+.preview-container.mobile-mode {
+    padding: 40px;
+    background-image: radial-gradient(var(--border) 1px, transparent 0);
+    background-size: 20px 20px;
+}
 
-        /* Main */
-        .main {
-            flex: 1;
-            display: flex;
-            min-width: 0;
-        }
+.preview-container.mobile-mode iframe#preview {
+    /* Dimensions handled by JS */
+    border-radius: 32px;
+    box-shadow: 0 0 0 10px #2d2d30, 0 20px 40px rgba(0,0,0,0.6);
+}
+body.light .preview-container.mobile-mode iframe#preview {
+    box-shadow: 0 0 0 10px #e2e8f0, 0 20px 40px rgba(0,0,0,0.2);
+}
 
-        .pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
+/* --- RESIZER --- */
+.resizer { width: 1px; background: var(--border); cursor: col-resize; position: relative; z-index: 10; }
+.resizer::after { content: ''; position: absolute; left: -4px; right: -4px; top: 0; bottom: 0; cursor: col-resize; }
+.resizer:hover, body.resizing .resizer { background: var(--primary); width: 2px; }
+body.resizing { cursor: col-resize; user-select: none; }
+body.resizing iframe { pointer-events: none; }
 
-        .pane-header {
-            padding: 12px 16px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .pane-title {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-dim);
-        }
-
-        .pane-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .icon-btn {
-            width: 32px;
-            height: 32px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .icon-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-
-        .pane-body {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-        }
-
-        #editor {
-            position: absolute;
-            inset: 0;
-        }
-
-        .ace_editor {
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
-        }
-
-        /* Preview */
-        .preview-wrapper {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg);
-        }
-
-        #preview {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-
-        .preview-wrapper.mobile #preview {
-           width: 375px;
-            height: 667px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-
-        /* Resizer */
-        .resizer {
-            width: 4px;
-            background: var(--border);
-            cursor: col-resize;
-            flex-shrink: 0;
-            position: relative;
-        }
-
-        .resizer:hover {
-            background: var(--accent);
-        }
-
-        body.resizing {
-            cursor: col-resize;
-            user-select: none;
-        }
-
-        body.resizing iframe {
-            pointer-events: none;
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                display: none;
-            }
-
-            .main {
-                flex-direction: column;
-            }
-
-            .resizer {
-                display: none;
-            }
-
-            .pane:not(.active) {
-                display: none;
-            }
-
-            .mobile-nav {
-                display: flex;
-                background: var(--surface);
-                border-top: 1px solid var(--border);
-            }
-
-            .mobile-nav button {
-                flex: 1;
-                padding: 12px;
-                background: transparent;
-                border: none;
-                color: var(--text-dim);
-                font-size: 11px;
-                cursor: pointer;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-            }
-
-            .mobile-nav button.active {
-                color: var(--accent);
-            }
-        }
-
-        .mobile-nav {
-            display: none;
-        }
-    </style>
+/* --- MOBILE UI --- */
+.mobile-nav { display: none; }
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar, .resizer { display: none; }
+    .main-area { flex-direction: column; }
+    .pane { display: none; height: 100%; }
+    .pane.active { display: flex; }
+    .mobile-nav {
+        height: 50px; background: var(--bg-panel); border-top: 1px solid var(--border);
+        display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
+    }
+    .mobile-tab {
+        background: none; border: none; color: var(--text-muted);
+        display: flex; flex-direction: column; align-items: center;
+        font-size: 10px; gap: 2px; cursor: pointer; padding: 6px;
+    }
+    .mobile-tab.active { color: var(--primary); }
+    .device-select { display: none !important; } /* Hide dropdown on actual mobile */
+}
+</style>
 </head>
 <body>
+
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-        <div class="logo">
-            <h1>⚡ HTML Viewer</h1>
-            <p>Live Editor & Preview</p>
+        <div class="brand">
+            <div class="brand-icon"><i class="ph ph-code"></i></div>
         </div>
-
-        <div class="menu">
-            <div class="menu-section">
-                <span class="menu-label">Editor</span>
-                <button class="btn primary" id="format-btn">✨ Format Code</button>
-                <button class="btn" id="sample-btn">📄 Load Sample</button>
-                <button class="btn" id="clear-btn">🗑️ Clear All</button>
-                 <a href="https://black-ice-3dbk.onrender.com/scrapsites/intsitebuild.html"  class="btn" style="text-decoration: none;">
-        🛠️ Interactive Site Builder
-    </a>
-            </div>
-
-            <div class="menu-section">
-                <span class="menu-label">File</span>
-                <button class="btn" id="import-btn">📁 Import HTML</button>
-                <button class="btn" id="export-btn">💾 Export HTML</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            <button class="theme-btn" id="theme-btn">
-                <span>Theme</span>
-                <div class="theme-indicator"></div>
-            </button>
+        <nav class="menu">
+            <button class="nav-btn primary-action" id="format-btn" title="Format Code"><i class="ph ph-magic-wand"></i></button>
+            <button class="nav-btn" id="sample-btn" title="Load Sample"><i class="ph ph-file-code"></i></button>
+            <button class="nav-btn" id="clear-btn" title="Clear Code"><i class="ph ph-trash"></i></button>
+            <div style="height: 1px; width: 24px; background: var(--border); margin: 4px 0;"></div>
+            <button class="nav-btn" id="import-btn" title="Import HTML"><i class="ph ph-upload-simple"></i></button>
+            <button class="nav-btn" id="export-btn" title="Export HTML"><i class="ph ph-download-simple"></i></button>
+            <a href="https://black-ice-3dbk.onrender.com/scrapsites/intsitebuild.html" class="nav-btn" target="_blank" title="Site Builder"><i class="ph ph-hammer"></i></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="theme-toggle" id="theme-btn" title="Toggle Theme"><i class="ph ph-moon"></i></button>
         </div>
     </aside>
 
-    <main class="main">
+    <!-- MAIN AREA -->
+    <main class="main-area">
         <section class="pane active" id="editor-pane">
             <header class="pane-header">
-                <span class="pane-title">HTML Editor</span>
+                <div class="pane-title"><i class="ph ph-pencil-simple"></i> Editor</div>
                 <div class="pane-actions">
-                    <button class="icon-btn" id="copy-btn" title="Copy">📋</button>
-                    <button class="icon-btn" id="find-btn" title="Find">🔍</button>
+                    <button class="icon-btn" id="find-btn" title="Search"><i class="ph ph-magnifying-glass"></i></button>
+                    <button class="icon-btn" id="copy-btn" title="Copy"><i class="ph ph-copy"></i></button>
                 </div>
             </header>
-            <div class="pane-body">
-                <div id="editor"></div>
-            </div>
+            <div class="pane-content"><div id="editor"></div></div>
         </section>
 
         <div class="resizer" id="resizer"></div>
 
         <section class="pane active" id="preview-pane">
             <header class="pane-header">
-                <span class="pane-title">Live Preview</span>
+                <div class="pane-title"><i class="ph ph-eye"></i> Preview</div>
                 <div class="pane-actions">
-                    <button class="icon-btn" id="desktop-btn" title="Desktop">🖥️</button>
-                    <button class="icon-btn" id="mobile-btn" title="Mobile">📱</button>
+                    <!-- Device Selector Dropdown -->
+                    <select id="device-select" class="device-select">
+                        <option value="375x667">iPhone SE (375x667)</option>
+                        <option value="390x844" selected>iPhone 14 (390x844)</option>
+                        <option value="430x932">iPhone 14 Pro Max (430x932)</option>
+                        <option value="412x915">Pixel 7 (412x915)</option>
+                        <option value="360x800">Samsung S22 (360x800)</option>
+                        <option value="768x1024">iPad Mini (768x1024)</option>
+                    </select>
+
+                    <button class="icon-btn active" id="desktop-btn" title="Desktop View"><i class="ph ph-monitor"></i></button>
+                    <button class="icon-btn" id="mobile-btn" title="Mobile View"><i class="ph ph-device-mobile"></i></button>
                 </div>
             </header>
-            <div class="pane-body">
-                <div class="preview-wrapper" id="preview-wrapper">
-                    <iframe id="preview" title="Preview"></iframe>
+            <div class="pane-content">
+                <div class="preview-container" id="preview-wrapper">
+                    <iframe id="preview" title="Output"></iframe>
                 </div>
             </div>
         </section>
     </main>
 
     <nav class="mobile-nav">
-        <button class="active" data-tab="editor">
-            <span>✏️</span>
-            <span>Editor</span>
-        </button>
-        <button data-tab="preview">
-            <span>👁️</span>
-            <span>Preview</span>
-        </button>
-        <button data-tab="menu">
-            <span>☰</span>
-            <span>Menu</span>
-        </button>
+        <button class="mobile-tab active" data-tab="editor"><i class="ph ph-code" style="font-size: 20px;"></i></button>
+        <button class="mobile-tab" data-tab="preview"><i class="ph ph-eye" style="font-size: 20px;"></i></button>
+        <button class="mobile-tab" id="mobile-theme-btn"><i class="ph ph-moon" style="font-size: 20px;"></i></button>
     </nav>
 
     <input type="file" id="file-input" accept=".html" hidden>
 
-    <!-- CDN Scripts -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.37.1/ace.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-html.min.js"></script>
-
+    
     <script>
-        // Initialize
+        // --- LOGIC ---
         let editor;
         let debounceTimer;
 
-        // Minimal landing page sample (with placeholder images)
         const SAMPLE_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Minimal Landing Page</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #f5f5f7;
-      --surface: #ffffff;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --accent: #2563eb;
-      --accent-soft: #dbeafe;
-      --border: #e5e7eb;
-      --radius: 16px;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.08);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
-      background: radial-gradient(circle at top, #f9fafb 0%, #f3f4f6 40%, #e5e7eb 100%);
-      color: var(--text-main);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .page {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 20px 16px 48px;
-    }
-
-    /* Navbar */
-    .nav {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-mark {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: #111827;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      color: #f9fafb;
-    }
-
-    .brand-name {
-      font-size: 0.9rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #4b5563;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 18px;
-      font-size: 0.9rem;
-      color: #6b7280;
-    }
-
-    .nav-links a {
-      position: relative;
-      padding-bottom: 2px;
-    }
-
-    .nav-links a::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 0;
-      height: 1px;
-      background: #9ca3af;
-      transition: width 0.2s ease;
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .nav-cta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .nav-cta a {
-      font-size: 0.9rem;
-      color: #4b5563;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: none;
-      background: #111827;
-      color: #f9fafb;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition:
-        background 0.18s ease,
-        transform 0.12s ease,
-        box-shadow 0.18s ease;
-      box-shadow: 0 16px 35px rgba(15, 23, 42, 0.18);
-    }
-
-    .btn-primary:hover {
-      background: #020617;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.5);
-      color: #374151;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition:
-        background 0.18s ease,
-        border-color 0.18s ease,
-        transform 0.12s ease;
-    }
-
-    .btn-secondary:hover {
-      background: #f3f4f6;
-      border-color: #d1d5db;
-      transform: translateY(-1px);
-    }
-
-    /* Layout wrapper */
-    .hero-wrapper {
-      margin-top: 32px;
-      background: var(--surface);
-      border-radius: 24px;
-      box-shadow: var(--shadow-soft);
-      padding: 28px 24px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-      gap: 32px;
-      align-items: center;
-    }
-
-    @media (max-width: 900px) {
-      .hero-wrapper {
-        grid-template-columns: 1fr;
-        padding: 22px 18px;
-      }
-      .nav-links {
-        display: none;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .page {
-        padding-inline: 14px;
-      }
-      .hero-cta-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-
-    /* Hero text */
-    .eyebrow {
-      font-size: 0.8rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #9ca3af;
-      margin-bottom: 10px;
-    }
-
-    .hero-title {
-      font-size: clamp(2rem, 4vw, 2.6rem);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      margin-bottom: 12px;
-    }
-
-    .highlight {
-      background: linear-gradient(120deg, #111827, #4b5563);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .hero-subtitle {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: var(--text-muted);
-      max-width: 460px;
-      margin-bottom: 20px;
-    }
-
-    .hero-cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .hero-meta {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .hero-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-    }
-
-    /* Hero image side */
-    .hero-image-card {
-      position: relative;
-      border-radius: 20px;
-      overflow: hidden;
-      background: #000;
-      min-height: 260px;
-    }
-
-    .hero-image-card img.hero-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: saturate(1.1);
-    }
-
-    .hero-tag {
-      position: absolute;
-      left: 16px;
-      top: 16px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(17, 24, 39, 0.78);
-      color: #f9fafb;
-      font-size: 0.75rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .hero-tag-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #22c55e;
-    }
-
-    .hero-mini {
-      position: absolute;
-      right: 14px;
-      bottom: 14px;
-      background: rgba(249, 250, 251, 0.92);
-      padding: 10px 12px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.8rem;
-      color: #374151;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
-    }
-
-    .hero-mini img {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      object-fit: cover;
-    }
-
-    .hero-mini-title {
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .hero-mini-label {
-      font-size: 0.75rem;
-      color: #6b7280;
-    }
-
-    /* Features section */
-    .features {
-      margin-top: 32px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .features {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 640px) {
-      .features {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .feature-card {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 16px 16px 18px;
-      border: 1px solid var(--border);
-      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--accent-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #1d4ed8;
-    }
-
-    .feature-title {
-      font-size: 0.98rem;
-      font-weight: 600;
-    }
-
-    .feature-text {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-    }
-
-    .feature-thumb {
-      margin-top: 4px;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    /* Small footer */
-    .footer {
-      margin-top: 32px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 0.8rem;
-      color: #9ca3af;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Modern Starter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+    :root { --bg: #f9fafb; --text: #1f2937; --accent: #3b82f6; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+    .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; }
+    h1 { margin-bottom: 0.5rem; letter-spacing: -0.025em; }
+    p { color: #6b7280; line-height: 1.5; margin-bottom: 1.5rem; }
+    button { background: var(--accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 99px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+</style>
 </head>
 <body>
-  <div class="page">
-    <!-- Navbar -->
-    <header class="nav">
-      <div class="nav-left">
-        <div class="logo-mark">M</div>
-        <span class="brand-name">Minimal</span>
-      </div>
-
-      <nav class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#about">About</a>
-        <a href="#pricing">Pricing</a>
-      </nav>
-
-      <div class="nav-cta">
-        <a href="#login">Log in</a>
-        <button class="btn-primary">Get started</button>
-      </div>
-    </header>
-
-    <!-- Hero -->
-    <main>
-      <section class="hero-wrapper">
-        <div>
-          <div class="eyebrow">Simple landing starter</div>
-          <h1 class="hero-title">
-            A clean way to present your <span class="highlight">next idea</span>.
-          </h1>
-          <p class="hero-subtitle">
-            Use this minimal layout as a starting point for your product, portfolio,
-            or startup. Replace the text and images, and you are ready to publish.
-          </p>
-
-          <div class="hero-cta-row">
-            <button class="btn-primary">Start free</button>
-            <button class="btn-secondary">View live demo</button>
-          </div>
-
-          <div class="hero-meta">
-            <span><span class="dot"></span> No signup required</span>
-            <span>Launch in under 10 minutes</span>
-          </div>
-        </div>
-
-        <aside class="hero-image-card">
-          <!-- Main hero image: placeholder -->
-          <img
-            src="https://picsum.photos/1200/800?blur=0"
-            alt="Clean workspace with laptop and phone"
-            class="hero-img"
-          />
-
-          <div class="hero-tag">
-            <span class="hero-tag-dot"></span>
-            Live preview
-          </div>
-
-          <div class="hero-mini">
-            <img
-              src="https://picsum.photos/200/200?grayscale"
-              alt="Close-up detail preview"
-            />
-            <div>
-              <div class="hero-mini-title">Minimal UI Kit</div>
-              <div class="hero-mini-label">Ready to customize</div>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <!-- Features -->
-      <section id="features" class="features">
-        <article class="feature-card">
-          <div class="feature-icon">✓</div>
-          <h3 class="feature-title">Focused layout</h3>
-          <p class="feature-text">
-            Only the essential sections, so visitors see the main message
-            without distraction.
-          </p>
-          <div class="feature-thumb">
-            <img
-              src="https://picsum.photos/600/400?1"
-              alt="Screenshot of the hero section"
-            />
-          </div>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon">📱</div>
-          <h3 class="feature-title">Responsive by default</h3>
-          <p class="feature-text">
-            The grid and spacing scale smoothly from mobile to desktop using
-            modern CSS only.
-          </p>
-          <div class="feature-thumb">
-            <img
-              src="https://picsum.photos/600/400?2"
-              alt="Mobile view of the landing page"
-            />
-          </div>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon">🖼</div>
-          <h3 class="feature-title">Image ready</h3>
-          <p class="feature-text">
-            Drop in product screenshots or photos in the hero and feature
-            thumbnails to match your brand.
-          </p>
-          <div class="feature-thumb">
-            <img
-              src="https://picsum.photos/600/400?3"
-              alt="Gallery of simple product screenshots"
-            />
-          </div>
-        </article>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <span>© 2025 Minimal Landing. All rights reserved.</span>
-      <span>Built with pure HTML & CSS.</span>
-    </footer>
-  </div>
+    <div class="card">
+        <h1>Hello World</h1>
+        <p>This is a live preview of your code. Edit the HTML on the left and see changes instantly.</p>
+        <button>Get Started</button>
+    </div>
 </body>
 </html>`;
 
-        // Setup Editor
         function initEditor() {
             editor = ace.edit('editor');
-            editor.setTheme('ace/theme/monokai');
+            editor.setTheme('ace/theme/tomorrow_night'); 
             editor.session.setMode('ace/mode/html');
             editor.setOptions({
-                fontSize: 14,
-                showPrintMargin: false,
-                enableLiveAutocompletion: true,
-                enableBasicAutocompletion: true
+                fontSize: 14, fontFamily: "'JetBrains Mono', 'Menlo', monospace",
+                showPrintMargin: false, enableLiveAutocompletion: true,
+                showGutter: true, highlightActiveLine: true, wrap: true
             });
-            editor.session.setUseWrapMode(true);
 
-            // Load saved or sample
             const saved = localStorage.getItem('html_code');
             editor.setValue(saved || SAMPLE_HTML, -1);
 
-            // Auto-update preview
             editor.session.on('change', () => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(updatePreview, 300);
             });
-
             updatePreview();
 
-            // Auto-save
-            setInterval(() => {
-                localStorage.setItem('html_code', editor.getValue());
-            }, 2000);
+            setInterval(() => localStorage.setItem('html_code', editor.getValue()), 2000);
         }
 
-        // Update Preview
         function updatePreview() {
             const iframe = document.getElementById('preview');
             iframe.srcdoc = editor.getValue();
         }
 
-        // Format Code
         function formatCode() {
             if (typeof html_beautify === 'undefined') return;
-            const code = editor.getValue();
-            if (!code.trim()) return;
-
             try {
-                const formatted = html_beautify(code, {
-                    indent_size: 2,
-                    preserve_newlines: true,
-                    max_preserve_newlines: 2
-                });
-                const pos = editor.getCursorPosition();
+                const formatted = html_beautify(editor.getValue(), { indent_size: 2, preserve_newlines: true });
                 editor.setValue(formatted, -1);
-                editor.moveCursorToPosition(pos);
-            } catch (e) {
-                console.error('Format error:', e);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // Toggle Theme
         function toggleTheme() {
             const isLight = document.body.classList.toggle('light');
+            const icon = document.querySelector('#theme-btn i');
+            const mobileIcon = document.querySelector('#mobile-theme-btn i');
+            
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            editor.setTheme(isLight ? 'ace/theme/chrome' : 'ace/theme/monokai');
+            editor.setTheme(isLight ? 'ace/theme/chrome' : 'ace/theme/tomorrow_night');
+            
+            if(icon) icon.className = isLight ? 'ph ph-sun' : 'ph ph-moon';
+            if(mobileIcon) mobileIcon.className = isLight ? 'ph ph-sun' : 'ph ph-moon';
         }
 
-        // Import File
-        function importFile() {
-            document.getElementById('file-input').click();
+        // View Mode Logic
+        function initViewModes() {
+            const wrapper = document.getElementById('preview-wrapper');
+            const iframe = document.getElementById('preview');
+            const desktopBtn = document.getElementById('desktop-btn');
+            const mobileBtn = document.getElementById('mobile-btn');
+            const deviceSelect = document.getElementById('device-select');
+
+            function setDesktop() {
+                wrapper.classList.remove('mobile-mode');
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                desktopBtn.classList.add('active');
+                mobileBtn.classList.remove('active');
+                deviceSelect.classList.remove('visible');
+            }
+
+            function setMobile() {
+                wrapper.classList.add('mobile-mode');
+                applyDimensions(); // Apply currently selected size
+                mobileBtn.classList.add('active');
+                desktopBtn.classList.remove('active');
+                deviceSelect.classList.add('visible');
+            }
+
+            function applyDimensions() {
+                const [w, h] = deviceSelect.value.split('x');
+                iframe.style.width = w + 'px';
+                iframe.style.height = h + 'px';
+            }
+
+            desktopBtn.addEventListener('click', setDesktop);
+            mobileBtn.addEventListener('click', setMobile);
+            deviceSelect.addEventListener('change', applyDimensions);
         }
 
-        // Export File
-        function exportFile() {
-            const blob = new Blob([editor.getValue()], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'index.html';
-            a.click();
-            URL.revokeObjectURL(url);
+        function initResizer() {
+            const resizer = document.getElementById('resizer');
+            const leftPane = document.getElementById('editor-pane');
+            let isResizing = false;
+            let startX, startWidth;
+
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true; startX = e.clientX; startWidth = leftPane.offsetWidth;
+                document.body.classList.add('resizing');
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const delta = e.clientX - startX;
+                const newWidth = Math.max(200, Math.min(startWidth + delta, window.innerWidth - 200));
+                leftPane.style.flex = `0 0 ${newWidth}px`;
+                editor.resize();
+            });
+            document.addEventListener('mouseup', () => {
+                isResizing = false; document.body.classList.remove('resizing');
+            });
         }
 
-        // Resize Handler
-        let isResizing = false;
-        let startX = 0;
-        let startWidth = 0;
+        function initMobileTabs() {
+            const tabs = document.querySelectorAll('.mobile-tab');
+            const editorPane = document.getElementById('editor-pane');
+            const previewPane = document.getElementById('preview-pane');
 
-        function startResize(e) {
-            isResizing = true;
-            startX = e.clientX;
-            startWidth = document.getElementById('editor-pane').offsetWidth;
-            document.body.classList.add('resizing');
-        }
-
-        function resize(e) {
-            if (!isResizing) return;
-            const delta = e.clientX - startX;
-            const newWidth = Math.max(300, Math.min(startWidth + delta, window.innerWidth - 300));
-            document.getElementById('editor-pane').style.flex = `0 0 ${newWidth}px`;
-            editor.resize();
-        }
-
-        function stopResize() {
-            if (!isResizing) return;
-            isResizing = false;
-            document.body.classList.remove('resizing');
-        }
-
-        // Mobile Tabs
-        function handleMobileTabs() {
-            const tabs = document.querySelectorAll('.mobile-nav button');
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
+                    if(tab.id === 'mobile-theme-btn') { toggleTheme(); return; }
+                    tabs.forEach(t => { if(t.id !== 'mobile-theme-btn') t.classList.remove('active'); });
                     tab.classList.add('active');
-
                     const target = tab.dataset.tab;
                     if (target === 'editor') {
-                        document.getElementById('editor-pane').classList.add('active');
-                        document.getElementById('preview-pane').classList.remove('active');
-                        editor.resize();
+                        editorPane.classList.add('active'); previewPane.classList.remove('active'); editor.resize();
                     } else if (target === 'preview') {
-                        document.getElementById('preview-pane').classList.add('active');
-                        document.getElementById('editor-pane').classList.remove('active');
-                    } else if (target === 'menu') {
-                        document.querySelector('.sidebar').style.display = 'flex';
+                        previewPane.classList.add('active'); editorPane.classList.remove('active');
                     }
                 });
             });
         }
 
-        // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             initEditor();
+            initResizer();
+            initMobileTabs();
+            initViewModes();
 
-            // Load theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light');
-                editor.setTheme('ace/theme/chrome');
-            }
+            if (localStorage.getItem('theme') === 'light') toggleTheme();
 
-            // Buttons
             document.getElementById('format-btn').addEventListener('click', formatCode);
-            document.getElementById('sample-btn').addEventListener('click', () => {
-                editor.setValue(SAMPLE_HTML, -1);
-            });
-            document.getElementById('clear-btn').addEventListener('click', () => {
-                if (confirm('Clear all code?')) editor.setValue('', -1);
-            });
-            document.getElementById('import-btn').addEventListener('click', importFile);
-            document.getElementById('export-btn').addEventListener('click', exportFile);
+            document.getElementById('sample-btn').addEventListener('click', () => editor.setValue(SAMPLE_HTML, -1));
+            document.getElementById('clear-btn').addEventListener('click', () => editor.setValue('', -1));
             document.getElementById('theme-btn').addEventListener('click', toggleTheme);
-            document.getElementById('copy-btn').addEventListener('click', () => {
-                navigator.clipboard.writeText(editor.getValue());
-            });
-            document.getElementById('find-btn').addEventListener('click', () => {
-                editor.execCommand('find');
-            });
+            document.getElementById('copy-btn').addEventListener('click', () => navigator.clipboard.writeText(editor.getValue()));
+            document.getElementById('find-btn').addEventListener('click', () => editor.execCommand('find'));
 
-            // Preview buttons
-            document.getElementById('desktop-btn').addEventListener('click', () => {
-                document.getElementById('preview-wrapper').classList.remove('mobile');
-            });
-            document.getElementById('mobile-btn').addEventListener('click', () => {
-                document.getElementById('preview-wrapper').classList.add('mobile');
-            });
-
-            // File input
+            document.getElementById('import-btn').addEventListener('click', () => document.getElementById('file-input').click());
             document.getElementById('file-input').addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    editor.setValue(evt.target.result, -1);
-                };
-                reader.readAsText(file);
+                const f = e.target.files[0];
+                if(f) { const r = new FileReader(); r.onload = (evt) => editor.setValue(evt.target.result, -1); r.readAsText(f); }
                 e.target.value = '';
             });
-
-            // Resizer
-            document.getElementById('resizer').addEventListener('mousedown', startResize);
-            document.addEventListener('mousemove', resize);
-            document.addEventListener('mouseup', stopResize);
-
-            // Mobile tabs
-            handleMobileTabs();
+            document.getElementById('export-btn').addEventListener('click', () => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([editor.getValue()], {type:'text/html'}));
+                a.download = 'index.html'; a.click();
+            });
         });
     </script>
 </body>
