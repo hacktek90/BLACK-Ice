@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Video Call // Swiss Minimal</title>
     <meta name="theme-color" content="#F4F4F4">
     
@@ -42,7 +42,7 @@
             background: #000;
             position: relative;
             overflow: hidden;
-            border-radius: 0; /* Swiss style prefers sharp edges, but minimal radius is ok */
+            border-radius: 0;
         }
         
         video {
@@ -65,22 +65,6 @@
         }
         .minimal-input:focus { border-bottom-color: #000; }
         
-        /* Button Hover Line */
-        .btn-line {
-            position: relative;
-        }
-        .btn-line::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0%;
-            height: 1px;
-            background-color: currentColor;
-            transition: width 0.3s;
-        }
-        .btn-line:hover::after { width: 100%; }
-
         /* Fullscreen Button */
         .fs-btn {
             position: absolute;
@@ -98,71 +82,77 @@
 </head>
 <body class="min-h-screen w-screen overflow-x-hidden relative flex flex-col">
 
-    <!-- GRID LINES -->
+    <!-- GRID LINES (Hidden on mobile to reduce noise) -->
     <div class="hidden md:block grid-line top-0 bottom-0 left-[25%] w-px"></div>
     <div class="hidden md:block grid-line top-0 bottom-0 left-[50%] w-px"></div>
     <div class="hidden md:block grid-line top-0 bottom-0 left-[75%] w-px"></div>
-    <div class="grid-line left-0 right-0 top-[100px] h-px"></div>
+    <div class="grid-line left-0 right-0 top-[80px] md:top-[100px] h-px"></div>
 
     <!-- MAIN WRAPPER -->
     <main class="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:grid md:grid-cols-4 md:grid-rows-[100px_1fr]">
 
         <!-- HEADER -->
-        <header class="col-span-4 h-[100px] px-6 md:px-12 flex items-center justify-between border-b border-black/5 bg-swiss-bg">
+        <header class="col-span-4 h-[80px] md:h-[100px] px-6 md:px-12 flex items-center justify-between border-b border-black/5 bg-swiss-bg sticky top-0 z-20">
             <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-swiss-red rounded-full animate-pulse" id="live-dot"></span>
-                <h1 class="text-sm font-medium tracking-tight uppercase">Video Bridge v1.0</h1>
+                <span class="w-2 md:w-3 h-2 md:h-3 bg-swiss-red rounded-full animate-pulse" id="live-dot"></span>
+                <h1 class="text-xs md:text-sm font-medium tracking-tight uppercase">Video Bridge v1.0</h1>
             </div>
             
             <!-- ID DISPLAY -->
-            <div class="flex items-center gap-4 text-sm font-mono">
-                <span class="text-gray-400 uppercase hidden sm:inline">My Identity:</span>
-                <span id="my-id" class="font-medium bg-black/5 px-2 py-1">Connecting...</span>
-                <button id="copyIdBtn" class="text-xs uppercase hover:text-swiss-red transition-colors">Copy</button>
-                <span id="copyFeedback" class="text-xs text-swiss-red min-w-[50px]"></span>
+            <div class="flex items-center gap-3 text-xs md:text-sm font-mono">
+                <span class="text-gray-400 uppercase hidden md:inline">My Identity:</span>
+                <span id="my-id" class="font-medium bg-black/5 px-2 py-1 max-w-[120px] truncate">Connecting...</span>
+                <button id="copyIdBtn" class="uppercase hover:text-swiss-red transition-colors p-2 md:p-0">Copy</button>
+                <span id="copyFeedback" class="text-swiss-red min-w-[30px]"></span>
             </div>
         </header>
 
-        <!-- LEFT COLUMN: CONTROLS (Mobile: Top, Desktop: Side) -->
+        <!-- LEFT COLUMN: CONTROLS (Mobile: First Section) -->
         <section class="col-span-4 md:col-span-1 px-6 md:px-12 py-8 md:py-12 border-b md:border-b-0 md:border-r border-black/5 flex flex-col gap-8 bg-swiss-bg">
             
             <!-- Connection Box -->
             <div>
-                <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">01 / Connect</h2>
+                <h2 class="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4 md:mb-6">01 / Connect</h2>
                 <div class="flex flex-col gap-4">
-                    <input id="remoteId" class="minimal-input text-lg w-full placeholder-gray-300" placeholder="Enter Remote ID..." autocomplete="off" />
+                    <input id="remoteId" class="minimal-input text-base md:text-lg w-full placeholder-gray-300" placeholder="Enter Remote ID..." autocomplete="off" />
                     
-                    <button id="callBtn" class="group flex items-center gap-3 text-sm font-medium hover:text-black transition-colors py-2">
-                        <span class="w-6 h-px bg-black group-hover:bg-swiss-red transition-colors"></span>
-                        Initiate Call
-                    </button>
-                    
-                    <button id="hangupBtn" class="group flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-swiss-red transition-colors py-2" disabled>
-                        <span class="w-6 h-px bg-gray-300 group-hover:bg-swiss-red transition-colors"></span>
-                        Terminate
-                    </button>
+                    <div class="flex md:flex-col gap-3">
+                        <button id="callBtn" class="flex-1 group flex items-center justify-center md:justify-start gap-3 text-sm font-medium bg-black text-white md:bg-transparent md:text-black hover:text-black transition-colors py-3 md:py-2">
+                            <span class="hidden md:block w-6 h-px bg-black group-hover:bg-swiss-red transition-colors"></span>
+                            Initiate Call
+                        </button>
+                        
+                        <button id="hangupBtn" class="flex-1 group flex items-center justify-center md:justify-start gap-3 text-sm font-medium bg-gray-200 text-gray-400 md:bg-transparent md:text-gray-400 hover:text-swiss-red transition-colors py-3 md:py-2" disabled>
+                            <span class="hidden md:block w-6 h-px bg-gray-300 group-hover:bg-swiss-red transition-colors"></span>
+                            Terminate
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Status -->
-            <div>
+            <!-- Status (Hidden on very small screens if needed, but useful) -->
+            <div class="hidden md:block">
                 <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">02 / Status</h2>
                 <div id="status" class="text-sm font-medium">System Ready</div>
             </div>
+            <!-- Mobile Status -->
+            <div id="mobile-status" class="md:hidden text-center text-xs font-mono uppercase tracking-widest text-gray-500 py-2 bg-gray-50 border border-black/5">
+                Status: System Ready
+            </div>
 
-            <!-- Actions -->
-            <div class="flex flex-col gap-3 mt-auto">
-                <button id="toggleAudio" class="text-left text-xs uppercase tracking-wider hover:text-swiss-red py-2 border-b border-black/5">Mute Microphone</button>
-                <button id="toggleVideo" class="text-left text-xs uppercase tracking-wider hover:text-swiss-red py-2 border-b border-black/5">Disable Camera</button>
-                <button id="shareScreen" class="text-left text-xs uppercase tracking-wider hover:text-swiss-red py-2 border-b border-black/5">Share Screen</button>
-                <button id="stopScreen" class="text-left text-xs uppercase tracking-wider text-gray-400 py-2 border-b border-black/5" disabled>Stop Sharing</button>
-                <a href="https://github.com/hacktek90/BLACK-Ice/releases/download/apk/app-release.apk" class="text-left text-xs uppercase tracking-wider text-blue-600 hover:text-blue-800 py-4 mt-4">Download .APK →</a>
+            <!-- Actions (Collapsible or Scrollable on mobile) -->
+            <div class="flex flex-row md:flex-col gap-2 md:gap-3 mt-auto overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+                <button id="toggleAudio" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider bg-white md:bg-transparent border md:border-0 border-black/10 hover:text-swiss-red md:border-b md:border-black/5">Mute Mic</button>
+                <button id="toggleVideo" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider bg-white md:bg-transparent border md:border-0 border-black/10 hover:text-swiss-red md:border-b md:border-black/5">Disable Cam</button>
+                <button id="shareScreen" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider bg-white md:bg-transparent border md:border-0 border-black/10 hover:text-swiss-red md:border-b md:border-black/5">Share Screen</button>
+                <a href="https://github.com/hacktek90/BLACK-Ice/releases/download/apk/app-release.apk" class="whitespace-nowrap px-4 py-2 md:px-0 text-left text-xs uppercase tracking-wider text-blue-600 bg-white md:bg-transparent border md:border-0 border-blue-100 md:mt-4">Get App</a>
+                <button id="stopScreen" class="hidden" disabled></button> <!-- Hidden logic button -->
             </div>
 
         </section>
 
-        <!-- RIGHT COLUMN: VIDEO GRID -->
-        <section class="col-span-4 md:col-span-3 bg-white relative">
+        <!-- RIGHT COLUMN: VIDEO GRID (Mobile: Bottom Section, fills remaining height) -->
+        <section class="col-span-4 md:col-span-3 bg-white relative h-[50vh] md:h-auto min-h-[300px]">
             
             <!-- Remote Video (Main) -->
             <div class="absolute inset-0 z-0">
@@ -171,19 +161,19 @@
                     <div class="fs-btn" data-video="remote">⛶</div>
                     
                     <!-- Placeholder Text -->
-                    <div id="remote-placeholder" class="absolute text-gray-300 uppercase tracking-widest text-sm pointer-events-none">
+                    <div id="remote-placeholder" class="absolute text-gray-300 uppercase tracking-widest text-xs md:text-sm pointer-events-none">
                         Remote Feed Inactive
                     </div>
                 </div>
             </div>
 
             <!-- Local Video (PIP) -->
-            <div class="absolute bottom-6 right-6 z-10 w-32 md:w-64 aspect-[4/3] shadow-lg border border-white/10">
+            <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-10 w-28 md:w-64 aspect-[4/3] shadow-lg border border-white/10">
                 <div class="video-box w-full h-full">
                     <video id="local" autoplay muted playsinline class="bg-[#222]"></video>
                     <div class="fs-btn" data-video="local">⛶</div>
                 </div>
-                <div class="absolute top-2 left-2 text-[10px] text-white/50 uppercase tracking-widest mix-blend-difference">Local</div>
+                <div class="absolute top-1 left-1 md:top-2 md:left-2 text-[8px] md:text-[10px] text-white/50 uppercase tracking-widest mix-blend-difference">Local</div>
             </div>
 
         </section>
@@ -213,6 +203,7 @@
     const localVideo = document.getElementById('local');
     const remoteVideo = document.getElementById('remote');
     const statusDiv = document.getElementById('status');
+    const mobileStatusDiv = document.getElementById('mobile-status');
     const liveDot = document.getElementById('live-dot');
     
     // Controls
@@ -227,7 +218,7 @@
     copyIdBtn.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(customPeerId);
-            copyFeedback.textContent = 'Copied';
+            copyFeedback.textContent = 'OK';
             setTimeout(() => copyFeedback.textContent = '', 2000);
         } catch (err) {
             copyFeedback.textContent = 'Err';
@@ -329,8 +320,8 @@
         isScreenSharing = false;
         isAudioEnabled = true;
         isVideoEnabled = true;
-        toggleAudioBtn.innerText = 'Mute Microphone';
-        toggleVideoBtn.innerText = 'Disable Camera';
+        toggleAudioBtn.innerText = 'Mute Mic';
+        toggleVideoBtn.innerText = 'Disable Cam';
         toggleVideoBtn.disabled = false;
         stopScreenBtn.disabled = true;
     }
@@ -338,6 +329,9 @@
     function updateStatus(msg, err=false) {
         statusDiv.textContent = msg;
         statusDiv.className = err ? "text-sm font-medium text-swiss-red" : "text-sm font-medium text-black";
+        // Sync mobile status
+        mobileStatusDiv.textContent = `Status: ${msg}`;
+        mobileStatusDiv.style.color = err ? '#FF3333' : '#666';
     }
 
     // === 6. MEDIA CONTROLS ===
@@ -345,16 +339,16 @@
         if (!localStream) return;
         isAudioEnabled = !isAudioEnabled;
         localStream.getAudioTracks().forEach(t => t.enabled = isAudioEnabled);
-        toggleAudioBtn.innerText = isAudioEnabled ? 'Mute Microphone' : 'Unmute Microphone';
-        toggleAudioBtn.style.color = isAudioEnabled ? 'black' : '#FF3333';
+        toggleAudioBtn.innerText = isAudioEnabled ? 'Mute Mic' : 'Unmute Mic';
+        toggleAudioBtn.style.color = isAudioEnabled ? 'inherit' : '#FF3333';
     };
 
     toggleVideoBtn.onclick = () => {
         if (!localStream || isScreenSharing) return;
         isVideoEnabled = !isVideoEnabled;
         localStream.getVideoTracks().forEach(t => t.enabled = isVideoEnabled);
-        toggleVideoBtn.innerText = isVideoEnabled ? 'Disable Camera' : 'Enable Camera';
-        toggleVideoBtn.style.color = isVideoEnabled ? 'black' : '#FF3333';
+        toggleVideoBtn.innerText = isVideoEnabled ? 'Disable Cam' : 'Enable Cam';
+        toggleVideoBtn.style.color = isVideoEnabled ? 'inherit' : '#FF3333';
     };
 
     shareScreenBtn.onclick = async () => {
@@ -362,48 +356,36 @@
         try {
             const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
             isScreenSharing = true;
-            
-            // Replace video track
             const videoTrack = stream.getVideoTracks()[0];
             const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
             sender.replaceTrack(videoTrack);
-            
-            // Local preview
             localVideo.srcObject = stream;
-            
-            // Track clean up when user clicks "Stop Sharing" on browser UI
             videoTrack.onended = () => stopScreenBtn.click();
-            
             toggleVideoBtn.disabled = true;
             stopScreenBtn.disabled = false;
             updateStatus('Sharing Screen');
         } catch (e) {
-            updateStatus('Screen Share Cancelled');
+            updateStatus('Share Cancelled');
         }
     };
 
     stopScreenBtn.onclick = async () => {
         if (!isScreenSharing) return;
         try {
-            // Revert to camera
             const camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             const videoTrack = camStream.getVideoTracks()[0];
-            
             const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
             sender.replaceTrack(videoTrack);
-            
             localVideo.srcObject = camStream;
-            localStream = camStream; // Update reference
-            
+            localStream = camStream; 
             isScreenSharing = false;
             toggleVideoBtn.disabled = false;
             stopScreenBtn.disabled = true;
             updateStatus('Camera Restored');
         } catch (e) {
-            updateStatus('Error Restoring Camera', true);
+            updateStatus('Restore Error', true);
         }
     };
-
 </script>
 </body>
 </html>
