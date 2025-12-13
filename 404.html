@@ -1,203 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>404 — System Not Found</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Not Found</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['"Inter Tight"', 'sans-serif'],
+                },
+                colors: {
+                    'swiss-red': '#FF3333',
+                }
+            }
+        }
+    }
+</script>
+
 <style>
-  /* ====== Tokens ====== */
-  :root{
-    --bg:#06070a;
-    --fg:#dff3ff;
-    --neon-cyan:#00e5ff;
-    --neon-mag:#ff2bd6;
-    --neon-yellow:#ffee00;
-    --grid:#0b0f1a;
-    --btn:#101420;
-    --border:rgba(255,255,255,.14);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    background: var(--bg);
-    color: var(--fg);
-    font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-    display:grid; place-items:center; padding:24px;
-    overflow:hidden; position:relative;
-  }
-
-  /* ====== Hex/tech background ====== */
-  .bg{
-    position:fixed; inset:0; pointer-events:none;
-    background:
-      radial-gradient(1200px 600px at 70% 10%, rgba(0,229,255,.12), transparent 55%),
-      radial-gradient(900px 700px at 20% 85%, rgba(255,43,214,.10), transparent 60%),
-      linear-gradient(transparent 0 0),
-      var(--bg);
-  }
-  .bg::before{
-    content:""; position:absolute; inset:-200px; opacity:.08;
-    background:
-      radial-gradient(circle at 50% 50%, transparent 30%, rgba(255,255,255,.04) 31% 32%, transparent 33%) 0 0/32px 32px,
-      linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/100% 18px;
-    filter: contrast(140%) saturate(130%);
-    animation: drift 24s linear infinite;
-  }
-  @keyframes drift{
-    0%{ transform: translate3d(0,0,0) rotate(0deg) }
-    100%{ transform: translate3d(-40px,-20px,0) rotate(1deg) }
-  }
-
-  /* ====== CRT and scanlines ====== */
-  .scan{
-    position:fixed; inset:0; pointer-events:none; mix-blend-mode:overlay;
-    background:
-      repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 2px, transparent 2px 4px);
-  }
-  .vignette{
-    position:fixed; inset:0; pointer-events:none;
-    box-shadow: inset 0 0 120px 60px rgba(0,0,0,.7), inset 0 0 300px rgba(0,0,0,.6);
-  }
-
-  /* ====== Wrap ====== */
-  .wrap{
-    width:min(92vw, 920px); text-align:center; position:relative; z-index:1;
-  }
-
-  /* ====== RGB glitch 404 ====== */
-  .title{
-    font-size:clamp(56px, 12vw, 160px);
-    line-height:.8; letter-spacing:2px; margin-bottom:8px;
-    position:relative; font-weight:900;
-    text-transform:uppercase;
-    color:var(--fg);
-    text-shadow:
-      0 0 14px rgba(0,229,255,.45),
-      0 0 26px rgba(255,43,214,.35),
-      0 0 36px rgba(0,229,255,.25);
-  }
-  .title span{ position:relative; display:inline-block; }
-  .title .layer{
-    position:absolute; inset:0; pointer-events:none; content:attr(data-text);
-  }
-  .title .r{ color:var(--neon-cyan); transform: translate(2px,0); mix-blend-mode:screen; filter: blur(.15px); }
-  .title .b{ color:var(--neon-mag); transform: translate(-2px,0); mix-blend-mode:screen; filter: blur(.15px); }
-  .title .y{ color:var(--neon-yellow); transform: translate(0,1px); mix-blend-mode:screen; opacity:.75; }
-
-  /* glitch slice mask */
-  .slice{
-    position:absolute; left:50%; translate:-50% 0;
-    width:100%; max-width:920px; height:8px; opacity:.85;
-    background: linear-gradient(90deg, rgba(0,229,255,.0), rgba(0,229,255,.35), rgba(255,43,214,.35), rgba(0,229,255,.0));
-    filter: blur(.6px);
-    animation: slice 2.4s ease-in-out infinite;
-  }
-  .slice:nth-child(1){ top:18%; animation-delay: .1s }
-  .slice:nth-child(2){ top:28%; animation-delay: .6s }
-  .slice:nth-child(3){ top:38%; animation-delay: 1.1s }
-  .slice:nth-child(4){ top:48%; animation-delay: 1.6s }
-  .slice:nth-child(5){ top:58%; animation-delay: 2.1s }
-  @keyframes slice{
-    0%,100%{ transform: scaleX(.2) }
-    50%{ transform: scaleX(1) }
-  }
-
-  .subtitle{
-    margin-top:6px; margin-bottom:22px;
-    color:#b9c3ff; font-size:clamp(14px, 2.4vw, 18px);
-    text-shadow: 0 0 10px rgba(185,195,255,.35);
-  }
-
-  /* ====== Button styles (glitchy primary) ====== */
-  .actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:8px }
-  .btn{
-    position:relative; border:1px solid var(--border); color:var(--fg);
-    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(10,14,22,.6));
-    padding:12px 22px; border-radius:12px; text-decoration:none; cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-    backdrop-filter: blur(6px);
-  }
-  .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.3) }
-  .btn.primary{
-    border-color:transparent; color:#0b0e15; font-weight:800;
-    background:linear-gradient(135deg, var(--neon-cyan), var(--neon-mag));
-    box-shadow:
-      0 0 18px rgba(0,229,255,.35),
-      0 0 26px rgba(255,43,214,.25);
-    overflow:hidden;
-  }
-  /* cyber glitch sheen */
-  .btn.primary::after{
-    content:""; position:absolute; inset:-2px; pointer-events:none;
-    background:
-      linear-gradient(90deg, transparent 0 45%, rgba(255,255,255,.35) 50%, transparent 55%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 2px, transparent 2px 4px);
-    mix-blend-mode: overlay; opacity:.35;
-    animation: sweep 2.5s linear infinite;
-  }
-  @keyframes sweep{
-    0%{ transform: translateX(-20%) }
-    100%{ transform: translateX(20%) }
-  }
-
-  /* ====== Frame with neon corners ====== */
-  .frame{
-    position:relative; margin-inline:auto; padding:28px 20px 24px;
-    border:1px solid rgba(0,229,255,.15);
-    border-radius:16px;
-    box-shadow:
-      0 0 0 1px rgba(0,229,255,.06) inset,
-      0 20px 40px rgba(0,0,0,.45);
-    background:
-      linear-gradient(180deg, rgba(0,229,255,.04), rgba(10,14,22,.35));
-    backdrop-filter: blur(6px);
-  }
-  .corner{
-    position:absolute; width:18px; height:18px; border:2px solid var(--neon-cyan); filter: drop-shadow(0 0 6px rgba(0,229,255,.6));
-  }
-  .tl{ top:-9px; left:-9px; border-right:none; border-bottom:none }
-  .tr{ top:-9px; right:-9px; border-left:none; border-bottom:none }
-  .bl{ bottom:-9px; left:-9px; border-right:none; border-top:none }
-  .br{ bottom:-9px; right:-9px; border-left:none; border-top:none }
-
-  /* ====== Utility ====== */
-  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; letter-spacing:.5px }
+    body {
+        background-color: #F4F4F4;
+        color: #111;
+    }
+    .grid-line {
+        position: absolute;
+        background-color: rgba(0,0,0,0.06);
+        pointer-events: none;
+        z-index: 0;
+    }
 </style>
 </head>
-<body>
-  <div class="bg"></div>
-  <div class="scan"></div>
-  <div class="vignette"></div>
+<body class="min-h-screen w-screen overflow-hidden relative selection:bg-black selection:text-white flex flex-col">
 
-  <!-- glitch slice overlays -->
-  <div class="slice"></div>
-  <div class="slice"></div>
-  <div class="slice"></div>
-  <div class="slice"></div>
-  <div class="slice"></div>
+    <!-- THE GRID SYSTEM (Visualized) -->
+    <!-- Vertical Lines (Hidden on mobile to reduce noise) -->
+    <div class="hidden md:block grid-line top-0 bottom-0 left-[25%] w-px"></div>
+    <div class="hidden md:block grid-line top-0 bottom-0 left-[50%] w-px"></div>
+    <div class="hidden md:block grid-line top-0 bottom-0 left-[75%] w-px"></div>
+    <!-- Horizontal Lines -->
+    <div class="grid-line left-0 right-0 top-[100px] h-px"></div>
+    <div class="grid-line left-0 right-0 bottom-[100px] h-px hidden md:block"></div>
 
-  <main class="wrap">
-    <section class="frame">
-      <span class="corner tl"></span>
-      <span class="corner tr"></span>
-      <span class="corner bl"></span>
-      <span class="corner br"></span>
+    <!-- MAIN CONTAINER -->
+    <main class="relative z-10 flex-grow w-full max-w-[1600px] mx-auto flex flex-col md:grid md:grid-cols-4 md:grid-rows-[100px_1fr]">
 
-      <h1 class="title" aria-label="404">
-        <span>404
-          <span class="layer r" aria-hidden="true">404</span>
-          <span class="layer b" aria-hidden="true">404</span>
-          <span class="layer y" aria-hidden="true">404</span>
-        </span>
-      </h1>
+        <!-- HEADER -->
+        <header class="h-[100px] col-span-4 px-6 md:px-12 flex items-center justify-between shrink-0">
+            <div class="text-sm font-medium tracking-tight flex items-center gap-2">
+                <span class="w-2 h-2 bg-swiss-red rounded-full animate-pulse"></span>
+                SYSTEM STATUS: 404
+            </div>
+            <!-- Hidden on mobile to save space -->
+            <div class="text-xs uppercase tracking-widest text-gray-400 hidden md:block">
+                Coordinates: Missing
+            </div>
+        </header>
 
-      <p class="subtitle mono">Node not found — route may be deprecated, relocated, or classified.</p>
+        <!-- CONTENT AREA -->
+        <!-- Stacked on mobile (flex-col), Side-by-side on desktop (grid) -->
+        <div class="flex-grow flex flex-col md:flex-row col-span-4 h-full">
 
-      <div class="actions">
-        <button class="btn primary" onclick="history.back()">Go Back</button>
-        <a class="btn" href="index.html">Go Home</a>
-      </div>
-    </section>
-  </main>
+            <!-- Left: The "404" Type -->
+            <div class="w-full md:w-1/2 px-6 md:px-12 flex flex-col justify-center py-10 md:py-0 border-r-0 md:border-r border-black/5">
+                <!-- Responsive Text Size: 8rem on mobile, 18rem on desktop -->
+                <h1 class="text-[8rem] sm:text-[12rem] md:text-[16rem] lg:text-[18rem] leading-[0.8] font-medium tracking-tighter -ml-1 md:-ml-4 text-center md:text-left select-none">
+                    404
+                </h1>
+            </div>
+
+            <!-- Right: The Explanation & Action -->
+            <div class="w-full md:w-1/2 px-6 md:px-12 flex flex-col justify-center items-center md:items-start space-y-8 md:space-y-12 pb-12 md:pb-0">
+                
+                <div class="space-y-4 md:space-y-6 max-w-md text-center md:text-left">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-normal leading-tight">
+                        The requested object<br>
+                        <span class="text-gray-400">could not be located.</span>
+                    </h2>
+                    
+                    <div class="h-px w-12 bg-black mx-auto md:mx-0"></div>
+                    
+                    <p class="text-sm md:text-base text-gray-600 leading-relaxed px-4 md:px-0">
+                        The URL you entered is either incorrect or the page has been moved. Please navigate back to the index.
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-center md:items-start gap-6 w-full md:w-auto">
+                    <!-- Main Button -->
+                    <a href="/" class="w-full md:w-auto text-center group flex items-center justify-center md:justify-start gap-4 text-lg font-medium hover:text-swiss-red transition-colors py-3 md:py-0">
+                        <span class="hidden md:block w-8 h-px bg-black group-hover:bg-swiss-red transition-colors"></span>
+                        Return Index
+                    </a>
+                    
+                    <!-- Secondary Button -->
+                    <button onclick="history.back()" class="w-full md:w-auto text-center group flex items-center justify-center md:justify-start gap-4 text-sm text-gray-500 hover:text-black transition-colors py-2 md:py-0">
+                        <span class="hidden md:block w-8 h-px bg-gray-300 group-hover:bg-black transition-colors"></span>
+                        Go Back
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <!-- Decorative Element (Hidden on small mobiles to prevent overlay issues) -->
+    <div class="hidden sm:flex fixed bottom-8 right-8 md:bottom-12 md:right-12 w-24 h-24 md:w-32 md:h-32 border border-black/10 rounded-full items-center justify-center animate-[spin_10s_linear_infinite] pointer-events-none">
+        <div class="w-full h-px bg-black/10"></div>
+        <div class="absolute h-full w-px bg-black/10"></div>
+    </div>
+
 </body>
 </html>
