@@ -2,116 +2,439 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Minimal QR Generator + Screen/Camera Scanner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<title>Swiss QR // Mobile Pro</title>
+<!-- Inter Tight Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800&display=swap" rel="stylesheet">
+
 <style>
-:root { --bg:#0b1020; --fg:#e6eef6; --muted:#9aa7bd; --accent:#22d3ee; }
-html,body { height:100%; margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial; background:linear-gradient(180deg,#0a1224,#081228); color:var(--fg); }
-.wrap { max-width:980px; margin:20px auto; padding:12px; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px; }
-h2 { margin:0 0 8px 0; font-size:16px; }
-label { display:block; font-size:12px; color:var(--muted); margin-top:8px; }
-input[type=text], input[type=number], select { width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:transparent; color:inherit; }
-input[type=color]{ width:36px; height:36px; padding:0; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:transparent; cursor:pointer; }
-.row { display:flex; gap:8px; }
-.row > * { flex:1; }
-button { background:var(--accent); color:#052; border:none; padding:8px 10px; border-radius:8px; font-weight:700; cursor:pointer; }
-.btn-ghost { background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.08); }
-.actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-.muted { color:var(--muted); font-size:12px; }
-canvas { background:#fff; border-radius:8px; width:100%; height:auto; max-height:420px; }
-video { width:100%; max-height:420px; border-radius:8px; background:#000; }
-.result { margin-top:8px; word-break:break-all; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); }
-.tiny { font-size:11px; color:var(--muted); }
-@media (max-width:900px){ .wrap{ grid-template-columns:1fr; } }
+/* 
+    SWISS MINIMALISM 2025 // MOBILE OPTIMIZED
+    Strict Grid | Monochrome + Orange | Inter Tight 
+*/
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --border-color: #000000;
+    --accent-color: #ff3300; /* International Orange */
+    --grid-line: 2px solid var(--border-color);
+    --thin-line: 1px solid var(--border-color);
+    --font-main: 'Inter Tight', sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    margin: 0;
+    font-family: var(--font-main);
+    background: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- LAYOUT GRID --- */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Default Desktop Split */
+    width: 100%;
+    border-top: var(--grid-line);
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    /* On mobile, we want natural scrolling, not overflow containers */
+    height: auto; 
+}
+
+/* Left Panel: Generator */
+.panel-gen {
+    border-right: var(--grid-line);
+}
+
+/* Right Panel: Scanner */
+.panel-scan {
+    background: #f4f4f4; 
+    border-left: none;
+}
+
+/* --- TYPOGRAPHY & HEADERS --- */
+h2 {
+    margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 20px;
+    border-bottom: var(--grid-line);
+    background: var(--bg-color);
+    font-weight: 800;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.instruction {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.1;
+    padding: 24px;
+    border-bottom: var(--thin-line);
+    letter-spacing: -0.03em;
+}
+
+/* --- FORMS & INPUTS --- */
+.input-group {
+    padding: 20px;
+    border-bottom: var(--thin-line);
+}
+
+/* Large, touch-friendly inputs */
+input[type=text], input[type=number], select {
+    width: 100%;
+    padding: 0;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font-family: var(--font-main);
+    font-size: 16px; /* Prevent IOS zoom */
+    color: var(--text-color);
+    height: 48px; /* Touch target min height */
+    border-radius: 0;
+    outline: none;
+    appearance: none; /* Remove native dropdown arrows */
+    transition: border 0.2s;
+}
+
+input[type=text]:focus, input[type=number]:focus, select:focus {
+    border-bottom: 2px solid var(--accent-color);
+}
+
+select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0 center;
+    background-size: 16px;
+}
+
+/* Color pickers grid */
+.color-row {
+    display: flex;
+    gap: 0;
+    border-bottom: var(--thin-line);
+    flex-wrap: wrap; /* Safe wrap for very small screens */
+}
+.color-item {
+    flex: 1;
+    min-width: 100px; /* Don't squash too small */
+    padding: 20px;
+    border-right: var(--thin-line);
+    display: flex;
+    flex-direction: column;
+}
+.color-item:last-child { border-right: none; }
+
+input[type=color] {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #000;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 0; 
+}
+
+/* File Input Wrapper */
+.file-upload-wrapper {
+    position: relative;
+    padding: 20px;
+    border-bottom: var(--thin-line);
+}
+/* Mask ugly file input */
+.file-upload-wrapper input[type=file] {
+    font-size: 14px;
+    padding-top: 10px;
+}
+
+/* --- BUTTONS --- */
+button {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    padding: 0 24px;
+    height: 56px; /* Fat finger friendly */
+    font-family: var(--font-main);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    white-space: nowrap;
+}
+
+button:active {
+    background: #000;
+    color: #fff;
+    transform: translateY(1px);
+}
+
+/* Primary Action Buttons */
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    width: 100%;
+    height: 64px;
+    font-size: 14px;
+}
+.btn-primary:active, .btn-primary:hover {
+    background: #000;
+    border-color: #000;
+    color: white;
+}
+
+.actions-row {
+    display: flex;
+    border-bottom: var(--thin-line);
+    flex-wrap: wrap; /* allow wrap on tiny screens */
+}
+.actions-row button {
+    flex: 1;
+    border: none;
+    border-right: var(--thin-line);
+    border-bottom: var(--thin-line);
+    min-width: 80px; /* Ensure clickable */
+}
+.actions-row button:last-child { border-right: none; }
+
+/* --- VISUAL OUTPUTS --- */
+.canvas-wrapper {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    border-bottom: var(--thin-line);
+}
+canvas {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 0 0 1px #eee;
+}
+
+/* Video Feed */
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    border-bottom: var(--thin-line);
+    background: #000;
+    min-height: 60vh; /* Taller on mobile for scanning */
+    overflow: hidden;
+}
+video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.scan-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px; height: 240px;
+    border: 2px solid var(--accent-color);
+    z-index: 5;
+    pointer-events: none;
+    box-shadow: 0 0 0 2000px rgba(0,0,0,0.5); /* Dim surrounding area */
+}
+.scan-overlay::before { content: "TARGET"; position: absolute; top: -25px; left: 0; color: var(--accent-color); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; }
+
+/* Result Display */
+.result-box {
+    padding: 24px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 18px;
+    word-break: break-all;
+    font-weight: 600;
+    line-height: 1.4;
+    display: none;
+    border-bottom: 4px solid black;
+}
+.result-label {
+    font-size: 10px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8;
+}
+
+/* --- MOBILE RESPONSIVE LOGIC --- */
+@media (max-width: 900px) {
+    .main-grid { 
+        grid-template-columns: 1fr; /* Stack vertically */
+        grid-template-rows: auto;
+        border-top: none; 
+    }
+    
+    .panel-gen { 
+        border-right: none; 
+        border-bottom: 4px solid black; /* Heavy separation between modules */
+        order: 2; /* Move generator below scanner on mobile? Or keep top. Let's keep top. */
+    }
+    
+    .panel-scan {
+        order: 1; /* Actually, scanner is often primary on mobile. Let's make it easy to reach. */
+    }
+    
+    /* Make buttons bigger on mobile */
+    .actions-row button {
+        padding: 0 16px;
+        font-size: 11px;
+    }
+    
+    h2 { font-size: 12px; padding: 16px; }
+}
+
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- Generator -->
-  <section class="card">
-    <h2>Generate</h2>
-    <div class="muted">Create a QR with size, colors, error correction, and optional logo overlay.</div>
-    <label>Text / URL</label>
-    <input id="text" type="text" placeholder="https://example.com" value="https://example.com">
-    <div class="row">
-      <div>
-        <label>Size (px)</label>
-        <input id="size" type="number" min="128" max="2048" value="512">
-      </div>
-      <div>
-        <label>Error correction</label>
-        <select id="ec">
-          <option value="L">L — 7%</option>
-          <option value="M" selected>M — 15%</option>
-          <option value="Q">Q — 25%</option>
-          <option value="H">H — 30%</option>
-        </select>
-      </div>
-    </div>
-    <div class="row" style="align-items:center">
-      <div>
-        <label>Foreground</label>
-        <input id="fg" type="color" value="#000000">
-      </div>
-      <div>
-        <label>Background</label>
-        <input id="bg" type="color" value="#ffffff">
-      </div>
-    </div>
-    <label>Embed logo</label>
-    <input id="logoFile" type="file" accept="image/*">
-    <div class="row" style="align-items:center">
-      <div>
-        <label>Logo scale (%)</label>
-        <input id="logoSize" type="number" min="10" max="50" value="20">
-      </div>
-      <div><label>&nbsp;</label><button id="generate">Generate</button></div>
-    </div>
-    <div class="actions">
-      <button id="downloadPng">Download PNG</button>
-      <button id="downloadSvg" class="btn-ghost">Download SVG</button>
-      <button id="copyData" class="btn-ghost">Copy text</button>
-    </div>
-    <div style="margin-top:10px">
-      <canvas id="qrCanvas" width="512" height="512"></canvas>
-    </div>
-    <div class="tiny">Tip: Higher error correction helps scannability if a logo covers the center of the code.</div>
-  </section>
+<div class="main-grid">
+    
+    <!-- PANEL 1: SCANNER (Priority on Mobile) -->
+    <section class="panel-scan">
+        <h2>01 // Scanner</h2>
+        
+        <!-- Video Area -->
+        <div class="video-wrapper">
+            <video id="scanVideo" playsinline muted autoplay></video>
+            <div class="scan-overlay"></div>
+            <canvas id="scanCanvas" style="display:none"></canvas>
+            
+            <!-- Error / Status Message Overlay -->
+            <div id="camStatus" style="position:absolute; bottom:20px; left:0; width:100%; text-align:center; color:white; font-size:11px; font-weight:600; text-shadow:0 1px 2px black;">
+                CAMERA INACTIVE
+            </div>
+        </div>
 
-  <!-- Scanner -->
-  <section class="card">
-    <h2>Scan</h2>
-    <div class="muted">Scan from your screen or your device camera; camera requires HTTPS and permission granted by the user.</div>
-    <div class="actions">
-      <button id="startScreen">Start Screen Scan (not in tab or mobile)</button>
-      <button id="startCamera">Start Camera Scan</button>
-      <select id="cameraSelect" title="Camera" class="btn-ghost"></select>
-      <button id="toggleTorch" class="btn-ghost" title="Toggle flashlight">Torch</button>
-      <button id="stopScan" class="btn-ghost">Stop</button>
-    </div>
-    <div style="margin-top:10px">
-      <video id="scanVideo" playsinline muted></video>
-      <canvas id="scanCanvas" style="display:none"></canvas>
-    </div>
-    <div class="result" id="scanResult" style="display:none"></div>
-    <div class="actions" id="resultActions" style="display:none">
-      <button id="copyResult" class="btn-ghost">Copy</button>
-      <button id="openResult">Open</button>
-      <button id="clearResult" class="btn-ghost">Clear</button>
-    </div>
-    <div class="tiny" style="margin-top:8px">
-      Uses the native Barcode Detection API when available, and falls back to jsQR image decoding if not supported.
-    </div>
-  </section>
+        <!-- Result Area -->
+        <div id="scanResult" class="result-box">
+            <div class="result-label">Decoded Content</div>
+            <span id="resText"></span>
+        </div>
+
+        <!-- Result Actions -->
+        <div class="actions-row" id="resultActions" style="display:none; background:white;">
+            <button id="copyResult">Copy</button>
+            <button id="openResult">Open URL</button>
+            <button id="shareResult" style="display:none">Share</button> <!-- Mobile Share API -->
+            <button id="clearResult">Clear</button>
+        </div>
+
+        <!-- Scanner Controls -->
+        <div class="actions-row" style="background:white;">
+            <button id="startCamera" style="flex:2; background:black; color:white;">Start Cam</button>
+            <button id="toggleTorch">Torch</button>
+            <button id="stopScan">Stop</button>
+        </div>
+        
+        <div class="input-group" style="background:white;">
+            <label>Select Camera</label>
+            <select id="cameraSelect"><option value="">Default (Rear)</option></select>
+        </div>
+        
+        <!-- Only show on Desktop/Support check -->
+        <div class="actions-row" style="background:white; border-top:var(--thin-line)">
+             <button id="startScreen">Scan Screen (Desktop)</button>
+        </div>
+    </section>
+
+    <!-- PANEL 2: GENERATOR -->
+    <section class="panel-gen">
+        <h2>02 // Generator</h2>
+        
+        <div class="input-group">
+            <label>Content / URL</label>
+            <input id="text" type="text" placeholder="https://example.com" value="https://example.com">
+        </div>
+
+        <div class="color-row">
+            <div class="color-item">
+                <label>Color (FG)</label>
+                <input id="fg" type="color" value="#000000">
+            </div>
+            <div class="color-item">
+                <label>Background</label>
+                <input id="bg" type="color" value="#ffffff">
+            </div>
+        </div>
+        
+        <div class="color-row">
+            <div class="color-item">
+                <label>Size (px)</label>
+                <input id="size" type="number" min="200" max="2048" value="1024">
+            </div>
+             <div class="color-item">
+                <label>Correction</label>
+                <select id="ec">
+                    <option value="L">L (7%)</option>
+                    <option value="M" selected>M (15%)</option>
+                    <option value="Q">Q (25%)</option>
+                    <option value="H">H (30%)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="file-upload-wrapper">
+            <label>Logo Overlay (Optional)</label>
+            <input id="logoFile" type="file" accept="image/*">
+            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+                <label style="margin:0; width:auto;">Scale:</label>
+                <input id="logoSize" type="number" min="10" max="40" value="20" style="width:60px; height:30px; border-bottom:1px solid black;">
+                <span style="font-size:12px;">%</span>
+            </div>
+        </div>
+
+        <div style="padding:20px; border-bottom:var(--thin-line);">
+            <button id="generate" class="btn-primary">CREATE CODE</button>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="qrCanvas" width="512" height="512"></canvas>
+        </div>
+
+        <div class="actions-row">
+            <button id="downloadPng">PNG</button>
+            <button id="downloadSvg">SVG</button>
+            <button id="copyData">Copy Text</button>
+        </div>
+    </section>
+
 </div>
 
-<!-- libs -->
+<!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
 <script>
-// --- Generator elements ---
+/* =========================================
+   1. QR GENERATOR LOGIC
+   ========================================= */
+
 const textEl = document.getElementById('text');
 const sizeEl = document.getElementById('size');
 const ecEl = document.getElementById('ec');
@@ -124,92 +447,123 @@ const canvas = document.getElementById('qrCanvas');
 const ctx = canvas.getContext('2d');
 let logoImage = null;
 
+// Handle Logo Upload
 logoFileEl.addEventListener('change', (e) => {
-  const f = e.target.files?.[0];
-  if (!f) { logoImage = null; return; }
-  const r = new FileReader();
-  r.onload = (ev) => {
-    const img = new Image();
-    img.onload = () => logoImage = img;
-    img.src = ev.target.result;
-  };
-  r.readAsDataURL(f);
+    const f = e.target.files?.[0];
+    if (!f) { logoImage = null; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => logoImage = img;
+        img.src = ev.target.result;
+    };
+    r.readAsDataURL(f);
 });
 
 async function renderQR() {
-  const value = textEl.value.trim();
-  const size = Math.max(128, Math.min(2048, Number(sizeEl.value)||512));
-  const ec = ecEl.value;
-  const fg = fgEl.value;
-  const bg = bgEl.value;
-  canvas.width = size;
-  canvas.height = size;
-  if (!value) {
-    ctx.clearRect(0,0,size,size);
-    return;
-  }
-  // Draw a background first
-  ctx.fillStyle = bg;
-  ctx.fillRect(0,0,size,size);
-  // Render QR via data URL, then draw to canvas
-  const opts = { errorCorrectionLevel: ec, margin: 1, width: size, color: { dark: fg, light: bg } };
-  const dataUrl = await QRCode.toDataURL(value, opts);
-  const img = new Image();
-  await new Promise(res => { img.onload = res; img.src = dataUrl; });
-  ctx.drawImage(img, 0, 0, size, size);
-  // Optional logo overlay
-  if (logoImage) {
-    const s = Math.max(10, Math.min(50, Number(logoSizeEl.value)||20)) / 100;
-    const w = size * s, h = size * s, x = (size - w) / 2, y = (size - h) / 2;
-    ctx.drawImage(logoImage, x, y, w, h);
-  }
+    const value = textEl.value.trim();
+    const size = Math.max(128, Math.min(2048, Number(sizeEl.value)||512));
+    const ec = ecEl.value;
+    const fg = fgEl.value;
+    const bg = bgEl.value;
+    
+    // Set high resolution for canvas
+    canvas.width = size;
+    canvas.height = size;
+    
+    if (!value) {
+        ctx.fillStyle = bg;
+        ctx.fillRect(0,0,size,size);
+        return;
+    }
+    
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,size,size);
+    
+    const opts = { errorCorrectionLevel: ec, margin: 1, width: size, color: { dark: fg, light: bg } };
+    try {
+        const dataUrl = await QRCode.toDataURL(value, opts);
+        const img = new Image();
+        await new Promise(res => { img.onload = res; img.src = dataUrl; });
+        ctx.drawImage(img, 0, 0, size, size);
+        
+        if (logoImage) {
+            const s = Math.max(10, Math.min(50, Number(logoSizeEl.value)||20)) / 100;
+            const w = size * s, h = size * s, x = (size - w) / 2, y = (size - h) / 2;
+            // Draw logo background for readability
+            ctx.fillStyle = bg;
+            // ctx.fillRect(x-5, y-5, w+10, h+10); // Optional border around logo
+            ctx.drawImage(logoImage, x, y, w, h);
+        }
+    } catch(e) {
+        console.error("QR Gen Error", e);
+    }
 }
-genBtn.addEventListener('click', renderQR);
-['input','change'].forEach(ev =>
-  [textEl,sizeEl,ecEl,fgEl,bgEl,logoSizeEl].forEach(el =>
-    el.addEventListener(ev, () => { clearTimeout(renderQR._t); renderQR._t = setTimeout(renderQR, 200); })
-  )
-);
-document.getElementById('downloadPng').addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = 'qrcode.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-});
-document.getElementById('downloadSvg').addEventListener('click', async () => {
-  const value = textEl.value.trim();
-  if (!value) return;
-  const ec = ecEl.value, fg = fgEl.value, bg = bgEl.value;
-  const svg = await QRCode.toString(value, { type:'svg', errorCorrectionLevel: ec, color: { dark: fg, light: bg } });
-  const blob = new Blob([svg], { type:'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = 'qrcode.svg';
-  link.href = url;
-  link.click();
-  URL.revokeObjectURL(url);
-});
-document.getElementById('copyData').addEventListener('click', () => {
-  navigator.clipboard.writeText(textEl.value||'');
-});
-// Initial render
-renderQR();
 
-// --- Scanner (screen + camera) ---
+genBtn.addEventListener('click', renderQR);
+
+// Live update debounce
+let debounceTimer;
+['input','change'].forEach(ev =>
+    [textEl,sizeEl,ecEl,fgEl,bgEl,logoSizeEl].forEach(el =>
+        el.addEventListener(ev, () => { 
+            clearTimeout(debounceTimer); 
+            debounceTimer = setTimeout(renderQR, 300); 
+        })
+    )
+);
+
+// Downloads
+document.getElementById('downloadPng').addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = `qr_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+});
+
+document.getElementById('downloadSvg').addEventListener('click', async () => {
+    const value = textEl.value.trim();
+    if (!value) return;
+    const ec = ecEl.value, fg = fgEl.value, bg = bgEl.value;
+    const svg = await QRCode.toString(value, { type:'svg', errorCorrectionLevel: ec, color: { dark: fg, light: bg } });
+    const blob = new Blob([svg], { type:'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `qr_${Date.now()}.svg`;
+    link.href = url;
+    link.click();
+});
+
+document.getElementById('copyData').addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(textEl.value||'');
+        alert("COPIED");
+    } catch(err) {
+        prompt("Copy this:", textEl.value);
+    }
+});
+
+renderQR(); // Init
+
+
+/* =========================================
+   2. MOBILE SCANNER LOGIC
+   ========================================= */
+
 const startScreenBtn = document.getElementById('startScreen');
 const startCameraBtn = document.getElementById('startCamera');
 const stopBtn = document.getElementById('stopScan');
 const torchBtn = document.getElementById('toggleTorch');
 const camSelect = document.getElementById('cameraSelect');
-
 const videoEl = document.getElementById('scanVideo');
 const scanCanvas = document.getElementById('scanCanvas');
 const scanCtx = scanCanvas.getContext('2d');
-const resultEl = document.getElementById('scanResult');
+const camStatus = document.getElementById('camStatus');
+
+const resultBox = document.getElementById('scanResult');
+const resText = document.getElementById('resText');
 const actionsEl = document.getElementById('resultActions');
-const copyResultBtn = document.getElementById('copyResult');
-const openResultBtn = document.getElementById('openResult');
-const clearResultBtn = document.getElementById('clearResult');
+const shareBtn = document.getElementById('shareResult');
 
 let scanStream = null;
 let rafId = 0;
@@ -218,170 +572,228 @@ let useNativeDetector = false;
 let currentVideoTrack = null;
 let torchOn = false;
 
+// Check for Web Share API
+if(navigator.share) {
+    shareBtn.style.display = 'block';
+    shareBtn.onclick = () => {
+        navigator.share({
+            title: 'Scanned QR',
+            text: resText.textContent
+        }).catch(console.error);
+    }
+}
+
+function updateStatus(msg) {
+    camStatus.textContent = msg;
+}
+
 function showResult(text){
-  resultEl.textContent = text||'';
-  resultEl.style.display = text ? 'block' : 'none';
-  actionsEl.style.display = text ? 'flex' : 'none';
+    if(text) {
+        // Vibrate on success (Mobile feature)
+        if(navigator.vibrate) navigator.vibrate(200);
+        
+        resText.textContent = text;
+        resultBox.style.display = 'block';
+        actionsEl.style.display = 'flex';
+        updateStatus("SCAN COMPLETE");
+        // Scroll to result on mobile
+        resultBox.scrollIntoView({behavior: "smooth", block: "center"});
+    } else {
+        resText.textContent = '';
+        resultBox.style.display = 'none';
+        actionsEl.style.display = 'none';
+    }
 }
 
 function stopScan(){
-  cancelAnimationFrame(rafId);
-  if (scanStream) {
-    scanStream.getTracks().forEach(t=>t.stop());
-    scanStream = null;
-  }
-  currentVideoTrack = null;
-  videoEl.srcObject = null;
+    cancelAnimationFrame(rafId);
+    if (scanStream) {
+        scanStream.getTracks().forEach(t=>t.stop());
+        scanStream = null;
+    }
+    currentVideoTrack = null;
+    videoEl.srcObject = null;
+    updateStatus("CAMERA INACTIVE");
 }
 
+// Feature Detection for Barcode API
 async function ensureDetector(){
-  useNativeDetector = 'BarcodeDetector' in window;
-  detector = null;
-  if (useNativeDetector) {
-    try {
-      const supported = await window.BarcodeDetector.getSupportedFormats();
-      if (!supported || !supported.includes('qr_code')) {
-        useNativeDetector = false;
-      } else {
-        detector = new window.BarcodeDetector({ formats: ['qr_code'] });
-      }
-    } catch {
-      useNativeDetector = false;
+    if ('BarcodeDetector' in window) {
+        try {
+            const formats = await BarcodeDetector.getSupportedFormats();
+            if (formats.includes('qr_code')) {
+                detector = new BarcodeDetector({ formats: ['qr_code'] });
+                useNativeDetector = true;
+                return;
+            }
+        } catch(e) {}
     }
-  }
+    useNativeDetector = false;
 }
 
 async function scanLoop(){
-  if (!videoEl.videoWidth || !videoEl.videoHeight) {
-    rafId = requestAnimationFrame(scanLoop);
-    return;
-  }
-  try {
-    if (useNativeDetector && detector) {
-      const barcodes = await detector.detect(videoEl);
-      if (barcodes && barcodes.length) {
-        showResult(barcodes[0].rawValue || '');
-        stopScan();
+    if (!videoEl.videoWidth || !videoEl.videoHeight) {
+        rafId = requestAnimationFrame(scanLoop);
         return;
-      }
-    } else {
-      const w = videoEl.videoWidth;
-      const h = videoEl.videoHeight;
-      scanCanvas.width = w;
-      scanCanvas.height = h;
-      scanCtx.drawImage(videoEl, 0, 0, w, h);
-      const imgData = scanCtx.getImageData(0, 0, w, h);
-      const code = jsQR(imgData.data, w, h);
-      if (code && code.data) {
-        showResult(code.data);
-        stopScan();
-        return;
-      }
     }
-  } catch (e) {
-    // ignore decode errors and continue
-  }
-  rafId = requestAnimationFrame(scanLoop);
-}
+    
+    // Safety check: is stream active?
+    if(!scanStream || !scanStream.active) {
+        stopScan();
+        return;
+    }
 
-// Populate camera list (after permission labels become available on most browsers)
-async function populateCameras(){
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const cams = devices.filter(d => d.kind === 'videoinput');
-    camSelect.innerHTML = cams.map(d => {
-      const label = d.label || 'Camera';
-      return `<option value="${d.deviceId}">${label}</option>`;
-    }).join('');
-  } catch {
-    camSelect.innerHTML = '';
-  }
-}
-
-async function startScreenScan(){
-  showResult('');
-  stopScan();
-  try {
-    await ensureDetector();
-    scanStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-    videoEl.srcObject = scanStream;
-    await videoEl.play();
-    currentVideoTrack = scanStream.getVideoTracks()[0] || null;
+    try {
+        if (useNativeDetector && detector) {
+            const barcodes = await detector.detect(videoEl);
+            if (barcodes.length > 0) {
+                showResult(barcodes[0].rawValue);
+                stopScan();
+                return;
+            }
+        } else {
+            // Fallback: jsQR
+            scanCanvas.width = videoEl.videoWidth; 
+            scanCanvas.height = videoEl.videoHeight;
+            scanCtx.drawImage(videoEl, 0, 0, scanCanvas.width, scanCanvas.height);
+            const imgData = scanCtx.getImageData(0, 0, scanCanvas.width, scanCanvas.height);
+            const code = jsQR(imgData.data, imgData.width, imgData.height, {
+                inversionAttempts: "dontInvert",
+            });
+            if (code && code.data) {
+                showResult(code.data);
+                stopScan();
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn("Scan frame error", e);
+    }
     rafId = requestAnimationFrame(scanLoop);
-  } catch {
-    stopScan();
-  }
+}
+
+// Enumerate Cameras - Handling Mobile Permissions
+async function populateCameras(){
+    camSelect.innerHTML = '<option value="">Default (Rear)</option>';
+    try {
+        // Only works if permission already granted
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+        
+        if(videoDevices.length > 0) {
+            camSelect.innerHTML = '';
+            videoDevices.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.deviceId;
+                // If label is missing, it means no permission yet
+                opt.text = d.label || `Camera ${videoDevices.indexOf(d) + 1}`;
+                camSelect.appendChild(opt);
+            });
+        }
+    } catch(e) {
+        console.warn("Camera enum error", e);
+    }
 }
 
 async function startCameraScan(){
-  showResult('');
-  stopScan();
-  try {
-    await ensureDetector();
-    // Prefer selected deviceId, else rear camera if available
-    const selectedId = camSelect.value || undefined;
-    const constraints = selectedId
-      ? { video: { deviceId: { exact: selectedId } } }
-      : { video: { facingMode: { ideal: 'environment' } } };
-    scanStream = await navigator.mediaDevices.getUserMedia(constraints);
-    videoEl.srcObject = scanStream;
-    await videoEl.play();
-    currentVideoTrack = scanStream.getVideoTracks()[0] || null;
-    // Update list after permission to reveal labels
-    await populateCameras();
-    // Reset torch state off
-    torchOn = false;
-    rafId = requestAnimationFrame(scanLoop);
-  } catch {
+    showResult(''); // Clear previous
     stopScan();
-  }
-}
-
-// Torch toggle (best-effort on supported devices/browsers)
-async function toggleTorch(){
-  try {
-    const track = currentVideoTrack;
-    if (!track) return;
-    // Try applyConstraints advanced torch hint
-    torchOn = !torchOn;
-    await track.applyConstraints({ advanced: [{ torch: torchOn }] });
-  } catch {
-    // Some browsers require ImageCapture to query capabilities; attempt and ignore if unsupported
+    updateStatus("INITIALIZING...");
+    
     try {
-      const imageCapture = new ImageCapture(currentVideoTrack);
-      const caps = await imageCapture.getPhotoCapabilities();
-      if (caps.torch) {
-        torchOn = !torchOn;
-        await currentVideoTrack.applyConstraints({ advanced: [{ torch: torchOn }] });
-      }
-    } catch {
-      // Not supported
+        await ensureDetector();
+        
+        const selectedId = camSelect.value;
+        const constraints = {
+            video: {
+                deviceId: selectedId ? { exact: selectedId } : undefined,
+                facingMode: selectedId ? undefined : { ideal: 'environment' }, // Prefer back cam
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                focusMode: 'continuous' // Try to force focus
+            }
+        };
+
+        scanStream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoEl.srcObject = scanStream;
+        
+        // Wait for video to actually play
+        await videoEl.play();
+        
+        currentVideoTrack = scanStream.getVideoTracks()[0];
+        updateStatus("SCANNING...");
+        
+        // Now that we have permission, update the list with real labels
+        populateCameras(); 
+        
+        rafId = requestAnimationFrame(scanLoop);
+        
+    } catch (err) {
+        console.error(err);
+        updateStatus("ERROR: " + err.name);
+        if(err.name === 'NotAllowedError') alert("Camera permission denied. Please allow access in settings.");
+        else if(err.name === 'NotFoundError') alert("No camera found.");
     }
-  }
 }
 
-// Wire UI
-startScreenBtn.addEventListener('click', startScreenScan);
+async function startScreenScan(){
+    // Desktop only usually
+    showResult('');
+    stopScan();
+    try {
+        await ensureDetector();
+        scanStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        videoEl.srcObject = scanStream;
+        await videoEl.play();
+        updateStatus("SCREEN SCAN ACTIVE");
+        rafId = requestAnimationFrame(scanLoop);
+    } catch (err) {
+        updateStatus("CANCELLED");
+    }
+}
+
+async function toggleTorch(){
+    if(!currentVideoTrack) return;
+    try {
+        torchOn = !torchOn;
+        await currentVideoTrack.applyConstraints({
+            advanced: [{ torch: torchOn }]
+        });
+    } catch(e) {
+        alert("Torch not supported on this device/browser");
+    }
+}
+
+// BINDINGS
 startCameraBtn.addEventListener('click', startCameraScan);
-camSelect.addEventListener('change', () => {
-  // If scanning, switch camera immediately
-  if (scanStream) startCameraScan();
-});
-torchBtn.addEventListener('click', toggleTorch);
 stopBtn.addEventListener('click', stopScan);
+torchBtn.addEventListener('click', toggleTorch);
+camSelect.addEventListener('change', () => { if(scanStream) startCameraScan(); });
+startScreenBtn.addEventListener('click', startScreenScan);
 
-copyResultBtn.addEventListener('click', () => {
-  if (resultEl.textContent) navigator.clipboard.writeText(resultEl.textContent);
+document.getElementById('copyResult').addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(resText.textContent);
+        alert("COPIED");
+    } catch(e) {
+        prompt("Copy result:", resText.textContent);
+    }
 });
-openResultBtn.addEventListener('click', () => {
-  const v = resultEl.textContent || '';
-  if (v) window.open(v, '_blank', 'noopener');
-});
-clearResultBtn.addEventListener('click', () => showResult(''));
 
-// Try to pre-populate camera list (labels may be empty until permission granted)
+document.getElementById('openResult').addEventListener('click', () => {
+    let url = resText.textContent;
+    if(!url.match(/^https?:\/\//i)) url = 'http://' + url;
+    window.open(url, '_blank', 'noopener');
+});
+
+document.getElementById('clearResult').addEventListener('click', () => {
+    showResult('');
+    updateStatus("READY");
+});
+
+// Initial load
 populateCameras();
-navigator.mediaDevices?.addEventListener?.('devicechange', populateCameras);
+
 </script>
 </body>
 </html>
