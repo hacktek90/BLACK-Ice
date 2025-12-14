@@ -2,209 +2,435 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>P2P Chat — Responsive Apple Style</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>P2P // SWISS</title>
+<!-- Inter Tight Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- PeerJS -->
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
 <style>
-  :root {
-    --blue: #007aff;
-    --gray-bg: #f5f5f7;
-    --gray-border: #d2d2d7;
-    --text-dark: #1c1c1e;
-    --text-light: #6e6e73;
-    --radius: 16px;
-    --shadow: 0 6px 25px rgba(0,0,0,0.12);
-  }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
-    background: var(--gray-bg);
+:root {
+    --bg: #ffffff;
+    --fg: #000000;
+    --accent: #ff3300; /* International Orange */
+    --border: 2px solid #000000;
+    --thin-border: 1px solid #000000;
+    --font: 'Inter Tight', sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
     margin: 0;
-    padding: 0;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  .chat-box {
-    background: #fff;
-    border: 1px solid var(--gray-border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    width: 400px;
-    max-width: 95%;
+    overflow: hidden;
+}
+
+/* --- MAIN CONTAINER --- */
+.app-container {
+    width: 480px;
+    height: 90vh;
+    max-height: 800px;
+    border: var(--border);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-  }
-  .header {
+    background: #fff;
+    box-shadow: 15px 15px 0px rgba(0,0,0,0.15); /* Hard shadow */
+}
+
+/* --- HEADER --- */
+header {
     padding: 16px 20px;
-    font-weight: 600;
-    color: var(--text-dark);
-    border-bottom: 1px solid var(--gray-border);
+    border-bottom: var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 18px;
-  }
-  .header span {
-    font-family: monospace;
-    color: var(--blue);
-    font-size: 16px;
-  }
-  #chatLog {
+    background: #fff;
+}
+
+.brand {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+}
+.brand span { color: var(--accent); }
+
+.status {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 1px solid #000;
+}
+.dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
+.dot.active { background: #00cc66; }
+
+/* --- ID SECTION --- */
+.id-panel {
+    border-bottom: var(--border);
+    padding: 16px 20px;
+    background: #f4f4f4;
+}
+.id-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+.id-display {
+    display: flex;
+    gap: 10px;
+}
+.my-id {
     flex: 1;
-    padding: 14px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    border-bottom: 2px solid #000;
+    padding: 4px 0;
+}
+.copy-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 4px 12px;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.copy-btn:hover { background: var(--accent); }
+
+/* --- CHAT AREA --- */
+#chatLog {
+    flex: 1;
+    padding: 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    background: #fafafa;
-    min-height: 250px;
-  }
-  .msg {
-    padding: 10px 16px;
-    border-radius: 20px;
-    max-width: 80%;
-    font-size: 16px;
-    line-height: 1.3;
-    word-break: break-word;
-  }
-  .self {
-    align-self: flex-end;
-    background: var(--blue);
-    color: #fff;
-  }
-  .peer {
-    align-self: flex-start;
-    background: #e5e5ea;
-    color: var(--text-dark);
-  }
-  .row {
-    display: flex;
-    border-top: 1px solid var(--gray-border);
-  }
-  input {
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 14px 12px;
-    font-size: 16px;
-    font-family: inherit;
-  }
-  button {
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    padding: 14px 18px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #005fcc;
-  }
+    gap: 12px;
+    background: #fff;
+    /* Dot pattern background */
+    background-image: radial-gradient(#ddd 1px, transparent 1px);
+    background-size: 20px 20px;
+}
 
-  /* Mobile adjustments */
-  @media (max-width: 500px) {
-    .chat-box {
-      width: 90%;
-    }
-    .header {
-      font-size: 16px;
-      padding: 12px 14px;
-    }
-    .header span {
-      font-size: 14px;
-    }
-    #chatLog {
-      min-height: 200px;
-      padding: 10px;
-    }
-    .msg {
-      font-size: 14px;
-      padding: 10px 12px;
-    }
-    input {
-      font-size: 14px;
-      padding: 12px 10px;
-    }
-    button {
-      font-size: 14px;
-      padding: 12px 14px;
-    }
-  }
+/* Scrollbar */
+#chatLog::-webkit-scrollbar { width: 4px; }
+#chatLog::-webkit-scrollbar-thumb { background: #000; }
+
+.msg {
+    max-width: 85%;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    word-break: break-word;
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Message Variations */
+.sys {
+    align-self: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #666;
+    background: #f4f4f4;
+    padding: 4px 12px;
+    border: 1px solid #ddd;
+    max-width: 100%;
+}
+
+.peer {
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid #000;
+    border-left: 4px solid var(--accent);
+    color: #000;
+}
+
+.self {
+    align-self: flex-end;
+    background: #000;
+    color: #fff;
+    border: 1px solid #000;
+}
+
+.timestamp {
+    display: block;
+    font-size: 9px;
+    opacity: 0.6;
+    margin-top: 4px;
+    text-align: right;
+    font-family: monospace;
+}
+.peer .timestamp { text-align: left; }
+
+/* --- CONTROLS --- */
+.controls-area {
+    border-top: var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.connect-row {
+    display: flex;
+    border-bottom: var(--thin-border);
+}
+.connect-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    background: #fcfcfc;
+}
+.connect-row button {
+    border: none;
+    border-left: var(--thin-border);
+    background: #fff;
+    padding: 0 16px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+.connect-row button:hover { background: #f0f0f0; }
+
+.chat-row {
+    display: flex;
+    height: 60px;
+}
+.chat-row input {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+}
+.chat-row button {
+    width: 70px;
+    border: none;
+    border-left: var(--border);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.chat-row button:hover { background: #000; }
+.chat-row button:disabled { background: #ccc; cursor: not-allowed; }
+
+/* --- MOBILE --- */
+@media (max-width: 500px) {
+    .app-container { width: 100%; height: 100vh; max-height: none; border: none; box-shadow: none; }
+    .brand { font-size: 16px; }
+    .msg { font-size: 13px; }
+}
 </style>
 </head>
 <body>
-<div class="chat-box">
-  <div class="header">
-    <div>P2P Chat</div>
-    <span id="myId">...</span>
-  </div>
-  <div id="chatLog"></div>
-  <div class="row">
-    <input id="peerInput" placeholder="Connect to peer ID...">
-    <button id="connectBtn">Go</button>
-  </div>
-  <div class="row">
-    <input id="msgInput" placeholder="Type message...">
-    <button id="sendBtn">Send</button>
-  </div>
+
+<div class="app-container">
+    <header>
+        <div class="brand">P2P <span>//</span> CHAT</div>
+        <div class="status">
+            <div id="statusDot" class="dot"></div>
+            <span id="statusText">OFFLINE</span>
+        </div>
+    </header>
+
+    <!-- ID Display -->
+    <div class="id-panel">
+        <div class="id-label">Your Session ID</div>
+        <div class="id-display">
+            <div class="my-id" id="myId">Generating...</div>
+            <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+    </div>
+
+    <!-- Chat Log -->
+    <div id="chatLog">
+        <div class="sys">Waiting for connection...</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-area">
+        <!-- Connect Bar -->
+        <div class="connect-row" id="connectRow">
+            <input id="peerInput" placeholder="Enter Peer ID to connect..." autocomplete="off">
+            <button id="connectBtn">Connect</button>
+        </div>
+
+        <!-- Message Bar -->
+        <div class="chat-row">
+            <input id="msgInput" placeholder="Type a message..." autocomplete="off">
+            <button id="sendBtn" disabled>
+                <i data-lucide="send-horizontal" width="20"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
-// human-readable ID generator
-const words1 = ["swift","golden","silent","happy","blue","bright","tiny","crystal","wild","frosty"];
-const words2 = ["lion","panda","falcon","whale","otter","eagle","moth","wolf","seal","deer"];
-function genID(){return `${words1[Math.floor(Math.random()*words1.length)]}-${words2[Math.floor(Math.random()*words2.length)]}-${Math.floor(Math.random()*999)}`;}
-const myId = genID();
-document.getElementById("myId").textContent = myId;
+// --- UTILS ---
+const $ = (id) => document.getElementById(id);
+const getTime = () => new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+const icons = () => lucide.createIcons();
 
-const chatLog = document.getElementById("chatLog");
-const peerInput = document.getElementById("peerInput");
-const msgInput = document.getElementById("msgInput");
-const connectBtn = document.getElementById("connectBtn");
-const sendBtn = document.getElementById("sendBtn");
-let conn;
+// --- STATE ---
+let myPeerId = null;
+let conn = null;
 
-function log(text,self=false){
-  const div=document.createElement("div");
-  div.className=`msg ${self?"self":"peer"}`;
-  div.textContent=text;
-  chatLog.appendChild(div);
-  chatLog.scrollTop=chatLog.scrollHeight;
+// --- ID GENERATOR ---
+const adj = ["Neon","Cyber","Swiss","Dark","Bold","Raw","Pure","Hyper","Mono","Flux"];
+const noun = ["Link","Node","Grid","Core","Base","Cell","Sync","Pulse","Data","Warp"];
+const genID = () => `${adj[Math.floor(Math.random()*adj.length)]}-${noun[Math.floor(Math.random()*noun.length)]}-${Math.floor(Math.random()*999)}`;
+
+// --- INIT PEER ---
+const peer = new Peer(genID());
+
+peer.on('open', (id) => {
+    myPeerId = id;
+    $('myId').textContent = id;
+    systemLog("Session Ready. Share your ID.");
+});
+
+peer.on('connection', (c) => {
+    // Incoming connection
+    if(conn) conn.close(); // Only one peer for simplicity in this version
+    setupConnection(c);
+});
+
+peer.on('error', (err) => {
+    systemLog(`Error: ${err.type}`);
+});
+
+// --- CONNECTION HANDLER ---
+function setupConnection(c) {
+    conn = c;
+    
+    conn.on('open', () => {
+        setStatus(true);
+        systemLog(`Connected to: ${conn.peer}`);
+        $('peerInput').value = conn.peer;
+        $('peerInput').disabled = true;
+        $('connectBtn').textContent = "LINKED";
+        $('sendBtn').disabled = false;
+        $('msgInput').focus();
+    });
+
+    conn.on('data', (data) => {
+        addMessage(data, 'peer');
+    });
+
+    conn.on('close', () => {
+        setStatus(false);
+        systemLog("Connection lost.");
+        $('peerInput').disabled = false;
+        $('connectBtn').textContent = "Connect";
+        $('sendBtn').disabled = true;
+        conn = null;
+    });
 }
 
-// Load PeerJS dynamically
-(async()=>{
-  if(typeof Peer==="undefined"){
-    await new Promise(res=>{
-      const s=document.createElement("script");
-      s.src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js";
-      s.onload=res;
-      document.head.appendChild(s);
+$('connectBtn').onclick = () => {
+    const pid = $('peerInput').value.trim();
+    if(!pid) return;
+    if(pid === myPeerId) return systemLog("Cannot connect to self.");
+    
+    systemLog(`Connecting to ${pid}...`);
+    const c = peer.connect(pid);
+    setupConnection(c);
+};
+
+// --- MESSAGING ---
+function sendMessage() {
+    if(!conn || !conn.open) return;
+    const txt = $('msgInput').value.trim();
+    if(!txt) return;
+    
+    conn.send(txt);
+    addMessage(txt, 'self');
+    $('msgInput').value = '';
+}
+
+$('sendBtn').onclick = sendMessage;
+$('msgInput').onkeypress = (e) => { if(e.key === "Enter") sendMessage(); };
+
+// --- UI HELPERS ---
+function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = `msg ${type}`;
+    div.innerHTML = `
+        ${text}
+        <span class="timestamp">${getTime()}</span>
+    `;
+    $('chatLog').appendChild(div);
+    scrollToBottom();
+}
+
+function systemLog(text) {
+    const div = document.createElement('div');
+    div.className = 'sys';
+    div.textContent = text;
+    $('chatLog').appendChild(div);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const log = $('chatLog');
+    log.scrollTop = log.scrollHeight;
+}
+
+function setStatus(active) {
+    const dot = $('statusDot');
+    const txt = $('statusText');
+    if(active) {
+        dot.classList.add('active');
+        txt.textContent = "ONLINE";
+        txt.style.color = "#000";
+    } else {
+        dot.classList.remove('active');
+        txt.textContent = "OFFLINE";
+        txt.style.color = "#999";
+    }
+}
+
+// --- CLIPBOARD ---
+$('copyBtn').onclick = () => {
+    navigator.clipboard.writeText(myPeerId).then(() => {
+        const original = $('copyBtn').textContent;
+        $('copyBtn').textContent = "COPIED";
+        $('copyBtn').style.background = "var(--accent)";
+        setTimeout(() => {
+            $('copyBtn').textContent = original;
+            $('copyBtn').style.background = "#000";
+        }, 1500);
     });
-  }
-  const peer=new Peer(myId);
-  peer.on("open",id=>log(`Your ID: ${id}`));
-  peer.on("connection",c=>{conn=c; setup();});
+};
 
-  connectBtn.onclick=()=>{const pid=peerInput.value.trim();if(!pid)return; conn=peer.connect(pid); setup();}
-  sendBtn.onclick=send;
-  msgInput.addEventListener("keypress",e=>e.key==="Enter"&&send());
+// Init icons
+icons();
 
-  function setup(){
-    conn.on("open",()=>log("✅ Connected to peer"));
-    conn.on("data",d=>log("Peer: "+d));
-  }
-  function send(){
-    if(!conn||!conn.open)return log("⚠️ Not connected");
-    const text=msgInput.value.trim();
-    if(!text)return;
-    conn.send(text);
-    log("You: "+text,true);
-    msgInput.value="";
-  }
-})();
 </script>
 </body>
 </html>
