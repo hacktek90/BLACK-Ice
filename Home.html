@@ -114,7 +114,7 @@ overflow:hidden;
 height:100%;
 transition:opacity .2s ease;
 }
-.split-pane.inactive{opacity:0.45;} /* keep clickable */
+.split-pane.inactive{opacity:0.45;}
 .split-pane.active{opacity:1;}
 .pane-indicator{
 position:absolute;
@@ -130,22 +130,21 @@ font-weight:800;
 letter-spacing:0.08em;
 display:none;
 backdrop-filter:blur(4px);
-/* CHANGED: Made interactive */
 pointer-events:auto;
 cursor:pointer;
 transition: all 0.2s ease;
 }
 .pane-indicator:hover {
-    background: rgba(39, 39, 42, 0.9);
-    color: white;
-    border-color: #52525b;
+background: rgba(39, 39, 42, 0.9);
+color: white;
+border-color: #52525b;
 }
 .split-view-active .pane-indicator{display:block;}
 .split-pane.active .pane-indicator{
 border-color:rgba(59,130,246,0.35);
 background:rgba(59,130,246,0.12);
 color:#60a5fa;
-pointer-events: none; /* Already active, no need to click */
+pointer-events: none;
 }
 .split-resizer{
 width:6px;
@@ -171,6 +170,16 @@ background:#52525b;
 border-radius:999px;
 }
 .split-resizer:hover::after,.split-resizer.dragging::after{background:#fff;}
+
+/* NEW: History styling in navbar */
+.no-scrollbar::-webkit-scrollbar {
+display: none;
+}
+.no-scrollbar {
+-ms-overflow-style: none;
+scrollbar-width: none;
+}
+
 @media (max-width: 768px){
 #splitResizer{display:none !important;}
 #rightPane{display:none !important;}
@@ -195,14 +204,22 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 </div>
 </div>
 </div>
+
 <!-- Mobile Header -->
 <div class="md:hidden h-14 solid-panel flex items-center justify-between px-4 z-50 shrink-0">
-<span class="font-bold text-lg tracking-tight text-white">BlackICE</span>
-<button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors">
+<div class="flex items-center gap-2 flex-1 min-w-0">
+<span class="font-bold text-lg tracking-tight text-white shrink-0">BlackICE</span>
+<div id="mobileHistoryChips" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0">
+<!-- Mobile history chips injected here -->
+</div>
+</div>
+<button id="menuBtn" class="w-8 h-8 flex items-center justify-center text-muted hover:text-white transition-colors shrink-0">
 <i data-lucide="menu" class="w-5 h-5"></i>
 </button>
 </div>
+
 <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
+
 <!-- Sidebar -->
 <aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-[#18181b] border-r border-[#27272a] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 shadow-2xl md:shadow-none overflow-hidden">
 <div class="p-3 border-b border-[#27272a] min-h-[57px]">
@@ -210,11 +227,9 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 <div class="flex items-center gap-1.5 hide-on-collapse">
 <h1 class="text-base font-bold tracking-tight text-white">Portal</h1>
 <div class="flex gap-1 items-center">
-<!-- Split View -->
 <button id="splitViewBtn" class="hidden md:flex p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Split View">
 <i data-lucide="columns-2" class="w-3.5 h-3.5"></i>
 </button>
-<!-- CHANGED: Removed targetLeftBtn and targetRightBtn from here -->
 <button id="fullscreenBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Fullscreen">
 <i data-lucide="expand" class="w-3.5 h-3.5"></i>
 </button>
@@ -258,9 +273,11 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
 </div>
 </aside>
+
 <!-- Main -->
 <main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
-<div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] flex items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden md:flex">
+<!-- Desktop History Bar: Removed 'flex', kept 'hidden'. Logic adds 'md:flex' -->
+<div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden">
 <div class="flex items-center gap-1.5 text-[#a1a1aa]">
 <i data-lucide="clock" class="w-3 h-3"></i>
 </div>
@@ -268,6 +285,7 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="text-[10px] text-[#a1a1aa]/50 italic">No recent history</span>
 </div>
 </div>
+
 <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
 <div class="flex flex-col items-center justify-center w-full max-w-lg">
 <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -293,7 +311,7 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="text-sm text-[#a1a1aa] animate-pulse mt-2 tracking-wide font-medium">Initializing Environment...</span>
 </div>
 </div>
-<!-- Split container -->
+
 <div id="splitContainer" class="flex-1 relative flex w-full h-full">
 <div id="leftPane" class="split-pane active" style="width: 100%;">
 <div class="pane-indicator" title="Set as Active Pane">LEFT</div>
@@ -305,7 +323,7 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <iframe id="portalFrame2" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
 </div>
 </div>
-<!-- Empty state -->
+
 <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
 <div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
 <div class="w-20 h-20 bg-[#18181b] rounded-3xl border border-[#27272a] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
@@ -320,10 +338,11 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 </div>
 </main>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-// Firebase
+
 const firebaseConfig = {
 apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
 authDomain: "h-90-8a7c5.firebaseapp.com",
@@ -335,7 +354,7 @@ appId: "1:367196609301:web:156e24c1b4532c26af671c"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-// Elements
+
 const els = {
 sidebar: document.getElementById('sidebar'),
 sidebarToggle: document.getElementById('sidebarToggle'),
@@ -353,6 +372,7 @@ cmdPalette: document.getElementById('cmdPalette'),
 cmdInput: document.getElementById('cmdInput'),
 cmdResults: document.getElementById('cmdResults'),
 historyChips: document.getElementById('historyChips'),
+mobileHistoryChips: document.getElementById('mobileHistoryChips'),
 historyBar: document.getElementById('historyBar'),
 splitBtn: document.getElementById('splitViewBtn'),
 splitContainer: document.getElementById('splitContainer'),
@@ -360,12 +380,12 @@ leftPane: document.getElementById('leftPane'),
 rightPane: document.getElementById('rightPane'),
 splitResizer: document.getElementById('splitResizer'),
 };
-// AutoAnimate
+
 if (window.autoAnimate && els.list) window.autoAnimate(els.list);
 if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
-// Icons
+
 lucide.createIcons();
-// Status
+
 function updateStatus() {
 const d = document.getElementById('statusDot');
 const t = document.getElementById('pingText');
@@ -383,7 +403,7 @@ t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
 window.addEventListener('online', updateStatus);
 window.addEventListener('offline', updateStatus);
 updateStatus();
-// Spotlight
+
 document.addEventListener('mousemove', (e) => {
 document.querySelectorAll('.project-card').forEach(card => {
 const rect = card.getBoundingClientRect();
@@ -391,19 +411,19 @@ card.style.setProperty('--x', `${e.clientX - rect.left}px`);
 card.style.setProperty('--y', `${e.clientY - rect.top}px`);
 });
 });
-// State
+
 let allSites = [];
 let pinnedIds = JSON.parse(localStorage.getItem('pinnedProjects') || '[]');
 let history = [];
-// Split state
 let splitViewActive = false;
-let activePane = 'left'; // best default for modern UX
+let activePane = 'left';
 let isDragging = false;
+
 function setIframePointerEvents(value) {
-// Workaround: iframes can swallow mouse events; disable during drag to keep smooth resize
 if (els.frame) els.frame.style.pointerEvents = value;
 if (els.frame2) els.frame2.style.pointerEvents = value;
 }
+
 function updatePaneVisuals() {
 if (!splitViewActive) {
 els.leftPane.classList.add('active');
@@ -420,16 +440,15 @@ els.rightPane.classList.add('active'); els.rightPane.classList.remove('inactive'
 els.leftPane.classList.add('inactive'); els.leftPane.classList.remove('active');
 }
 }
+
 function setActivePane(pane) {
 activePane = pane;
 updatePaneVisuals();
 }
 
-// CHANGED: Bind click events to the labels (indicators) directly
 document.querySelector('#leftPane .pane-indicator').onclick = () => setActivePane('left');
 document.querySelector('#rightPane .pane-indicator').onclick = () => setActivePane('right');
 
-// Split toggle
 if (els.splitBtn) {
 els.splitBtn.onclick = () => {
 if (window.innerWidth < 768) return;
@@ -441,7 +460,6 @@ els.rightPane.classList.remove('hidden');
 els.rightPane.style.width = '50%';
 els.splitResizer.classList.remove('hidden');
 els.splitBtn.classList.add('text-primary', 'bg-primary/10');
-// keep current target; visuals update
 updatePaneVisuals();
 } else {
 els.splitContainer.classList.remove('split-view-active');
@@ -456,7 +474,7 @@ setIframePointerEvents('auto');
 lucide.createIcons();
 };
 }
-// Resizer
+
 els.splitResizer.addEventListener('mousedown', () => {
 if (!splitViewActive) return;
 isDragging = true;
@@ -465,6 +483,7 @@ document.body.style.cursor = 'col-resize';
 document.body.style.userSelect = 'none';
 setIframePointerEvents('none');
 });
+
 document.addEventListener('mousemove', (e) => {
 if (!isDragging) return;
 const rect = els.splitContainer.getBoundingClientRect();
@@ -475,6 +494,7 @@ els.leftPane.style.width = `${pct}%`;
 els.rightPane.style.width = `${100 - pct}%`;
 }
 });
+
 document.addEventListener('mouseup', () => {
 if (!isDragging) return;
 isDragging = false;
@@ -484,6 +504,7 @@ document.body.style.userSelect = '';
 setIframePointerEvents('auto');
 updatePaneVisuals();
 });
+
 window.addEventListener('resize', () => {
 if (window.innerWidth < 768 && splitViewActive) {
 splitViewActive = false;
@@ -497,7 +518,7 @@ setActivePane('left');
 setIframePointerEvents('auto');
 }
 });
-// Pinning
+
 function togglePin(id, e) {
 e.stopPropagation();
 if (pinnedIds.includes(id)) pinnedIds = pinnedIds.filter(pid => pid !== id);
@@ -506,7 +527,7 @@ localStorage.setItem('pinnedProjects', JSON.stringify(pinnedIds));
 renderProjects();
 }
 window.togglePin = togglePin;
-// Command palette
+
 document.addEventListener('keydown', (e) => {
 if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 e.preventDefault();
@@ -516,13 +537,16 @@ setTimeout(() => document.getElementById('cmdContent').classList.remove('scale-9
 }
 if (e.key === 'Escape') closeCmd();
 });
+
 function closeCmd() {
 document.getElementById('cmdContent').classList.add('scale-95', 'opacity-0');
 setTimeout(() => els.cmdPalette.classList.add('hidden'), 200);
 }
+
 els.cmdPalette.addEventListener('click', (e) => {
 if (e.target === els.cmdPalette) closeCmd();
 });
+
 els.cmdInput.addEventListener('input', (e) => {
 const q = e.target.value.toLowerCase();
 const results = allSites.filter(s => (s.title || '').toLowerCase().includes(q));
@@ -533,20 +557,35 @@ els.cmdResults.innerHTML = results.slice(0, 5).map(site => `
 </button>
 `).join('');
 });
+
 window.loadProjectFromCmd = (url) => { loadProject(url); closeCmd(); };
-// History
+
 function addToHistory(title, url) {
 history = history.filter(h => h.url !== url);
 history.unshift({ title, url });
 if (history.length > 5) history.pop();
-els.historyChips.innerHTML = history.map(h => `
+  
+const historyHTML = history.map(h => `
 <button onclick="loadProject('${h.url}')"
 class="shrink-0 px-2 py-0.5 text-[10px] bg-[#18181b] border border-[#27272a] rounded hover:border-primary/50 hover:text-primary text-[#a1a1aa] transition-colors truncate max-w-[110px]">
 ${h.title}
 </button>
 `).join('');
-if (history.length > 0) els.historyBar.classList.remove('hidden');
+
+els.historyChips.innerHTML = historyHTML;
+if (history.length > 0) {
+    // UPDATED: Use md:flex to show only on desktop, keep hidden on mobile
+    els.historyBar.classList.add('md:flex');
 }
+
+els.mobileHistoryChips.innerHTML = history.map(h => `
+<button onclick="loadProject('${h.url}')"
+class="shrink-0 px-1.5 py-0.5 text-[9px] bg-[#27272a] border border-[#3f3f46] rounded hover:border-primary/50 hover:text-primary text-[#a1a1aa] transition-colors truncate max-w-[70px]">
+${h.title}
+</button>
+`).join('');
+}
+
 function convertToLocalHostUrl(url) {
 try {
 const u = new URL(url);
@@ -556,7 +595,7 @@ return window.location.origin + u.pathname;
 return url;
 }
 }
-// Load project (respects LEFT/RIGHT target)
+
 function loadProject(url, btnElement) {
 els.loader.classList.remove('hidden');
 els.empty.classList.add('hidden');
@@ -570,6 +609,7 @@ const site = allSites.find(s => convertToLocalHostUrl(s.url) === convertToLocalH
 if (site) addToHistory(site.title, url);
 }
 window.loadProject = loadProject;
+
 function createCard(site, isPinned) {
 const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
 const btn = document.createElement('button');
@@ -596,6 +636,7 @@ class="p-0.5 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white opacity-
 btn.onclick = () => loadProject(site.url, btn);
 return btn;
 }
+
 function renderProjects() {
 els.list.innerHTML = '';
 els.pinnedList.innerHTML = '';
@@ -615,7 +656,7 @@ els.pinnedSection.classList.add('hidden');
 others.forEach(site => els.list.appendChild(createCard(site, false)));
 lucide.createIcons();
 }
-// Firebase listener
+
 onValue(ref(db, 'sites'), (snapshot) => {
 const data = snapshot.val();
 if (!data) {
@@ -627,7 +668,7 @@ allSites = Object.entries(data)
 .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
 renderProjects();
 });
-// Search
+
 els.search.oninput = (e) => {
 const q = e.target.value.toLowerCase();
 document.querySelectorAll('.project-card').forEach(btn => {
@@ -635,7 +676,7 @@ const text = btn.innerText.toLowerCase();
 btn.style.display = text.includes(q) ? 'flex' : 'none';
 });
 };
-// Sidebar mobile
+
 function toggleSidebar(show) {
 if (show) {
 els.sidebar.classList.remove('-translate-x-full');
@@ -649,7 +690,7 @@ setTimeout(() => els.overlay.classList.add('hidden'), 300);
 }
 els.menuBtn && (els.menuBtn.onclick = () => toggleSidebar(true));
 els.overlay && (els.overlay.onclick = () => toggleSidebar(false));
-// Sidebar collapse
+
 let isCollapsed = false;
 if (els.sidebarToggle) {
 els.sidebarToggle.onclick = () => {
@@ -664,7 +705,7 @@ els.sidebarToggle.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"
 lucide.createIcons();
 };
 }
-// Buttons
+
 document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
 document.getElementById('goHomeBtn').onclick = () => {
 els.loader.classList.remove('hidden');
