@@ -3,376 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Persistent Stopwatch</title>
+<title>Chronometer .02</title>
+<!-- Typography: Inter Tight for that Swiss "Typography as UI" feel -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
 <style>
-:root {
-/* Primitive Color Tokens */
---color-white: rgba(255, 255, 255, 1);
---color-black: rgba(0, 0, 0, 1);
---color-cream-50: rgba(252, 252, 249, 1);
---color-gray-200: rgba(245, 245, 245, 1);
---color-slate-500: rgba(98, 108, 113, 1);
---color-charcoal-700: rgba(31, 33, 33, 1);
---color-charcoal-800: rgba(38, 40, 40, 1);
---color-slate-900: rgba(19, 52, 59, 1);
---color-teal-300: rgba(50, 184, 198, 1);
---color-teal-400: rgba(45, 166, 178, 1);
---color-teal-500: rgba(33, 128, 141, 1);
---color-teal-600: rgba(29, 116, 128, 1);
---color-red-400: rgba(255, 84, 89, 1);
---color-red-500: rgba(192, 21, 47, 1);
-/* RGB versions for opacity control */
---color-teal-500-rgb: 33, 128, 141;
---color-teal-300-rgb: 50, 184, 198;
---color-red-500-rgb: 192, 21, 47;
---color-red-400-rgb: 255, 84, 89;
-/* Semantic Color Tokens (Light Mode) */
---color-background: var(--color-cream-50);
---color-text: var(--color-slate-900);
---color-text-secondary: var(--color-slate-500);
---color-primary: var(--color-teal-500);
---color-primary-hover: var(--color-teal-600);
---color-error: var(--color-red-500);
---color-btn-primary-text: var(--color-white);
---color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
---color-border: rgba(0,0,0,0.1);
-/* Typography */
---font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
---font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
---font-size-base: 16px;
---font-weight-normal: 400;
---font-weight-bold: 600;
-/* Spacing */
---space-4: 4px;
---space-8: 8px;
---space-12: 12px;
---space-16: 16px;
---space-24: 24px;
---space-32: 32px;
-/* Border Radius */
---radius-base: 8px;
---radius-full: 9999px;
-/* Animation */
---duration-fast: 150ms;
-}
-@media (prefers-color-scheme: dark) {
-:root {
---color-background: var(--color-charcoal-700);
---color-text: var(--color-gray-200);
---color-primary: var(--color-teal-300);
---color-primary-hover: var(--color-teal-400);
---color-error: var(--color-red-400);
---color-btn-primary-text: var(--color-slate-900);
---color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
---color-border: rgba(255,255,255,0.1);
-}
-}
-@font-face {
-font-family: 'FKGroteskNeue';
-src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
-}
-body {
-margin: 0;
-font-family: var(--font-family-base);
-background-color: var(--color-background);
-color: var(--color-text);
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-min-height: 100vh;
-text-align: center;
-padding: var(--space-16);
-box-sizing: border-box;
-}
-.stopwatch-container {
-padding: var(--space-24);
-width: 100%;
-max-width: 500px;
-display: flex;
-flex-direction: column;
-align-items: center;
-}
-#display {
-font-family: var(--font-family-mono);
-font-size: 3.5rem;
-font-weight: var(--font-weight-normal);
-margin-bottom: var(--space-24);
-background: var(--color-background);
-padding: var(--space-16);
-border-radius: var(--radius-base);
-border: 1px solid var(--color-border);
-width: 100%;
-box-sizing: border-box;
-text-align: center;
-min-height: 120px;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.buttons {
-display: flex;
-flex-direction: column;
-gap: var(--space-12);
-width: 100%;
-max-width: 300px;
-}
-.btn {
-padding: var(--space-16) var(--space-24);
-font-size: var(--font-size-base);
-font-weight: var(--font-weight-bold);
-border: none;
-border-radius: var(--radius-base);
-cursor: pointer;
-transition: background-color var(--duration-fast);
-min-height: 50px;
-display: flex;
-align-items: center;
-justify-content: center;
-box-sizing: border-box;
-}
-.btn:focus-visible {
-outline: none;
-box-shadow: 0 0 0 3px var(--color-focus-ring);
-}
-#startStopBtn {
-background-color: var(--color-primary);
-color: var(--color-btn-primary-text);
-}
-#startStopBtn:hover {
-background-color: var(--color-primary-hover);
-}
-#startStopBtn.running {
-background-color: var(--color-error);
-}
-#resetBtn {
-background-color: transparent;
-color: var(--color-text-secondary);
-border: 1px solid var(--color-border);
-}
-#resetBtn:hover {
-background-color: var(--color-border);
-}
-.description {
-max-width: 600px;
-margin-top: var(--space-32);
-text-align: left;
-font-size: 0.9rem;
-color: var(--color-text-secondary);
-width: 100%;
-}
-.description h3 {
-text-align: center;
-color: var(--color-text);
-margin-bottom: var(--space-16);
-font-size: 1.2rem;
-}
-.description ul {
-list-style-type: none;
-padding: 0;
-display: flex;
-flex-direction: column;
-gap: var(--space-8);
-}
-.description li {
-padding-left: 22px;
-position: relative;
-line-height: 1.4;
-}
-.description li::before {
-content: '✓';
-position: absolute;
-left: 0;
-top: 1px;
-color: var(--color-primary);
-font-weight: var(--font-weight-bold);
-}
-/* Claim Banner */
-.claim-banner {
-background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
-color: white;
-padding: var(--space-16);
-border-radius: var(--radius-base);
-margin: var(--space-16) 0;
-width: 100%;
-max-width: 500px;
-text-align: center;
-box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-display: flex;
-align-items: center;
-justify-content: center;
-gap: var(--space-8);
-font-weight: var(--font-weight-bold);
-animation: pulse 2s infinite;
-}
-.claim-banner svg {
-width: 24px;
-height: 24px;
-}
-/* Responsive adjustments */
-@media (min-width: 768px) {
-#display {
-font-size: 5rem;
-min-height: 150px;
-}
-.buttons {
-flex-direction: row;
-max-width: 400px;
-}
-.btn {
-min-width: 120px;
-}
-.stopwatch-container {
-padding: var(--space-32);
-}
-.claim-banner {
-padding: var(--space-16) var(--space-24);
-}
-}
-@media (max-width: 480px) {
-#display {
-font-size: 2.5rem;
-}
-.btn {
-padding: var(--space-12) var(--space-16);
-font-size: 1rem;
-}
-.claim-banner {
-font-size: 0.9rem;
-}
-}
-@keyframes pulse {
-0% { box-shadow: 0 0 0 0 rgba(33, 128, 141, 0.4); }
-70% { box-shadow: 0 0 0 10px rgba(33, 128, 141, 0); }
-100% { box-shadow: 0 0 0 0 rgba(33, 128, 141, 0); }
-}
+    :root {
+        /* Palette: Swiss International Style */
+        --c-white: #ffffff;
+        --c-black: #000000;
+        --c-gray-100: #f0f0f0;
+        --c-gray-300: #cccccc;
+        
+        /* New Colors */
+        --c-accent: #0055FF; /* Royal Blue (International Style) */
+        --c-error: #D00000;   /* Deep Swiss Red */
+
+        /* Spacing & Grid */
+        --grid-gap: 1px;
+        --sp-xs: 0.5rem;
+        --sp-sm: 1rem;
+        --sp-md: 2rem;
+        --sp-lg: 4rem;
+        
+        /* Type */
+        --font-main: "Inter Tight", sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background-color: var(--c-gray-300); /* Defines the grid lines */
+        font-family: var(--font-main);
+        color: var(--c-black);
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Main Grid Layout */
+    .swiss-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 1400px;
+        background-color: var(--c-black); /* Grid line color */
+        gap: 1px; 
+        border-left: 1px solid var(--c-black);
+        border-right: 1px solid var(--c-black);
+    }
+
+    @media (min-width: 768px) {
+        .swiss-grid {
+            grid-template-columns: repeat(12, 1fr);
+            min-height: 100vh;
+        }
+    }
+
+    /* Generic Cell Styles */
+    .cell {
+        background-color: var(--c-white);
+        padding: var(--sp-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Typography Utilities */
+    .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        color: var(--c-black);
+        opacity: 0.5;
+        margin-bottom: var(--sp-xs);
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    /* HEADER SECTION */
+    .header {
+        grid-column: 1 / -1;
+        padding: var(--sp-sm) var(--sp-md);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--c-accent);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    /* STOPWATCH SECTION */
+    .section-stopwatch {
+        grid-column: 1 / -1;
+        padding: var(--sp-lg) var(--sp-md);
+        align-items: center;
+        justify-content: center;
+        min-height: 40vh;
+        position: relative;
+    }
+    
+    @media (min-width: 768px) {
+        .section-stopwatch {
+            grid-column: 1 / 9;
+        }
+    }
+
+    #display {
+        font-size: 12vw; 
+        line-height: 0.9;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+        color: var(--c-black);
+    }
+
+    @media (min-width: 768px) {
+        #display { font-size: 8rem; }
+    }
+
+    /* CONTROLS SECTION (Right Side) */
+    .section-controls {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background-color: var(--c-black);
+    }
+
+    @media (min-width: 768px) {
+        .section-controls {
+            grid-column: 9 / -1;
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+        }
+    }
+
+    /* BUTTONS */
+    .btn {
+        appearance: none;
+        border: none;
+        background: var(--c-white);
+        font-family: var(--font-main);
+        font-size: 1.25rem;
+        font-weight: 600;
+        padding: var(--sp-md);
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn:hover {
+        background-color: var(--c-gray-100);
+        padding-left: calc(var(--sp-md) + 4px);
+    }
+
+    .btn:active {
+        background-color: var(--c-gray-300);
+    }
+    
+    /* Primary Action Styles */
+    .btn-primary {
+        color: var(--c-accent);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--c-accent);
+        color: var(--c-white);
+    }
+
+    .btn-stop {
+        color: var(--c-error);
+    }
+
+    .btn-stop:hover {
+        background-color: var(--c-error);
+        color: var(--c-white);
+    }
+
+    /* TIMER SECTION (Bottom) */
+    .section-timer {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1px;
+        background-color: var(--c-black);
+    }
+
+    @media (min-width: 768px) {
+        .section-timer {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+
+    .timer-display-container {
+        grid-column: 1 / -1;
+        background: var(--c-white);
+        padding: var(--sp-md);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    
+    @media (min-width: 768px) {
+        .timer-display-container {
+            grid-column: 1 / 2;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+    }
+
+    #timerDisplay {
+        font-size: 4rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .timer-inputs {
+        background: var(--c-white);
+        padding: var(--sp-md);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--sp-sm);
+    }
+
+    .input-group {
+        display: flex;
+        gap: var(--sp-sm);
+    }
+
+    input[type="number"] {
+        width: 100%;
+        border: none;
+        border-bottom: 2px solid var(--c-gray-300);
+        font-family: var(--font-main);
+        font-size: 1.5rem;
+        font-weight: 600;
+        padding: var(--sp-xs) 0;
+        border-radius: 0;
+        outline: none;
+        transition: border-color 0.2s;
+        background: transparent;
+    }
+
+    input[type="number"]:focus {
+        border-color: var(--c-accent);
+    }
+
+    input[type="number"]::placeholder {
+        color: var(--c-gray-300);
+    }
+
+    .timer-controls {
+        background: var(--c-white);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .timer-controls .btn {
+        flex: 1;
+        border-bottom: 1px solid var(--c-gray-100);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+        0% { transform: scale(0.95); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(0.95); opacity: 0.5; }
+    }
+
 </style>
 </head>
 <body>
-<body>
-  <div class="claim-banner">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"></circle>
-      <path d="M12 6v6l4 2"></path>
-    </svg>
-    <span>Works even when you close and reopen the site!</span>
-  </div>
 
-  <div class="stopwatch-container">
-    <div id="display">00:00:00.0</div>
-    <div class="buttons">
-      <button id="startStopBtn" class="btn">Start</button>
-      <button id="resetBtn" class="btn">Reset</button>
+    <div class="swiss-grid">
+        <!-- Header -->
+        <header class="cell header">
+            <h1>CHRONO .02</h1>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>Active</span>
+            </div>
+        </header>
+
+        <!-- Main Stopwatch Display -->
+        <section class="cell section-stopwatch">
+            <div class="label">Total Elapsed Time</div>
+            <div id="display">00:00:00.0</div>
+        </section>
+
+        <!-- Stopwatch Controls -->
+        <section class="section-controls">
+            <button id="startStopBtn" class="btn btn-primary">Start</button>
+            <button id="resetBtn" class="btn">Reset</button>
+        </section>
+
+        <!-- Timer Section -->
+        <div class="section-timer">
+            <!-- Timer Display -->
+            <div class="timer-display-container">
+                <div class="label">Timer Countdown</div>
+                <div id="timerDisplay">00:00</div>
+            </div>
+
+            <!-- Timer Inputs -->
+            <div class="timer-inputs">
+                <div class="label">Set Duration</div>
+                <div class="input-group">
+                    <input id="timerMinutes" type="number" min="0" max="999" placeholder="00m" />
+                    <input id="timerSeconds" type="number" min="0" max="59" placeholder="00s" />
+                </div>
+            </div>
+
+            <!-- Timer Controls -->
+            <div class="timer-controls">
+                <button id="timerStartStopBtn" class="btn btn-primary">Start Timer</button>
+                <button id="timerResetBtn" class="btn">Reset Timer</button>
+            </div>
+        </div>
+        
+        <!-- Footer Removed as requested -->
     </div>
-  </div>
 
-  <!-- New: Timer UI -->
-  <div class="stopwatch-container" style="margin-top: 8px;">
-    <!-- MODIFIED: Adjusted style for surrounding UI -->
-    <div id="timerDisplay" style="font-family: var(--font-family-mono); font-size: 2.5rem; padding: var(--space-16); border-radius: var(--radius-base); border: 2px solid var(--color-primary); box-shadow: 0 0 8px rgba(var(--color-teal-500-rgb), 0.3); min-height: 72px; display: flex; align-items: center; justify-content: center; transition: box-shadow 0.3s;">
-      00:00
-    </div>
-
-    <div class="buttons" style="margin-top: 8px;">
-      <input id="timerMinutes" type="number" min="0" max="999" placeholder="Min" style="flex:1; padding: 12px; border-radius: 8px; border:1px solid var(--color-border);" />
-      <input id="timerSeconds" type="number" min="0" max="59" placeholder="Sec" style="flex:1; padding: 12px; border-radius: 8px; border:1px solid var(--color-border);" />
-    </div>
-
-    <div class="buttons" style="margin-top: 8px;">
-      <button id="timerStartStopBtn" class="btn">Start timer</button>
-      <button id="timerResetBtn" class="btn">Reset timer</button>
-    </div>
-  </div>
-
-  <div class="description">
-    <h3>Page Features</h3>
-    <ul>
-      <li><strong>Minimal UI:</strong> A large, clear display and simple Start/Stop and Reset buttons for straightforward operation.</li>
-      <li><strong>Persistent State:</strong> Remembers the time across browser sessions and even computer restarts using local storage.</li>
-      <li><strong>Accurate Timing:</strong> Calculates elapsed time based on the initial start timestamp, ensuring accuracy even if the page is closed.</li>
-      <li><strong>Start/Stop Toggle:</strong> A single button conveniently toggles the timer's state, changing color to indicate if it's running.</li>
-      <li><strong>Reset Function:</strong> Easily clears the timer and its stored state to begin a new timing session.</li>
-      <li><strong>Adaptive Theme:</strong> Automatically switches between light and dark mode to match your system's preference.</li>
-    </ul>
-  </div>
-
-  <script>
-    // ====== Existing Stopwatch Code (unchanged) ======
+<script>
+    // ====== Stopwatch Logic ======
     const display = document.getElementById('display');
     const startStopBtn = document.getElementById('startStopBtn');
     const resetBtn = document.getElementById('resetBtn');
+    
     let startTime;
     let elapsedTime = 0;
     let timerInterval;
     let running = false;
 
     function formatTime(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      const tenths = Math.floor((ms % 1000) / 100);
-      return [
-        hours.toString().padStart(2, '0'),
-        minutes.toString().padStart(2, '0'),
-        seconds.toString().padStart(2, '0')
-      ].join(':') + '.' + tenths;
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const tenths = Math.floor((ms % 1000) / 100);
+        
+        return [
+            hours.toString().padStart(2, '0'),
+            minutes.toString().padStart(2, '0'),
+            seconds.toString().padStart(2, '0')
+        ].join(':') + '.' + tenths;
     }
+
     function updateDisplay() {
-      const currentTime = Date.now();
-      elapsedTime = currentTime - startTime;
-      display.textContent = formatTime(elapsedTime);
+        const currentTime = Date.now();
+        elapsedTime = currentTime - startTime;
+        display.textContent = formatTime(elapsedTime);
+        document.title = formatTime(elapsedTime) + " - Chrono";
     }
+
     function start() {
-      startTime = Date.now() - elapsedTime;
-      localStorage.setItem('stopwatchStartTime', startTime);
-      localStorage.setItem('stopwatchRunning', 'true');
-      timerInterval = setInterval(updateDisplay, 100);
-      startStopBtn.textContent = 'Stop';
-      startStopBtn.classList.add('running');
-      running = true;
+        startTime = Date.now() - elapsedTime;
+        localStorage.setItem('stopwatchStartTime', startTime);
+        localStorage.setItem('stopwatchRunning', 'true');
+        
+        timerInterval = setInterval(updateDisplay, 100);
+        
+        startStopBtn.textContent = 'Stop';
+        startStopBtn.classList.add('btn-stop');
+        startStopBtn.classList.remove('btn-primary');
+        running = true;
     }
+
     function stop() {
-      clearInterval(timerInterval);
-      localStorage.removeItem('stopwatchStartTime');
-      localStorage.setItem('stopwatchElapsedTime', elapsedTime);
-      localStorage.setItem('stopwatchRunning', 'false');
-      startStopBtn.textContent = 'Start';
-      startStopBtn.classList.remove('running');
-      running = false;
+        clearInterval(timerInterval);
+        localStorage.removeItem('stopwatchStartTime');
+        localStorage.setItem('stopwatchElapsedTime', elapsedTime);
+        localStorage.setItem('stopwatchRunning', 'false');
+        
+        startStopBtn.textContent = 'Start';
+        startStopBtn.classList.remove('btn-stop');
+        startStopBtn.classList.add('btn-primary');
+        document.title = "Chronometer .02";
+        running = false;
     }
+
     function reset() {
-      clearInterval(timerInterval);
-      localStorage.removeItem('stopwatchStartTime');
-      localStorage.removeItem('stopwatchElapsedTime');
-      localStorage.removeItem('stopwatchRunning');
-      elapsedTime = 0;
-      display.textContent = formatTime(0);
-      startStopBtn.textContent = 'Start';
-      startStopBtn.classList.remove('running');
-      running = false;
+        stop();
+        localStorage.removeItem('stopwatchElapsedTime');
+        elapsedTime = 0;
+        display.textContent = formatTime(0);
+        startStopBtn.textContent = 'Start';
+        startStopBtn.classList.remove('btn-stop');
+        startStopBtn.classList.add('btn-primary');
     }
+
     function loadState() {
-      const isRunning = localStorage.getItem('stopwatchRunning') === 'true';
-      if (isRunning) {
-        const storedStartTime = parseInt(localStorage.getItem('stopwatchStartTime'), 10);
-        if (!isNaN(storedStartTime)) {
-          elapsedTime = Date.now() - storedStartTime;
-          start();
+        const isRunning = localStorage.getItem('stopwatchRunning') === 'true';
+        if (isRunning) {
+            const storedStartTime = parseInt(localStorage.getItem('stopwatchStartTime'), 10);
+            if (!isNaN(storedStartTime)) {
+                elapsedTime = Date.now() - storedStartTime;
+                start();
+            }
+        } else {
+            const storedElapsedTime = parseInt(localStorage.getItem('stopwatchElapsedTime'), 10);
+            if (!isNaN(storedElapsedTime)) {
+                elapsedTime = storedElapsedTime;
+                display.textContent = formatTime(elapsedTime);
+            }
         }
-      } else {
-        const storedElapsedTime = parseInt(localStorage.getItem('stopwatchElapsedTime'), 10);
-        if (!isNaN(storedElapsedTime)) {
-          elapsedTime = storedElapsedTime;
-          display.textContent = formatTime(elapsedTime);
-        }
-      }
     }
+
     startStopBtn.addEventListener('click', () => { if (running) { stop(); } else { start(); } });
     resetBtn.addEventListener('click', reset);
     window.addEventListener('load', loadState);
 
-    // ====== New: Timer feature with vibrate+beep ======
+
+    // ====== Timer Logic ======
     const timerDisplay = document.getElementById('timerDisplay');
     const timerStartStopBtn = document.getElementById('timerStartStopBtn');
     const timerResetBtn = document.getElementById('timerResetBtn');
@@ -383,155 +458,151 @@ font-size: 0.9rem;
     let countdownRunning = false;
     let countdownEndTime = null;
     let countdownFired = false;
-
-    // Web Audio: create/resume only after a user gesture
     let audioCtx = null;
+
     function ensureAudioContext() {
-      if (!audioCtx) {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (Ctx) audioCtx = new Ctx();
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+        if (!audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) audioCtx = new Ctx();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
     }
+
     function playBeep(duration = 250, frequency = 880, volume = 0.2) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = frequency;
-      gain.gain.value = volume;
-      osc.connect(gain).connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-      osc.start(now);
-      osc.stop(now + duration / 1000);
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.value = volume;
+        osc.connect(gain).connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        osc.start(now);
+        osc.stop(now + duration / 1000);
     }
 
-    // MODIFIED: Changed to a single 4-second beep
-    function beepPattern() {
-      // A single 4-second long beep at a pleasant frequency.
-      // The playBeep function takes duration in milliseconds.
-      playBeep(4000, 660, 0.2);
-    }
-
-    function vibratePattern() {
-      if ('vibrate' in navigator) {
-        // Short pattern; ignored on unsupported devices
-        navigator.vibrate([300, 150, 300, 150, 500]);
-      }
+    function triggerAlarm() {
+        playBeep(4000, 660, 0.2); 
+        if ('vibrate' in navigator) {
+            navigator.vibrate([300, 150, 300, 150, 500]);
+        }
     }
 
     function formatMMSS(ms) {
-      const total = Math.max(0, Math.floor(ms / 1000));
-      const mm = Math.floor(total / 60).toString().padStart(2, '0');
-      const ss = (total % 60).toString().padStart(2, '0');
-      return `${mm}:${ss}`;
+        const total = Math.max(0, Math.floor(ms / 1000));
+        const mm = Math.floor(total / 60).toString().padStart(2, '0');
+        const ss = (total % 60).toString().padStart(2, '0');
+        return `${mm}:${ss}`;
     }
 
     function updateTimerTick() {
-      const remaining = countdownEndTime - Date.now();
-      timerDisplay.textContent = formatMMSS(remaining);
-      if (remaining <= 0) {
-        stopTimerInternal(true);
-      }
+        const remaining = countdownEndTime - Date.now();
+        timerDisplay.textContent = formatMMSS(remaining);
+        if (remaining <= 0) {
+            stopTimerInternal(true);
+        }
     }
 
     function startTimer() {
-      // Prepare audio on user gesture to satisfy autoplay policy
-      ensureAudioContext();
-      const m = parseInt(timerMinutes.value || '0', 10);
-      const s = parseInt(timerSeconds.value || '0', 10);
-      const totalMs = (isNaN(m) ? 0 : m) * 60000 + (isNaN(s) ? 0 : Math.min(59, s)) * 1000;
-      if (totalMs <= 0) return;
+        ensureAudioContext();
+        const m = parseInt(timerMinutes.value || '0', 10);
+        const s = parseInt(timerSeconds.value || '0', 10);
+        const totalMs = (isNaN(m) ? 0 : m) * 60000 + (isNaN(s) ? 0 : Math.min(59, s)) * 1000;
+        
+        if (totalMs <= 0) return;
 
-      countdownEndTime = Date.now() + totalMs;
-      countdownFired = false;
-      localStorage.setItem('countdownEndTime', String(countdownEndTime));
-      localStorage.setItem('countdownRunning', 'true');
-      localStorage.setItem('countdownFired', 'false');
-
-      timerDisplay.textContent = formatMMSS(totalMs);
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(updateTimerTick, 200);
-      timerStartStopBtn.textContent = 'Stop timer';
-      timerStartStopBtn.classList.add('running');
-      countdownRunning = true;
+        countdownEndTime = Date.now() + totalMs;
+        countdownFired = false;
+        
+        localStorage.setItem('countdownEndTime', String(countdownEndTime));
+        localStorage.setItem('countdownRunning', 'true');
+        localStorage.setItem('countdownFired', 'false');
+        
+        timerDisplay.textContent = formatMMSS(totalMs);
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(updateTimerTick, 200);
+        
+        timerStartStopBtn.textContent = 'Stop Timer';
+        timerStartStopBtn.classList.add('btn-stop');
+        timerStartStopBtn.classList.remove('btn-primary');
+        countdownRunning = true;
     }
 
     function stopTimerInternal(fireAlert) {
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = null;
-      timerStartStopBtn.textContent = 'Start timer';
-      timerStartStopBtn.classList.remove('running');
-      countdownRunning = false;
-
-      // Clear persisted running, but keep last end to determine 00:00 display
-      localStorage.setItem('countdownRunning', 'false');
-
-      if (fireAlert && !countdownFired) {
-        countdownFired = true;
-        localStorage.setItem('countdownFired', 'true');
-        vibratePattern();
-        beepPattern();
-        timerDisplay.textContent = '00:00';
-      }
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = null;
+        
+        timerStartStopBtn.textContent = 'Start Timer';
+        timerStartStopBtn.classList.remove('btn-stop');
+        timerStartStopBtn.classList.add('btn-primary');
+        countdownRunning = false;
+        
+        localStorage.setItem('countdownRunning', 'false');
+        
+        if (fireAlert && !countdownFired) {
+            countdownFired = true;
+            localStorage.setItem('countdownFired', 'true');
+            triggerAlarm();
+            timerDisplay.textContent = '00:00';
+        }
     }
 
     function stopTimer() {
-      stopTimerInternal(false);
+        stopTimerInternal(false);
     }
 
     function resetTimer() {
-      stopTimerInternal(false);
-      countdownEndTime = null;
-      countdownFired = false;
-      timerDisplay.textContent = '00:00';
-      timerMinutes.value = '';
-      timerSeconds.value = '';
-      localStorage.removeItem('countdownEndTime');
-      localStorage.removeItem('countdownRunning');
-      localStorage.removeItem('countdownFired');
+        stopTimerInternal(false);
+        countdownEndTime = null;
+        countdownFired = false;
+        timerDisplay.textContent = '00:00';
+        timerMinutes.value = '';
+        timerSeconds.value = '';
+        
+        localStorage.removeItem('countdownEndTime');
+        localStorage.removeItem('countdownRunning');
+        localStorage.removeItem('countdownFired');
     }
 
     function loadTimerState() {
-      const running = localStorage.getItem('countdownRunning') === 'true';
-      const fired = localStorage.getItem('countdownFired') === 'true';
-      const end = parseInt(localStorage.getItem('countdownEndTime') || 'NaN', 10);
-      if (!isNaN(end)) {
-        countdownEndTime = end;
-        const remaining = end - Date.now();
-        if (running && remaining > 0) {
-          timerDisplay.textContent = formatMMSS(remaining);
-          if (countdownInterval) clearInterval(countdownInterval);
-          countdownInterval = setInterval(updateTimerTick, 200);
-          timerStartStopBtn.textContent = 'Stop timer';
-          timerStartStopBtn.classList.add('running');
-          countdownRunning = true;
-        } else if (running && remaining <= 0 && !fired) {
-          // Timer expired while away; fire once
-          countdownRunning = false;
-          countdownFired = true;
-          localStorage.setItem('countdownRunning', 'false');
-          localStorage.setItem('countdownFired', 'true');
-          vibratePattern();
-          // Only attempt audio after a click; UI will beep after next user gesture if blocked
-          timerDisplay.textContent = '00:00';
-        } else {
-          timerDisplay.textContent = remaining > 0 ? formatMMSS(remaining) : '00:00';
-          countdownRunning = false;
+        const running = localStorage.getItem('countdownRunning') === 'true';
+        const fired = localStorage.getItem('countdownFired') === 'true';
+        const end = parseInt(localStorage.getItem('countdownEndTime') || 'NaN', 10);
+
+        if (!isNaN(end)) {
+            countdownEndTime = end;
+            const remaining = end - Date.now();
+            
+            if (running && remaining > 0) {
+                timerDisplay.textContent = formatMMSS(remaining);
+                if (countdownInterval) clearInterval(countdownInterval);
+                countdownInterval = setInterval(updateTimerTick, 200);
+                timerStartStopBtn.textContent = 'Stop Timer';
+                timerStartStopBtn.classList.add('btn-stop');
+                timerStartStopBtn.classList.remove('btn-primary');
+                countdownRunning = true;
+            } else if (running && remaining <= 0 && !fired) {
+                countdownRunning = false;
+                countdownFired = true;
+                localStorage.setItem('countdownRunning', 'false');
+                localStorage.setItem('countdownFired', 'true');
+                triggerAlarm(); 
+                timerDisplay.textContent = '00:00';
+            } else {
+                timerDisplay.textContent = remaining > 0 ? formatMMSS(remaining) : '00:00';
+                countdownRunning = false;
+            }
         }
-      }
     }
 
     timerStartStopBtn.addEventListener('click', () => {
-      // User gesture here allows resuming AudioContext on first interaction
-      ensureAudioContext();
-      if (countdownRunning) stopTimer(); else startTimer();
+        ensureAudioContext();
+        if (countdownRunning) stopTimer(); else startTimer();
     });
     timerResetBtn.addEventListener('click', resetTimer);
     window.addEventListener('load', loadTimerState);
-  </script>
+</script>
 </body>
-
 </html>
