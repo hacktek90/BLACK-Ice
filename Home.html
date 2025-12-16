@@ -5,9 +5,8 @@
 <title>BlackICE Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
-  <link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
+<link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
 <link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -173,7 +172,6 @@ background:#52525b;
 border-radius:999px;
 }
 .split-resizer:hover::after,.split-resizer.dragging::after{background:#fff;}
-
 /* NEW: History styling in navbar */
 .no-scrollbar::-webkit-scrollbar {
 display: none;
@@ -182,7 +180,6 @@ display: none;
 -ms-overflow-style: none;
 scrollbar-width: none;
 }
-
 @media (max-width: 768px){
 #splitResizer{display:none !important;}
 #rightPane{display:none !important;}
@@ -207,7 +204,6 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 </div>
 </div>
 </div>
-
 <!-- Mobile Header -->
 <div class="md:hidden h-14 solid-panel flex items-center justify-between px-4 z-50 shrink-0">
 <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -220,9 +216,7 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 <i data-lucide="menu" class="w-5 h-5"></i>
 </button>
 </div>
-
 <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
-
 <!-- Sidebar -->
 <aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-[#18181b] border-r border-[#27272a] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 shadow-2xl md:shadow-none overflow-hidden">
 <div class="p-3 border-b border-[#27272a] min-h-[57px]">
@@ -269,14 +263,18 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 </div>
 <div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse">
-<div class="flex items-center gap-1.5">
-<span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
-<span id="pingText" class="hide-on-collapse text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
-</div>
-<span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
+    <div class="flex items-center gap-2">
+        <button id="homeBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Go Home">
+            <i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+        </button>
+        <div class="flex items-center gap-1.5 hide-on-collapse">
+            <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
+            <span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
+        </div>
+    </div>
+    <span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
 </div>
 </aside>
-
 <!-- Main -->
 <main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
 <!-- Desktop History Bar: Removed 'flex', kept 'hidden'. Logic adds 'md:flex' -->
@@ -288,7 +286,6 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="text-[10px] text-[#a1a1aa]/50 italic">No recent history</span>
 </div>
 </div>
-
 <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
 <div class="flex flex-col items-center justify-center w-full max-w-lg">
 <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -314,7 +311,6 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="text-sm text-[#a1a1aa] animate-pulse mt-2 tracking-wide font-medium">Initializing Environment...</span>
 </div>
 </div>
-
 <div id="splitContainer" class="flex-1 relative flex w-full h-full">
 <div id="leftPane" class="split-pane active" style="width: 100%;">
 <div class="pane-indicator" title="Set as Active Pane">LEFT</div>
@@ -326,7 +322,6 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <iframe id="portalFrame2" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
 </div>
 </div>
-
 <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
 <div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
 <div class="w-20 h-20 bg-[#18181b] rounded-3xl border border-[#27272a] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
@@ -334,30 +329,23 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 <h2 class="text-3xl font-black mb-2 text-white tracking-tight">Welcome Back</h2>
 <p class="text-[#a1a1aa] mb-8 text-sm">Select a tool from the sidebar.</p>
-<button id="goHomeBtn" class="group flex items-center gap-3 px-6 py-3 bg-[#18181b] hover:bg-[#1e1e22] border border-[#27272a] hover:border-primary/50 rounded-xl transition-all duration-200 shadow-xl hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] pointer-events-auto">
-<i data-lucide="home" class="w-4 h-4 text-[#a1a1aa] group-hover:text-primary transition-colors"></i>
-<span class="text-sm font-bold text-[#e4e4e7] group-hover:text-primary transition-colors">Go to Dashboard</span>
-</button>
 </div>
 </div>
 </main>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
 const firebaseConfig = {
 apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
 authDomain: "h-90-8a7c5.firebaseapp.com",
 databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
 projectId: "h-90-8a7c5",
-storageBucket: "h-90-8a7c5.firebasestorage.app",
+storageBucket: "h-90-8a7c5.appspot.com",
 messagingSenderId: "367196609301",
 appId: "1:367196609301:web:156e24c1b4532c26af671c"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 const els = {
 sidebar: document.getElementById('sidebar'),
 sidebarToggle: document.getElementById('sidebarToggle'),
@@ -383,12 +371,9 @@ leftPane: document.getElementById('leftPane'),
 rightPane: document.getElementById('rightPane'),
 splitResizer: document.getElementById('splitResizer'),
 };
-
 if (window.autoAnimate && els.list) window.autoAnimate(els.list);
 if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
-
 lucide.createIcons();
-
 function updateStatus() {
 const d = document.getElementById('statusDot');
 const t = document.getElementById('pingText');
@@ -406,7 +391,6 @@ t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
 window.addEventListener('online', updateStatus);
 window.addEventListener('offline', updateStatus);
 updateStatus();
-
 document.addEventListener('mousemove', (e) => {
 document.querySelectorAll('.project-card').forEach(card => {
 const rect = card.getBoundingClientRect();
@@ -414,19 +398,16 @@ card.style.setProperty('--x', `${e.clientX - rect.left}px`);
 card.style.setProperty('--y', `${e.clientY - rect.top}px`);
 });
 });
-
 let allSites = [];
 let pinnedIds = JSON.parse(localStorage.getItem('pinnedProjects') || '[]');
 let history = [];
 let splitViewActive = false;
 let activePane = 'left';
 let isDragging = false;
-
 function setIframePointerEvents(value) {
 if (els.frame) els.frame.style.pointerEvents = value;
 if (els.frame2) els.frame2.style.pointerEvents = value;
 }
-
 function updatePaneVisuals() {
 if (!splitViewActive) {
 els.leftPane.classList.add('active');
@@ -443,15 +424,12 @@ els.rightPane.classList.add('active'); els.rightPane.classList.remove('inactive'
 els.leftPane.classList.add('inactive'); els.leftPane.classList.remove('active');
 }
 }
-
 function setActivePane(pane) {
 activePane = pane;
 updatePaneVisuals();
 }
-
 document.querySelector('#leftPane .pane-indicator').onclick = () => setActivePane('left');
 document.querySelector('#rightPane .pane-indicator').onclick = () => setActivePane('right');
-
 if (els.splitBtn) {
 els.splitBtn.onclick = () => {
 if (window.innerWidth < 768) return;
@@ -477,7 +455,6 @@ setIframePointerEvents('auto');
 lucide.createIcons();
 };
 }
-
 els.splitResizer.addEventListener('mousedown', () => {
 if (!splitViewActive) return;
 isDragging = true;
@@ -486,7 +463,6 @@ document.body.style.cursor = 'col-resize';
 document.body.style.userSelect = 'none';
 setIframePointerEvents('none');
 });
-
 document.addEventListener('mousemove', (e) => {
 if (!isDragging) return;
 const rect = els.splitContainer.getBoundingClientRect();
@@ -497,7 +473,6 @@ els.leftPane.style.width = `${pct}%`;
 els.rightPane.style.width = `${100 - pct}%`;
 }
 });
-
 document.addEventListener('mouseup', () => {
 if (!isDragging) return;
 isDragging = false;
@@ -507,7 +482,6 @@ document.body.style.userSelect = '';
 setIframePointerEvents('auto');
 updatePaneVisuals();
 });
-
 window.addEventListener('resize', () => {
 if (window.innerWidth < 768 && splitViewActive) {
 splitViewActive = false;
@@ -521,7 +495,6 @@ setActivePane('left');
 setIframePointerEvents('auto');
 }
 });
-
 function togglePin(id, e) {
 e.stopPropagation();
 if (pinnedIds.includes(id)) pinnedIds = pinnedIds.filter(pid => pid !== id);
@@ -530,7 +503,6 @@ localStorage.setItem('pinnedProjects', JSON.stringify(pinnedIds));
 renderProjects();
 }
 window.togglePin = togglePin;
-
 document.addEventListener('keydown', (e) => {
 if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 e.preventDefault();
@@ -540,16 +512,13 @@ setTimeout(() => document.getElementById('cmdContent').classList.remove('scale-9
 }
 if (e.key === 'Escape') closeCmd();
 });
-
 function closeCmd() {
 document.getElementById('cmdContent').classList.add('scale-95', 'opacity-0');
 setTimeout(() => els.cmdPalette.classList.add('hidden'), 200);
 }
-
 els.cmdPalette.addEventListener('click', (e) => {
 if (e.target === els.cmdPalette) closeCmd();
 });
-
 els.cmdInput.addEventListener('input', (e) => {
 const q = e.target.value.toLowerCase();
 const results = allSites.filter(s => (s.title || '').toLowerCase().includes(q));
@@ -560,27 +529,22 @@ els.cmdResults.innerHTML = results.slice(0, 5).map(site => `
 </button>
 `).join('');
 });
-
 window.loadProjectFromCmd = (url) => { loadProject(url); closeCmd(); };
-
 function addToHistory(title, url) {
 history = history.filter(h => h.url !== url);
 history.unshift({ title, url });
 if (history.length > 5) history.pop();
-  
 const historyHTML = history.map(h => `
 <button onclick="loadProject('${h.url}')"
 class="shrink-0 px-2 py-0.5 text-[10px] bg-[#18181b] border border-[#27272a] rounded hover:border-primary/50 hover:text-primary text-[#a1a1aa] transition-colors truncate max-w-[110px]">
 ${h.title}
 </button>
 `).join('');
-
 els.historyChips.innerHTML = historyHTML;
 if (history.length > 0) {
-    // UPDATED: Use md:flex to show only on desktop, keep hidden on mobile
-    els.historyBar.classList.add('md:flex');
+// UPDATED: Use md:flex to show only on desktop, keep hidden on mobile
+els.historyBar.classList.add('md:flex');
 }
-
 els.mobileHistoryChips.innerHTML = history.map(h => `
 <button onclick="loadProject('${h.url}')"
 class="shrink-0 px-1.5 py-0.5 text-[9px] bg-[#27272a] border border-[#3f3f46] rounded hover:border-primary/50 hover:text-primary text-[#a1a1aa] transition-colors truncate max-w-[70px]">
@@ -588,7 +552,6 @@ ${h.title}
 </button>
 `).join('');
 }
-
 function convertToLocalHostUrl(url) {
 try {
 const u = new URL(url);
@@ -598,7 +561,6 @@ return window.location.origin + u.pathname;
 return url;
 }
 }
-
 function loadProject(url, btnElement) {
 els.loader.classList.remove('hidden');
 els.empty.classList.add('hidden');
@@ -612,7 +574,6 @@ const site = allSites.find(s => convertToLocalHostUrl(s.url) === convertToLocalH
 if (site) addToHistory(site.title, url);
 }
 window.loadProject = loadProject;
-
 function createCard(site, isPinned) {
 const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
 const btn = document.createElement('button');
@@ -639,7 +600,6 @@ class="p-0.5 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white opacity-
 btn.onclick = () => loadProject(site.url, btn);
 return btn;
 }
-
 function renderProjects() {
 els.list.innerHTML = '';
 els.pinnedList.innerHTML = '';
@@ -659,7 +619,6 @@ els.pinnedSection.classList.add('hidden');
 others.forEach(site => els.list.appendChild(createCard(site, false)));
 lucide.createIcons();
 }
-
 onValue(ref(db, 'sites'), (snapshot) => {
 const data = snapshot.val();
 if (!data) {
@@ -671,7 +630,6 @@ allSites = Object.entries(data)
 .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
 renderProjects();
 });
-
 els.search.oninput = (e) => {
 const q = e.target.value.toLowerCase();
 document.querySelectorAll('.project-card').forEach(btn => {
@@ -679,7 +637,6 @@ const text = btn.innerText.toLowerCase();
 btn.style.display = text.includes(q) ? 'flex' : 'none';
 });
 };
-
 function toggleSidebar(show) {
 if (show) {
 els.sidebar.classList.remove('-translate-x-full');
@@ -693,7 +650,6 @@ setTimeout(() => els.overlay.classList.add('hidden'), 300);
 }
 els.menuBtn && (els.menuBtn.onclick = () => toggleSidebar(true));
 els.overlay && (els.overlay.onclick = () => toggleSidebar(false));
-
 let isCollapsed = false;
 if (els.sidebarToggle) {
 els.sidebarToggle.onclick = () => {
@@ -708,12 +664,14 @@ els.sidebarToggle.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"
 lucide.createIcons();
 };
 }
-
 document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
-document.getElementById('goHomeBtn').onclick = () => {
-els.loader.classList.remove('hidden');
-els.empty.classList.add('hidden');
-els.frame.src = window.location.origin + '/index.html';
+document.getElementById('homeBtn').onclick = () => {
+    els.loader.classList.remove('hidden');
+    els.empty.classList.add('hidden');
+    const targetFrame = (splitViewActive && activePane === 'right') ? els.frame2 : els.frame;
+    targetFrame.src = '/index.html';
+    targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
+    addToHistory('Home', '/index.html');
 };
 document.getElementById('fullscreenBtn').onclick = () => {
 if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
