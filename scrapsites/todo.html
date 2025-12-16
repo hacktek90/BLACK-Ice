@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Swiss Task 2025 Mobile</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter Tight -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter Tight"', 'sans-serif'],
+                    },
+                    colors: {
+                        'swiss-red': '#FF3B30',
+                        'swiss-offwhite': '#F5F5F7',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        /* Checkbox Logic */
+        .task-checkbox:checked + span {
+            text-decoration: line-through;
+            color: #D1D5DB; 
+        }
+
+        /* Mobile Tap Highlight Removal */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smooth iOS Scrolling */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-white text-black font-sans min-h-screen selection:bg-swiss-red selection:text-white pb-24 md:pb-0">
+
+    <!-- MAIN GRID CONTAINER -->
+    <div class="max-w-screen-xl mx-auto px-6 md:px-12 py-8 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-8">
+
+        <!-- HEADER & NAVIGATION WRAPPER -->
+        <header class="md:col-span-4 flex flex-col justify-between h-auto md:h-[80vh] md:sticky md:top-12 z-50">
+            
+            <!-- BRANDING -->
+            <div class="mb-6 md:mb-0">
+                <h1 class="text-7xl md:text-9xl font-bold tracking-tighter leading-[0.85] mb-2 md:mb-4">
+                    TO<br>DO.
+                </h1>
+                <p class="text-xs md:text-sm font-medium tracking-widest uppercase mt-2 text-gray-400">
+                    Ready
+                </p>
+            </div>
+
+            <!-- MOBILE NAV: Sticky Horizontal Scroll -->
+            <!-- DESKTOP NAV: Vertical Stack -->
+            <nav class="sticky top-0 bg-white/95 backdrop-blur-sm py-4 md:py-0 md:static md:mt-0 w-[calc(100%+3rem)] -ml-6 px-6 md:w-auto md:ml-0 md:px-0 border-b border-gray-100 md:border-none flex md:flex-col items-center md:items-start gap-6 md:gap-2 overflow-x-auto no-scrollbar snap-x whitespace-nowrap">
+                
+                <button onclick="filterTasks('all')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-black" data-filter="all">All</button>
+                <button onclick="filterTasks('active')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-gray-300" data-filter="active">Active</button>
+                <button onclick="filterTasks('completed')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-gray-300" data-filter="completed">Done</button>
+                
+                <!-- Spacer for Mobile Scroll -->
+                <div class="w-4 md:hidden"></div>
+
+                <!-- Desktop Spacer -->
+                <div class="hidden md:block h-8"></div> 
+                
+                <button onclick="clearCompleted()" class="hidden md:block text-sm font-bold uppercase tracking-widest hover:text-swiss-red transition-colors text-gray-400 text-left">
+                    Clear Completed
+                </button>
+            </nav>
+
+            <!-- Stats (Desktop Only mostly, or bottom of list on mobile) -->
+            <div class="hidden md:block text-xs text-gray-300 mt-8">
+                <span id="items-left">0</span> ITEMS LEFT
+            </div>
+        </header>
+
+        <!-- MAIN TASK LIST SECTION -->
+        <main class="md:col-span-8 relative mt-4 md:mt-0">
+            
+            <!-- INPUT AREA -->
+            <div class="mb-8 md:mb-16 input-group group relative">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    placeholder="New task..." 
+                    class="w-full text-4xl md:text-5xl font-medium placeholder-gray-200 border-none outline-none bg-transparent py-4 rounded-none"
+                    onkeydown="handleEnter(event)"
+                    autocomplete="off"
+                >
+                <!-- Dynamic Line -->
+                <div class="input-line h-1 w-8 md:w-12 bg-black transition-all duration-500 ease-out group-focus-within:w-full group-focus-within:bg-swiss-red"></div>
+            </div>
+
+            <!-- LIST -->
+            <ul id="taskList" class="space-y-0 pb-20 md:pb-0">
+                <!-- Tasks Injected Here -->
+            </ul>
+
+            <!-- EMPTY STATE -->
+            <div id="emptyState" class="hidden mt-12 text-center md:text-left">
+                <p class="text-lg md:text-xl text-gray-300 font-light">No tasks pending.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MOBILE FLOATING ACTION (Optional for easier clearing on mobile) -->
+    <div class="md:hidden fixed bottom-6 right-6 z-40">
+        <button onclick="clearCompleted()" class="bg-black text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('swissTodos')) || [];
+        let currentFilter = 'all';
+
+        const taskListEl = document.getElementById('taskList');
+        const itemsLeftEl = document.getElementById('items-left');
+        const inputEl = document.getElementById('taskInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        render();
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') addTask();
+        }
+
+        function addTask() {
+            const text = inputEl.value.trim();
+            if (!text) return;
+            // Prevent duplicate rapid entry
+            if(tasks.length > 0 && tasks[0].text === text) return;
+
+            const newTask = {
+                id: Date.now(),
+                text: text,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+
+            tasks.unshift(newTask);
+            saveAndRender();
+            inputEl.value = '';
+            // Keep focus on mobile? often better to blur to hide keyboard
+            // inputEl.blur(); 
+        }
+
+        function toggleTask(id) {
+            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveAndRender();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRender();
+        }
+
+        function clearCompleted() {
+            tasks = tasks.filter(t => !t.completed);
+            saveAndRender();
+        }
+
+        function filterTasks(filterType) {
+            currentFilter = filterType;
+            filterBtns.forEach(btn => {
+                const isActive = btn.dataset.filter === filterType;
+                btn.className = `filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors ${isActive ? 'text-black' : 'text-gray-300'}`;
+            });
+            render();
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('swissTodos', JSON.stringify(tasks));
+            render();
+        }
+
+        function render() {
+            if(itemsLeftEl) itemsLeftEl.innerText = tasks.filter(t => !t.completed).length;
+
+            let visibleTasks = tasks;
+            if (currentFilter === 'active') visibleTasks = tasks.filter(t => !t.completed);
+            if (currentFilter === 'completed') visibleTasks = tasks.filter(t => t.completed);
+
+            const emptyStateEl = document.getElementById('emptyState');
+            
+            if (visibleTasks.length === 0) {
+                taskListEl.innerHTML = '';
+                emptyStateEl.classList.remove('hidden');
+                emptyStateEl.innerText = tasks.length === 0 ? "Empty canvas." : `No ${currentFilter} tasks.`;
+            } else {
+                emptyStateEl.classList.add('hidden');
+                taskListEl.innerHTML = visibleTasks.map(task => `
+                    <li class="group flex items-start py-4 md:py-6 border-b border-gray-100 active:bg-gray-50 transition-colors duration-200">
+                        
+                        <!-- CHECKBOX -->
+                        <div class="pt-1.5 md:pt-2 w-10 md:w-12 flex-shrink-0 cursor-pointer" onclick="toggleTask(${task.id})">
+                            <div class="w-5 h-5 md:w-6 md:h-6 border-2 border-black ${task.completed ? 'bg-black' : 'bg-transparent'} flex items-center justify-center transition-colors duration-200">
+                                ${task.completed ? '<div class="w-2 h-2 bg-white"></div>' : ''}
+                            </div>
+                        </div>
+
+                        <!-- TEXT -->
+                        <div class="flex-grow pr-4">
+                            <span 
+                                onclick="toggleTask(${task.id})"
+                                class="text-xl md:text-3xl font-medium cursor-pointer leading-tight block break-words ${task.completed ? 'text-gray-200 line-through decoration-swiss-red' : 'text-black'}"
+                            >
+                                ${task.text}
+                            </span>
+                        </div>
+
+                        <!-- DELETE (Always visible on mobile as small X, hover on desktop) -->
+                        <button 
+                            onclick="deleteTask(${task.id})"
+                            class="md:opacity-0 md:group-hover:opacity-100 text-gray-300 hover:text-swiss-red px-2 py-1"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </li>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
