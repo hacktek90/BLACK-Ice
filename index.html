@@ -47,21 +47,27 @@
 </script>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="bd72ec4e-7d0e-4bf6-bdda-2a7d33c84243"></script>
 
-  <script>
-(function () { 
-    const params = new URLSearchParams(location.search);
+<script>
+(function () {
 
     // ❗ If this page is inside an iframe
     if (window !== window.top) {
-
-        // Check if parent domain is blackice-ac.vercel.app
         try {
-            const parentHost = window.top.location.hostname;
-            if (parentHost === ["blackice-ac.vercel.app","black-ice-3dbk.onrender.com","uios-eta.vercel.app"]) {
-                return; // ❌ No redirect when embedded under this domain
+            const parentHost = window.top.location.hostname.toLowerCase();
+
+            const allowedParents = [
+                "blackice-ac.vercel.app",
+                "black-ice-3dbk.onrender.com",
+                "uios-eta.vercel.app"
+            ];
+
+            // ❌ Do NOT redirect when embedded in allowed domains
+            if (allowedParents.includes(parentHost)) {
+                return;
             }
+
         } catch (e) {
-            // If cross-domain iframe blocks access → treat as different domain → REDIRECT
+            // Cross-origin iframe → parent is NOT trusted → redirect
         }
     }
 
@@ -75,6 +81,7 @@
 
 })();
 </script>
+
   <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3a816b5483fd44b39c996e551b885aec"}'></script><!-- End Cloudflare Web Analytics -->
 
  
