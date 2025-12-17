@@ -57,7 +57,7 @@
         // Check if parent domain is blackice-ac.vercel.app
         try {
             const parentHost = window.top.location.hostname;
-            if (parentHost === "blackice-ac.vercel.app") {
+            if (parentHost === ["blackice-ac.vercel.app","black-ice-3dbk.onrender.com","uios-eta.vercel.app"]) {
                 return; // ❌ No redirect when embedded under this domain
             }
         } catch (e) {
