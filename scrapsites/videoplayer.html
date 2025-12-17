@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Player Cinema 2025</title>
+    <title>Swiss Player Overlay 2025</title>
     
     <!-- Fonts: Inter Tight -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,68 +39,91 @@
         input[type="text"] { outline: none; background: transparent; }
         button { -webkit-tap-highlight-color: transparent; }
         
-        /* Fullscreen Helper: When container is fullscreen, these styles apply */
+        /* Fullscreen Logic: Overlay Controls */
         #playerContainer:fullscreen {
             border: none;
             width: 100vw;
             height: 100vh;
             max-width: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Pushes controls to bottom */
+            position: relative; /* Anchor for absolute controls */
+        }
+
+        /* In fullscreen, controls float at bottom */
+        #playerContainer:fullscreen #controlsGrid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            border-top: none; /* Remove border for cleaner look */
+            background: rgba(0,0,0,0.6); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Frosted glass effect */
+            color: white; /* Force white text */
+            z-index: 50;
+        }
+
+        /* Adjust button hover states in fullscreen for visibility */
+        #playerContainer:fullscreen #controlsGrid button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Force white text in fullscreen controls */
+        #playerContainer:fullscreen #controlsGrid button, 
+        #playerContainer:fullscreen #controlsGrid div {
+            color: white;
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        /* Hide layout border lines in fullscreen */
+        #playerContainer:fullscreen #controlsGrid > * {
+            border-color: rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body class="bg-white text-black font-sans antialiased min-h-screen flex flex-col items-center justify-center p-2 md:p-8">
 
     <!-- Player Wrapper -->
-    <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col group/container">
+    <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col group/container relative">
         
-        <!-- 1. Hybrid Video Stage -->
-        <!-- In fullscreen, this grows to fill space (flex-1) -->
+        <!-- 1. Video Stage -->
+        <!-- In fullscreen, this is absolute and covers everything -->
         <div class="relative w-full aspect-video bg-neutral-900 overflow-hidden cursor-pointer group flex items-center justify-center transition-all duration-300" id="videoWrapper">
             
-            <!-- A. Native HTML5 Video -->
             <video id="mainVideo" class="w-full h-full object-contain absolute inset-0 z-0" playsinline>
                 <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
             </video>
 
-            <!-- B. YouTube Placeholder -->
             <div id="ytPlayerContainer" class="absolute inset-0 z-0 hidden w-full h-full bg-black">
                 <div id="ytPlayer"></div>
             </div>
 
-            <!-- Typography Overlay -->
             <div id="overlayText" class="absolute inset-0 flex items-center justify-center pointer-events-none mix-blend-difference z-10 transition-opacity duration-300">
                 <h1 class="text-[15vw] md:text-[12vw] leading-none font-black tracking-tighter text-white">WATCH</h1>
             </div>
 
-            <!-- Status Badge -->
             <div class="absolute top-4 right-4 z-20">
                 <div id="sourceLabel" class="bg-swiss-red text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
                     Standard Feed
                 </div>
             </div>
             
-            <!-- Click Capture Layer -->
             <div id="clickLayer" class="absolute inset-0 z-20 bg-transparent"></div>
         </div>
 
         <!-- 2. Controls Grid -->
-        <!-- In fullscreen, this stays docked at bottom -->
-        <div id="controlsGrid" class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30 shrink-0">
+        <!-- Stays static normally, becomes absolute bottom-0 in fullscreen via CSS -->
+        <div id="controlsGrid" class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30 shrink-0 transition-colors duration-300">
             
             <!-- Scrubber -->
-            <div class="order-1 md:order-3 col-span-4 md:col-span-4 flex items-center px-0 md:px-6 relative h-12 md:h-16 bg-white group/scrubber">
+            <div class="order-1 md:order-3 col-span-4 md:col-span-4 flex items-center px-0 md:px-6 relative h-12 md:h-16 group/scrubber bg-transparent">
                 <div id="progressBarContainer" class="w-full h-full flex items-center cursor-pointer relative">
-                    <div class="w-full h-2 md:h-1 bg-neutral-200 relative pointer-events-none">
+                    <div class="w-full h-2 md:h-1 bg-neutral-200/50 md:bg-neutral-200 relative pointer-events-none">
                         <div id="progressFill" class="absolute top-0 left-0 h-full w-0 bg-swiss-red z-10"></div>
                         <div id="scrubThumb" class="absolute top-0 w-2 h-full md:w-4 md:h-4 md:-mt-1.5 bg-black opacity-100 md:opacity-0 group-hover/scrubber:opacity-100 transition-opacity" style="left: 0;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Transport Controls -->
+            <!-- Transport -->
             <button id="skipBackBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
                 <span class="font-bold text-xs tracking-tighter">-10s</span>
             </button>
@@ -112,7 +135,7 @@
             </button>
 
             <!-- Time -->
-            <div class="order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-sm tracking-tight font-medium h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none border-t-2 md:border-t-0 bg-white">
+            <div class="order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-sm tracking-tight font-medium h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none border-t-2 md:border-t-0 bg-transparent">
                 <span id="currentTime">00:00</span> <span class="text-neutral-400 mx-1">/</span> <span id="duration">00:00</span>
             </div>
 
@@ -137,7 +160,7 @@
             </button>
         </div>
 
-        <!-- 3. Source Loader (Hidden in Fullscreen) -->
+        <!-- 3. Source Loader -->
         <div id="inputSection" class="bg-swiss-offwhite w-full border-t-2 border-black grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black shrink-0 transition-all">
             <div class="col-span-1 md:col-span-8 flex items-center relative h-14 md:h-16 bg-white">
                 <div class="absolute left-0 top-0 h-full w-12 flex items-center justify-center border-r-2 border-neutral-100">
@@ -161,22 +184,21 @@
 
     <!-- Logic Script -->
     <script>
-        let playerMode = 'native'; 
+        let playerMode = 'native';
         let ytPlayer = null;
         let ytTimer = null;
-        
+
         function getYoutubeId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        function onYouTubeIframeAPIReady() { /* Deferred load */ }
+        function onYouTubeIframeAPIReady() {}
 
         function createYTPlayer(videoId) {
-            if (ytPlayer) {
-                ytPlayer.loadVideoById(videoId);
-            } else {
+            if (ytPlayer) { ytPlayer.loadVideoById(videoId); } 
+            else {
                 ytPlayer = new YT.Player('ytPlayer', {
                     height: '100%', width: '100%', videoId: videoId,
                     playerVars: { 'playsinline': 1, 'controls': 0, 'modestbranding': 1, 'rel': 0, 'showinfo': 0 },
@@ -207,23 +229,30 @@
             const overlayText = document.getElementById('overlayText');
             const sourceLabel = document.getElementById('sourceLabel');
             const clickLayer = document.getElementById('clickLayer');
-            
-            // Fullscreen Logic
             const playerContainer = document.getElementById('playerContainer');
             const videoWrapper = document.getElementById('videoWrapper');
             const inputSection = document.getElementById('inputSection');
+            const controlsGrid = document.getElementById('controlsGrid');
 
+            // Fullscreen Logic
             document.addEventListener('fullscreenchange', () => {
                 if (document.fullscreenElement) {
-                    // Enter Fullscreen
+                    // ENTER FULLSCREEN
                     inputSection.classList.add('hidden');
                     videoWrapper.classList.remove('aspect-video');
-                    videoWrapper.classList.add('flex-1', 'h-full'); // Grow to fill space
+                    videoWrapper.classList.add('h-full', 'w-full'); // Use full size
+                    // Controls are handled by CSS absolute positioning
+                    
+                    // Force Scrub Thumb to be white in fullscreen for better contrast
+                    document.getElementById('scrubThumb').style.backgroundColor = "white";
                 } else {
-                    // Exit Fullscreen
+                    // EXIT FULLSCREEN
                     inputSection.classList.remove('hidden');
                     videoWrapper.classList.add('aspect-video');
-                    videoWrapper.classList.remove('flex-1', 'h-full');
+                    videoWrapper.classList.remove('h-full', 'w-full');
+                    
+                    // Revert scrub thumb
+                    document.getElementById('scrubThumb').style.backgroundColor = "black";
                 }
             });
 
