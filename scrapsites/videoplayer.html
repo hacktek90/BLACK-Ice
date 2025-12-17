@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Player Mobile 2025</title>
+    <title>Swiss Player Ultimate 2025</title>
     
     <!-- Fonts: Inter Tight -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +22,9 @@
                     colors: {
                         'swiss-red': '#FF2400',
                         'swiss-offwhite': '#F5F5F5'
+                    },
+                    screens: {
+                        'md': '850px' 
                     }
                 }
             }
@@ -33,122 +36,108 @@
         .vol-bar.active { background-color: #FF2400; }
         .vol-bar.inactive { background-color: #E5E5E5; }
         input[type="text"] { outline: none; background: transparent; }
-        
-        /* Mobile Touch Optimizations */
-        @media (max-width: 768px) {
-            .touch-target { min-height: 48px; }
-        }
+        button { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-white text-black font-sans antialiased selection:bg-swiss-red selection:text-white min-h-screen flex flex-col items-center justify-center p-2 md:p-12">
+<body class="bg-white text-black font-sans antialiased min-h-screen flex flex-col items-center justify-center p-2 md:p-8">
 
-    <!-- Player Container -->
-    <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black select-none shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
+    <!-- Player Wrapper -->
+    <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col">
         
-        <!-- 1. Video Stage (Flexible Height) -->
-        <!-- "aspect-video" is default, but we allow it to grow for vertical mobile videos if needed via JS or keep it letterboxed -->
+        <!-- 1. Video Stage -->
         <div class="relative w-full aspect-video bg-neutral-900 overflow-hidden cursor-pointer group flex items-center justify-center" id="videoWrapper">
-            
-            <!-- Video Element: object-contain ensures NO cropping on any format -->
             <video id="mainVideo" class="w-full h-full object-contain" playsinline>
                 <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
             </video>
 
-            <!-- Typography Overlay -->
+            <!-- Overlay -->
             <div id="overlayText" class="absolute inset-0 flex items-center justify-center pointer-events-none mix-blend-difference z-10 transition-opacity duration-300">
-                <h1 class="text-[15vw] md:text-[12vw] leading-none font-black tracking-tighter text-white">
-                    WATCH
-                </h1>
+                <h1 class="text-[15vw] md:text-[12vw] leading-none font-black tracking-tighter text-white">WATCH</h1>
             </div>
 
-            <!-- Mobile-Friendly Status Badge -->
+            <!-- Status Badge -->
             <div class="absolute top-4 right-4 z-20">
-                <div id="sourceLabel" class="bg-swiss-red text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 shadow-sm">
-                    Demo Feed
+                <div id="sourceLabel" class="bg-swiss-red text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
+                    Standard Feed
                 </div>
-            </div>
-
-            <!-- Error Message Toast (Hidden by default) -->
-            <div id="errorToast" class="hidden absolute bottom-10 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-4 py-2 uppercase tracking-widest">
-                Format Not Supported
             </div>
         </div>
 
-        <!-- 2. Responsive Controls Grid -->
-        <!-- Mobile: Stacked Rows | Desktop: Single 12-col Row -->
+        <!-- 2. Controls Grid -->
         <div class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse">
             
-            <!-- A. Scrubber (Row 1 on Mobile, Col 3 on Desktop) -->
-            <!-- We move this visually to top on mobile using order-first -->
-            <div class="order-1 md:order-3 col-span-4 md:col-span-7 flex items-center px-0 md:px-6 relative h-12 md:h-20 group/scrubber bg-white">
-                <div id="progressBarContainer" class="w-full h-full flex items-center cursor-pointer relative px-0">
+            <!-- Scrubber -->
+            <div class="order-1 md:order-3 col-span-4 md:col-span-4 flex items-center px-0 md:px-6 relative h-12 md:h-16 bg-white group/scrubber">
+                <div id="progressBarContainer" class="w-full h-full flex items-center cursor-pointer relative">
                     <div class="w-full h-2 md:h-1 bg-neutral-200 relative pointer-events-none">
                         <div id="progressFill" class="absolute top-0 left-0 h-full w-0 bg-swiss-red z-10"></div>
-                        <!-- Thicker thumb for mobile touch -->
-                        <div id="scrubThumb" class="absolute top-0 w-2 h-full md:w-4 md:h-4 md:-mt-1.5 bg-black opacity-100 md:opacity-0 group-hover/scrubber:opacity-100 transition-opacity pointer-events-none" style="left: 0;"></div>
+                        <div id="scrubThumb" class="absolute top-0 w-2 h-full md:w-4 md:h-4 md:-mt-1.5 bg-black opacity-100 md:opacity-0 group-hover/scrubber:opacity-100 transition-opacity" style="left: 0;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- B. Play/Pause (Row 2 Col 1 on Mobile) -->
-            <button id="playBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-20 border-r-2 md:border-r-0 border-black md:border-none">
-                <span id="playText" class="font-bold text-xs md:text-lg tracking-tighter block">PLAY</span>
+            <!-- Transport Controls -->
+            <button id="skipBackBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
+                <span class="font-bold text-xs tracking-tighter">-10s</span>
             </button>
 
-            <!-- C. Time (Row 2 Col 2-3 on Mobile) -->
-            <div class="order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-lg tracking-tight font-medium h-16 md:h-20 border-r-2 md:border-r-0 border-black md:border-none">
+            <button id="playBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
+                <span id="playText" class="font-black text-sm md:text-base tracking-tighter">PLAY</span>
+            </button>
+
+            <button id="skipFwdBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16">
+                <span class="font-bold text-xs tracking-tighter">+10s</span>
+            </button>
+
+            <!-- Time -->
+            <div class="order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-sm tracking-tight font-medium h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none border-t-2 md:border-t-0 bg-white">
                 <span id="currentTime">00:00</span> 
-                <span class="text-neutral-400 mx-1 md:mx-2">/</span> 
+                <span class="text-neutral-400 mx-1">/</span> 
                 <span id="duration">00:00</span>
             </div>
 
-            <!-- D. Settings/Fullscreen (Row 2 Col 4 on Mobile) -->
-            <div class="order-4 md:order-4 col-span-1 md:col-span-2 flex items-center justify-center md:justify-between px-0 md:px-4 h-16 md:h-20">
-                <!-- Volume Hidden on Mobile (Too small), Visible Desktop -->
-                <div class="hidden md:flex flex-col gap-1 cursor-pointer" id="volumeControl">
-                    <span class="text-[0.6rem] font-bold uppercase tracking-widest text-neutral-500">Vol</span>
-                    <div class="flex gap-0.5 h-4 items-end">
-                        <div class="vol-bar w-1 h-2 bg-swiss-red" data-vol="0.2"></div>
-                        <div class="vol-bar w-1 h-3 bg-swiss-red" data-vol="0.4"></div>
-                        <div class="vol-bar w-1 h-4 bg-swiss-red" data-vol="0.6"></div>
-                        <div class="vol-bar w-1 h-4 inactive bg-neutral-200 hover:bg-black" data-vol="1.0"></div>
-                    </div>
-                </div>
-                <!-- Fullscreen Icon -->
-                <button id="fsBtn" class="w-full h-full md:w-auto md:h-auto flex items-center justify-center hover:text-swiss-red transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="square" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                    </svg>
-                </button>
-            </div>
+            <!-- Speed -->
+            <button id="speedBtn" class="order-2 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-l-2 border-black md:border-none">
+                <span class="font-bold text-xs tracking-tight">1.0X</span>
+            </button>
+
+            <!-- PiP Button (Updated Icon) -->
+            <button id="pipBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-t-2 md:border-t-0 border-black md:border-none" title="Picture in Picture">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <!-- Standard "Pop Out" Icon: Rectangle with Arrow leaving -->
+                    <path stroke-linecap="square" stroke-linejoin="miter" d="M13.5 4.5h6m0 0v6m0-6-9 9" />
+                    <path stroke-linecap="square" stroke-linejoin="miter" d="M18 13.5v6a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 3 19.5v-12A1.5 1.5 0 0 1 4.5 6h6" />
+                </svg>
+            </button>
+
+            <!-- Fullscreen -->
+            <button id="fsBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-colors h-16 md:h-16 border-t-2 md:border-t-0 border-l-2 border-black">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="square" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                </svg>
+            </button>
         </div>
 
-        <!-- 3. Mobile-Optimized Input Stack -->
+        <!-- 3. Source Loader -->
         <div class="bg-swiss-offwhite w-full border-t-2 border-black grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black">
-            
             <!-- URL Input -->
-            <div class="col-span-1 md:col-span-8 flex items-center relative h-14 md:h-20 bg-white">
-                <div class="absolute left-0 top-0 h-full w-10 md:w-12 flex items-center justify-center border-r-2 border-neutral-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-neutral-400">
-                        <path stroke-linecap="square" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-                    </svg>
+            <div class="col-span-1 md:col-span-8 flex items-center relative h-14 md:h-16 bg-white">
+                <div class="absolute left-0 top-0 h-full w-12 flex items-center justify-center border-r-2 border-neutral-100">
+                    <span class="font-bold text-xs text-neutral-400">URL</span>
                 </div>
-                <input type="text" id="urlInput" placeholder="LINK (MP4/MOV/WEBM)" class="w-full h-full pl-12 md:pl-16 pr-4 text-xs md:text-sm font-mono font-medium tracking-tight placeholder-neutral-400 text-black uppercase">
+                <input type="text" id="urlInput" placeholder="PASTE LINK..." class="w-full h-full pl-16 pr-4 text-xs md:text-sm font-mono font-medium tracking-tight placeholder-neutral-400 text-black uppercase">
             </div>
 
-            <!-- Action Buttons Grid -->
+            <!-- Buttons -->
             <div class="col-span-1 md:col-span-4 grid grid-cols-2 divide-x-2 divide-black">
-                <button id="loadUrlBtn" class="h-14 md:h-20 bg-white hover:bg-black hover:text-white transition-colors font-bold text-xs md:text-sm tracking-widest uppercase">
-                    Load
+                <button id="loadUrlBtn" class="h-14 md:h-16 bg-white hover:bg-black hover:text-white transition-colors font-bold text-xs tracking-widest uppercase">
+                    Load Link
                 </button>
-                <div class="relative h-14 md:h-20 bg-swiss-red hover:bg-red-700 transition-colors">
-                    <input type="file" id="fileInput" accept="video/mp4,video/webm,video/ogg,video/quicktime" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                <div class="relative h-14 md:h-16 bg-swiss-red hover:bg-red-700 transition-colors">
+                    <input type="file" id="fileInput" accept="video/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
                     <div class="absolute inset-0 flex items-center justify-center text-white z-10 pointer-events-none">
-                        <span class="font-bold text-xs md:text-sm tracking-widest uppercase flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5">
-                                <path stroke-linecap="square" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                            </svg>
-                            File
+                        <span class="font-bold text-xs tracking-widest uppercase flex items-center gap-2">
+                            Upload File
                         </span>
                     </div>
                 </div>
@@ -160,92 +149,66 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const video = document.getElementById('mainVideo');
-            const videoWrapper = document.getElementById('videoWrapper');
             const playBtn = document.getElementById('playBtn');
             const playText = document.getElementById('playText');
             const overlayText = document.getElementById('overlayText');
             const sourceLabel = document.getElementById('sourceLabel');
-            const errorToast = document.getElementById('errorToast');
-            
+            const skipBackBtn = document.getElementById('skipBackBtn');
+            const skipFwdBtn = document.getElementById('skipFwdBtn');
+            const speedBtn = document.getElementById('speedBtn');
+            const pipBtn = document.getElementById('pipBtn');
             const urlInput = document.getElementById('urlInput');
             const loadUrlBtn = document.getElementById('loadUrlBtn');
             const fileInput = document.getElementById('fileInput');
 
-            // --- Error Handling ---
-            video.addEventListener('error', (e) => {
-                console.error("Video Error:", e);
-                showError();
+            // --- 1. Navigation & Speed ---
+            skipBackBtn.addEventListener('click', () => {
+                video.currentTime = Math.max(0, video.currentTime - 10);
             });
 
-            function showError() {
-                errorToast.classList.remove('hidden');
-                sourceLabel.textContent = "ERROR";
-                sourceLabel.classList.remove('bg-black', 'bg-swiss-red');
-                sourceLabel.classList.add('bg-neutral-500');
-                setTimeout(() => errorToast.classList.add('hidden'), 3000);
-            }
-
-            // --- Upload Handling ---
-            loadUrlBtn.addEventListener('click', () => {
-                const url = urlInput.value.trim();
-                if(url) loadVideoSource(url, "WEB LINK");
+            skipFwdBtn.addEventListener('click', () => {
+                video.currentTime = Math.min(video.duration, video.currentTime + 10);
             });
 
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Check size/type if needed
-                    const objectUrl = URL.createObjectURL(file);
-                    loadVideoSource(objectUrl, "LOCAL FILE");
+            const speeds = [1.0, 1.5, 2.0];
+            let speedIndex = 0;
+            speedBtn.addEventListener('click', () => {
+                speedIndex = (speedIndex + 1) % speeds.length;
+                video.playbackRate = speeds[speedIndex];
+                speedBtn.querySelector('span').textContent = speeds[speedIndex].toFixed(1) + "X";
+            });
+
+            // --- 2. PiP Logic ---
+            pipBtn.addEventListener('click', async () => {
+                try {
+                    if (video !== document.pictureInPictureElement) {
+                        await video.requestPictureInPicture();
+                    } else {
+                        await document.exitPictureInPicture();
+                    }
+                } catch (error) {
+                    // Fallback visual feedback if PiP fails
+                    pipBtn.style.color = '#FF2400';
+                    setTimeout(() => pipBtn.style.color = '', 500);
                 }
             });
 
-            function loadVideoSource(src, type) {
-                errorToast.classList.add('hidden');
-                video.pause();
-                video.src = src;
-                video.load();
-                
-                // Attempt Play
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => {
-                        // Playback started
-                        playText.textContent = "PAUSE";
-                        overlayText.classList.add('opacity-0');
-                    })
-                    .catch(error => {
-                        // Auto-play prevented or format error
-                        console.log("Auto-play prevented or error");
-                        playText.textContent = "PLAY";
-                        overlayText.classList.remove('opacity-0');
-                    });
-                }
-                
-                // UI Updates
-                sourceLabel.textContent = type;
-                sourceLabel.classList.remove('bg-swiss-red', 'bg-neutral-500');
-                sourceLabel.classList.add('bg-black');
-            }
-
-            // --- Play/Pause ---
+            // --- 3. Play/Pause ---
             function togglePlay() {
                 if (video.paused) {
                     video.play();
                     playText.textContent = "PAUSE";
                     overlayText.classList.add('opacity-0');
-                    overlayText.classList.remove('opacity-100');
                 } else {
                     video.pause();
                     playText.textContent = "PLAY";
                     overlayText.classList.remove('opacity-0');
-                    overlayText.classList.add('opacity-100');
                 }
             }
             playBtn.addEventListener('click', togglePlay);
-            videoWrapper.addEventListener('click', togglePlay);
+            document.getElementById('videoWrapper').addEventListener('click', togglePlay);
 
-            // --- Time & Scrubbing ---
+            // --- 4. Scrubbing ---
             const timeDisplay = document.getElementById('currentTime');
             const durationDisplay = document.getElementById('duration');
             const progressBarContainer = document.getElementById('progressBarContainer');
@@ -279,34 +242,36 @@
                 video.currentTime = pos * video.duration;
             });
 
-            // --- Volume (Desktop Only) ---
-            const volBars = document.querySelectorAll('.vol-bar');
-            document.getElementById('volumeControl').addEventListener('click', (e) => {
-                if(e.target.classList.contains('vol-bar')) {
-                    e.stopPropagation();
-                    const level = parseFloat(e.target.dataset.vol);
-                    video.volume = level;
-                    volBars.forEach(bar => {
-                        const barLevel = parseFloat(bar.dataset.vol);
-                        if (level >= barLevel) {
-                            bar.classList.remove('inactive', 'bg-neutral-200');
-                            bar.classList.add('active', 'bg-swiss-red');
-                        } else {
-                            bar.classList.remove('active', 'bg-swiss-red');
-                            bar.classList.add('inactive', 'bg-neutral-200');
-                        }
-                    });
+            // --- 5. Sources ---
+            loadUrlBtn.addEventListener('click', () => {
+                if(urlInput.value.trim()) {
+                    loadSource(urlInput.value.trim(), "WEB LINK");
                 }
             });
 
-            // --- Fullscreen ---
-            document.getElementById('fsBtn').addEventListener('click', () => {
-                const container = document.getElementById('playerContainer');
-                if (!document.fullscreenElement) {
-                    container.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    loadSource(URL.createObjectURL(file), "LOCAL FILE");
                 }
+            });
+
+            function loadSource(src, label) {
+                video.pause();
+                video.src = src;
+                video.load();
+                sourceLabel.textContent = label;
+                sourceLabel.classList.remove('bg-swiss-red');
+                sourceLabel.classList.add('bg-black');
+                playText.textContent = "PLAY";
+                overlayText.classList.remove('opacity-0');
+            }
+
+            // --- 6. Fullscreen ---
+            document.getElementById('fsBtn').addEventListener('click', () => {
+                const el = document.getElementById('playerContainer');
+                if(!document.fullscreenElement) el.requestFullscreen();
+                else document.exitFullscreen();
             });
         });
     </script>
