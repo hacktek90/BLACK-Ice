@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Player Hybrid 2025</title>
+    <title>Swiss Player Cinema 2025</title>
     
     <!-- Fonts: Inter Tight -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,36 +39,38 @@
         input[type="text"] { outline: none; background: transparent; }
         button { -webkit-tap-highlight-color: transparent; }
         
-        /* YouTube Overlay Fix: Ensures click events hit our custom wrapper if needed, 
-           but we leave pointer-events auto for YouTube interaction if preferred.
-           For this Swiss design, we want the "WATCH" text to handle visual state. */
-        .yt-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        /* Fullscreen Helper: When container is fullscreen, these styles apply */
+        #playerContainer:fullscreen {
+            border: none;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes controls to bottom */
         }
     </style>
 </head>
 <body class="bg-white text-black font-sans antialiased min-h-screen flex flex-col items-center justify-center p-2 md:p-8">
 
     <!-- Player Wrapper -->
-    <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col">
+    <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col group/container">
         
         <!-- 1. Hybrid Video Stage -->
-        <div class="relative w-full aspect-video bg-neutral-900 overflow-hidden cursor-pointer group flex items-center justify-center" id="videoWrapper">
+        <!-- In fullscreen, this grows to fill space (flex-1) -->
+        <div class="relative w-full aspect-video bg-neutral-900 overflow-hidden cursor-pointer group flex items-center justify-center transition-all duration-300" id="videoWrapper">
             
-            <!-- A. Native HTML5 Video (Default) -->
+            <!-- A. Native HTML5 Video -->
             <video id="mainVideo" class="w-full h-full object-contain absolute inset-0 z-0" playsinline>
                 <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
             </video>
 
-            <!-- B. YouTube Placeholder (Hidden by default) -->
+            <!-- B. YouTube Placeholder -->
             <div id="ytPlayerContainer" class="absolute inset-0 z-0 hidden w-full h-full bg-black">
                 <div id="ytPlayer"></div>
             </div>
 
-            <!-- Typography Overlay (UI Layer) -->
-            <!-- mix-blend-difference allows text to be visible over both video types -->
+            <!-- Typography Overlay -->
             <div id="overlayText" class="absolute inset-0 flex items-center justify-center pointer-events-none mix-blend-difference z-10 transition-opacity duration-300">
                 <h1 class="text-[15vw] md:text-[12vw] leading-none font-black tracking-tighter text-white">WATCH</h1>
             </div>
@@ -80,12 +82,13 @@
                 </div>
             </div>
             
-            <!-- Click Capture Layer (Transparent, for unified click-to-pause) -->
+            <!-- Click Capture Layer -->
             <div id="clickLayer" class="absolute inset-0 z-20 bg-transparent"></div>
         </div>
 
         <!-- 2. Controls Grid -->
-        <div class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30">
+        <!-- In fullscreen, this stays docked at bottom -->
+        <div id="controlsGrid" class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30 shrink-0">
             
             <!-- Scrubber -->
             <div class="order-1 md:order-3 col-span-4 md:col-span-4 flex items-center px-0 md:px-6 relative h-12 md:h-16 bg-white group/scrubber">
@@ -97,7 +100,7 @@
                 </div>
             </div>
 
-            <!-- Transport -->
+            <!-- Transport Controls -->
             <button id="skipBackBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
                 <span class="font-bold text-xs tracking-tighter">-10s</span>
             </button>
@@ -134,8 +137,8 @@
             </button>
         </div>
 
-        <!-- 3. Source Loader -->
-        <div class="bg-swiss-offwhite w-full border-t-2 border-black grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black">
+        <!-- 3. Source Loader (Hidden in Fullscreen) -->
+        <div id="inputSection" class="bg-swiss-offwhite w-full border-t-2 border-black grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black shrink-0 transition-all">
             <div class="col-span-1 md:col-span-8 flex items-center relative h-14 md:h-16 bg-white">
                 <div class="absolute left-0 top-0 h-full w-12 flex items-center justify-center border-r-2 border-neutral-100">
                     <span class="font-bold text-xs text-neutral-400">URL</span>
@@ -156,57 +159,35 @@
         </div>
     </div>
 
-    <!-- Hybrid Logic Script -->
+    <!-- Logic Script -->
     <script>
-        // --- Global State ---
-        let playerMode = 'native'; // 'native' or 'youtube'
+        let playerMode = 'native'; 
         let ytPlayer = null;
         let ytTimer = null;
         
-        // --- 1. YouTube Helper Functions ---
         function getYoutubeId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // Must be global for YouTube API to call
-        function onYouTubeIframeAPIReady() {
-            // Player created only when needed
-        }
+        function onYouTubeIframeAPIReady() { /* Deferred load */ }
 
         function createYTPlayer(videoId) {
             if (ytPlayer) {
                 ytPlayer.loadVideoById(videoId);
             } else {
                 ytPlayer = new YT.Player('ytPlayer', {
-                    height: '100%',
-                    width: '100%',
-                    videoId: videoId,
-                    playerVars: {
-                        'playsinline': 1,
-                        'controls': 0, // Hide default controls
-                        'modestbranding': 1,
-                        'rel': 0,
-                        'showinfo': 0
-                    },
-                    events: {
-                        'onStateChange': onPlayerStateChange,
-                        'onReady': onPlayerReady
-                    }
+                    height: '100%', width: '100%', videoId: videoId,
+                    playerVars: { 'playsinline': 1, 'controls': 0, 'modestbranding': 1, 'rel': 0, 'showinfo': 0 },
+                    events: { 'onStateChange': onPlayerStateChange, 'onReady': onPlayerReady }
                 });
             }
         }
-
-        function onPlayerReady(event) {
-            event.target.playVideo();
-        }
-
+        function onPlayerReady(event) { event.target.playVideo(); }
         function onPlayerStateChange(event) {
             const playText = document.getElementById('playText');
             const overlayText = document.getElementById('overlayText');
-            
-            // YT.PlayerState.PLAYING = 1
             if (event.data === YT.PlayerState.PLAYING) {
                 playText.textContent = "PAUSE";
                 overlayText.classList.add('opacity-0');
@@ -217,24 +198,36 @@
                 stopYTTimer();
             }
         }
+        function startYTTimer() { stopYTTimer(); ytTimer = setInterval(updateYTTime, 500); }
+        function stopYTTimer() { if (ytTimer) clearInterval(ytTimer); }
 
-        function startYTTimer() {
-            stopYTTimer();
-            ytTimer = setInterval(updateYTTime, 500);
-        }
-
-        function stopYTTimer() {
-            if (ytTimer) clearInterval(ytTimer);
-        }
-
-        // --- 2. Main Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             const video = document.getElementById('mainVideo');
             const ytContainer = document.getElementById('ytPlayerContainer');
             const overlayText = document.getElementById('overlayText');
             const sourceLabel = document.getElementById('sourceLabel');
+            const clickLayer = document.getElementById('clickLayer');
             
-            // Controls
+            // Fullscreen Logic
+            const playerContainer = document.getElementById('playerContainer');
+            const videoWrapper = document.getElementById('videoWrapper');
+            const inputSection = document.getElementById('inputSection');
+
+            document.addEventListener('fullscreenchange', () => {
+                if (document.fullscreenElement) {
+                    // Enter Fullscreen
+                    inputSection.classList.add('hidden');
+                    videoWrapper.classList.remove('aspect-video');
+                    videoWrapper.classList.add('flex-1', 'h-full'); // Grow to fill space
+                } else {
+                    // Exit Fullscreen
+                    inputSection.classList.remove('hidden');
+                    videoWrapper.classList.add('aspect-video');
+                    videoWrapper.classList.remove('flex-1', 'h-full');
+                }
+            });
+
+            // Standard Controls
             const playBtn = document.getElementById('playBtn');
             const playText = document.getElementById('playText');
             const timeDisplay = document.getElementById('currentTime');
@@ -242,9 +235,7 @@
             const progressBarContainer = document.getElementById('progressBarContainer');
             const progressFill = document.getElementById('progressFill');
             const scrubThumb = document.getElementById('scrubThumb');
-            const clickLayer = document.getElementById('clickLayer');
 
-            // --- Unified Time Formatter ---
             function formatTime(seconds) {
                 if(isNaN(seconds)) return "00:00";
                 const m = Math.floor(seconds / 60);
@@ -252,17 +243,14 @@
                 return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }
 
-            // --- 3. Switcher Logic ---
             function switchMode(mode) {
                 playerMode = mode;
                 video.pause();
                 stopYTTimer();
-                
                 if (mode === 'youtube') {
                     video.classList.add('hidden');
                     ytContainer.classList.remove('hidden');
                     sourceLabel.textContent = "YOUTUBE";
-                    // YouTube doesn't support PiP via standard API button easily on all browsers
                     document.getElementById('pipBtn').style.opacity = '0.3'; 
                 } else {
                     if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
@@ -271,14 +259,10 @@
                     sourceLabel.textContent = "LOCAL/WEB";
                     document.getElementById('pipBtn').style.opacity = '1';
                 }
-                
                 sourceLabel.classList.remove('bg-swiss-red');
                 sourceLabel.classList.add('bg-black');
             }
 
-            // --- 4. Unified Control Logic ---
-            
-            // Play/Pause
             function togglePlay() {
                 if (playerMode === 'native') {
                     if (video.paused) {
@@ -292,45 +276,36 @@
                     }
                 } else if (playerMode === 'youtube' && ytPlayer) {
                     const state = ytPlayer.getPlayerState();
-                    if (state === 1) { // Playing
-                        ytPlayer.pauseVideo();
-                    } else {
-                        ytPlayer.playVideo();
-                    }
+                    if (state === 1) ytPlayer.pauseVideo();
+                    else ytPlayer.playVideo();
                 }
             }
             playBtn.addEventListener('click', togglePlay);
             clickLayer.addEventListener('click', togglePlay);
 
-            // Skip
             document.getElementById('skipBackBtn').addEventListener('click', () => {
                 if(playerMode === 'native') video.currentTime = Math.max(0, video.currentTime - 10);
                 else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() - 10, true);
             });
-
             document.getElementById('skipFwdBtn').addEventListener('click', () => {
                 if(playerMode === 'native') video.currentTime = Math.min(video.duration, video.currentTime + 10);
                 else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + 10, true);
             });
 
-            // Speed
             const speeds = [1.0, 1.5, 2.0];
             let speedIndex = 0;
             document.getElementById('speedBtn').addEventListener('click', function() {
                 speedIndex = (speedIndex + 1) % speeds.length;
                 const spd = speeds[speedIndex];
                 this.querySelector('span').textContent = spd.toFixed(1) + "X";
-                
                 if(playerMode === 'native') video.playbackRate = spd;
                 else if(ytPlayer) ytPlayer.setPlaybackRate(spd);
             });
 
-            // Scrubbing
             progressBarContainer.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const rect = progressBarContainer.getBoundingClientRect();
                 const pos = (e.clientX - rect.left) / rect.width;
-                
                 if(playerMode === 'native' && video.duration) {
                     video.currentTime = pos * video.duration;
                 } else if(playerMode === 'youtube' && ytPlayer) {
@@ -339,20 +314,15 @@
                 }
             });
 
-            // --- 5. Updates & Events ---
-            
-            // Native Updates
             video.addEventListener('timeupdate', () => {
                 if(playerMode !== 'native') return;
                 const percent = (video.currentTime / video.duration) * 100;
                 updateUI(video.currentTime, video.duration, percent);
             });
-            
             video.addEventListener('loadedmetadata', () => {
                 if(playerMode === 'native') durationDisplay.textContent = formatTime(video.duration);
             });
 
-            // YouTube Updates (Polled via setInterval in startYTTimer)
             window.updateYTTime = function() {
                 if(!ytPlayer || !ytPlayer.getCurrentTime) return;
                 const curr = ytPlayer.getCurrentTime();
@@ -370,13 +340,10 @@
                 durationDisplay.textContent = formatTime(dur);
             }
 
-            // --- 6. Input Handlers ---
             const urlInput = document.getElementById('urlInput');
-            
             document.getElementById('loadUrlBtn').addEventListener('click', () => {
                 const val = urlInput.value.trim();
                 if(!val) return;
-                
                 const ytId = getYoutubeId(val);
                 if (ytId) {
                     switchMode('youtube');
@@ -399,10 +366,8 @@
                 }
             });
 
-            // --- 7. Fullscreen & PiP ---
             document.getElementById('fsBtn').addEventListener('click', () => {
-                const el = document.getElementById('playerContainer');
-                if(!document.fullscreenElement) el.requestFullscreen();
+                if(!document.fullscreenElement) playerContainer.requestFullscreen();
                 else document.exitFullscreen();
             });
             
