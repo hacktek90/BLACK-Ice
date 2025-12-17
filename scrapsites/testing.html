@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,8 @@
 <title>BlackICE Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
+<link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
+<link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -170,7 +173,6 @@ background:#52525b;
 border-radius:999px;
 }
 .split-resizer:hover::after,.split-resizer.dragging::after{background:#fff;}
-
 /* NEW: History styling in navbar */
 .no-scrollbar::-webkit-scrollbar {
 display: none;
@@ -179,12 +181,16 @@ display: none;
 -ms-overflow-style: none;
 scrollbar-width: none;
 }
-
 @media (max-width: 768px){
 #splitResizer{display:none !important;}
 #rightPane{display:none !important;}
 #leftPane{width:100% !important;}
 }
+/* Compact mode styles */
+.compact-mode .project-card{padding:6px 8px !important;}
+.compact-mode .project-card .w-7{width:20px !important;height:20px !important;}
+.compact-mode #projectList{gap:2px !important;}
+.compact-mode .space-y-1>:not([hidden])~:not([hidden]){margin-top:2px !important;}
 </style>
 </head>
 <body class="h-screen w-screen flex flex-col md:flex-row bg-transparent">
@@ -205,6 +211,141 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 </div>
 </div>
 
+<!-- Quick Notes Panel -->
+<div id="notesPanel" class="fixed right-0 top-0 h-full w-80 bg-[#18181b] border-l border-[#27272a] z-[90] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+<div class="p-3 border-b border-[#27272a] flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <i data-lucide="sticky-note" class="w-4 h-4 text-primary"></i>
+        <span class="font-semibold text-white text-sm">Quick Notes</span>
+    </div>
+    <button id="closeNotesBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+</div>
+<div class="flex-1 p-3 overflow-y-auto">
+    <textarea id="notesTextarea" placeholder="Start typing your notes here..."
+    class="w-full h-full bg-[#09090b] border border-[#27272a] rounded-lg p-3 text-sm text-[#e4e4e7] placeholder:text-[#a1a1aa]/60 outline-none focus:border-primary/50 resize-none"></textarea>
+</div>
+<div class="p-2 border-t border-[#27272a] flex items-center justify-between text-[10px] text-[#a1a1aa]">
+    <span id="notesCharCount">0 characters</span>
+    <span>Auto-saved locally</span>
+</div>
+</div>
+
+<!-- Tasks Panel -->
+<div id="tasksPanel" class="fixed right-0 top-0 h-full w-80 bg-[#18181b] border-l border-[#27272a] z-[90] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+<div class="p-3 border-b border-[#27272a] flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <i data-lucide="check-square" class="w-4 h-4 text-primary"></i>
+        <span class="font-semibold text-white text-sm">Tasks</span>
+    </div>
+    <button id="closeTasksBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+</div>
+<div class="p-3 border-b border-[#27272a]">
+    <div class="flex gap-2">
+        <input id="newTaskInput" type="text" placeholder="Add a new task..."
+        class="flex-1 bg-[#09090b] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#e4e4e7] placeholder:text-[#a1a1aa]/60 outline-none focus:border-primary/50">
+        <button id="addTaskBtn" class="p-2 bg-primary/20 border border-primary/30 rounded-lg text-primary hover:bg-primary/30 transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+        </button>
+    </div>
+</div>
+<div id="tasksList" class="flex-1 p-3 overflow-y-auto space-y-2">
+    <div class="text-center text-[#a1a1aa] text-xs py-8">No tasks yet. Add one above.</div>
+</div>
+<div class="p-2 border-t border-[#27272a] flex items-center justify-between text-[10px] text-[#a1a1aa]">
+    <span id="tasksCount">0 tasks</span>
+    <button id="clearCompletedBtn" class="hover:text-primary transition-colors">Clear completed</button>
+</div>
+</div>
+
+<!-- Bookmarks Panel -->
+<div id="bookmarksPanel" class="fixed right-0 top-0 h-full w-80 bg-[#18181b] border-l border-[#27272a] z-[90] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+<div class="p-3 border-b border-[#27272a] flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <i data-lucide="bookmark" class="w-4 h-4 text-primary"></i>
+        <span class="font-semibold text-white text-sm">Bookmarks</span>
+    </div>
+    <button id="closeBookmarksBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+</div>
+<div class="p-3 border-b border-[#27272a]">
+    <div class="flex gap-2">
+        <input id="bookmarkUrlInput" type="text" placeholder="Paste URL to bookmark..."
+        class="flex-1 bg-[#09090b] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#e4e4e7] placeholder:text-[#a1a1aa]/60 outline-none focus:border-primary/50">
+        <button id="addBookmarkBtn" class="p-2 bg-primary/20 border border-primary/30 rounded-lg text-primary hover:bg-primary/30 transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+        </button>
+    </div>
+</div>
+<div id="bookmarksList" class="flex-1 p-3 overflow-y-auto space-y-2">
+    <div class="text-center text-[#a1a1aa] text-xs py-8">No bookmarks yet. Add one above.</div>
+</div>
+<div class="p-2 border-t border-[#27272a] text-[10px] text-[#a1a1aa]">
+    <span id="bookmarksCount">0 bookmarks</span>
+</div>
+</div>
+
+<!-- Settings Panel -->
+<div id="settingsPanel" class="fixed inset-0 z-[95] bg-black/60 hidden items-center justify-center backdrop-blur-sm">
+<div class="w-full max-w-md bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden">
+    <div class="p-4 border-b border-[#27272a] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <i data-lucide="settings" class="w-5 h-5 text-primary"></i>
+            <span class="font-semibold text-white">Settings</span>
+        </div>
+        <button id="closeSettingsBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+    <div class="p-4 space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white">Compact Mode</div>
+                <div class="text-[10px] text-[#a1a1aa]">Reduce spacing in project list</div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="compactModeToggle" class="sr-only peer">
+                <div class="w-9 h-5 bg-[#27272a] peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-white"></div>
+            </label>
+        </div>
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white">Auto-load Last Project</div>
+                <div class="text-[10px] text-[#a1a1aa]">Open last viewed project on startup</div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="autoLoadToggle" class="sr-only peer">
+                <div class="w-9 h-5 bg-[#27272a] peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-white"></div>
+            </label>
+        </div>
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white">Show Screenshots</div>
+                <div class="text-[10px] text-[#a1a1aa]">Display project thumbnails</div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="showScreenshotsToggle" class="sr-only peer" checked>
+                <div class="w-9 h-5 bg-[#27272a] peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-white"></div>
+            </label>
+        </div>
+        <div class="pt-2 border-t border-[#27272a]">
+            <div class="text-sm text-white mb-2">Data Management</div>
+            <div class="flex gap-2">
+                <button id="exportDataBtn" class="flex-1 px-3 py-2 text-xs bg-[#09090b] border border-[#27272a] rounded-lg text-[#a1a1aa] hover:text-white hover:border-[#3f3f46] transition-colors">
+                    Export Data
+                </button>
+                <button id="clearDataBtn" class="flex-1 px-3 py-2 text-xs bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors">
+                    Clear All Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 <!-- Mobile Header -->
 <div class="md:hidden h-14 solid-panel flex items-center justify-between px-4 z-50 shrink-0">
 <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -217,9 +358,7 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 <i data-lucide="menu" class="w-5 h-5"></i>
 </button>
 </div>
-
 <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden transition-opacity opacity-0"></div>
-
 <!-- Sidebar -->
 <aside id="sidebar" class="fixed md:relative top-0 left-0 h-full w-[240px] bg-[#18181b] border-r border-[#27272a] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 shadow-2xl md:shadow-none overflow-hidden">
 <div class="p-3 border-b border-[#27272a] min-h-[57px]">
@@ -265,15 +404,43 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 </div>
 </div>
-<div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse">
-<div class="flex items-center gap-1.5">
-<span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
-<span id="pingText" class="hide-on-collapse text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
+<!-- Quick Actions Section -->
+<div class="p-2 border-t border-[#27272a] hide-on-collapse">
+    <div class="px-1 mb-1.5 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider flex items-center gap-1">
+        <i data-lucide="zap" class="w-2.5 h-2.5"></i> Quick Actions
+    </div>
+    <div class="grid grid-cols-3 gap-1">
+        <button id="quickNoteBtn" class="p-2 rounded-lg bg-[#09090b] border border-[#27272a] hover:border-primary/30 hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all group flex flex-col items-center gap-1" title="Quick Notes">
+            <i data-lucide="sticky-note" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform"></i>
+            <span class="text-[8px]">Notes</span>
+        </button>
+        <button id="quickTodoBtn" class="p-2 rounded-lg bg-[#09090b] border border-[#27272a] hover:border-primary/30 hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all group flex flex-col items-center gap-1" title="Todo List">
+            <i data-lucide="check-square" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform"></i>
+            <span class="text-[8px]">Tasks</span>
+        </button>
+        <button id="quickBookmarkBtn" class="p-2 rounded-lg bg-[#09090b] border border-[#27272a] hover:border-primary/30 hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all group flex flex-col items-center gap-1" title="Bookmarks">
+            <i data-lucide="bookmark" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform"></i>
+            <span class="text-[8px]">Saved</span>
+        </button>
+    </div>
 </div>
-<span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
+<!-- Sidebar Footer -->
+<div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse">
+    <div class="flex items-center gap-2">
+        <button id="homeBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Go Home">
+            <i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+        </button>
+        <button id="settingsBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Settings">
+            <i data-lucide="settings" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+        </button>
+        <div class="flex items-center gap-1.5 hide-on-collapse">
+            <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
+            <span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
+        </div>
+    </div>
+    <span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
 </div>
 </aside>
-
 <!-- Main -->
 <main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
 <!-- Desktop History Bar: Removed 'flex', kept 'hidden'. Logic adds 'md:flex' -->
@@ -285,7 +452,6 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="text-[10px] text-[#a1a1aa]/50 italic">No recent history</span>
 </div>
 </div>
-
 <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
 <div class="flex flex-col items-center justify-center w-full max-w-lg">
 <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -311,7 +477,6 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span class="text-sm text-[#a1a1aa] animate-pulse mt-2 tracking-wide font-medium">Initializing Environment...</span>
 </div>
 </div>
-
 <div id="splitContainer" class="flex-1 relative flex w-full h-full">
 <div id="leftPane" class="split-pane active" style="width: 100%;">
 <div class="pane-indicator" title="Set as Active Pane">LEFT</div>
@@ -323,7 +488,6 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <iframe id="portalFrame2" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
 </div>
 </div>
-
 <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
 <div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
 <div class="w-20 h-20 bg-[#18181b] rounded-3xl border border-[#27272a] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
@@ -331,30 +495,23 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 <h2 class="text-3xl font-black mb-2 text-white tracking-tight">Welcome Back</h2>
 <p class="text-[#a1a1aa] mb-8 text-sm">Select a tool from the sidebar.</p>
-<button id="goHomeBtn" class="group flex items-center gap-3 px-6 py-3 bg-[#18181b] hover:bg-[#1e1e22] border border-[#27272a] hover:border-primary/50 rounded-xl transition-all duration-200 shadow-xl hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] pointer-events-auto">
-<i data-lucide="home" class="w-4 h-4 text-[#a1a1aa] group-hover:text-primary transition-colors"></i>
-<span class="text-sm font-bold text-[#e4e4e7] group-hover:text-primary transition-colors">Go to Dashboard</span>
-</button>
 </div>
 </div>
 </main>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
 const firebaseConfig = {
 apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
 authDomain: "h-90-8a7c5.firebaseapp.com",
 databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
 projectId: "h-90-8a7c5",
-storageBucket: "h-90-8a7c5.firebasestorage.app",
+storageBucket: "h-90-8a7c5.appspot.com",
 messagingSenderId: "367196609301",
 appId: "1:367196609301:web:156e24c1b4532c26af671c"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 const els = {
 sidebar: document.getElementById('sidebar'),
 sidebarToggle: document.getElementById('sidebarToggle'),
@@ -380,12 +537,9 @@ leftPane: document.getElementById('leftPane'),
 rightPane: document.getElementById('rightPane'),
 splitResizer: document.getElementById('splitResizer'),
 };
-
 if (window.autoAnimate && els.list) window.autoAnimate(els.list);
 if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
-
 lucide.createIcons();
-
 function updateStatus() {
 const d = document.getElementById('statusDot');
 const t = document.getElementById('pingText');
@@ -403,7 +557,6 @@ t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
 window.addEventListener('online', updateStatus);
 window.addEventListener('offline', updateStatus);
 updateStatus();
-
 document.addEventListener('mousemove', (e) => {
 document.querySelectorAll('.project-card').forEach(card => {
 const rect = card.getBoundingClientRect();
@@ -411,19 +564,16 @@ card.style.setProperty('--x', `${e.clientX - rect.left}px`);
 card.style.setProperty('--y', `${e.clientY - rect.top}px`);
 });
 });
-
 let allSites = [];
 let pinnedIds = JSON.parse(localStorage.getItem('pinnedProjects') || '[]');
 let history = [];
 let splitViewActive = false;
 let activePane = 'left';
 let isDragging = false;
-
 function setIframePointerEvents(value) {
 if (els.frame) els.frame.style.pointerEvents = value;
 if (els.frame2) els.frame2.style.pointerEvents = value;
 }
-
 function updatePaneVisuals() {
 if (!splitViewActive) {
 els.leftPane.classList.add('active');
@@ -440,15 +590,12 @@ els.rightPane.classList.add('active'); els.rightPane.classList.remove('inactive'
 els.leftPane.classList.add('inactive'); els.leftPane.classList.remove('active');
 }
 }
-
 function setActivePane(pane) {
 activePane = pane;
 updatePaneVisuals();
 }
-
 document.querySelector('#leftPane .pane-indicator').onclick = () => setActivePane('left');
 document.querySelector('#rightPane .pane-indicator').onclick = () => setActivePane('right');
-
 if (els.splitBtn) {
 els.splitBtn.onclick = () => {
 if (window.innerWidth < 768) return;
@@ -474,7 +621,6 @@ setIframePointerEvents('auto');
 lucide.createIcons();
 };
 }
-
 els.splitResizer.addEventListener('mousedown', () => {
 if (!splitViewActive) return;
 isDragging = true;
@@ -483,7 +629,6 @@ document.body.style.cursor = 'col-resize';
 document.body.style.userSelect = 'none';
 setIframePointerEvents('none');
 });
-
 document.addEventListener('mousemove', (e) => {
 if (!isDragging) return;
 const rect = els.splitContainer.getBoundingClientRect();
@@ -494,7 +639,6 @@ els.leftPane.style.width = `${pct}%`;
 els.rightPane.style.width = `${100 - pct}%`;
 }
 });
-
 document.addEventListener('mouseup', () => {
 if (!isDragging) return;
 isDragging = false;
@@ -504,7 +648,6 @@ document.body.style.userSelect = '';
 setIframePointerEvents('auto');
 updatePaneVisuals();
 });
-
 window.addEventListener('resize', () => {
 if (window.innerWidth < 768 && splitViewActive) {
 splitViewActive = false;
@@ -518,7 +661,6 @@ setActivePane('left');
 setIframePointerEvents('auto');
 }
 });
-
 function togglePin(id, e) {
 e.stopPropagation();
 if (pinnedIds.includes(id)) pinnedIds = pinnedIds.filter(pid => pid !== id);
@@ -527,7 +669,6 @@ localStorage.setItem('pinnedProjects', JSON.stringify(pinnedIds));
 renderProjects();
 }
 window.togglePin = togglePin;
-
 document.addEventListener('keydown', (e) => {
 if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 e.preventDefault();
@@ -537,16 +678,13 @@ setTimeout(() => document.getElementById('cmdContent').classList.remove('scale-9
 }
 if (e.key === 'Escape') closeCmd();
 });
-
 function closeCmd() {
 document.getElementById('cmdContent').classList.add('scale-95', 'opacity-0');
 setTimeout(() => els.cmdPalette.classList.add('hidden'), 200);
 }
-
 els.cmdPalette.addEventListener('click', (e) => {
 if (e.target === els.cmdPalette) closeCmd();
 });
-
 els.cmdInput.addEventListener('input', (e) => {
 const q = e.target.value.toLowerCase();
 const results = allSites.filter(s => (s.title || '').toLowerCase().includes(q));
@@ -557,27 +695,22 @@ els.cmdResults.innerHTML = results.slice(0, 5).map(site => `
 </button>
 `).join('');
 });
-
 window.loadProjectFromCmd = (url) => { loadProject(url); closeCmd(); };
-
 function addToHistory(title, url) {
 history = history.filter(h => h.url !== url);
 history.unshift({ title, url });
 if (history.length > 5) history.pop();
-  
 const historyHTML = history.map(h => `
 <button onclick="loadProject('${h.url}')"
 class="shrink-0 px-2 py-0.5 text-[10px] bg-[#18181b] border border-[#27272a] rounded hover:border-primary/50 hover:text-primary text-[#a1a1aa] transition-colors truncate max-w-[110px]">
 ${h.title}
 </button>
 `).join('');
-
 els.historyChips.innerHTML = historyHTML;
 if (history.length > 0) {
-    // UPDATED: Use md:flex to show only on desktop, keep hidden on mobile
-    els.historyBar.classList.add('md:flex');
+// UPDATED: Use md:flex to show only on desktop, keep hidden on mobile
+els.historyBar.classList.add('md:flex');
 }
-
 els.mobileHistoryChips.innerHTML = history.map(h => `
 <button onclick="loadProject('${h.url}')"
 class="shrink-0 px-1.5 py-0.5 text-[9px] bg-[#27272a] border border-[#3f3f46] rounded hover:border-primary/50 hover:text-primary text-[#a1a1aa] transition-colors truncate max-w-[70px]">
@@ -585,7 +718,6 @@ ${h.title}
 </button>
 `).join('');
 }
-
 function convertToLocalHostUrl(url) {
 try {
 const u = new URL(url);
@@ -595,7 +727,6 @@ return window.location.origin + u.pathname;
 return url;
 }
 }
-
 function loadProject(url, btnElement) {
 els.loader.classList.remove('hidden');
 els.empty.classList.add('hidden');
@@ -609,7 +740,6 @@ const site = allSites.find(s => convertToLocalHostUrl(s.url) === convertToLocalH
 if (site) addToHistory(site.title, url);
 }
 window.loadProject = loadProject;
-
 function createCard(site, isPinned) {
 const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
 const btn = document.createElement('button');
@@ -636,7 +766,6 @@ class="p-0.5 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white opacity-
 btn.onclick = () => loadProject(site.url, btn);
 return btn;
 }
-
 function renderProjects() {
 els.list.innerHTML = '';
 els.pinnedList.innerHTML = '';
@@ -656,7 +785,6 @@ els.pinnedSection.classList.add('hidden');
 others.forEach(site => els.list.appendChild(createCard(site, false)));
 lucide.createIcons();
 }
-
 onValue(ref(db, 'sites'), (snapshot) => {
 const data = snapshot.val();
 if (!data) {
@@ -668,7 +796,6 @@ allSites = Object.entries(data)
 .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
 renderProjects();
 });
-
 els.search.oninput = (e) => {
 const q = e.target.value.toLowerCase();
 document.querySelectorAll('.project-card').forEach(btn => {
@@ -676,7 +803,6 @@ const text = btn.innerText.toLowerCase();
 btn.style.display = text.includes(q) ? 'flex' : 'none';
 });
 };
-
 function toggleSidebar(show) {
 if (show) {
 els.sidebar.classList.remove('-translate-x-full');
@@ -690,7 +816,6 @@ setTimeout(() => els.overlay.classList.add('hidden'), 300);
 }
 els.menuBtn && (els.menuBtn.onclick = () => toggleSidebar(true));
 els.overlay && (els.overlay.onclick = () => toggleSidebar(false));
-
 let isCollapsed = false;
 if (els.sidebarToggle) {
 els.sidebarToggle.onclick = () => {
@@ -705,17 +830,320 @@ els.sidebarToggle.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"
 lucide.createIcons();
 };
 }
-
 document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
-document.getElementById('goHomeBtn').onclick = () => {
-els.loader.classList.remove('hidden');
-els.empty.classList.add('hidden');
-els.frame.src = window.location.origin + '/index.html';
+document.getElementById('homeBtn').onclick = () => {
+    els.loader.classList.remove('hidden');
+    els.empty.classList.add('hidden');
+    const targetFrame = (splitViewActive && activePane === 'right') ? els.frame2 : els.frame;
+    targetFrame.src = '/index.html';
+    targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
+    addToHistory('Home', '/index.html');
 };
 document.getElementById('fullscreenBtn').onclick = () => {
 if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
 else if (document.exitFullscreen) document.exitFullscreen();
 };
+
+// =====================================================
+// QUICK ACTIONS: Notes, Tasks, Bookmarks, Settings
+// =====================================================
+
+// Panel Elements
+const notesPanel = document.getElementById('notesPanel');
+const tasksPanel = document.getElementById('tasksPanel');
+const bookmarksPanel = document.getElementById('bookmarksPanel');
+const settingsPanel = document.getElementById('settingsPanel');
+
+// Helper: Close all side panels
+function closeAllPanels() {
+    notesPanel.classList.add('translate-x-full');
+    tasksPanel.classList.add('translate-x-full');
+    bookmarksPanel.classList.add('translate-x-full');
+}
+
+// Helper: Toggle panel
+function togglePanel(panel) {
+    const isOpen = !panel.classList.contains('translate-x-full');
+    closeAllPanels();
+    if (!isOpen) {
+        panel.classList.remove('translate-x-full');
+    }
+}
+
+// ---- NOTES FEATURE ----
+const notesTextarea = document.getElementById('notesTextarea');
+const notesCharCount = document.getElementById('notesCharCount');
+
+// Load saved notes
+notesTextarea.value = localStorage.getItem('portalNotes') || '';
+notesCharCount.textContent = `${notesTextarea.value.length} characters`;
+
+// Auto-save notes
+notesTextarea.addEventListener('input', () => {
+    localStorage.setItem('portalNotes', notesTextarea.value);
+    notesCharCount.textContent = `${notesTextarea.value.length} characters`;
+});
+
+document.getElementById('quickNoteBtn').onclick = () => togglePanel(notesPanel);
+document.getElementById('closeNotesBtn').onclick = () => notesPanel.classList.add('translate-x-full');
+
+// ---- TASKS FEATURE ----
+let tasks = JSON.parse(localStorage.getItem('portalTasks') || '[]');
+
+function saveTasks() {
+    localStorage.setItem('portalTasks', JSON.stringify(tasks));
+}
+
+function renderTasks() {
+    const tasksList = document.getElementById('tasksList');
+    const tasksCount = document.getElementById('tasksCount');
+
+    if (tasks.length === 0) {
+        tasksList.innerHTML = '<div class="text-center text-[#a1a1aa] text-xs py-8">No tasks yet. Add one above.</div>';
+    } else {
+        tasksList.innerHTML = tasks.map((task, index) => `
+            <div class="flex items-center gap-2 p-2 bg-[#09090b] border border-[#27272a] rounded-lg group ${task.completed ? 'opacity-50' : ''}">
+                <button onclick="toggleTask(${index})" class="p-0.5 rounded ${task.completed ? 'text-primary' : 'text-[#a1a1aa] hover:text-white'}">
+                    <i data-lucide="${task.completed ? 'check-circle-2' : 'circle'}" class="w-4 h-4"></i>
+                </button>
+                <span class="flex-1 text-sm ${task.completed ? 'line-through text-[#a1a1aa]' : 'text-white'}">${task.text}</span>
+                <button onclick="deleteTask(${index})" class="p-0.5 rounded text-[#a1a1aa] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    const completedCount = tasks.filter(t => t.completed).length;
+    tasksCount.textContent = `${tasks.length} tasks (${completedCount} done)`;
+}
+
+window.toggleTask = (index) => {
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
+};
+
+window.deleteTask = (index) => {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
+};
+
+function addTask() {
+    const input = document.getElementById('newTaskInput');
+    const text = input.value.trim();
+    if (text) {
+        tasks.unshift({ text, completed: false, created: Date.now() });
+        saveTasks();
+        renderTasks();
+        input.value = '';
+    }
+}
+
+document.getElementById('addTaskBtn').onclick = addTask;
+document.getElementById('newTaskInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
+
+document.getElementById('clearCompletedBtn').onclick = () => {
+    tasks = tasks.filter(t => !t.completed);
+    saveTasks();
+    renderTasks();
+};
+
+document.getElementById('quickTodoBtn').onclick = () => togglePanel(tasksPanel);
+document.getElementById('closeTasksBtn').onclick = () => tasksPanel.classList.add('translate-x-full');
+
+renderTasks();
+
+// ---- BOOKMARKS FEATURE ----
+let bookmarks = JSON.parse(localStorage.getItem('portalBookmarks') || '[]');
+
+function saveBookmarks() {
+    localStorage.setItem('portalBookmarks', JSON.stringify(bookmarks));
+}
+
+function renderBookmarks() {
+    const bookmarksList = document.getElementById('bookmarksList');
+    const bookmarksCount = document.getElementById('bookmarksCount');
+
+    if (bookmarks.length === 0) {
+        bookmarksList.innerHTML = '<div class="text-center text-[#a1a1aa] text-xs py-8">No bookmarks yet. Add one above.</div>';
+    } else {
+        bookmarksList.innerHTML = bookmarks.map((bm, index) => `
+            <div class="flex items-center gap-2 p-2 bg-[#09090b] border border-[#27272a] rounded-lg group hover:border-[#3f3f46] transition-colors">
+                <div class="w-6 h-6 rounded bg-[#27272a] flex items-center justify-center shrink-0">
+                    <i data-lucide="link" class="w-3 h-3 text-[#a1a1aa]"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs text-white truncate cursor-pointer hover:text-primary" onclick="openBookmark('${bm.url}')">${bm.title || bm.url}</div>
+                    <div class="text-[9px] text-[#a1a1aa] truncate">${bm.url}</div>
+                </div>
+                <button onclick="deleteBookmark(${index})" class="p-0.5 rounded text-[#a1a1aa] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    bookmarksCount.textContent = `${bookmarks.length} bookmarks`;
+}
+
+window.openBookmark = (url) => {
+    loadProject(url);
+    bookmarksPanel.classList.add('translate-x-full');
+};
+
+window.deleteBookmark = (index) => {
+    bookmarks.splice(index, 1);
+    saveBookmarks();
+    renderBookmarks();
+};
+
+function addBookmark() {
+    const input = document.getElementById('bookmarkUrlInput');
+    const url = input.value.trim();
+    if (url) {
+        let title = url;
+        try {
+            const urlObj = new URL(url.startsWith('http') ? url : 'https://' + url);
+            title = urlObj.hostname + urlObj.pathname;
+        } catch(e) {}
+        bookmarks.unshift({ url: url.startsWith('http') ? url : 'https://' + url, title, created: Date.now() });
+        saveBookmarks();
+        renderBookmarks();
+        input.value = '';
+    }
+}
+
+document.getElementById('addBookmarkBtn').onclick = addBookmark;
+document.getElementById('bookmarkUrlInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addBookmark();
+});
+
+document.getElementById('quickBookmarkBtn').onclick = () => togglePanel(bookmarksPanel);
+document.getElementById('closeBookmarksBtn').onclick = () => bookmarksPanel.classList.add('translate-x-full');
+
+renderBookmarks();
+
+// ---- SETTINGS FEATURE ----
+const compactModeToggle = document.getElementById('compactModeToggle');
+const autoLoadToggle = document.getElementById('autoLoadToggle');
+const showScreenshotsToggle = document.getElementById('showScreenshotsToggle');
+
+// Load settings
+compactModeToggle.checked = localStorage.getItem('portalCompactMode') === 'true';
+autoLoadToggle.checked = localStorage.getItem('portalAutoLoad') === 'true';
+showScreenshotsToggle.checked = localStorage.getItem('portalShowScreenshots') !== 'false';
+
+// Apply compact mode
+function applyCompactMode() {
+    if (compactModeToggle.checked) {
+        document.documentElement.classList.add('compact-mode');
+    } else {
+        document.documentElement.classList.remove('compact-mode');
+    }
+}
+applyCompactMode();
+
+compactModeToggle.addEventListener('change', () => {
+    localStorage.setItem('portalCompactMode', compactModeToggle.checked);
+    applyCompactMode();
+});
+
+autoLoadToggle.addEventListener('change', () => {
+    localStorage.setItem('portalAutoLoad', autoLoadToggle.checked);
+});
+
+showScreenshotsToggle.addEventListener('change', () => {
+    localStorage.setItem('portalShowScreenshots', showScreenshotsToggle.checked);
+    document.querySelectorAll('.screenshot-img').forEach(img => {
+        img.style.display = showScreenshotsToggle.checked ? 'block' : 'none';
+    });
+});
+
+document.getElementById('settingsBtn').onclick = () => {
+    settingsPanel.classList.remove('hidden');
+    settingsPanel.classList.add('flex');
+};
+
+document.getElementById('closeSettingsBtn').onclick = () => {
+    settingsPanel.classList.add('hidden');
+    settingsPanel.classList.remove('flex');
+};
+
+settingsPanel.addEventListener('click', (e) => {
+    if (e.target === settingsPanel) {
+        settingsPanel.classList.add('hidden');
+        settingsPanel.classList.remove('flex');
+    }
+});
+
+document.getElementById('exportDataBtn').onclick = () => {
+    const data = {
+        notes: localStorage.getItem('portalNotes') || '',
+        tasks: JSON.parse(localStorage.getItem('portalTasks') || '[]'),
+        bookmarks: JSON.parse(localStorage.getItem('portalBookmarks') || '[]'),
+        pinnedProjects: JSON.parse(localStorage.getItem('pinnedProjects') || '[]'),
+        settings: {
+            compactMode: localStorage.getItem('portalCompactMode'),
+            autoLoad: localStorage.getItem('portalAutoLoad'),
+            showScreenshots: localStorage.getItem('portalShowScreenshots')
+        }
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'portal-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+};
+
+document.getElementById('clearDataBtn').onclick = () => {
+    if (confirm('This will clear all your notes, tasks, bookmarks, and settings. Are you sure?')) {
+        localStorage.removeItem('portalNotes');
+        localStorage.removeItem('portalTasks');
+        localStorage.removeItem('portalBookmarks');
+        localStorage.removeItem('pinnedProjects');
+        localStorage.removeItem('portalCompactMode');
+        localStorage.removeItem('portalAutoLoad');
+        localStorage.removeItem('portalShowScreenshots');
+        location.reload();
+    }
+};
+
+// Auto-load last project
+if (autoLoadToggle.checked && history.length > 0) {
+    setTimeout(() => {
+        const lastUrl = localStorage.getItem('lastProjectUrl');
+        if (lastUrl) loadProject(lastUrl);
+    }, 500);
+}
+
+// Track last visited project
+const originalLoadProject = window.loadProject;
+window.loadProject = function(url, btnElement) {
+    localStorage.setItem('lastProjectUrl', url);
+    originalLoadProject(url, btnElement);
+};
+
+// Close panels when clicking outside (on main content)
+document.querySelector('main').addEventListener('click', closeAllPanels);
+
+// Keyboard shortcut: Escape to close panels
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllPanels();
+        if (settingsPanel.classList.contains('flex')) {
+            settingsPanel.classList.add('hidden');
+            settingsPanel.classList.remove('flex');
+        }
+    }
+});
 </script>
 </body>
 </html>
