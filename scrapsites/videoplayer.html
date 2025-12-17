@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Player Overlay 2025</title>
+    <title>Swiss Player Modern Cinema 2025</title>
     
     <!-- Fonts: Inter Tight -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,9 +21,8 @@
                     },
                     colors: {
                         'swiss-red': '#FF2400',
-                        'swiss-offwhite': '#F5F5F5'
-                    },
-                    screens: { 'md': '850px' }
+                        'glass-black': 'rgba(10, 10, 10, 0.65)'
+                    }
                 }
             }
         }
@@ -34,58 +33,96 @@
     
     <style>
         video::-webkit-media-controls { display: none !important; }
-        .vol-bar.active { background-color: #FF2400; }
-        .vol-bar.inactive { background-color: #E5E5E5; }
-        input[type="text"] { outline: none; background: transparent; }
         button { -webkit-tap-highlight-color: transparent; }
         
-        /* Fullscreen Logic: Overlay Controls */
+        /* --- Transitions --- */
+        #controlsGrid {
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .controls-hidden {
+            opacity: 0 !important;
+            transform: translateY(10px); /* Subtle slide down on hide */
+            pointer-events: none;
+        }
+        .cursor-hidden { cursor: none; }
+
+        /* --- Fullscreen Modernization --- */
         #playerContainer:fullscreen {
             border: none;
             width: 100vw;
             height: 100vh;
             max-width: none;
-            position: relative; /* Anchor for absolute controls */
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* In fullscreen, controls float at bottom */
+        #playerContainer:fullscreen #videoWrapper {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* The Cinematic Scrim (Background Shadow) */
         #playerContainer:fullscreen #controlsGrid {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            border-top: none; /* Remove border for cleaner look */
-            background: rgba(0,0,0,0.6); /* Semi-transparent background */
-            backdrop-filter: blur(10px); /* Frosted glass effect */
-            color: white; /* Force white text */
             z-index: 50;
+            /* Complex gradient for smoother fade (Linear interpolation) */
+            background: linear-gradient(
+                to top,
+                rgba(0,0,0,0.85) 0%,
+                rgba(0,0,0,0.73) 19%,
+                rgba(0,0,0,0.54) 34%,
+                rgba(0,0,0,0.38) 47%,
+                rgba(0,0,0,0.18) 63.5%,
+                rgba(0,0,0,0.06) 78%,
+                rgba(0,0,0,0) 100%
+            );
+            border: none;
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-top: 60px; /* Space for gradient to breathe */
         }
 
-        /* Adjust button hover states in fullscreen for visibility */
-        #playerContainer:fullscreen #controlsGrid button:hover {
-            background: rgba(255, 255, 255, 0.2);
+        /* Modern Text Styling in Fullscreen */
+        #playerContainer:fullscreen .control-text,
+        #playerContainer:fullscreen button {
+            color: rgba(255, 255, 255, 0.95) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
-        /* Force white text in fullscreen controls */
-        #playerContainer:fullscreen #controlsGrid button, 
-        #playerContainer:fullscreen #controlsGrid div {
-            color: white;
-            border-color: rgba(255,255,255,0.2);
+        #playerContainer:fullscreen svg {
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
         }
-        
-        /* Hide layout border lines in fullscreen */
+
+        /* Remove borders in FS */
         #playerContainer:fullscreen #controlsGrid > * {
-            border-color: rgba(255,255,255,0.1);
+            border: none !important;
+        }
+
+        /* Floating Track Design in FS */
+        #playerContainer:fullscreen .track-bg {
+            background-color: rgba(255,255,255,0.2) !important;
+            height: 4px !important; /* Thinner line */
+            border-radius: 99px;
+            overflow: hidden; /* Clean edges */
+        }
+
+        /* Glow effect on hover */
+        #playerContainer:fullscreen button:hover {
+            color: white !important;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body class="bg-white text-black font-sans antialiased min-h-screen flex flex-col items-center justify-center p-2 md:p-8">
 
-    <!-- Player Wrapper -->
     <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col group/container relative">
         
-        <!-- 1. Video Stage -->
-        <!-- In fullscreen, this is absolute and covers everything -->
+        <!-- Video Stage -->
         <div class="relative w-full aspect-video bg-neutral-900 overflow-hidden cursor-pointer group flex items-center justify-center transition-all duration-300" id="videoWrapper">
             
             <video id="mainVideo" class="w-full h-full object-contain absolute inset-0 z-0" playsinline>
@@ -101,7 +138,7 @@
             </div>
 
             <div class="absolute top-4 right-4 z-20">
-                <div id="sourceLabel" class="bg-swiss-red text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
+                <div id="sourceLabel" class="bg-swiss-red text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 shadow-sm">
                     Standard Feed
                 </div>
             </div>
@@ -109,58 +146,58 @@
             <div id="clickLayer" class="absolute inset-0 z-20 bg-transparent"></div>
         </div>
 
-        <!-- 2. Controls Grid -->
-        <!-- Stays static normally, becomes absolute bottom-0 in fullscreen via CSS -->
-        <div id="controlsGrid" class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30 shrink-0 transition-colors duration-300">
+        <!-- Controls Grid -->
+        <div id="controlsGrid" class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30 shrink-0 transition-all duration-300">
             
-            <!-- Scrubber -->
+            <!-- Scrubber: In fullscreen, we move it to row 1 visually via order-first if we want, or keep layout -->
             <div class="order-1 md:order-3 col-span-4 md:col-span-4 flex items-center px-0 md:px-6 relative h-12 md:h-16 group/scrubber bg-transparent">
-                <div id="progressBarContainer" class="w-full h-full flex items-center cursor-pointer relative">
-                    <div class="w-full h-2 md:h-1 bg-neutral-200/50 md:bg-neutral-200 relative pointer-events-none">
-                        <div id="progressFill" class="absolute top-0 left-0 h-full w-0 bg-swiss-red z-10"></div>
-                        <div id="scrubThumb" class="absolute top-0 w-2 h-full md:w-4 md:h-4 md:-mt-1.5 bg-black opacity-100 md:opacity-0 group-hover/scrubber:opacity-100 transition-opacity" style="left: 0;"></div>
+                <div id="progressBarContainer" class="w-full h-full flex items-center cursor-pointer relative px-4 md:px-0">
+                    <div class="track-bg w-full h-2 md:h-1 bg-neutral-200 relative pointer-events-none transition-all duration-300">
+                        <div id="progressFill" class="absolute top-0 left-0 h-full w-0 bg-swiss-red z-10 box-border"></div>
+                        <!-- Thumb glows in fullscreen -->
+                        <div id="scrubThumb" class="absolute top-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 bg-black opacity-100 md:opacity-0 group-hover/scrubber:opacity-100 transition-all duration-200 rounded-full shadow-lg" style="left: 0;"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Transport -->
-            <button id="skipBackBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
-                <span class="font-bold text-xs tracking-tighter">-10s</span>
+            <button id="skipBackBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-all h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
+                <span class="font-bold text-xs tracking-tighter opacity-80 hover:opacity-100">-10s</span>
             </button>
-            <button id="playBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
+            <button id="playBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-all h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
                 <span id="playText" class="font-black text-sm md:text-base tracking-tighter">PLAY</span>
             </button>
-            <button id="skipFwdBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16">
-                <span class="font-bold text-xs tracking-tighter">+10s</span>
+            <button id="skipFwdBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-all h-16 md:h-16">
+                <span class="font-bold text-xs tracking-tighter opacity-80 hover:opacity-100">+10s</span>
             </button>
 
             <!-- Time -->
-            <div class="order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-sm tracking-tight font-medium h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none border-t-2 md:border-t-0 bg-transparent">
-                <span id="currentTime">00:00</span> <span class="text-neutral-400 mx-1">/</span> <span id="duration">00:00</span>
+            <div class="control-text order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-sm tracking-tight font-medium h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none border-t-2 md:border-t-0 bg-transparent">
+                <span id="currentTime">00:00</span> <span class="mx-2 opacity-40">|</span> <span id="duration" class="opacity-60">00:00</span>
             </div>
 
             <!-- Speed -->
-            <button id="speedBtn" class="order-2 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-l-2 border-black md:border-none">
-                <span class="font-bold text-xs tracking-tight">1.0X</span>
+            <button id="speedBtn" class="order-2 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-all h-16 md:h-16 border-l-2 border-black md:border-none">
+                <span class="font-bold text-xs tracking-tight opacity-90 hover:opacity-100">1.0X</span>
             </button>
 
             <!-- PiP -->
-            <button id="pipBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-t-2 md:border-t-0 border-black md:border-none">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <button id="pipBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-all h-16 md:h-16 border-t-2 md:border-t-0 border-black md:border-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 opacity-90 hover:opacity-100">
                     <path stroke-linecap="square" stroke-linejoin="miter" d="M13.5 4.5h6m0 0v6m0-6-9 9" />
                     <path stroke-linecap="square" stroke-linejoin="miter" d="M18 13.5v6a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 3 19.5v-12A1.5 1.5 0 0 1 4.5 6h6" />
                 </svg>
             </button>
 
             <!-- Fullscreen -->
-            <button id="fsBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-colors h-16 md:h-16 border-t-2 md:border-t-0 border-l-2 border-black">
+            <button id="fsBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-all h-16 md:h-16 border-t-2 md:border-t-0 border-l-2 border-black">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="square" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                 </svg>
             </button>
         </div>
 
-        <!-- 3. Source Loader -->
+        <!-- Source Loader -->
         <div id="inputSection" class="bg-swiss-offwhite w-full border-t-2 border-black grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black shrink-0 transition-all">
             <div class="col-span-1 md:col-span-8 flex items-center relative h-14 md:h-16 bg-white">
                 <div class="absolute left-0 top-0 h-full w-12 flex items-center justify-center border-r-2 border-neutral-100">
@@ -187,7 +224,29 @@
         let playerMode = 'native';
         let ytPlayer = null;
         let ytTimer = null;
+        let idleTimer = null;
 
+        function resetIdleTimer() {
+            const controls = document.getElementById('controlsGrid');
+            const container = document.getElementById('playerContainer');
+            
+            controls.classList.remove('controls-hidden');
+            container.classList.remove('cursor-hidden');
+            clearTimeout(idleTimer);
+
+            const video = document.getElementById('mainVideo');
+            const isPlayingNative = !video.paused && playerMode === 'native';
+            const isPlayingYT = ytPlayer && ytPlayer.getPlayerState() === 1 && playerMode === 'youtube';
+
+            if (isPlayingNative || isPlayingYT) {
+                idleTimer = setTimeout(() => {
+                    controls.classList.add('controls-hidden');
+                    container.classList.add('cursor-hidden');
+                }, 3000);
+            }
+        }
+
+        // --- YouTube Logic ---
         function getYoutubeId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = url.match(regExp);
@@ -210,14 +269,17 @@
         function onPlayerStateChange(event) {
             const playText = document.getElementById('playText');
             const overlayText = document.getElementById('overlayText');
+            
             if (event.data === YT.PlayerState.PLAYING) {
                 playText.textContent = "PAUSE";
                 overlayText.classList.add('opacity-0');
                 startYTTimer();
+                resetIdleTimer(); 
             } else {
                 playText.textContent = "PLAY";
                 overlayText.classList.remove('opacity-0');
                 stopYTTimer();
+                resetIdleTimer();
             }
         }
         function startYTTimer() { stopYTTimer(); ytTimer = setInterval(updateYTTime, 500); }
@@ -234,25 +296,43 @@
             const inputSection = document.getElementById('inputSection');
             const controlsGrid = document.getElementById('controlsGrid');
 
+            // --- Auto-Hide Event Listeners ---
+            playerContainer.addEventListener('mousemove', resetIdleTimer);
+            playerContainer.addEventListener('click', resetIdleTimer);
+            playerContainer.addEventListener('touchstart', resetIdleTimer);
+            
+            controlsGrid.addEventListener('mouseenter', () => {
+                clearTimeout(idleTimer);
+                controlsGrid.classList.remove('controls-hidden');
+            });
+            controlsGrid.addEventListener('mouseleave', resetIdleTimer);
+
+
             // Fullscreen Logic
             document.addEventListener('fullscreenchange', () => {
                 if (document.fullscreenElement) {
                     // ENTER FULLSCREEN
                     inputSection.classList.add('hidden');
                     videoWrapper.classList.remove('aspect-video');
-                    videoWrapper.classList.add('h-full', 'w-full'); // Use full size
-                    // Controls are handled by CSS absolute positioning
+                    videoWrapper.classList.add('h-full', 'w-full');
                     
-                    // Force Scrub Thumb to be white in fullscreen for better contrast
+                    // Style adjustments for fullscreen
                     document.getElementById('scrubThumb').style.backgroundColor = "white";
+                    document.getElementById('scrubThumb').classList.add('shadow-white');
+                    
+                    resetIdleTimer();
                 } else {
                     // EXIT FULLSCREEN
                     inputSection.classList.remove('hidden');
                     videoWrapper.classList.add('aspect-video');
                     videoWrapper.classList.remove('h-full', 'w-full');
                     
-                    // Revert scrub thumb
                     document.getElementById('scrubThumb').style.backgroundColor = "black";
+                    document.getElementById('scrubThumb').classList.remove('shadow-white');
+                    
+                    controlsGrid.classList.remove('controls-hidden');
+                    playerContainer.classList.remove('cursor-hidden');
+                    clearTimeout(idleTimer);
                 }
             });
 
@@ -298,10 +378,12 @@
                         video.play();
                         playText.textContent = "PAUSE";
                         overlayText.classList.add('opacity-0');
+                        resetIdleTimer();
                     } else {
                         video.pause();
                         playText.textContent = "PLAY";
                         overlayText.classList.remove('opacity-0');
+                        resetIdleTimer();
                     }
                 } else if (playerMode === 'youtube' && ytPlayer) {
                     const state = ytPlayer.getPlayerState();
@@ -315,10 +397,12 @@
             document.getElementById('skipBackBtn').addEventListener('click', () => {
                 if(playerMode === 'native') video.currentTime = Math.max(0, video.currentTime - 10);
                 else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() - 10, true);
+                resetIdleTimer();
             });
             document.getElementById('skipFwdBtn').addEventListener('click', () => {
                 if(playerMode === 'native') video.currentTime = Math.min(video.duration, video.currentTime + 10);
                 else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + 10, true);
+                resetIdleTimer();
             });
 
             const speeds = [1.0, 1.5, 2.0];
@@ -329,6 +413,7 @@
                 this.querySelector('span').textContent = spd.toFixed(1) + "X";
                 if(playerMode === 'native') video.playbackRate = spd;
                 else if(ytPlayer) ytPlayer.setPlaybackRate(spd);
+                resetIdleTimer();
             });
 
             progressBarContainer.addEventListener('click', (e) => {
@@ -341,6 +426,7 @@
                     const dur = ytPlayer.getDuration();
                     ytPlayer.seekTo(pos * dur, true);
                 }
+                resetIdleTimer();
             });
 
             video.addEventListener('timeupdate', () => {
@@ -351,6 +437,9 @@
             video.addEventListener('loadedmetadata', () => {
                 if(playerMode === 'native') durationDisplay.textContent = formatTime(video.duration);
             });
+            // Hook play event for native video
+            video.addEventListener('play', () => resetIdleTimer());
+            video.addEventListener('pause', () => resetIdleTimer());
 
             window.updateYTTime = function() {
                 if(!ytPlayer || !ytPlayer.getCurrentTime) return;
