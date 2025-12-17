@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Player Ultimate 2025</title>
+    <title>Swiss Player Hybrid 2025</title>
     
     <!-- Fonts: Inter Tight -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,13 +23,14 @@
                         'swiss-red': '#FF2400',
                         'swiss-offwhite': '#F5F5F5'
                     },
-                    screens: {
-                        'md': '850px' 
-                    }
+                    screens: { 'md': '850px' }
                 }
             }
         }
     </script>
+    
+    <!-- YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     
     <style>
         video::-webkit-media-controls { display: none !important; }
@@ -37,6 +38,15 @@
         .vol-bar.inactive { background-color: #E5E5E5; }
         input[type="text"] { outline: none; background: transparent; }
         button { -webkit-tap-highlight-color: transparent; }
+        
+        /* YouTube Overlay Fix: Ensures click events hit our custom wrapper if needed, 
+           but we leave pointer-events auto for YouTube interaction if preferred.
+           For this Swiss design, we want the "WATCH" text to handle visual state. */
+        .yt-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="bg-white text-black font-sans antialiased min-h-screen flex flex-col items-center justify-center p-2 md:p-8">
@@ -44,13 +54,21 @@
     <!-- Player Wrapper -->
     <div id="playerContainer" class="w-full max-w-6xl border-2 border-black bg-black shadow-none md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col">
         
-        <!-- 1. Video Stage -->
+        <!-- 1. Hybrid Video Stage -->
         <div class="relative w-full aspect-video bg-neutral-900 overflow-hidden cursor-pointer group flex items-center justify-center" id="videoWrapper">
-            <video id="mainVideo" class="w-full h-full object-contain" playsinline>
+            
+            <!-- A. Native HTML5 Video (Default) -->
+            <video id="mainVideo" class="w-full h-full object-contain absolute inset-0 z-0" playsinline>
                 <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
             </video>
 
-            <!-- Overlay -->
+            <!-- B. YouTube Placeholder (Hidden by default) -->
+            <div id="ytPlayerContainer" class="absolute inset-0 z-0 hidden w-full h-full bg-black">
+                <div id="ytPlayer"></div>
+            </div>
+
+            <!-- Typography Overlay (UI Layer) -->
+            <!-- mix-blend-difference allows text to be visible over both video types -->
             <div id="overlayText" class="absolute inset-0 flex items-center justify-center pointer-events-none mix-blend-difference z-10 transition-opacity duration-300">
                 <h1 class="text-[15vw] md:text-[12vw] leading-none font-black tracking-tighter text-white">WATCH</h1>
             </div>
@@ -61,10 +79,13 @@
                     Standard Feed
                 </div>
             </div>
+            
+            <!-- Click Capture Layer (Transparent, for unified click-to-pause) -->
+            <div id="clickLayer" class="absolute inset-0 z-20 bg-transparent"></div>
         </div>
 
         <!-- 2. Controls Grid -->
-        <div class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse">
+        <div class="bg-white w-full border-t-2 border-black grid grid-cols-4 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black border-collapse relative z-30">
             
             <!-- Scrubber -->
             <div class="order-1 md:order-3 col-span-4 md:col-span-4 flex items-center px-0 md:px-6 relative h-12 md:h-16 bg-white group/scrubber">
@@ -76,24 +97,20 @@
                 </div>
             </div>
 
-            <!-- Transport Controls -->
+            <!-- Transport -->
             <button id="skipBackBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
                 <span class="font-bold text-xs tracking-tighter">-10s</span>
             </button>
-
             <button id="playBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-swiss-red hover:text-white transition-colors h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none">
                 <span id="playText" class="font-black text-sm md:text-base tracking-tighter">PLAY</span>
             </button>
-
             <button id="skipFwdBtn" class="order-2 md:order-1 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16">
                 <span class="font-bold text-xs tracking-tighter">+10s</span>
             </button>
 
             <!-- Time -->
             <div class="order-3 md:order-2 col-span-2 md:col-span-2 flex items-center justify-center font-mono text-xs md:text-sm tracking-tight font-medium h-16 md:h-16 border-r-2 md:border-r-0 border-black md:border-none border-t-2 md:border-t-0 bg-white">
-                <span id="currentTime">00:00</span> 
-                <span class="text-neutral-400 mx-1">/</span> 
-                <span id="duration">00:00</span>
+                <span id="currentTime">00:00</span> <span class="text-neutral-400 mx-1">/</span> <span id="duration">00:00</span>
             </div>
 
             <!-- Speed -->
@@ -101,10 +118,9 @@
                 <span class="font-bold text-xs tracking-tight">1.0X</span>
             </button>
 
-            <!-- PiP Button (Updated Icon) -->
-            <button id="pipBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-t-2 md:border-t-0 border-black md:border-none" title="Picture in Picture">
+            <!-- PiP -->
+            <button id="pipBtn" class="order-3 md:order-4 col-span-1 md:col-span-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors h-16 md:h-16 border-t-2 md:border-t-0 border-black md:border-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                    <!-- Standard "Pop Out" Icon: Rectangle with Arrow leaving -->
                     <path stroke-linecap="square" stroke-linejoin="miter" d="M13.5 4.5h6m0 0v6m0-6-9 9" />
                     <path stroke-linecap="square" stroke-linejoin="miter" d="M18 13.5v6a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 3 19.5v-12A1.5 1.5 0 0 1 4.5 6h6" />
                 </svg>
@@ -120,15 +136,12 @@
 
         <!-- 3. Source Loader -->
         <div class="bg-swiss-offwhite w-full border-t-2 border-black grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black">
-            <!-- URL Input -->
             <div class="col-span-1 md:col-span-8 flex items-center relative h-14 md:h-16 bg-white">
                 <div class="absolute left-0 top-0 h-full w-12 flex items-center justify-center border-r-2 border-neutral-100">
                     <span class="font-bold text-xs text-neutral-400">URL</span>
                 </div>
-                <input type="text" id="urlInput" placeholder="PASTE LINK..." class="w-full h-full pl-16 pr-4 text-xs md:text-sm font-mono font-medium tracking-tight placeholder-neutral-400 text-black uppercase">
+                <input type="text" id="urlInput" placeholder="PASTE LINK (YOUTUBE OR MP4)..." class="w-full h-full pl-16 pr-4 text-xs md:text-sm font-mono font-medium tracking-tight placeholder-neutral-400 text-black uppercase">
             </div>
-
-            <!-- Buttons -->
             <div class="col-span-1 md:col-span-4 grid grid-cols-2 divide-x-2 divide-black">
                 <button id="loadUrlBtn" class="h-14 md:h-16 bg-white hover:bg-black hover:text-white transition-colors font-bold text-xs tracking-widest uppercase">
                     Load Link
@@ -136,85 +149,102 @@
                 <div class="relative h-14 md:h-16 bg-swiss-red hover:bg-red-700 transition-colors">
                     <input type="file" id="fileInput" accept="video/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
                     <div class="absolute inset-0 flex items-center justify-center text-white z-10 pointer-events-none">
-                        <span class="font-bold text-xs tracking-widest uppercase flex items-center gap-2">
-                            Upload File
-                        </span>
+                        <span class="font-bold text-xs tracking-widest uppercase flex items-center gap-2">Upload File</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Logic Script -->
+    <!-- Hybrid Logic Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const video = document.getElementById('mainVideo');
-            const playBtn = document.getElementById('playBtn');
+        // --- Global State ---
+        let playerMode = 'native'; // 'native' or 'youtube'
+        let ytPlayer = null;
+        let ytTimer = null;
+        
+        // --- 1. YouTube Helper Functions ---
+        function getYoutubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Must be global for YouTube API to call
+        function onYouTubeIframeAPIReady() {
+            // Player created only when needed
+        }
+
+        function createYTPlayer(videoId) {
+            if (ytPlayer) {
+                ytPlayer.loadVideoById(videoId);
+            } else {
+                ytPlayer = new YT.Player('ytPlayer', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: videoId,
+                    playerVars: {
+                        'playsinline': 1,
+                        'controls': 0, // Hide default controls
+                        'modestbranding': 1,
+                        'rel': 0,
+                        'showinfo': 0
+                    },
+                    events: {
+                        'onStateChange': onPlayerStateChange,
+                        'onReady': onPlayerReady
+                    }
+                });
+            }
+        }
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+
+        function onPlayerStateChange(event) {
             const playText = document.getElementById('playText');
             const overlayText = document.getElementById('overlayText');
-            const sourceLabel = document.getElementById('sourceLabel');
-            const skipBackBtn = document.getElementById('skipBackBtn');
-            const skipFwdBtn = document.getElementById('skipFwdBtn');
-            const speedBtn = document.getElementById('speedBtn');
-            const pipBtn = document.getElementById('pipBtn');
-            const urlInput = document.getElementById('urlInput');
-            const loadUrlBtn = document.getElementById('loadUrlBtn');
-            const fileInput = document.getElementById('fileInput');
-
-            // --- 1. Navigation & Speed ---
-            skipBackBtn.addEventListener('click', () => {
-                video.currentTime = Math.max(0, video.currentTime - 10);
-            });
-
-            skipFwdBtn.addEventListener('click', () => {
-                video.currentTime = Math.min(video.duration, video.currentTime + 10);
-            });
-
-            const speeds = [1.0, 1.5, 2.0];
-            let speedIndex = 0;
-            speedBtn.addEventListener('click', () => {
-                speedIndex = (speedIndex + 1) % speeds.length;
-                video.playbackRate = speeds[speedIndex];
-                speedBtn.querySelector('span').textContent = speeds[speedIndex].toFixed(1) + "X";
-            });
-
-            // --- 2. PiP Logic ---
-            pipBtn.addEventListener('click', async () => {
-                try {
-                    if (video !== document.pictureInPictureElement) {
-                        await video.requestPictureInPicture();
-                    } else {
-                        await document.exitPictureInPicture();
-                    }
-                } catch (error) {
-                    // Fallback visual feedback if PiP fails
-                    pipBtn.style.color = '#FF2400';
-                    setTimeout(() => pipBtn.style.color = '', 500);
-                }
-            });
-
-            // --- 3. Play/Pause ---
-            function togglePlay() {
-                if (video.paused) {
-                    video.play();
-                    playText.textContent = "PAUSE";
-                    overlayText.classList.add('opacity-0');
-                } else {
-                    video.pause();
-                    playText.textContent = "PLAY";
-                    overlayText.classList.remove('opacity-0');
-                }
+            
+            // YT.PlayerState.PLAYING = 1
+            if (event.data === YT.PlayerState.PLAYING) {
+                playText.textContent = "PAUSE";
+                overlayText.classList.add('opacity-0');
+                startYTTimer();
+            } else {
+                playText.textContent = "PLAY";
+                overlayText.classList.remove('opacity-0');
+                stopYTTimer();
             }
-            playBtn.addEventListener('click', togglePlay);
-            document.getElementById('videoWrapper').addEventListener('click', togglePlay);
+        }
 
-            // --- 4. Scrubbing ---
+        function startYTTimer() {
+            stopYTTimer();
+            ytTimer = setInterval(updateYTTime, 500);
+        }
+
+        function stopYTTimer() {
+            if (ytTimer) clearInterval(ytTimer);
+        }
+
+        // --- 2. Main Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('mainVideo');
+            const ytContainer = document.getElementById('ytPlayerContainer');
+            const overlayText = document.getElementById('overlayText');
+            const sourceLabel = document.getElementById('sourceLabel');
+            
+            // Controls
+            const playBtn = document.getElementById('playBtn');
+            const playText = document.getElementById('playText');
             const timeDisplay = document.getElementById('currentTime');
             const durationDisplay = document.getElementById('duration');
             const progressBarContainer = document.getElementById('progressBarContainer');
             const progressFill = document.getElementById('progressFill');
             const scrubThumb = document.getElementById('scrubThumb');
+            const clickLayer = document.getElementById('clickLayer');
 
+            // --- Unified Time Formatter ---
             function formatTime(seconds) {
                 if(isNaN(seconds)) return "00:00";
                 const m = Math.floor(seconds / 60);
@@ -222,56 +252,165 @@
                 return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }
 
-            video.addEventListener('loadedmetadata', () => {
-                durationDisplay.textContent = formatTime(video.duration);
-            });
-
-            video.addEventListener('timeupdate', () => {
-                if(!video.duration) return;
-                const percent = (video.currentTime / video.duration) * 100;
-                progressFill.style.width = `${percent}%`;
-                scrubThumb.style.left = `${percent}%`;
-                timeDisplay.textContent = formatTime(video.currentTime);
-            });
-
-            progressBarContainer.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if(!video.duration) return;
-                const rect = progressBarContainer.getBoundingClientRect();
-                const pos = (e.clientX - rect.left) / rect.width;
-                video.currentTime = pos * video.duration;
-            });
-
-            // --- 5. Sources ---
-            loadUrlBtn.addEventListener('click', () => {
-                if(urlInput.value.trim()) {
-                    loadSource(urlInput.value.trim(), "WEB LINK");
-                }
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if(file) {
-                    loadSource(URL.createObjectURL(file), "LOCAL FILE");
-                }
-            });
-
-            function loadSource(src, label) {
+            // --- 3. Switcher Logic ---
+            function switchMode(mode) {
+                playerMode = mode;
                 video.pause();
-                video.src = src;
-                video.load();
-                sourceLabel.textContent = label;
+                stopYTTimer();
+                
+                if (mode === 'youtube') {
+                    video.classList.add('hidden');
+                    ytContainer.classList.remove('hidden');
+                    sourceLabel.textContent = "YOUTUBE";
+                    // YouTube doesn't support PiP via standard API button easily on all browsers
+                    document.getElementById('pipBtn').style.opacity = '0.3'; 
+                } else {
+                    if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+                    video.classList.remove('hidden');
+                    ytContainer.classList.add('hidden');
+                    sourceLabel.textContent = "LOCAL/WEB";
+                    document.getElementById('pipBtn').style.opacity = '1';
+                }
+                
                 sourceLabel.classList.remove('bg-swiss-red');
                 sourceLabel.classList.add('bg-black');
-                playText.textContent = "PLAY";
-                overlayText.classList.remove('opacity-0');
             }
 
-            // --- 6. Fullscreen ---
+            // --- 4. Unified Control Logic ---
+            
+            // Play/Pause
+            function togglePlay() {
+                if (playerMode === 'native') {
+                    if (video.paused) {
+                        video.play();
+                        playText.textContent = "PAUSE";
+                        overlayText.classList.add('opacity-0');
+                    } else {
+                        video.pause();
+                        playText.textContent = "PLAY";
+                        overlayText.classList.remove('opacity-0');
+                    }
+                } else if (playerMode === 'youtube' && ytPlayer) {
+                    const state = ytPlayer.getPlayerState();
+                    if (state === 1) { // Playing
+                        ytPlayer.pauseVideo();
+                    } else {
+                        ytPlayer.playVideo();
+                    }
+                }
+            }
+            playBtn.addEventListener('click', togglePlay);
+            clickLayer.addEventListener('click', togglePlay);
+
+            // Skip
+            document.getElementById('skipBackBtn').addEventListener('click', () => {
+                if(playerMode === 'native') video.currentTime = Math.max(0, video.currentTime - 10);
+                else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() - 10, true);
+            });
+
+            document.getElementById('skipFwdBtn').addEventListener('click', () => {
+                if(playerMode === 'native') video.currentTime = Math.min(video.duration, video.currentTime + 10);
+                else if(ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + 10, true);
+            });
+
+            // Speed
+            const speeds = [1.0, 1.5, 2.0];
+            let speedIndex = 0;
+            document.getElementById('speedBtn').addEventListener('click', function() {
+                speedIndex = (speedIndex + 1) % speeds.length;
+                const spd = speeds[speedIndex];
+                this.querySelector('span').textContent = spd.toFixed(1) + "X";
+                
+                if(playerMode === 'native') video.playbackRate = spd;
+                else if(ytPlayer) ytPlayer.setPlaybackRate(spd);
+            });
+
+            // Scrubbing
+            progressBarContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = progressBarContainer.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                
+                if(playerMode === 'native' && video.duration) {
+                    video.currentTime = pos * video.duration;
+                } else if(playerMode === 'youtube' && ytPlayer) {
+                    const dur = ytPlayer.getDuration();
+                    ytPlayer.seekTo(pos * dur, true);
+                }
+            });
+
+            // --- 5. Updates & Events ---
+            
+            // Native Updates
+            video.addEventListener('timeupdate', () => {
+                if(playerMode !== 'native') return;
+                const percent = (video.currentTime / video.duration) * 100;
+                updateUI(video.currentTime, video.duration, percent);
+            });
+            
+            video.addEventListener('loadedmetadata', () => {
+                if(playerMode === 'native') durationDisplay.textContent = formatTime(video.duration);
+            });
+
+            // YouTube Updates (Polled via setInterval in startYTTimer)
+            window.updateYTTime = function() {
+                if(!ytPlayer || !ytPlayer.getCurrentTime) return;
+                const curr = ytPlayer.getCurrentTime();
+                const dur = ytPlayer.getDuration();
+                if(dur) {
+                    const percent = (curr / dur) * 100;
+                    updateUI(curr, dur, percent);
+                }
+            };
+
+            function updateUI(curr, dur, percent) {
+                progressFill.style.width = `${percent}%`;
+                scrubThumb.style.left = `${percent}%`;
+                timeDisplay.textContent = formatTime(curr);
+                durationDisplay.textContent = formatTime(dur);
+            }
+
+            // --- 6. Input Handlers ---
+            const urlInput = document.getElementById('urlInput');
+            
+            document.getElementById('loadUrlBtn').addEventListener('click', () => {
+                const val = urlInput.value.trim();
+                if(!val) return;
+                
+                const ytId = getYoutubeId(val);
+                if (ytId) {
+                    switchMode('youtube');
+                    createYTPlayer(ytId);
+                } else {
+                    switchMode('native');
+                    video.src = val;
+                    video.load();
+                    video.play();
+                }
+            });
+
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    switchMode('native');
+                    video.src = URL.createObjectURL(file);
+                    video.load();
+                    video.play();
+                }
+            });
+
+            // --- 7. Fullscreen & PiP ---
             document.getElementById('fsBtn').addEventListener('click', () => {
                 const el = document.getElementById('playerContainer');
                 if(!document.fullscreenElement) el.requestFullscreen();
                 else document.exitFullscreen();
+            });
+            
+            document.getElementById('pipBtn').addEventListener('click', async () => {
+                if(playerMode === 'native') {
+                   if (video !== document.pictureInPictureElement) await video.requestPictureInPicture();
+                   else await document.exitPictureInPicture(); 
+                }
             });
         });
     </script>
