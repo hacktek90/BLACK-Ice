@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +8,7 @@
 <link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
 <link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://unpkg.com/quicklink/dist/quicklink.umd.js"></script>
@@ -103,13 +103,19 @@ z-index:3;
 .project-card.active .title-text{color:#60a5fa;font-weight:700;}
 .screenshot-img{opacity:0;transition:opacity .3s;}
 .screenshot-img.loaded{opacity:1;}
-/* Loader */
-.trace-bg{stroke:#27272a;stroke-width:2;fill:none;opacity:0.5;}
-.trace-flow{stroke-width:2;fill:none;stroke-dasharray:40 400;stroke-dashoffset:440;stroke-linecap:round;animation:flow 2.5s cubic-bezier(0.4,0,0.2,1) infinite;}
-.yellow{stroke:#fbbf24;}
-.blue{stroke:#3b82f6;}
-.purple{stroke:#8b5cf6;}
-@keyframes flow{0%{stroke-dashoffset:440;opacity:0;}10%{opacity:1;}80%{opacity:1;}100%{stroke-dashoffset:0;opacity:0;}}
+/* Simple Loader */
+.loader-spinner {
+border: 4px solid #27272a;
+border-top: 4px solid #3b82f6;
+border-radius: 50%;
+width: 48px;
+height: 48px;
+animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
 /* Split view */
 .split-pane{
 position:relative;
@@ -186,11 +192,6 @@ scrollbar-width: none;
 #rightPane{display:none !important;}
 #leftPane{width:100% !important;}
 }
-/* Compact mode styles */
-.compact-mode .project-card{padding:6px 8px !important;}
-.compact-mode .project-card .w-7{width:20px !important;height:20px !important;}
-.compact-mode #projectList{gap:2px !important;}
-.compact-mode .space-y-1>:not([hidden])~:not([hidden]){margin-top:2px !important;}
 </style>
 </head>
 <body class="h-screen w-screen flex flex-col md:flex-row bg-transparent">
@@ -208,142 +209,6 @@ class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 fo
 <span>Select <kbd class="font-sans text-gray-300">↵</kbd></span>
 <span>Navigate <kbd class="font-sans text-gray-300">↑↓</kbd></span>
 </div>
-</div>
-</div>
-
-<!-- Quick Notes Panel -->
-<div id="notesPanel" class="fixed right-0 top-0 h-full w-80 bg-[#18181b] border-l border-[#27272a] z-[90] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
-<div class="p-3 border-b border-[#27272a] flex items-center justify-between">
-    <div class="flex items-center gap-2">
-        <i data-lucide="sticky-note" class="w-4 h-4 text-primary"></i>
-        <span class="font-semibold text-white text-sm">Quick Notes</span>
-    </div>
-    <button id="closeNotesBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
-        <i data-lucide="x" class="w-4 h-4"></i>
-    </button>
-</div>
-<div class="flex-1 p-3 overflow-y-auto">
-    <textarea id="notesTextarea" placeholder="Start typing your notes here..."
-    class="w-full h-full bg-[#09090b] border border-[#27272a] rounded-lg p-3 text-sm text-[#e4e4e7] placeholder:text-[#a1a1aa]/60 outline-none focus:border-primary/50 resize-none"></textarea>
-</div>
-<div class="p-2 border-t border-[#27272a] flex items-center justify-between text-[10px] text-[#a1a1aa]">
-    <span id="notesCharCount">0 characters</span>
-    <span>Auto-saved locally</span>
-</div>
-</div>
-
-<!-- Tasks Panel -->
-<div id="tasksPanel" class="fixed right-0 top-0 h-full w-80 bg-[#18181b] border-l border-[#27272a] z-[90] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
-<div class="p-3 border-b border-[#27272a] flex items-center justify-between">
-    <div class="flex items-center gap-2">
-        <i data-lucide="check-square" class="w-4 h-4 text-primary"></i>
-        <span class="font-semibold text-white text-sm">Tasks</span>
-    </div>
-    <button id="closeTasksBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
-        <i data-lucide="x" class="w-4 h-4"></i>
-    </button>
-</div>
-<div class="p-3 border-b border-[#27272a]">
-    <div class="flex gap-2">
-        <input id="newTaskInput" type="text" placeholder="Add a new task..."
-        class="flex-1 bg-[#09090b] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#e4e4e7] placeholder:text-[#a1a1aa]/60 outline-none focus:border-primary/50">
-        <button id="addTaskBtn" class="p-2 bg-primary/20 border border-primary/30 rounded-lg text-primary hover:bg-primary/30 transition-colors">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-        </button>
-    </div>
-</div>
-<div id="tasksList" class="flex-1 p-3 overflow-y-auto space-y-2">
-    <div class="text-center text-[#a1a1aa] text-xs py-8">No tasks yet. Add one above.</div>
-</div>
-<div class="p-2 border-t border-[#27272a] flex items-center justify-between text-[10px] text-[#a1a1aa]">
-    <span id="tasksCount">0 tasks</span>
-    <button id="clearCompletedBtn" class="hover:text-primary transition-colors">Clear completed</button>
-</div>
-</div>
-
-<!-- Bookmarks Panel -->
-<div id="bookmarksPanel" class="fixed right-0 top-0 h-full w-80 bg-[#18181b] border-l border-[#27272a] z-[90] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
-<div class="p-3 border-b border-[#27272a] flex items-center justify-between">
-    <div class="flex items-center gap-2">
-        <i data-lucide="bookmark" class="w-4 h-4 text-primary"></i>
-        <span class="font-semibold text-white text-sm">Bookmarks</span>
-    </div>
-    <button id="closeBookmarksBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
-        <i data-lucide="x" class="w-4 h-4"></i>
-    </button>
-</div>
-<div class="p-3 border-b border-[#27272a]">
-    <div class="flex gap-2">
-        <input id="bookmarkUrlInput" type="text" placeholder="Paste URL to bookmark..."
-        class="flex-1 bg-[#09090b] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#e4e4e7] placeholder:text-[#a1a1aa]/60 outline-none focus:border-primary/50">
-        <button id="addBookmarkBtn" class="p-2 bg-primary/20 border border-primary/30 rounded-lg text-primary hover:bg-primary/30 transition-colors">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-        </button>
-    </div>
-</div>
-<div id="bookmarksList" class="flex-1 p-3 overflow-y-auto space-y-2">
-    <div class="text-center text-[#a1a1aa] text-xs py-8">No bookmarks yet. Add one above.</div>
-</div>
-<div class="p-2 border-t border-[#27272a] text-[10px] text-[#a1a1aa]">
-    <span id="bookmarksCount">0 bookmarks</span>
-</div>
-</div>
-
-<!-- Settings Panel -->
-<div id="settingsPanel" class="fixed inset-0 z-[95] bg-black/60 hidden items-center justify-center backdrop-blur-sm">
-<div class="w-full max-w-md bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden">
-    <div class="p-4 border-b border-[#27272a] flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <i data-lucide="settings" class="w-5 h-5 text-primary"></i>
-            <span class="font-semibold text-white">Settings</span>
-        </div>
-        <button id="closeSettingsBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-    </div>
-    <div class="p-4 space-y-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <div class="text-sm text-white">Compact Mode</div>
-                <div class="text-[10px] text-[#a1a1aa]">Reduce spacing in project list</div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="compactModeToggle" class="sr-only peer">
-                <div class="w-9 h-5 bg-[#27272a] peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-white"></div>
-            </label>
-        </div>
-        <div class="flex items-center justify-between">
-            <div>
-                <div class="text-sm text-white">Auto-load Last Project</div>
-                <div class="text-[10px] text-[#a1a1aa]">Open last viewed project on startup</div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="autoLoadToggle" class="sr-only peer">
-                <div class="w-9 h-5 bg-[#27272a] peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-white"></div>
-            </label>
-        </div>
-        <div class="flex items-center justify-between">
-            <div>
-                <div class="text-sm text-white">Show Screenshots</div>
-                <div class="text-[10px] text-[#a1a1aa]">Display project thumbnails</div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="showScreenshotsToggle" class="sr-only peer" checked>
-                <div class="w-9 h-5 bg-[#27272a] peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-white"></div>
-            </label>
-        </div>
-        <div class="pt-2 border-t border-[#27272a]">
-            <div class="text-sm text-white mb-2">Data Management</div>
-            <div class="flex gap-2">
-                <button id="exportDataBtn" class="flex-1 px-3 py-2 text-xs bg-[#09090b] border border-[#27272a] rounded-lg text-[#a1a1aa] hover:text-white hover:border-[#3f3f46] transition-colors">
-                    Export Data
-                </button>
-                <button id="clearDataBtn" class="flex-1 px-3 py-2 text-xs bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors">
-                    Clear All Data
-                </button>
-            </div>
-        </div>
-    </div>
 </div>
 </div>
 <!-- Mobile Header -->
@@ -404,41 +269,17 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 </div>
 </div>
-<!-- Quick Actions Section -->
-<div class="p-2 border-t border-[#27272a] hide-on-collapse">
-    <div class="px-1 mb-1.5 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider flex items-center gap-1">
-        <i data-lucide="zap" class="w-2.5 h-2.5"></i> Quick Actions
-    </div>
-    <div class="grid grid-cols-3 gap-1">
-        <button id="quickNoteBtn" class="p-2 rounded-lg bg-[#09090b] border border-[#27272a] hover:border-primary/30 hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all group flex flex-col items-center gap-1" title="Quick Notes">
-            <i data-lucide="sticky-note" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform"></i>
-            <span class="text-[8px]">Notes</span>
-        </button>
-        <button id="quickTodoBtn" class="p-2 rounded-lg bg-[#09090b] border border-[#27272a] hover:border-primary/30 hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all group flex flex-col items-center gap-1" title="Todo List">
-            <i data-lucide="check-square" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform"></i>
-            <span class="text-[8px]">Tasks</span>
-        </button>
-        <button id="quickBookmarkBtn" class="p-2 rounded-lg bg-[#09090b] border border-[#27272a] hover:border-primary/30 hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all group flex flex-col items-center gap-1" title="Bookmarks">
-            <i data-lucide="bookmark" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform"></i>
-            <span class="text-[8px]">Saved</span>
-        </button>
-    </div>
-</div>
-<!-- Sidebar Footer -->
 <div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse">
-    <div class="flex items-center gap-2">
-        <button id="homeBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Go Home">
-            <i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-        </button>
-        <button id="settingsBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Settings">
-            <i data-lucide="settings" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-        </button>
-        <div class="flex items-center gap-1.5 hide-on-collapse">
-            <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
-            <span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
-        </div>
-    </div>
-    <span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
+<div class="flex items-center gap-2">
+<button id="homeBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Go Home">
+<i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+</button>
+<div class="flex items-center gap-1.5 hide-on-collapse">
+<span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
+<span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
+</div>
+</div>
+<span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
 </div>
 </aside>
 <!-- Main -->
@@ -453,28 +294,9 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 </div>
 </div>
 <div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
-<div class="flex flex-col items-center justify-center w-full max-w-lg">
-<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-<defs>
-<linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="#2d2d2d"></stop>
-<stop offset="100%" stop-color="#0f0f0f"></stop>
-</linearGradient>
-<linearGradient id="textGradient" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="#eeeeee"></stop>
-<stop offset="100%" stop-color="#888888"></stop>
-</linearGradient>
-</defs>
-<g id="traces">
-<path d="M100 100 H200 V210 H326" class="trace-bg"></path><path d="M100 100 H200 V210 H326" class="trace-flow purple"></path>
-<path d="M80 180 H180 V230 H326" class="trace-bg"></path><path d="M80 180 H180 V230 H326" class="trace-flow blue"></path>
-<path d="M700 90 H560 V210 H474" class="trace-bg"></path><path d="M700 90 H560 V210 H474" class="trace-flow blue"></path>
-<path d="M680 340 H570 V270 H474" class="trace-bg"></path><path d="M680 340 H570 V270 H474" class="trace-flow yellow"></path>
-</g>
-<rect x="330" y="190" width="140" height="100" rx="20" ry="20" fill="url(#chipGradient)" stroke="#222" stroke-width="3"></rect>
-<text x="400" y="240" font-family="Satoshi, sans-serif" font-weight="700" font-size="22" fill="url(#textGradient)" text-anchor="middle" alignment-baseline="middle">LOADING</text>
-</svg>
-<span class="text-sm text-[#a1a1aa] animate-pulse mt-2 tracking-wide font-medium">Initializing Environment...</span>
+<div class="flex flex-col items-center justify-center gap-4">
+<div class="loader-spinner"></div>
+<span class="text-sm text-[#a1a1aa] font-medium tracking-wide">Loading</span>
 </div>
 </div>
 <div id="splitContainer" class="flex-1 relative flex w-full h-full">
@@ -832,318 +654,17 @@ lucide.createIcons();
 }
 document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
 document.getElementById('homeBtn').onclick = () => {
-    els.loader.classList.remove('hidden');
-    els.empty.classList.add('hidden');
-    const targetFrame = (splitViewActive && activePane === 'right') ? els.frame2 : els.frame;
-    targetFrame.src = '/index.html';
-    targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
-    addToHistory('Home', '/index.html');
+els.loader.classList.remove('hidden');
+els.empty.classList.add('hidden');
+const targetFrame = (splitViewActive && activePane === 'right') ? els.frame2 : els.frame;
+targetFrame.src = '/index.html';
+targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
+addToHistory('Home', '/index.html');
 };
 document.getElementById('fullscreenBtn').onclick = () => {
 if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
 else if (document.exitFullscreen) document.exitFullscreen();
 };
-
-// =====================================================
-// QUICK ACTIONS: Notes, Tasks, Bookmarks, Settings
-// =====================================================
-
-// Panel Elements
-const notesPanel = document.getElementById('notesPanel');
-const tasksPanel = document.getElementById('tasksPanel');
-const bookmarksPanel = document.getElementById('bookmarksPanel');
-const settingsPanel = document.getElementById('settingsPanel');
-
-// Helper: Close all side panels
-function closeAllPanels() {
-    notesPanel.classList.add('translate-x-full');
-    tasksPanel.classList.add('translate-x-full');
-    bookmarksPanel.classList.add('translate-x-full');
-}
-
-// Helper: Toggle panel
-function togglePanel(panel) {
-    const isOpen = !panel.classList.contains('translate-x-full');
-    closeAllPanels();
-    if (!isOpen) {
-        panel.classList.remove('translate-x-full');
-    }
-}
-
-// ---- NOTES FEATURE ----
-const notesTextarea = document.getElementById('notesTextarea');
-const notesCharCount = document.getElementById('notesCharCount');
-
-// Load saved notes
-notesTextarea.value = localStorage.getItem('portalNotes') || '';
-notesCharCount.textContent = `${notesTextarea.value.length} characters`;
-
-// Auto-save notes
-notesTextarea.addEventListener('input', () => {
-    localStorage.setItem('portalNotes', notesTextarea.value);
-    notesCharCount.textContent = `${notesTextarea.value.length} characters`;
-});
-
-document.getElementById('quickNoteBtn').onclick = () => togglePanel(notesPanel);
-document.getElementById('closeNotesBtn').onclick = () => notesPanel.classList.add('translate-x-full');
-
-// ---- TASKS FEATURE ----
-let tasks = JSON.parse(localStorage.getItem('portalTasks') || '[]');
-
-function saveTasks() {
-    localStorage.setItem('portalTasks', JSON.stringify(tasks));
-}
-
-function renderTasks() {
-    const tasksList = document.getElementById('tasksList');
-    const tasksCount = document.getElementById('tasksCount');
-
-    if (tasks.length === 0) {
-        tasksList.innerHTML = '<div class="text-center text-[#a1a1aa] text-xs py-8">No tasks yet. Add one above.</div>';
-    } else {
-        tasksList.innerHTML = tasks.map((task, index) => `
-            <div class="flex items-center gap-2 p-2 bg-[#09090b] border border-[#27272a] rounded-lg group ${task.completed ? 'opacity-50' : ''}">
-                <button onclick="toggleTask(${index})" class="p-0.5 rounded ${task.completed ? 'text-primary' : 'text-[#a1a1aa] hover:text-white'}">
-                    <i data-lucide="${task.completed ? 'check-circle-2' : 'circle'}" class="w-4 h-4"></i>
-                </button>
-                <span class="flex-1 text-sm ${task.completed ? 'line-through text-[#a1a1aa]' : 'text-white'}">${task.text}</span>
-                <button onclick="deleteTask(${index})" class="p-0.5 rounded text-[#a1a1aa] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-            </div>
-        `).join('');
-        lucide.createIcons();
-    }
-
-    const completedCount = tasks.filter(t => t.completed).length;
-    tasksCount.textContent = `${tasks.length} tasks (${completedCount} done)`;
-}
-
-window.toggleTask = (index) => {
-    tasks[index].completed = !tasks[index].completed;
-    saveTasks();
-    renderTasks();
-};
-
-window.deleteTask = (index) => {
-    tasks.splice(index, 1);
-    saveTasks();
-    renderTasks();
-};
-
-function addTask() {
-    const input = document.getElementById('newTaskInput');
-    const text = input.value.trim();
-    if (text) {
-        tasks.unshift({ text, completed: false, created: Date.now() });
-        saveTasks();
-        renderTasks();
-        input.value = '';
-    }
-}
-
-document.getElementById('addTaskBtn').onclick = addTask;
-document.getElementById('newTaskInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addTask();
-});
-
-document.getElementById('clearCompletedBtn').onclick = () => {
-    tasks = tasks.filter(t => !t.completed);
-    saveTasks();
-    renderTasks();
-};
-
-document.getElementById('quickTodoBtn').onclick = () => togglePanel(tasksPanel);
-document.getElementById('closeTasksBtn').onclick = () => tasksPanel.classList.add('translate-x-full');
-
-renderTasks();
-
-// ---- BOOKMARKS FEATURE ----
-let bookmarks = JSON.parse(localStorage.getItem('portalBookmarks') || '[]');
-
-function saveBookmarks() {
-    localStorage.setItem('portalBookmarks', JSON.stringify(bookmarks));
-}
-
-function renderBookmarks() {
-    const bookmarksList = document.getElementById('bookmarksList');
-    const bookmarksCount = document.getElementById('bookmarksCount');
-
-    if (bookmarks.length === 0) {
-        bookmarksList.innerHTML = '<div class="text-center text-[#a1a1aa] text-xs py-8">No bookmarks yet. Add one above.</div>';
-    } else {
-        bookmarksList.innerHTML = bookmarks.map((bm, index) => `
-            <div class="flex items-center gap-2 p-2 bg-[#09090b] border border-[#27272a] rounded-lg group hover:border-[#3f3f46] transition-colors">
-                <div class="w-6 h-6 rounded bg-[#27272a] flex items-center justify-center shrink-0">
-                    <i data-lucide="link" class="w-3 h-3 text-[#a1a1aa]"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="text-xs text-white truncate cursor-pointer hover:text-primary" onclick="openBookmark('${bm.url}')">${bm.title || bm.url}</div>
-                    <div class="text-[9px] text-[#a1a1aa] truncate">${bm.url}</div>
-                </div>
-                <button onclick="deleteBookmark(${index})" class="p-0.5 rounded text-[#a1a1aa] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-            </div>
-        `).join('');
-        lucide.createIcons();
-    }
-
-    bookmarksCount.textContent = `${bookmarks.length} bookmarks`;
-}
-
-window.openBookmark = (url) => {
-    loadProject(url);
-    bookmarksPanel.classList.add('translate-x-full');
-};
-
-window.deleteBookmark = (index) => {
-    bookmarks.splice(index, 1);
-    saveBookmarks();
-    renderBookmarks();
-};
-
-function addBookmark() {
-    const input = document.getElementById('bookmarkUrlInput');
-    const url = input.value.trim();
-    if (url) {
-        let title = url;
-        try {
-            const urlObj = new URL(url.startsWith('http') ? url : 'https://' + url);
-            title = urlObj.hostname + urlObj.pathname;
-        } catch(e) {}
-        bookmarks.unshift({ url: url.startsWith('http') ? url : 'https://' + url, title, created: Date.now() });
-        saveBookmarks();
-        renderBookmarks();
-        input.value = '';
-    }
-}
-
-document.getElementById('addBookmarkBtn').onclick = addBookmark;
-document.getElementById('bookmarkUrlInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addBookmark();
-});
-
-document.getElementById('quickBookmarkBtn').onclick = () => togglePanel(bookmarksPanel);
-document.getElementById('closeBookmarksBtn').onclick = () => bookmarksPanel.classList.add('translate-x-full');
-
-renderBookmarks();
-
-// ---- SETTINGS FEATURE ----
-const compactModeToggle = document.getElementById('compactModeToggle');
-const autoLoadToggle = document.getElementById('autoLoadToggle');
-const showScreenshotsToggle = document.getElementById('showScreenshotsToggle');
-
-// Load settings
-compactModeToggle.checked = localStorage.getItem('portalCompactMode') === 'true';
-autoLoadToggle.checked = localStorage.getItem('portalAutoLoad') === 'true';
-showScreenshotsToggle.checked = localStorage.getItem('portalShowScreenshots') !== 'false';
-
-// Apply compact mode
-function applyCompactMode() {
-    if (compactModeToggle.checked) {
-        document.documentElement.classList.add('compact-mode');
-    } else {
-        document.documentElement.classList.remove('compact-mode');
-    }
-}
-applyCompactMode();
-
-compactModeToggle.addEventListener('change', () => {
-    localStorage.setItem('portalCompactMode', compactModeToggle.checked);
-    applyCompactMode();
-});
-
-autoLoadToggle.addEventListener('change', () => {
-    localStorage.setItem('portalAutoLoad', autoLoadToggle.checked);
-});
-
-showScreenshotsToggle.addEventListener('change', () => {
-    localStorage.setItem('portalShowScreenshots', showScreenshotsToggle.checked);
-    document.querySelectorAll('.screenshot-img').forEach(img => {
-        img.style.display = showScreenshotsToggle.checked ? 'block' : 'none';
-    });
-});
-
-document.getElementById('settingsBtn').onclick = () => {
-    settingsPanel.classList.remove('hidden');
-    settingsPanel.classList.add('flex');
-};
-
-document.getElementById('closeSettingsBtn').onclick = () => {
-    settingsPanel.classList.add('hidden');
-    settingsPanel.classList.remove('flex');
-};
-
-settingsPanel.addEventListener('click', (e) => {
-    if (e.target === settingsPanel) {
-        settingsPanel.classList.add('hidden');
-        settingsPanel.classList.remove('flex');
-    }
-});
-
-document.getElementById('exportDataBtn').onclick = () => {
-    const data = {
-        notes: localStorage.getItem('portalNotes') || '',
-        tasks: JSON.parse(localStorage.getItem('portalTasks') || '[]'),
-        bookmarks: JSON.parse(localStorage.getItem('portalBookmarks') || '[]'),
-        pinnedProjects: JSON.parse(localStorage.getItem('pinnedProjects') || '[]'),
-        settings: {
-            compactMode: localStorage.getItem('portalCompactMode'),
-            autoLoad: localStorage.getItem('portalAutoLoad'),
-            showScreenshots: localStorage.getItem('portalShowScreenshots')
-        }
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'portal-data.json';
-    a.click();
-    URL.revokeObjectURL(url);
-};
-
-document.getElementById('clearDataBtn').onclick = () => {
-    if (confirm('This will clear all your notes, tasks, bookmarks, and settings. Are you sure?')) {
-        localStorage.removeItem('portalNotes');
-        localStorage.removeItem('portalTasks');
-        localStorage.removeItem('portalBookmarks');
-        localStorage.removeItem('pinnedProjects');
-        localStorage.removeItem('portalCompactMode');
-        localStorage.removeItem('portalAutoLoad');
-        localStorage.removeItem('portalShowScreenshots');
-        location.reload();
-    }
-};
-
-// Auto-load last project
-if (autoLoadToggle.checked && history.length > 0) {
-    setTimeout(() => {
-        const lastUrl = localStorage.getItem('lastProjectUrl');
-        if (lastUrl) loadProject(lastUrl);
-    }, 500);
-}
-
-// Track last visited project
-const originalLoadProject = window.loadProject;
-window.loadProject = function(url, btnElement) {
-    localStorage.setItem('lastProjectUrl', url);
-    originalLoadProject(url, btnElement);
-};
-
-// Close panels when clicking outside (on main content)
-document.querySelector('main').addEventListener('click', closeAllPanels);
-
-// Keyboard shortcut: Escape to close panels
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeAllPanels();
-        if (settingsPanel.classList.contains('flex')) {
-            settingsPanel.classList.add('hidden');
-            settingsPanel.classList.remove('flex');
-        }
-    }
-});
 </script>
 </body>
 </html>
