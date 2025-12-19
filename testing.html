@@ -258,19 +258,7 @@ document.getElementById('osApkBtn').onclick=()=>window.open(window.location.orig
 document.getElementById('homeBtn').onclick=()=>{els.loader.classList.remove('hidden');els.empty.classList.add('hidden');const targetFrame=(splitViewActive&&activePane==='right')?els.frame2:els.frame;targetFrame.src='/index.html';targetFrame.addEventListener('load',()=>els.loader.classList.add('hidden'),{once:!0});addToHistory('Home','/index.html');};
 document.getElementById('fullscreenBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen();};
 </script>
-  <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6944f648ea27d7197b0992da/1jcqm431c';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+ 
   <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 </body>
 </html>
