@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Assist Demo</title>
+  <!-- Swiss Minimal Styling -->
+  <style>
+    body {
+      font-family: 'Inter Tight', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      padding: 2rem;
+      text-align: center;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 2rem;
+    }
+    button:hover {
+      background: #333;
+    }
+    .content {
+      width: 90%;
+      max-width: 800px;
+      line-height: 1.6;
+    }
+    .box {
+      padding: 2rem;
+      margin: 1rem 0;
+      background: #f2f2f2;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Live Assist Demo</h1>
+    <p>Click the button to start co-browsing session</p>
+    <button onclick="TogetherJS(this); return false;">Start Live Assist</button>
+  </header>
+
+  <div class="content">
+    <div class="box" onclick="alert('Box 1 clicked!')">Interactive Box 1</div>
+    <div class="box" onclick="alert('Box 2 clicked!')">Interactive Box 2</div>
+    <div class="box" onclick="alert('Box 3 clicked!')">Interactive Box 3</div>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    <p>Scroll down to test scroll sync during co-browsing.</p>
+    <p style="margin-bottom: 1000px;">End of content.</p>
+  </div>
+
+  <!-- TogetherJS CDN -->
+  <script src="https://togetherjs.com/togetherjs-min.js"></script>
+</body>
+</html>
