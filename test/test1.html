@@ -1,124 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enhanced Live Assist Demo</title>
-<!-- Swiss Minimal Styling -->
-<style>
-  body {
-    font-family: 'Inter Tight', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    color: #111;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-  header {
-    padding: 2rem;
-    text-align: center;
-  }
-  button#liveAssistBtn {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    background: #000;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-bottom: 2rem;
-    display: none; /* Hidden by default, only admin can see */
-  }
-  button#liveAssistBtn:hover {
-    background: #333;
-  }
-  .content {
-    width: 90%;
-    max-width: 800px;
-    line-height: 1.6;
-  }
-  .box {
-    padding: 2rem;
-    margin: 1rem 0;
-    background: #f2f2f2;
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: center;
-    transition: background 0.3s, border 0.3s;
-  }
-  .box.highlighted {
-    border: 2px solid #000;
-    background: #e0e0e0;
-  }
-  /* Custom TogetherJS cursor */
-  .togetherjs-cursor {
-    width: 14px !important;
-    height: 14px !important;
-    background-color: #000 !important;
-    border-radius: 50% !important;
-    z-index: 9999 !important;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Browse / Swiss Minimal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter Tight -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <!-- TogetherJS Library -->
+    <script>
+        // Config: Disabling the welcome popup for a cleaner UI
+        var TogetherJSConfig_suppressJoinConfirmation = true; 
+    </script>
+    <script src="https://togetherjs.com/togetherjs-min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter Tight"', 'sans-serif'],
+                    },
+                    colors: {
+                        'swiss-black': '#0a0a0a',
+                        'swiss-white': '#ffffff',
+                        'accent-navy': '#001F54', // Deep Navy Blue
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Utilities for Swiss Design */
+        body {
+            background-color: #ffffff;
+            color: #0a0a0a;
+            font-family: "Inter Tight", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Grid Lines for visual structure (Optional but fits the trend) */
+        .grid-lines {
+            background-size: 100% 1px, 1px 100%;
+            background-image: linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Typography as UI */
+        .type-ui-huge {
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            font-weight: 700;
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between p-6 md:p-12 relative overflow-x-hidden">
 
-<header>
-  <h1>Enhanced Live Assist Demo</h1>
-  <p>Admin-only Live Assist button is available below</p>
-  <button id="liveAssistBtn" onclick="TogetherJS(this); return false;">Start Live Assist</button>
-</header>
+    <!-- Top Grid: Header -->
+    <header class="grid grid-cols-12 gap-4 border-b-2 border-swiss-black pb-6 mb-12">
+        <div class="col-span-12 md:col-span-4">
+            <span class="text-sm font-semibold tracking-widest uppercase text-accent-navy">Project 2025</span>
+        </div>
+        <div class="col-span-12 md:col-span-8 text-right">
+            <span class="text-sm font-medium">Status: Active / Grid: On</span>
+        </div>
+    </header>
 
-<div class="content">
-  <div class="box" id="box1" onclick="alert('Box 1 clicked!')">Interactive Box 1</div>
-  <div class="box" id="box2" onclick="alert('Box 2 clicked!')">Interactive Box 2</div>
-  <div class="box" id="box3" onclick="alert('Box 3 clicked!')">Interactive Box 3</div>
+    <!-- Main Content: Typography as UI -->
+    <main class="grid grid-cols-1 md:grid-cols-12 gap-4 flex-grow items-center mb-24">
+        
+        <!-- Large Typographic Statement -->
+        <div class="col-span-12 md:col-span-9">
+            <h1 class="type-ui-huge text-swiss-black">
+                REAL<br>
+                TIME<br>
+                <span class="text-accent-navy">SYNC.</span>
+            </h1>
+        </div>
 
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-  <p>Scroll down to test scroll sync during co-browsing.</p>
-  <p style="margin-bottom: 1000px;">End of content.</p>
-</div>
+        <!-- Functional Column -->
+        <div class="col-span-12 md:col-span-3 flex flex-col justify-end space-y-8 border-l-0 md:border-l-2 border-swiss-black md:pl-8 mt-8 md:mt-0">
+            
+            <div class="space-y-2">
+                <h2 class="text-xl font-bold tracking-tight">Co-Browsing Protocol</h2>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    Activate synchronous session to mirror cursor movements, clicks, and scroll position across active viewports.
+                </p>
+            </div>
 
-<!-- TogetherJS CDN -->
-<script src="https://togetherjs.com/togetherjs-min.js"></script>
+            <!-- The Interaction Element -->
+            <button onclick="TogetherJS(this); return false;" 
+                    class="group relative w-full overflow-hidden bg-swiss-black text-white py-6 px-6 text-left transition-all hover:bg-accent-navy">
+                <span class="relative z-10 font-medium text-lg flex justify-between items-center">
+                    INITIATE SESSION
+                    <span class="transform transition-transform group-hover:translate-x-1">→</span>
+                </span>
+            </button>
+            
+            <div class="text-xs text-gray-400 mt-4 font-mono">
+                LIB: MOZILLA_TOGETHER_JS<br>
+                VER: LATEST_MIN
+            </div>
 
-<script>
-  // ===== Admin-only display =====
-  const isAdmin = true; // Change to false for normal users
-  if (isAdmin) {
-    document.getElementById('liveAssistBtn').style.display = 'block';
-  }
+        </div>
+    </main>
 
-  // ===== Auto-highlight boxes for co-browsing =====
-  function highlightBox(id) {
-    const box = document.getElementById(id);
-    if (!box) return;
-    box.classList.add('highlighted');
-    setTimeout(() => box.classList.remove('highlighted'), 2000); // remove highlight after 2s
-  }
-
-  // TogetherJS event listeners
-  TogetherJS.hub.on("togetherjs.hello", function () {
-    console.log("Live Assist session started!");
-  });
-
-  // Highlight boxes when agent clicks
-  const boxes = document.querySelectorAll(".box");
-  boxes.forEach(box => {
-    box.addEventListener("click", () => {
-      if (TogetherJS.running) {
-        TogetherJS.send({ type: "highlight", id: box.id });
-      }
-    });
-  });
-
-  TogetherJS.hub.on("highlight", function (msg) {
-    highlightBox(msg.id);
-  });
-</script>
+    <!-- Interactive Elements to Test Synchronization -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 border-t-2 border-swiss-black pt-6">
+        <div class="p-8 border border-gray-200 hover:bg-gray-50 transition-colors">
+            <h3 class="font-bold mb-2">Input Sync</h3>
+            <input type="text" placeholder="Type here..." class="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-accent-navy pb-2 font-mono text-sm">
+        </div>
+        <div class="p-8 border border-gray-200 hover:bg-gray-50 transition-colors">
+            <h3 class="font-bold mb-2">Toggle Sync</h3>
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 text-accent-navy border-gray-300 rounded focus:ring-accent-navy">
+                <span class="text-sm">Active State</span>
+            </label>
+        </div>
+        <!-- Spacer for grid alignment -->
+        <div class="col-span-2 hidden md:block"></div>
+    </section>
 
 </body>
 </html>
