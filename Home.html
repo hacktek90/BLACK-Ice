@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>BlackICE Portal – Projects & Tools</title>
-  <meta name='description' content='a multi purpose application, all utility tool, converter , changer , how to apps, an os like application.'>
+<meta name='description' content='a multi purpose application, all utility tool, converter , changer , how to apps, an os like application.'>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow">
+<meta name="robots" content="index, follow">
 <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
 <link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
 <link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
@@ -30,21 +30,20 @@ t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 })(window, document, "clarity", "script", "ujy4ecml45");
 </script>
-  <!-- Google Tag Manager -->
+<!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-N36FJFW2');</script>
 <!-- End Google Tag Manager -->
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-BJ7N8R2CLY');
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-BJ7N8R2CLY');
 </script>
 <script>
 tailwind.config = {
@@ -380,6 +379,17 @@ leftPane: document.getElementById('leftPane'),
 rightPane: document.getElementById('rightPane'),
 splitResizer: document.getElementById('splitResizer'),
 };
+
+// ===== AUDIO SETUP =====
+const clickAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/914/914-preview.mp3');
+clickAudio.preload = 'auto';
+
+function playClickSound() {
+  clickAudio.currentTime = 0;
+  clickAudio.play().catch(err => console.log('Audio play failed:', err));
+}
+// =======================
+
 if (window.autoAnimate && els.list) window.autoAnimate(els.list);
 if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
 lucide.createIcons();
@@ -571,6 +581,10 @@ return url;
 }
 }
 function loadProject(url, btnElement) {
+// ===== PLAY AUDIO ON PROJECT CLICK =====
+playClickSound();
+// =======================================
+
 els.loader.classList.remove('hidden');
 els.empty.classList.add('hidden');
 document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
