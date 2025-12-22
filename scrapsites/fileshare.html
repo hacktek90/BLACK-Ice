@@ -2,713 +2,476 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  />
-  <title>File Share Companion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>SwissShare · Mini</title>
 
-  <!-- Fonts -->
+  <!-- Inter Tight -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-  <!-- QR Libraries -->
+  <!-- QR -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Inter Tight"', "system-ui", "sans-serif"] },
+          colors: {
+            navy: { 900: "#020617", 800: "#0f172a", 700: "#1e293b", accent: "#2563eb" }
+          }
+        }
+      }
+    };
+  </script>
+
   <style>
-    :root {
-      --glass-surface: rgba(255, 255, 255, 0.85);
-      --glass-border: rgba(255, 255, 255, 0.6);
-      --glass-blur: blur(20px);
-
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --text-main: #1e293b;
-      --text-sub: #64748b;
-      --danger: #ef4444;
-
-      --radius-dock: 24px;
-      --radius-btn: 14px;
-      --shadow-dock: 0 8px 32px rgba(0, 0, 0, 0.12);
-      --dock-width: 500px;
+    body{
+      min-height:100dvh;
+      font-family:"Inter Tight",system-ui,sans-serif;
+      background-color:#020617;
+      background-image:
+        linear-gradient(rgba(30,41,59,.40) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,41,59,.40) 1px, transparent 1px);
+      background-size:40px 40px;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      outline: none;
-      -webkit-tap-highlight-color: transparent;
+    .glass-dock{
+      background:rgba(15,23,42,.90);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      box-shadow:0 0 0 1px rgba(148,163,184,.22), 0 24px 50px rgba(0,0,0,.65);
     }
-
-    body {
-      font-family: "Inter", sans-serif;
-      height: 100vh;
-      overflow: hidden;
-      background: #f8fafc;
-      color: var(--text-main);
-      /* Prevent scrolling on mobile while dragging */
-      touch-action: none; 
+    .modal-backdrop{
+      background:rgba(2,6,23,.86);
+      backdrop-filter:blur(4px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+      padding-bottom: env(safe-area-inset-bottom);
     }
-
-    /* 1. Host Iframe */
-    #host-frame {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      z-index: 0;
-      background: white;
-    }
-
-    /* 2. Top Title Bar */
-    .title-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 100;
-      
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      
-      background: var(--glass-surface);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-bottom: 1px solid var(--glass-border);
-      
-      padding: 16px 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
-
-    .app-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 15px;
-      color: var(--text-main);
-    }
-    
-    .brand-icon {
-      color: var(--primary);
-      font-size: 22px;
-    }
-
-    .brand-text-muted {
-      color: var(--text-sub);
-      font-weight: 400;
-    }
-
-    .brand-text-bold {
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    .status-badge {
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(37, 99, 235, 0.1);
-      color: var(--primary);
-      padding: 6px 12px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--primary);
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
-    }
-
-    /* 3. Bottom Dock (Draggable) */
-    .dock-container {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000; /* High Z to float over everything */
-      width: 92%;
-      max-width: var(--dock-width);
-      display: flex;
-      justify-content: center;
-      
-      /* Prepare for dragging */
-      cursor: grab;
-      touch-action: none;
-      user-select: none;
-    }
-
-    .dock-container:active {
-      cursor: grabbing;
-    }
-
-    .glass-dock {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--glass-surface);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      padding: 10px;
-      border-radius: var(--radius-dock);
-      box-shadow: var(--shadow-dock);
-      width: 100%;
-      
-      /* Smooth transitions for hover effects, but NOT position (handled by JS) */
-      transition: background 0.3s ease, box-shadow 0.3s ease; 
-    }
-
-    /* Input & Controls */
-    .input-wrapper {
-      flex: 1;
-      position: relative;
-      display: flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: var(--radius-btn);
-      border: 1px solid transparent;
-      transition: all 0.2s ease;
-      cursor: text; /* Override drag cursor */
-    }
-    .input-wrapper:focus-within {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-
-    .icon-left {
-      position: absolute;
-      left: 12px;
-      color: var(--text-sub);
-      font-size: 18px;
-    }
-
-    .dock-input {
-      width: 100%;
-      border: none;
-      background: transparent;
-      padding: 12px 12px 12px 40px;
-      font-size: 14px;
-      color: var(--text-main);
-      border-radius: var(--radius-btn);
-    }
-    .dock-input::placeholder { color: #94a3b8; }
-
-    .action-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius-btn);
-      border: none;
-      background: rgba(255, 255, 255, 0.4);
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      cursor: pointer; /* Override drag cursor */
-      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      flex-shrink: 0;
-    }
-    .action-btn:hover {
-      background: white;
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-    .action-btn:active { transform: scale(0.95); }
-
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); }
-
-    .divider {
-      width: 1px;
-      height: 20px;
-      background: rgba(0, 0, 0, 0.1);
-      margin: 0 2px;
-    }
-
-    /* Modals */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      z-index: 2000; /* Higher than dock */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
-    .modal-card {
-      background: white;
-      padding: 24px;
-      width: 90%;
-      max-width: 380px;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-      transform: scale(0.9);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    .modal-overlay.active .modal-card { transform: scale(1); }
-
-    .modal-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .modal-title { font-weight: 600; font-size: 18px; color: var(--text-main); }
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      color: var(--text-sub);
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    #qr-reader {
-      width: 100%;
-      height: 280px;
-      background: #000;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 10px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      position: relative;
-    }
-    #qr-reader video { object-fit: cover; border-radius: 16px; }
-
-    .info-text { font-size: 14px; color: var(--text-sub); line-height: 1.5; text-align: left; }
-    .info-text strong { color: var(--text-main); }
-    
-    .powered-by {
-      margin-top: 16px;
-      font-size: 12px;
-      color: #94a3b8;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 12px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: rgba(15, 23, 42, 0.9);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0;
-      transition: all 0.3s;
-      z-index: 3000;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    @media (max-width: 480px) {
-      .title-bar { padding: 12px 16px; }
-      .app-brand { font-size: 14px; }
-      .status-badge { font-size: 10px; }
-      .glass-dock { padding: 8px; gap: 8px; }
-      .action-btn { width: 40px; height: 40px; font-size: 18px; }
-      .dock-input { font-size: 13px; padding-left: 36px; }
-      .icon-left { font-size: 16px; left: 10px; }
-    }
+    .modal-backdrop.active{ opacity:1; pointer-events:auto; }
   </style>
 </head>
-<body>
 
-  <!-- Iframe Host -->
-  <iframe
-    id="host-frame"
-    src="https://krakenfiles.com"
-    allow="clipboard-read; clipboard-write"
-  ></iframe>
+<body class="text-slate-200 overflow-hidden selection:bg-navy-accent selection:text-white">
 
-  <!-- Toast -->
-  <div class="toast" id="toast">
-    <i class="ph ph-check-circle"></i>
-    <span id="toast-msg">Notification</span>
-  </div>
-
-  <!-- TITLE BAR -->
-  <div class="title-bar">
-    <div class="app-brand">
-      <i class="ph ph-cloud-arrow-up brand-icon"></i>
-      <div>
-        <span class="brand-text-muted">Powered by</span>
-        <span class="brand-text-bold">KrakenFiles</span>
+  <!-- Hero -->
+  <main class="min-h-[100dvh] flex items-center justify-center px-5 sm:px-6">
+    <div class="w-full max-w-2xl text-center space-y-6 sm:space-y-7 -mt-16 sm:-mt-20">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-700/70 bg-navy-900/80 text-[10px] uppercase tracking-[0.24em] text-slate-400">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        Mini (≤100MB) · Big (Kraken)
       </div>
-    </div>
-    <div class="status-badge">
-      <div class="status-dot"></div>
-      Active
-    </div>
-  </div>
 
-  <!-- DRAGGABLE DOCK -->
-  <div class="dock-container" id="draggableDock">
-    <div class="glass-dock">
-      <button class="action-btn" onclick="resetHome()" title="Upload new file">
-        <i class="ph ph-upload-simple"></i>
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-semibold tracking-tighter text-white leading-[0.95]">
+        Swiss<span class="text-navy-accent">Share</span>
+      </h1>
+
+      <p class="text-slate-400 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+        Upload small files instantly. Big files open KrakenFiles.
+      </p>
+    </div>
+  </main>
+
+  <!-- Dock (responsive) -->
+  <div class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 w-[94%] sm:w-[92%] max-w-[560px] z-50">
+    <div class="glass-dock rounded-2xl p-2 sm:p-2.5 flex items-center gap-2 sm:gap-2.5">
+
+      <!-- Upload -->
+      <button type="button"
+        onclick="openModal('uploadModal')"
+        class="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 flex items-center justify-center rounded-xl bg-navy-accent text-white hover:bg-blue-600 active:scale-95 transition-all"
+        title="Upload">
+        <i class="ph-bold ph-plus text-[18px] sm:text-xl"></i>
       </button>
 
-      <div class="divider"></div>
+      <!-- Big file -->
+      <button type="button"
+        onclick="openKraken()"
+        class="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 flex items-center justify-center rounded-xl bg-slate-800/60 border border-slate-700/70 text-slate-200 hover:bg-slate-800 active:scale-95 transition-all"
+        title="Big file mode">
+        <i class="ph-bold ph-hard-drives text-[18px] sm:text-xl"></i>
+      </button>
 
-      <div class="input-wrapper">
-        <i class="ph ph-link icon-left"></i>
+      <div class="hidden sm:block w-px h-6 bg-slate-700/60"></div>
+
+      <!-- Input -->
+      <div class="flex-1 relative">
+        <span class="absolute inset-y-0 left-3 flex items-center text-slate-500">
+          <i class="ph ph-link-simple text-lg"></i>
+        </span>
         <input
-          type="text"
           id="linkInput"
-          class="dock-input"
-          placeholder="Paste file link..."
-          onkeypress="handleEnter(event)"
+          type="text"
+          placeholder="Paste link…"
+          class="w-full bg-slate-800/40 border border-slate-700/70 rounded-xl py-3 pl-10 pr-3 sm:py-3.5 sm:pr-4 text-[13px] sm:text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:bg-slate-800 focus:border-navy-accent transition-all"
+          onkeypress="handleLinkEnter(event)"
         />
       </div>
 
-      <button
-        class="action-btn btn-primary"
+      <!-- QR -->
+      <button type="button"
         onclick="generateQR()"
-        title="Share via QR"
-      >
-        <i class="ph ph-qr-code"></i>
+        class="hidden sm:flex w-11 h-11 items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
+        title="Make QR">
+        <i class="ph ph-qr-code text-xl"></i>
       </button>
 
-      <button class="action-btn" onclick="initScanner()" title="Scan to download">
-        <i class="ph ph-scan"></i>
+      <button type="button"
+        onclick="startScanner()"
+        class="hidden sm:flex w-11 h-11 items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
+        title="Scan QR">
+        <i class="ph ph-scan text-xl"></i>
       </button>
 
-      <button class="action-btn" onclick="openModal('infoModal')" title="Info">
-        <i class="ph ph-info"></i>
+      <!-- Mobile-only small QR menu -->
+      <button type="button"
+        onclick="openModal('quickModal')"
+        class="sm:hidden w-11 h-11 flex items-center justify-center rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors border border-slate-700/60"
+        title="More">
+        <i class="ph ph-dots-three-outline text-xl"></i>
       </button>
     </div>
   </div>
 
-  <!-- MODALS -->
-  <div class="modal-overlay" id="shareModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <span class="modal-title">Share File</span>
-        <button class="btn-close" onclick="closeAll()">
-          <i class="ph ph-x"></i>
+  <!-- Quick actions modal (mobile) -->
+  <div id="quickModal" class="modal-backdrop fixed inset-0 z-[120] hidden flex items-end sm:hidden">
+    <div class="modal-card w-full bg-navy-900 border-t border-slate-700 rounded-t-2xl p-4 transform translate-y-3 opacity-0 transition-all duration-200">
+      <div class="flex items-center justify-between">
+        <p class="text-xs uppercase tracking-[0.22em] text-slate-500">Actions</p>
+        <button type="button" onclick="closeAllModals()" class="text-slate-400 hover:text-white">
+          <i class="ph ph-x text-xl"></i>
         </button>
       </div>
-      <canvas id="qrCanvas"></canvas>
-      <p style="margin-top: 12px; font-size: 13px; color: var(--text-sub)">
-        Scan this code on another device to download.
+
+      <div class="mt-3 grid grid-cols-2 gap-2">
+        <button onclick="closeAllModals(); generateQR();"
+          class="rounded-xl border border-slate-700 bg-slate-800/40 px-3 py-3 text-sm text-slate-100 flex items-center justify-center gap-2">
+          <i class="ph ph-qr-code"></i> QR
+        </button>
+        <button onclick="closeAllModals(); startScanner();"
+          class="rounded-xl border border-slate-700 bg-slate-800/40 px-3 py-3 text-sm text-slate-100 flex items-center justify-center gap-2">
+          <i class="ph ph-scan"></i> Scan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div id="uploadModal" class="modal-backdrop fixed inset-0 z-[100] hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="modal-card relative bg-navy-900 border border-slate-700 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl transform scale-95 opacity-0 transition-all duration-200">
+      <button type="button" onclick="closeAllModals()"
+        class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-500 hover:text-white">
+        <i class="ph ph-x text-xl"></i>
+      </button>
+
+      <h2 class="text-lg sm:text-xl font-semibold mb-1">Upload</h2>
+      <p class="text-[11px] uppercase tracking-[0.22em] text-slate-500 mb-5 sm:mb-6">
+        ≤100MB → Mini · &gt;100MB → Big
       </p>
+
+      <div id="dropZone" class="relative border border-dashed border-slate-700 rounded-xl bg-slate-800/20 transition-all">
+        <input id="fileInput" type="file"
+          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          onclick="this.value=null"
+          onchange="handleFileChosen(this.files[0])"
+        />
+
+        <div id="uploadIdle" class="p-8 sm:p-9 text-center space-y-3">
+          <div class="w-14 h-14 rounded-full mx-auto bg-slate-800 flex items-center justify-center text-navy-accent">
+            <i class="ph ph-cloud-arrow-up text-2xl"></i>
+          </div>
+          <p class="text-sm text-slate-200">Click or drop a file here</p>
+          <p class="text-xs text-slate-500">Auto-routing by file size.</p>
+        </div>
+
+        <div id="uploadingState" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-navy-900/90 rounded-xl">
+          <i class="ph ph-spinner text-3xl text-navy-accent animate-spin mb-3"></i>
+          <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Uploading…</p>
+        </div>
+      </div>
+
+      <div id="uploadResult" class="mt-5 sm:mt-6 hidden border-t border-slate-800 pt-4 space-y-3">
+        <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-slate-500">
+          <span>Direct link</span>
+          <span>Mini mode</span>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 flex items-center">
+            <input id="resultUrl" readonly class="w-full bg-transparent text-xs sm:text-sm text-slate-200 font-mono outline-none" />
+          </div>
+          <button type="button"
+            onclick="copyResultUrl()"
+            class="px-3 py-2 rounded-lg text-xs font-semibold bg-navy-accent/10 text-navy-accent border border-navy-accent/30 hover:bg-navy-accent hover:text-white transition-colors">
+            Copy
+          </button>
+        </div>
+
+        <div id="previewContainer"
+          class="rounded-lg border border-slate-800 bg-black/40 min-h-[64px] max-h-[35dvh] overflow-auto flex items-center justify-center">
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="scanModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <span class="modal-title">Scan QR</span>
-        <button class="btn-close" onclick="closeAll()">
-          <i class="ph ph-x"></i>
-        </button>
+  <!-- Big Mode: KrakenFiles iframe (responsive) -->
+  <div id="krakenModal" class="modal-backdrop fixed inset-0 z-[110] hidden flex items-center justify-center p-2 sm:p-6">
+    <div class="modal-card relative bg-navy-900 border border-slate-700 rounded-2xl w-full max-w-6xl shadow-2xl transform scale-95 opacity-0 transition-all duration-200 overflow-hidden">
+      <div class="flex items-center justify-between gap-3 px-3 sm:px-4 py-3 border-b border-slate-800">
+        <div class="min-w-0">
+          <p class="text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-slate-500">Big file mode</p>
+          <p class="text-sm text-slate-200 truncate">KrakenFiles</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a href="https://krakenfiles.com" target="_blank"
+            class="text-xs px-3 py-2 rounded-lg border border-slate-700 text-slate-200 hover:bg-slate-800 transition-colors">
+            Open
+          </a>
+          <button type="button" onclick="closeAllModals()" class="text-slate-400 hover:text-white px-2 py-2">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
       </div>
-      <div id="qr-reader"></div>
-      <p id="scan-status" style="font-size: 12px; color: var(--text-sub)">
-        Waiting for camera permissions...
-      </p>
+
+      <iframe
+        id="krakenFrame"
+        src="https://krakenfiles.com"
+        class="w-full bg-white"
+        style="height: min(78dvh, 860px); border: 0;"
+        allow="clipboard-read; clipboard-write"
+      ></iframe>
     </div>
   </div>
 
-  <div class="modal-overlay" id="infoModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <span class="modal-title">Info</span>
-        <button class="btn-close" onclick="closeAll()">
-          <i class="ph ph-x"></i>
+  <!-- QR Modal -->
+  <div id="qrModal" class="modal-backdrop fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div class="modal-card relative bg-white text-navy-900 w-full max-w-sm rounded-3xl p-7 sm:p-8 shadow-2xl transform scale-95 opacity-0 transition-all duration-200">
+      <button type="button" onclick="closeAllModals()"
+        class="absolute top-4 right-4 text-slate-400 hover:text-navy-900">
+        <i class="ph ph-x text-xl"></i>
+      </button>
+
+      <h3 class="text-lg font-semibold mb-6 text-center">Scan to open</h3>
+      <canvas id="qrCanvas" class="mx-auto"></canvas>
+      <p class="mt-6 text-sm text-slate-500 text-center">Open on another device.</p>
+    </div>
+  </div>
+
+  <!-- Scanner Modal -->
+  <div id="scanModal" class="modal-backdrop fixed inset-0 z-[100] hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="modal-card bg-navy-900 border border-slate-700 w-full max-w-sm rounded-2xl p-5 shadow-2xl transform scale-95 opacity-0 transition-all duration-200">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm font-medium">QR scanner</span>
+        <button type="button" onclick="closeAllModals()" class="text-slate-400 hover:text-white">
+          <i class="ph ph-x text-xl"></i>
         </button>
       </div>
-      <div class="info-text">
-        <p style="margin-bottom: 8px">
-          <strong>1. Upload:</strong> Use site background.
-        </p>
-        <p style="margin-bottom: 8px">
-          <strong>2. Share:</strong> Paste link + tap <i class="ph ph-qr-code"></i>.
-        </p>
-        <p style="margin-bottom: 8px">
-          <strong>3. Receive:</strong> Tap <i class="ph ph-scan"></i>.
-        </p>
-      </div>
-      <div class="powered-by">
-        Powered by <strong>ModernWeb</strong>
-      </div>
+      <div id="qr-reader" class="rounded-lg border border-slate-800 bg-black h-[260px] overflow-hidden"></div>
+      <p id="scanStatus" class="mt-3 text-xs text-slate-500 text-center">Requesting camera…</p>
     </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"
+    class="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 translate-y-[-200%] bg-slate-900/95 border border-slate-700 text-white px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-medium tracking-wide shadow-xl transition-transform duration-300 z-[200]">
+    <i id="toastIcon" class="ph-fill ph-check-circle text-emerald-400"></i>
+    <span id="toastMsg">Done</span>
   </div>
 
   <script>
-    const iframe = document.getElementById("host-frame");
-    const linkInput = document.getElementById("linkInput");
-    const toastEl = document.getElementById("toast");
-    const toastMsg = document.getElementById("toast-msg");
-    const scanStatus = document.getElementById("scan-status");
-    const dock = document.getElementById("draggableDock");
+    const $ = (id) => document.getElementById(id);
+    const MINI_LIMIT_BYTES = 100 * 1024 * 1024;
 
-    let html5QrCode = null;
-    let isScanning = false;
-
-    // --- DRAG LOGIC ---
-    let isDragging = false;
-    let dragStartX, dragStartY;
-    let initialLeft, initialTop;
-
-    const startDrag = (e) => {
-      // Don't drag if touching input or buttons directly (optional check)
-      if(e.target.closest('button') || e.target.closest('input')) return;
-
-      isDragging = true;
-      dock.style.transition = 'none'; // Disable laggy transitions during drag
-      
-      const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-      const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-
-      // Calculate the offset from the element's current position
-      const rect = dock.getBoundingClientRect();
-      
-      // Fix width so it doesn't shrink when we remove transform
-      dock.style.width = rect.width + 'px';
-      dock.style.maxWidth = 'none';
-      
-      // Switch from bottom/transform positioning to top/left positioning
-      dock.style.bottom = 'auto';
-      dock.style.transform = 'none';
-      dock.style.left = rect.left + 'px';
-      dock.style.top = rect.top + 'px';
-
-      dragStartX = clientX;
-      dragStartY = clientY;
-      initialLeft = rect.left;
-      initialTop = rect.top;
-    };
-
-    const drag = (e) => {
-      if (!isDragging) return;
-      e.preventDefault(); // Stop scrolling on mobile
-
-      const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-      const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-
-      const deltaX = clientX - dragStartX;
-      const deltaY = clientY - dragStartY;
-
-      dock.style.left = `${initialLeft + deltaX}px`;
-      dock.style.top = `${initialTop + deltaY}px`;
-    };
-
-    const endDrag = () => {
-      isDragging = false;
-      // Re-enable hover effects if needed, but keep position fixed
-    };
-
-    // Attach Drag Events
-    dock.addEventListener('mousedown', startDrag);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', endDrag);
-
-    dock.addEventListener('touchstart', startDrag, { passive: false });
-    document.addEventListener('touchmove', drag, { passive: false });
-    document.addEventListener('touchend', endDrag);
-
-    // --- APP LOGIC ---
-
-    const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
-      const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-      const size = Math.floor(minEdge * 0.7);
-      return { width: size, height: size };
-    };
-
-    function resetHome() {
-      iframe.src = "https://krakenfiles.com";
-      linkInput.value = "";
-      showToast("Ready to upload new file");
+    function showToast(msg, type = "ok") {
+      const toast = $("toast");
+      const icon = $("toastIcon");
+      $("toastMsg").textContent = msg;
+      icon.className = type === "error"
+        ? "ph-fill ph-warning-circle text-red-400"
+        : "ph-fill ph-check-circle text-emerald-400";
+      toast.style.transform = "translate(-50%, 0)";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { toast.style.transform = "translate(-50%, -200%)"; }, 2600);
     }
 
-    function handleEnter(e) {
-      if (e.key === "Enter") {
-        let url = linkInput.value.trim();
-        if (!url) return;
-        if (!url.startsWith("http")) url = "https://" + url;
-        iframe.src = url;
-        showToast("Opening link...");
-      }
+    function toPreviewURL(apiUrl) {
+      try {
+        const u = new URL(apiUrl);
+        if (u.pathname.startsWith("/dl/")) return apiUrl;
+        return `${u.origin}/dl${u.pathname}`;
+      } catch { return apiUrl; }
     }
 
-    function generateQR() {
-      const url = linkInput.value.trim();
-      if (!url) {
-        showToast("Paste a file link first");
-        linkInput.parentElement.style.borderColor = "var(--danger)";
-        setTimeout(
-          () => (linkInput.parentElement.style.borderColor = "transparent"),
-          500
-        );
+    // Modals (fixed race)
+    function openModal(id) {
+      closeAllModals(id);
+      const backdrop = $(id);
+      const card = backdrop.querySelector(".modal-card");
+      backdrop.classList.remove("hidden");
+      requestAnimationFrame(() => {
+        backdrop.classList.add("active");
+        card.classList.remove("scale-95", "opacity-0", "translate-y-3");
+        card.classList.add("scale-100", "opacity-100");
+      });
+    }
+
+    async function closeAllModals(exceptId = null) {
+      await stopScanner();
+      document.querySelectorAll(".modal-backdrop").forEach((b) => {
+        if (exceptId && b.id === exceptId) return;
+        const card = b.querySelector(".modal-card");
+        b.classList.remove("active");
+        if (card) {
+          card.classList.add("scale-95", "opacity-0");
+          card.classList.remove("scale-100", "opacity-100");
+        }
+        setTimeout(() => b.classList.add("hidden"), 180);
+      });
+    }
+
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAllModals(); });
+    document.querySelectorAll(".modal-backdrop").forEach((b) => {
+      b.addEventListener("click", (e) => { if (e.target === b) closeAllModals(); });
+    });
+
+    // Big mode
+    function openKraken() {
+      $("krakenFrame").src = "https://krakenfiles.com";
+      openModal("krakenModal");
+      showToast("Big file mode opened");
+    }
+
+    // Upload
+    async function handleFileChosen(file) {
+      if (!file) return;
+
+      if (file.size > MINI_LIMIT_BYTES) {
+        closeAllModals();
+        openKraken();
+        showToast("File >100MB → Big mode");
         return;
       }
-      QRCode.toCanvas(
-        document.getElementById("qrCanvas"),
-        url,
-        {
-          width: 220,
-          margin: 1,
-          color: { dark: "#1e293b", light: "#ffffff" },
-        },
-        (err) => {
-          if (!err) openModal("shareModal");
-        }
+
+      $("uploadIdle").classList.add("hidden");
+      $("uploadingState").classList.remove("hidden");
+      $("uploadResult").classList.add("hidden");
+
+      const fd = new FormData();
+      fd.append("file", file);
+
+      try {
+        const res = await fetch("https://tmpfiles.org/api/v1/upload", { method: "POST", body: fd });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const json = await res.json();
+        if (json.status !== "success") throw new Error("API error");
+
+        const directUrl = toPreviewURL(json.data.url);
+        $("resultUrl").value = directUrl;
+
+        let preview = `<div class="text-xs text-slate-500 p-3">Preview not available</div>`;
+        if (file.type.startsWith("image/")) preview = `<img src="${directUrl}" class="w-full max-h-52 object-contain" />`;
+        else if (file.type.startsWith("audio/")) preview = `<audio controls src="${directUrl}" class="w-full"></audio>`;
+        else if (file.type.startsWith("video/")) preview = `<video controls src="${directUrl}" class="w-full max-h-52"></video>`;
+        $("previewContainer").innerHTML = preview;
+
+        $("uploadingState").classList.add("hidden");
+        $("uploadIdle").classList.remove("hidden");
+        $("uploadResult").classList.remove("hidden");
+        showToast("Upload complete");
+      } catch (err) {
+        console.error(err);
+        $("uploadingState").classList.add("hidden");
+        $("uploadIdle").classList.remove("hidden");
+        showToast("Upload failed", "error");
+      }
+    }
+
+    function copyResultUrl() {
+      const val = $("resultUrl").value;
+      if (!val) return;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(val).then(() => showToast("Link copied"));
+      } else {
+        const input = $("resultUrl");
+        input.select();
+        document.execCommand("copy");
+        showToast("Link copied");
+      }
+    }
+
+    // Drop support
+    const dz = $("dropZone");
+    ["dragenter","dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.add("border-navy-accent"); }));
+    ["dragleave","drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.remove("border-navy-accent"); }));
+    dz.addEventListener("drop", (e) => { const f = e.dataTransfer?.files?.[0]; if (f) handleFileChosen(f); });
+
+    // QR create
+    function handleLinkEnter(e) { if (e.key === "Enter") generateQR(); }
+
+    function generateQR() {
+      let url = $("linkInput").value.trim();
+      if (!url) return showToast("Paste a link first", "error");
+      if (!url.startsWith("http")) url = "https://" + url;
+
+      const canvas = $("qrCanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      QRCode.toCanvas(canvas, url, { width: 240, margin: 2, color: { dark: "#020617", light: "#ffffff" } },
+        (err) => { if (err) showToast("QR failed", "error"); else openModal("qrModal"); }
       );
     }
 
-    function initScanner() {
-      if (location.protocol === "file:") {
-        alert("Camera will not work on file://. Use localhost or HTTPS.");
-        return;
-      }
+    // Scanner
+    let html5QrCode = null;
 
+    function startScanner() {
       openModal("scanModal");
-      if (isScanning) return;
+      $("scanStatus").textContent = "Initializing camera…";
 
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("qr-reader", {
-          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      setTimeout(() => {
+        if (html5QrCode) return;
+        html5QrCode = new Html5Qrcode("qr-reader");
+
+        html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          (decodedText) => {
+            $("linkInput").value = decodedText;
+            closeAllModals();
+            if (decodedText.startsWith("http")) { window.open(decodedText, "_blank"); showToast("Opening link…"); }
+            else showToast("Scanned");
+          },
+          () => {}
+        ).then(() => {
+          $("scanStatus").textContent = "Scanning…";
+        }).catch((e) => {
+          console.error(e);
+          $("scanStatus").innerHTML = "<span class='text-red-400'>Camera blocked</span>";
+          stopScanner();
         });
-      }
-
-      scanStatus.innerText = "Starting camera...";
-
-      const config = {
-        fps: 10,
-        qrbox: qrboxFunction,
-        aspectRatio: 1.0,
-        videoConstraints: {
-          facingMode: "environment",
-          width: { min: 640, ideal: 1280, max: 1920 },
-          focusMode: "continuous",
-        },
-      };
-
-      html5QrCode
-        .start({ facingMode: "environment" }, config, onScanSuccess, onScanError)
-        .then(() => {
-          isScanning = true;
-          scanStatus.innerText = "Scanning...";
-          setTimeout(() => {
-              if(!html5QrCode || !isScanning) return;
-              const caps = html5QrCode.getRunningTrackCameraCapabilities();
-              if(caps && caps.zoom) {
-                 html5QrCode.applyVideoConstraints({ advanced: [{ zoom: 2.0 }] })
-                    .catch(e => console.log(e));
-              }
-          }, 2000);
-        })
-        .catch((err) => {
-          console.warn("Back camera failed, trying user camera...", err);
-          html5QrCode
-            .start({ facingMode: "user" }, config, onScanSuccess, onScanError)
-            .then(() => {
-              isScanning = true;
-              scanStatus.innerText = "Using Front Camera";
-            })
-            .catch((err2) => {
-              console.error("All cameras failed", err2);
-              scanStatus.innerHTML =
-                `<span style='color:red'>Camera Error: ${err2.name || err2}</span>`;
-            });
-        });
+      }, 200);
     }
-
-    function onScanSuccess(decodedText) {
-      stopScanner().then(() => {
-        closeAll();
-        linkInput.value = decodedText;
-
-        if (decodedText.startsWith("http") || decodedText.includes(".")) {
-          const url = decodedText.startsWith("http")
-            ? decodedText
-            : "https://" + decodedText;
-          iframe.src = url;
-          showToast("Opening scanned link...");
-        } else {
-          showToast("Scanned: " + decodedText);
-        }
-      });
-    }
-
-    function onScanError(_msg) { /* ignore */ }
 
     function stopScanner() {
-      if (html5QrCode && isScanning) {
-        return html5QrCode
-          .stop()
-          .then(() => {
-            isScanning = false;
-            html5QrCode.clear();
-          })
-          .catch((err) => console.error("Stop failed:", err));
-      }
-      return Promise.resolve();
+      if (!html5QrCode) return Promise.resolve();
+      return html5QrCode.stop()
+        .then(() => { html5QrCode.clear(); html5QrCode = null; const el = $("qr-reader"); if (el) el.innerHTML = ""; })
+        .catch(() => { html5QrCode = null; });
     }
-
-    function openModal(id) {
-      document.getElementById(id).classList.add("active");
-    }
-
-    function closeAll() {
-      document
-        .querySelectorAll(".modal-overlay")
-        .forEach((el) => el.classList.remove("active"));
-      stopScanner();
-    }
-
-    function showToast(msg) {
-      toastMsg.innerText = msg;
-      toastEl.classList.add("show");
-      setTimeout(() => toastEl.classList.remove("show"), 3000);
-    }
-
-    document.querySelectorAll(".modal-overlay").forEach((overlay) => {
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) closeAll();
-      });
-    });
   </script>
 </body>
 </html>
