@@ -9,7 +9,7 @@
 <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
 <link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
 <link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com/"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -211,7 +211,10 @@ scrollbar-width: none;
 }
 </style>
 </head>
-<body class="h-screen w-screen flex flex-col md:flex-row bg-transparent"><!-- Google Tag Manager (noscript) -->
+<body class="h-screen w-screen flex flex-col md:flex-row bg-transparent">
+<!-- Background Audio Player with updated URL -->
+<audio id="backgroundAudio" src="/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com (1).mp3" loop></audio>
+<!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N36FJFW2"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
@@ -299,7 +302,10 @@ class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 t
 <span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
 </div>
 </div>
-<span class="hide-on-collapse text-[8px] text-[#a1a1aa]/50 font-mono">v2.5</span>
+<!-- VERSION REPLACED WITH AUDIO CONTROL -->
+<button id="audioControlBtn" title="Toggle Music" class="hide-on-collapse p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all">
+<i data-lucide="play" class="w-4 h-4"></i>
+</button>
 </div>
 </aside>
 <!-- Main -->
@@ -378,18 +384,55 @@ splitContainer: document.getElementById('splitContainer'),
 leftPane: document.getElementById('leftPane'),
 rightPane: document.getElementById('rightPane'),
 splitResizer: document.getElementById('splitResizer'),
+// NEW: Audio elements
+backgroundAudio: document.getElementById('backgroundAudio'),
+audioControlBtn: document.getElementById('audioControlBtn'),
 };
+// --- Background Audio Logic ---
+if (els.backgroundAudio && els.audioControlBtn) {
+    els.backgroundAudio.volume = 0.3; // Set a default volume
 
+    const toggleAudio = () => {
+        if (els.backgroundAudio.paused) {
+            els.backgroundAudio.play().catch(e => console.error("Audio could not be played:", e));
+        } else {
+            els.backgroundAudio.pause();
+        }
+    };
+
+    els.audioControlBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleAudio();
+    });
+
+    els.backgroundAudio.onplay = () => {
+        els.audioControlBtn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
+        lucide.createIcons();
+    };
+
+    els.backgroundAudio.onpause = () => {
+        els.audioControlBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+        lucide.createIcons();
+    };
+
+    // Attempt to autoplay when the page is loaded
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            els.backgroundAudio.play().catch(error => {
+                console.log("Audio autoplay was prevented by the browser. User must click play.");
+            });
+        }, 300);
+    });
+}
+// --- End Audio Logic ---
 // ===== AUDIO SETUP =====
 const clickAudio = new Audio('/test/914-preview.mp3');
 clickAudio.preload = 'auto';
-
 function playClickSound() {
-  clickAudio.currentTime = 0;
-  clickAudio.play().catch(err => console.log('Audio play failed:', err));
+clickAudio.currentTime = 0;
+clickAudio.play().catch(err => console.log('Audio play failed:', err));
 }
 // =======================
-
 if (window.autoAnimate && els.list) window.autoAnimate(els.list);
 if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
 lucide.createIcons();
@@ -584,7 +627,6 @@ function loadProject(url, btnElement) {
 // ===== PLAY AUDIO ON PROJECT CLICK =====
 playClickSound();
 // =======================================
-
 els.loader.classList.remove('hidden');
 els.empty.classList.add('hidden');
 document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
