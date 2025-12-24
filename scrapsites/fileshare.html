@@ -63,7 +63,8 @@
 <body class="text-slate-200 overflow-hidden selection:bg-navy-accent selection:text-white">
 
   <!-- Hero -->
-  <main class="min-h-[100dvh] flex items-center justify-center px-5 sm:px-6">
+  <!-- Added opacity-40 to prevent visual clash with the centered dock -->
+  <main class="min-h-[100dvh] flex items-center justify-center px-5 sm:px-6 opacity-40 blur-[2px] transition-all hover:opacity-100 hover:blur-0">
     <div class="w-full max-w-2xl text-center space-y-6 sm:space-y-7 -mt-16 sm:-mt-20">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-700/70 bg-navy-900/80 text-[10px] uppercase tracking-[0.24em] text-slate-400">
         <span class="relative flex h-2 w-2">
@@ -83,8 +84,9 @@
     </div>
   </main>
 
-  <!-- Dock (responsive) -->
-  <div class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 w-[94%] sm:w-[92%] max-w-[560px] z-50">
+  <!-- Dock (Centered) -->
+  <!-- Changed: bottom-4 to top-1/2, added -translate-y-1/2 -->
+  <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[94%] sm:w-[92%] max-w-[560px] z-50">
     <div class="glass-dock rounded-2xl p-2 sm:p-2.5 flex items-center gap-2 sm:gap-2.5">
 
       <!-- Upload -->
