@@ -204,6 +204,23 @@ display: none;
 -ms-overflow-style: none;
 scrollbar-width: none;
 }
+
+/* NEW: Copy Link Button Styling */
+.copy-btn {
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+}
+.project-card:hover .copy-btn {
+  opacity: 1;
+}
+.copy-btn:hover {
+  background: #3f3f46 !important;
+}
+.copy-btn.copied {
+  background: #10b981 !important;
+  color: white !important;
+}
+
 @media (max-width: 768px){
 #splitResizer{display:none !important;}
 #rightPane{display:none !important;}
@@ -213,7 +230,7 @@ scrollbar-width: none;
 </head>
 <body class="h-screen w-screen flex flex-col md:flex-row bg-transparent">
 <!-- Background Audio Player with updated URL -->
-<audio id="backgroundAudio" src="/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com (1).mp3" loop></audio>
+<audio id="backgroundAudio" src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3" loop></audio>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N36FJFW2"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -390,39 +407,34 @@ audioControlBtn: document.getElementById('audioControlBtn'),
 };
 // --- Background Audio Logic ---
 if (els.backgroundAudio && els.audioControlBtn) {
-    els.backgroundAudio.volume = 0.3; // Set a default volume
-
-    const toggleAudio = () => {
-        if (els.backgroundAudio.paused) {
-            els.backgroundAudio.play().catch(e => console.error("Audio could not be played:", e));
-        } else {
-            els.backgroundAudio.pause();
-        }
-    };
-
-    els.audioControlBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleAudio();
-    });
-
-    els.backgroundAudio.onplay = () => {
-        els.audioControlBtn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
-        lucide.createIcons();
-    };
-
-    els.backgroundAudio.onpause = () => {
-        els.audioControlBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
-        lucide.createIcons();
-    };
-
-    // Attempt to autoplay when the page is loaded
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            els.backgroundAudio.play().catch(error => {
-                console.log("Audio autoplay was prevented by the browser. User must click play.");
-            });
-        }, 300);
-    });
+els.backgroundAudio.volume = 0.3; // Set a default volume
+const toggleAudio = () => {
+if (els.backgroundAudio.paused) {
+els.backgroundAudio.play().catch(e => console.error("Audio could not be played:", e));
+} else {
+els.backgroundAudio.pause();
+}
+};
+els.audioControlBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+toggleAudio();
+});
+els.backgroundAudio.onplay = () => {
+els.audioControlBtn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
+lucide.createIcons();
+};
+els.backgroundAudio.onpause = () => {
+els.audioControlBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+lucide.createIcons();
+};
+// Attempt to autoplay when the page is loaded
+window.addEventListener('load', () => {
+setTimeout(() => {
+els.backgroundAudio.play().catch(error => {
+console.log("Audio autoplay was prevented by the browser. User must click play.");
+});
+}, 300);
+});
 }
 // --- End Audio Logic ---
 // ===== AUDIO SETUP =====
@@ -565,6 +577,31 @@ localStorage.setItem('pinnedProjects', JSON.stringify(pinnedIds));
 renderProjects();
 }
 window.togglePin = togglePin;
+
+// NEW: Copy project link to clipboard
+window.copyProjectLink = function(event, link, buttonElement) {
+  event.stopPropagation();
+  navigator.clipboard.writeText(link).then(() => {
+    const icon = buttonElement.querySelector('i');
+    const originalIcon = icon.outerHTML;
+    
+    // Show success feedback
+    buttonElement.classList.add('copied');
+    icon.outerHTML = '<i data-lucide="check" class="w-3 h-3"></i>';
+    lucide.createIcons();
+    
+    // Reset after 2 seconds
+    setTimeout(() => {
+      buttonElement.classList.remove('copied');
+      buttonElement.querySelector('i').outerHTML = originalIcon;
+      lucide.createIcons();
+    }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy link:', err);
+    alert(' copied link to clipboard');
+  });
+};
+
 document.addEventListener('keydown', (e) => {
 if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 e.preventDefault();
@@ -636,35 +673,61 @@ targetFrame.src = convertToLocalHostUrl(url);
 targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
 if (window.innerWidth < 768) toggleSidebar(false);
 const site = allSites.find(s => convertToLocalHostUrl(s.url) === convertToLocalHostUrl(url) || s.url === url);
-if (site) addToHistory(site.title, url);
+if (site) {
+    addToHistory(site.title, url);
+    // NEW: Update URL with project parameter
+    const projectParam = encodeURIComponent(site.title || site.id || site.url);
+    const newUrl = `${window.location.pathname}?project=${projectParam}`;
+    window.history.pushState({}, '', newUrl);
+}
 }
 window.loadProject = loadProject;
+
+// MODIFIED: Create card with Copy Link button
 function createCard(site, isPinned) {
-const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
-const btn = document.createElement('button');
-btn.className = 'project-card w-full text-left p-1.5 rounded-lg mb-1 flex items-center gap-2 border border-transparent select-none group';
-btn.innerHTML = `
-<div class="w-7 h-7 rounded bg-[#18181b] border border-[#27272a] overflow-hidden shrink-0 relative">
-<img src="${screenshot}" class="screenshot-img w-full h-full object-cover" loading="lazy"
-onload="this.classList.add('loaded')" onerror="this.style.display='none'">
-<div class="absolute inset-0 flex items-center justify-center bg-[#18181b] -z-10">
-<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#a1a1aa]">
-<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 14 22l7-4A2 2 0 0 0 21 16z"></path>
-</svg>
-</div>
-</div>
-<div class="min-w-0 flex-1 hide-on-collapse">
-<div class="title-text text-xs font-medium truncate leading-tight group-hover:text-white transition-colors">${site.title || 'Untitled'}</div>
-<div class="text-[9px] text-[#a1a1aa] truncate mt-0.5 group-hover:text-gray-300">Project</div>
-</div>
-<div onclick="togglePin('${site.id || site.url}', event)"
-class="p-0.5 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity hide-on-collapse ${isPinned ? 'opacity-100 text-primary' : ''}">
-<i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i>
-</div>
-`;
-btn.onclick = () => loadProject(site.url, btn);
-return btn;
+  const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
+  const btn = document.createElement('button');
+  btn.className = 'project-card w-full text-left p-1.5 rounded-lg mb-1 flex items-center gap-2 border border-transparent select-none group';
+  
+  // Generate shareable link with project parameter
+  const projectParam = encodeURIComponent(site.title || site.id || site.url);
+  const shareableLink = `${window.location.origin}${window.location.pathname}?project=${projectParam}`;
+  
+  btn.innerHTML = `
+    <div class="w-7 h-7 rounded bg-[#18181b] border border-[#27272a] overflow-hidden shrink-0 relative">
+      <img src="${screenshot}" class="screenshot-img w-full h-full object-cover" loading="lazy"
+        onload="this.classList.add('loaded')" onerror="this.style.display='none'">
+      <div class="absolute inset-0 flex items-center justify-center bg-[#18181b] -z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#a1a1aa]">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 14 22l7-4A2 2 0 0 0 21 16z"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="min-w-0 flex-1 hide-on-collapse">
+      <div class="title-text text-xs font-medium truncate leading-tight group-hover:text-white transition-colors">${site.title || 'Untitled'}</div>
+      <div class="text-[9px] text-[#a1a1aa] truncate mt-0.5 group-hover:text-gray-300">Project</div>
+    </div>
+    <div class="flex items-center gap-1 hide-on-collapse">
+      <button onclick="copyProjectLink(event, '${shareableLink}', this)" 
+        class="copy-btn p-1 rounded text-[#a1a1aa] hover:text-white transition-colors" 
+        title="Copy shareable link">
+        <i data-lucide="link" class="w-3 h-3"></i>
+      </button>
+      <div onclick="togglePin('${site.id || site.url}', event)"
+        class="p-1 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity ${isPinned ? 'opacity-100 text-primary' : ''}">
+        <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i>
+      </div>
+    </div>
+  `;
+  btn.onclick = (e) => {
+    // Prevent clicking card if clicking buttons inside it
+    if (!e.target.closest('.copy-btn') && !e.target.closest('[onclick*="togglePin"]')) {
+      loadProject(site.url, btn);
+    }
+  };
+  return btn;
 }
+
 function renderProjects() {
 els.list.innerHTML = '';
 els.pinnedList.innerHTML = '';
@@ -684,6 +747,34 @@ els.pinnedSection.classList.add('hidden');
 others.forEach(site => els.list.appendChild(createCard(site, false)));
 lucide.createIcons();
 }
+
+// NEW: Load project from URL parameter on page load
+function loadProjectFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectParam = urlParams.get('project');
+  
+  if (projectParam && allSites.length > 0) {
+    const decodedParam = decodeURIComponent(projectParam);
+    
+    // Find project by title, id, or url
+    const project = allSites.find(site => 
+      site.title === decodedParam || 
+      site.id === decodedParam || 
+      site.url === decodedParam ||
+      (site.title || '').toLowerCase() === decodedParam.toLowerCase()
+    );
+    
+    if (project) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const projectCard = Array.from(document.querySelectorAll('.project-card'))
+          .find(card => card.textContent.includes(project.title));
+        loadProject(project.url, projectCard);
+      }, 300);
+    }
+  }
+}
+
 onValue(ref(db, 'sites'), (snapshot) => {
 const data = snapshot.val();
 if (!data) {
@@ -694,7 +785,11 @@ allSites = Object.entries(data)
 .map(([key, value]) => ({ ...value, id: key || value.url }))
 .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
 renderProjects();
+
+// NEW: Check for URL param after projects load
+loadProjectFromURL();
 });
+
 els.search.oninput = (e) => {
 const q = e.target.value.toLowerCase();
 document.querySelectorAll('.project-card').forEach(btn => {
@@ -737,6 +832,8 @@ const targetFrame = (splitViewActive && activePane === 'right') ? els.frame2 : e
 targetFrame.src = '/index.html';
 targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
 addToHistory('Home', '/index.html');
+// Clear project param when going home
+window.history.pushState({}, '', window.location.pathname);
 };
 document.getElementById('fullscreenBtn').onclick = () => {
 if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
