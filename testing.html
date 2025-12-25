@@ -47,8 +47,8 @@
         <p>This page hosts the BlackICE Portal Widget.</p>
     </div><script> 
      /**
- * BlackICE Portal Widget v3.7
- * Features: No Search Auto-Focus, Immersive Iframe, Home Button, Crisp Chat
+ * BlackICE Portal Widget v3.8
+ * Features: Fixed Iframe Scrolling, No Auto-Focus, Immersive Mode
  */
 
 (function() {
@@ -264,11 +264,14 @@
                     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                     background: #000; z-index: 2147483645; 
                     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+                    overflow: hidden; /* Lock parent scroll */
+                    -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
                 }
                 #bi-iframe-container.active { opacity: 1; pointer-events: auto; }
                 
                 #bi-iframe {
                     width: 100%; height: 100%; border: none; background: white;
+                    display: block; /* Removes bottom whitespace */
                 }
                 
                 /* Main Overlay Backdrop */
@@ -294,7 +297,8 @@
             this.iframeContainer = document.createElement('div');
             this.iframeContainer.id = 'bi-iframe-container';
             this.iframeContainer.className = 'bi-root';
-            this.iframeContainer.innerHTML = `<iframe id="bi-iframe" src="about:blank"></iframe>`;
+            // Allow fullscreen
+            this.iframeContainer.innerHTML = `<iframe id="bi-iframe" src="about:blank" allowfullscreen allow="autoplay; fullscreen"></iframe>`;
 
             // 3. Trigger Button
             const menuIcon = `<svg class="bi-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
@@ -412,13 +416,22 @@
             const container = document.getElementById('bi-iframe-container');
             iframe.src = url;
             container.classList.add('active');
+            
+            // Lock body scroll on parent page
+            document.body.style.overflow = 'hidden'; 
+            
             this.toggle(); 
         }
 
         closeProject() {
             const container = document.getElementById('bi-iframe-container');
             const iframe = document.getElementById('bi-iframe');
+            
             container.classList.remove('active');
+            
+            // Unlock body scroll
+            document.body.style.overflow = '';
+            
             setTimeout(() => { iframe.src = 'about:blank'; }, 300);
             this.toggle();
         }
@@ -475,7 +488,6 @@
                 this.sidebar.classList.add('open');
                 this.btn.classList.add('open');
                 this.overlay.classList.add('visible');
-                // REMOVED: setTimeout(() => document.getElementById('bi-search').focus(), 100);
             } else {
                 this.sidebar.classList.remove('open');
                 this.btn.classList.remove('open');
@@ -487,6 +499,7 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => new BlackICEWidget());
     else new BlackICEWidget();
 })();
+
 
 </script>
 
