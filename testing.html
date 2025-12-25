@@ -46,9 +46,9 @@
         <h1>My Website Content</h1>
         <p>This page hosts the BlackICE Portal Widget.</p>
     </div><script> 
-        /**
- * BlackICE Portal Widget v3.4
- * Features: Full-screen Iframe Overlay, Crisp Chat, Draggable Button, Glassmorphism
+      /**
+ * BlackICE Portal Widget v3.6
+ * Features: 100% Immersive Iframe, Home Button in Sidebar, Crisp Chat
  */
 
 (function() {
@@ -194,7 +194,7 @@
                 
                 .bi-header {
                     padding: 16px 20px;
-                    display: flex; align-items: center; gap: 10px;
+                    display: flex; align-items: center; gap: 8px;
                     border-bottom: 1px solid ${this.theme.glassBorder};
                     background: rgba(255,255,255,0.02);
                 }
@@ -211,6 +211,10 @@
                     transition: all 0.2s; font-size: 11px; font-weight: 600;
                 }
                 .bi-action-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+                
+                /* Home Button Color */
+                #bi-home-btn:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+
                 .bi-btn-os { padding: 6px 10px; gap: 6px; }
                 .bi-btn-os svg { width: 14px; height: 14px; }
                 
@@ -256,31 +260,16 @@
                 .bi-card-title { color: #f4f4f5; font-size: 14px; font-weight: 500; }
                 .bi-card-desc { color: #71717a; font-size: 11px; }
 
-                /* --- IFRAME OVERLAY (Full Screen Project View) --- */
+                /* --- IMMERSIVE IFRAME OVERLAY --- */
                 #bi-iframe-container {
                     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                    background: #000; z-index: 2147483645; /* Below button/sidebar */
+                    background: #000; z-index: 2147483645; 
                     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-                    display: flex; flex-direction: column;
                 }
                 #bi-iframe-container.active { opacity: 1; pointer-events: auto; }
                 
-                #bi-iframe-header {
-                    height: 50px; background: #09090b; border-bottom: 1px solid #27272a;
-                    display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-                }
-                #bi-iframe-title { font-weight: 600; font-size: 14px; color: white; }
-                #bi-iframe-close {
-                    background: #27272a; border: none; color: #a1a1aa;
-                    width: 30px; height: 30px; border-radius: 6px;
-                    display: flex; align-items: center; justify-content: center;
-                    cursor: pointer; transition: all 0.2s;
-                }
-                #bi-iframe-close:hover { background: #ef4444; color: white; }
-                
                 #bi-iframe {
-                    flex: 1; width: 100%; border: none; background: white;
+                    width: 100%; height: 100%; border: none; background: white;
                 }
                 
                 /* Main Overlay Backdrop */
@@ -302,19 +291,11 @@
             this.overlay.id = 'bi-overlay';
             this.overlay.onclick = () => this.toggle();
 
-            // 2. Fullscreen Iframe Container (Hidden initially)
+            // 2. Fullscreen Iframe (Clean, No Buttons)
             this.iframeContainer = document.createElement('div');
             this.iframeContainer.id = 'bi-iframe-container';
             this.iframeContainer.className = 'bi-root';
-            this.iframeContainer.innerHTML = `
-                <div id="bi-iframe-header">
-                    <span id="bi-iframe-title">Project View</span>
-                    <button id="bi-iframe-close" title="Close Project">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </div>
-                <iframe id="bi-iframe" src="about:blank"></iframe>
-            `;
+            this.iframeContainer.innerHTML = `<iframe id="bi-iframe" src="about:blank"></iframe>`;
 
             // 3. Trigger Button
             const menuIcon = `<svg class="bi-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
@@ -336,6 +317,12 @@
                 <div class="bi-header">
                     <div class="bi-logo">B</div>
                     <div class="bi-title">BlackICE</div>
+                    
+                    <!-- NEW: Home/Close App Button -->
+                    <button id="bi-home-btn" class="bi-action-btn" title="Exit App / Home">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </button>
+
                     <button id="bi-chat-btn" class="bi-action-btn" title="Support Chat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     </button>
@@ -379,8 +366,8 @@
                 this.renderProjects(filtered);
             };
 
-            // Close Iframe
-            document.getElementById('bi-iframe-close').onclick = () => {
+            // NEW: Home Button Logic
+            document.getElementById('bi-home-btn').onclick = () => {
                 this.closeProject();
             };
         }
@@ -408,9 +395,8 @@
             }
             projects.forEach(p => {
                 const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(p.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
-                const el = document.createElement('div'); // Changed from <a> to <div>
+                const el = document.createElement('div'); 
                 el.className = 'bi-card';
-                // Remove href, add onclick
                 el.onclick = () => this.openProject(p.url, p.title);
                 
                 el.innerHTML = `
@@ -424,31 +410,24 @@
             });
         }
         
-        // NEW: Open Project in Iframe
         openProject(url, title) {
             const iframe = document.getElementById('bi-iframe');
             const container = document.getElementById('bi-iframe-container');
-            const titleEl = document.getElementById('bi-iframe-title');
-            
-            titleEl.innerText = title || 'Project View';
             iframe.src = url;
             container.classList.add('active');
-            
-            // Close the sidebar automatically for better view
+            // Close sidebar to show full screen app
             this.toggle(); 
         }
 
-        // NEW: Close Project Iframe
         closeProject() {
             const container = document.getElementById('bi-iframe-container');
             const iframe = document.getElementById('bi-iframe');
             
+            // Hide container and stop app
             container.classList.remove('active');
-            setTimeout(() => {
-                iframe.src = 'about:blank'; // Clear source to stop audio/video
-            }, 300);
+            setTimeout(() => { iframe.src = 'about:blank'; }, 300);
             
-            // Re-open sidebar so user can choose another
+            // Close the sidebar to reveal the host site
             this.toggle();
         }
 
@@ -516,6 +495,7 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => new BlackICEWidget());
     else new BlackICEWidget();
 })();
+
 
 </script>
 
