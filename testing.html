@@ -46,9 +46,9 @@
         <h1>My Website Content</h1>
         <p>This page hosts the BlackICE Portal Widget.</p>
     </div><script> 
-      /**
- * BlackICE Portal Widget v3.6
- * Features: 100% Immersive Iframe, Home Button in Sidebar, Crisp Chat
+     /**
+ * BlackICE Portal Widget v3.7
+ * Features: No Search Auto-Focus, Immersive Iframe, Home Button, Crisp Chat
  */
 
 (function() {
@@ -212,7 +212,6 @@
                 }
                 .bi-action-btn:hover { background: rgba(255,255,255,0.1); color: white; }
                 
-                /* Home Button Color */
                 #bi-home-btn:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
 
                 .bi-btn-os { padding: 6px 10px; gap: 6px; }
@@ -291,7 +290,7 @@
             this.overlay.id = 'bi-overlay';
             this.overlay.onclick = () => this.toggle();
 
-            // 2. Fullscreen Iframe (Clean, No Buttons)
+            // 2. Fullscreen Iframe
             this.iframeContainer = document.createElement('div');
             this.iframeContainer.id = 'bi-iframe-container';
             this.iframeContainer.className = 'bi-root';
@@ -318,7 +317,6 @@
                     <div class="bi-logo">B</div>
                     <div class="bi-title">BlackICE</div>
                     
-                    <!-- NEW: Home/Close App Button -->
                     <button id="bi-home-btn" class="bi-action-btn" title="Exit App / Home">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     </button>
@@ -366,7 +364,6 @@
                 this.renderProjects(filtered);
             };
 
-            // NEW: Home Button Logic
             document.getElementById('bi-home-btn').onclick = () => {
                 this.closeProject();
             };
@@ -415,19 +412,14 @@
             const container = document.getElementById('bi-iframe-container');
             iframe.src = url;
             container.classList.add('active');
-            // Close sidebar to show full screen app
             this.toggle(); 
         }
 
         closeProject() {
             const container = document.getElementById('bi-iframe-container');
             const iframe = document.getElementById('bi-iframe');
-            
-            // Hide container and stop app
             container.classList.remove('active');
             setTimeout(() => { iframe.src = 'about:blank'; }, 300);
-            
-            // Close the sidebar to reveal the host site
             this.toggle();
         }
 
@@ -483,7 +475,7 @@
                 this.sidebar.classList.add('open');
                 this.btn.classList.add('open');
                 this.overlay.classList.add('visible');
-                setTimeout(() => document.getElementById('bi-search').focus(), 100);
+                // REMOVED: setTimeout(() => document.getElementById('bi-search').focus(), 100);
             } else {
                 this.sidebar.classList.remove('open');
                 this.btn.classList.remove('open');
@@ -495,7 +487,6 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => new BlackICEWidget());
     else new BlackICEWidget();
 })();
-
 
 </script>
 
