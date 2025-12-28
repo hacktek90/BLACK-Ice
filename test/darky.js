@@ -1,79 +1,167 @@
+ (function () {
+            class DarkyWidget {
+                constructor(options = {}) {
+                    this.options = {
+                        bottom: options.bottom || '32px',
+                        right: options.right || '32px',
+                        left: options.left || 'unset',
+                        saveState: options.saveState !== false,
+                        autoMatchOs: options.autoMatchOs !== false,
+                    };
 
-  // ... your existing code ...
-  const darkmode = new Darky();
-  darkmode.enable();
+                    this.widget = null;
+                    this.isDragging = false;
+                    this.hasMoved = false;
+                    this.startX = 0;
+                    this.startY = 0;
+                    this.initialLeft = 0;
+                    this.initialTop = 0;
 
-  // Custom code to make the button draggable
-  window.addEventListener('DOMContentLoaded', () => {
-    // 1. Find the button using its class name
-    // DarkyJS v1.2.0+ typically uses 'darkmode--trigger'
-    const button = document.querySelector('.darkmode--trigger');
+                    this.init();
+                }
 
-    if (button) {
-      makeElementDraggable(button);
-    } else {
-      console.warn('DarkyJS button not found. Check the class name.');
-    }
+                init() {
+                    this.injectStyles();
+                    this.createWidget();
+                    this.attachEvents();
+                    this.checkPreference();
+                }
 
-    function makeElementDraggable(el) {
-      let isDragging = false;
-      let startX, startY, initialLeft, initialTop;
+                injectStyles() {
+                    const css = `
+                        .dw-widget {
+                            position: fixed;
+                            bottom: ${this.options.bottom};
+                            right: ${this.options.right};
+                            left: ${this.options.left};
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            cursor: grab;
+                            z-index: 2147483647;
+                            background-color: #fff; 
+                            mix-blend-mode: difference;
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            touch-action: none; 
+                            user-select: none;
+                            transition: transform 0.1s, background-color 0.4s;
+                            -webkit-tap-highlight-color: transparent;
+                        }
+                        .dw-widget:active { cursor: grabbing; transform: scale(0.9); }
+                        .dw-icon {
+                            width: 18px; height: 18px; position: absolute;
+                            top: 50%; left: 50%; transform: translate(-50%, -50%);
+                            transition: opacity 0.4s, transform 0.4s; pointer-events: none;
+                        }
+                        .dw-icon-moon { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); fill: #000; }
+                        .dw-icon-sun { opacity: 0; transform: translate(-50%, -50%) rotate(-90deg); fill: #fff; }
+                        
+                        html.dw-dark-mode { filter: invert(1) hue-rotate(180deg); transition: filter 0.4s ease; }
+                        
+                        html.dw-dark-mode img, 
+                        html.dw-dark-mode video, 
+                        html.dw-dark-mode iframe, 
+                        html.dw-dark-mode .dw-ignore,
+                        html.dw-dark-mode .dw-widget {
+                            filter: invert(1) hue-rotate(180deg);
+                        }
+                        
+                        html.dw-dark-mode .dw-widget { background-color: #000; box-shadow: 0 4px 10px rgba(255,255,255,0.2); }
+                        html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: translate(-50%, -50%) rotate(90deg); }
+                        html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }
+                    `;
+                    const style = document.createElement('style');
+                    style.type = 'text/css';
+                    style.appendChild(document.createTextNode(css));
+                    document.head.appendChild(style);
+                }
 
-      el.addEventListener('mousedown', (e) => {
-        // Prevent default browser dragging behavior
-        e.preventDefault();
-        
-        isDragging = false;
-        startX = e.clientX;
-        startY = e.clientY;
-        
-        // Get current position
-        const rect = el.getBoundingClientRect();
-        initialLeft = rect.left;
-        initialTop = rect.top;
+                createWidget() {
+                    this.widget = document.createElement('div');
+                    this.widget.className = 'dw-widget';
+                    this.widget.id = 'dw-widget';
+                    this.widget.title = 'Toggle Dark Mode';
+                    
+                    const moonSvg = `<svg class="dw-icon dw-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+                    const sunSvg = `<svg class="dw-icon dw-icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
 
-        // Prepare element for positioning
-        el.style.position = 'fixed';
-        el.style.bottom = 'auto';
-        el.style.right = 'auto';
-        el.style.left = `${initialLeft}px`;
-        el.style.top = `${initialTop}px`;
-        el.style.cursor = 'grabbing';
+                    this.widget.innerHTML = moonSvg + sunSvg;
+                    document.body.appendChild(this.widget);
+                }
 
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-      });
+                toggleTheme() {
+                    const html = document.documentElement;
+                    html.classList.toggle('dw-dark-mode');
+                    if (this.options.saveState) {
+                        localStorage.setItem('dw-theme', html.classList.contains('dw-dark-mode') ? 'dark' : 'light');
+                    }
+                }
 
-      function onMouseMove(e) {
-        // Calculate distance moved
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+                checkPreference() {
+                    const saved = localStorage.getItem('dw-theme');
+                    const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (saved === 'dark' || (!saved && this.options.autoMatchOs && system)) {
+                        document.documentElement.classList.add('dw-dark-mode');
+                    }
+                }
 
-        // If moved more than 5px, consider it a drag (to avoid accidental clicks)
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-          isDragging = true;
-        }
+                attachEvents() {
+                    const start = (e, clientX, clientY) => {
+                        this.isDragging = true;
+                        this.hasMoved = false;
+                        this.startX = clientX;
+                        this.startY = clientY;
+                        const rect = this.widget.getBoundingClientRect();
+                        this.initialLeft = rect.left;
+                        this.initialTop = rect.top;
+                        this.widget.style.bottom = 'auto';
+                        this.widget.style.right = 'auto';
+                        this.widget.style.left = this.initialLeft + 'px';
+                        this.widget.style.top = this.initialTop + 'px';
+                    };
 
-        // Update position
-        el.style.left = `${initialLeft + dx}px`;
-        el.style.top = `${initialTop + dy}px`;
-      }
+                    const move = (e, clientX, clientY) => {
+                        if (!this.isDragging) return;
+                        if(e.cancelable) e.preventDefault();
+                        const dx = clientX - this.startX;
+                        const dy = clientY - this.startY;
+                        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.hasMoved = true;
+                        
+                        let newL = this.initialLeft + dx;
+                        let newT = this.initialTop + dy;
+                        const maxL = window.innerWidth - this.widget.offsetWidth;
+                        const maxT = window.innerHeight - this.widget.offsetHeight;
+                        
+                        if (newL < 0) newL = 0; if (newT < 0) newT = 0;
+                        if (newL > maxL) newL = maxL; if (newT > maxT) newT = maxT;
+                        
+                        this.widget.style.left = newL + 'px';
+                        this.widget.style.top = newT + 'px';
+                    };
 
-      function onMouseUp(e) {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        el.style.cursor = 'pointer';
+                    const end = () => {
+                        if (!this.isDragging) return;
+                        this.isDragging = false;
+                        if (!this.hasMoved) this.toggleTheme();
+                    };
 
-        // If it was a drag operation, prevent the click (toggle) action
-        if (isDragging) {
-          const preventClick = (clickEvent) => {
-            clickEvent.stopImmediatePropagation();
-            clickEvent.preventDefault();
-            el.removeEventListener('click', preventClick, true);
-          };
-          el.addEventListener('click', preventClick, true);
-        }
-      }
-    }
-  });
+                    this.widget.addEventListener('mousedown', e => start(e, e.clientX, e.clientY));
+                    document.addEventListener('mousemove', e => move(e, e.clientX, e.clientY));
+                    document.addEventListener('mouseup', end);
 
+                    this.widget.addEventListener('touchstart', e => start(e, e.touches[0].clientX, e.touches[0].clientY), {passive:false});
+                    document.addEventListener('touchmove', e => move(e, e.touches[0].clientX, e.touches[0].clientY), {passive:false});
+                    document.addEventListener('touchend', end);
+                }
+            }
+            
+            // Initializer
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => new DarkyWidget());
+            } else {
+                new DarkyWidget();
+            }
+        })();
