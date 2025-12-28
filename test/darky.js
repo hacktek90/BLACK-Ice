@@ -5,8 +5,8 @@
                 bottom: options.bottom || '32px',
                 right: options.right || '32px',
                 left: options.left || 'unset',
-                saveState: options.saveState !== false,
-                autoMatchOs: options.autoMatchOs !== false,
+                saveState: options.saveState !== false, // Default: true (remember choice)
+                autoMatchOs: options.autoMatchOs === true, // CHANGED: Default false (manual only)
             };
             this.init();
         }
@@ -26,7 +26,7 @@
                     bottom: ${this.options.bottom};
                     right: ${this.options.right};
                     left: ${this.options.left};
-                    width: 32px; /* Button size stays compact */
+                    width: 32px;
                     height: 32px;
                     border-radius: 50%;
                     cursor: grab;
@@ -44,25 +44,19 @@
                 }
                 .dw-widget:active { cursor: grabbing; transform: scale(0.9); }
 
-                /* ICONS - SIZE INCREASED HERE */
+                /* ICONS (22px) */
                 .dw-icon {
-                    width: 22px;  /* Increased from 18px */
-                    height: 22px; /* Increased from 18px */
-                    position: absolute;
-                    top: 50%; 
-                    left: 50%; 
-                    transform: translate(-50%, -50%);
-                    transition: opacity 0.4s, transform 0.4s; 
-                    pointer-events: none;
+                    width: 22px; height: 22px; position: absolute;
+                    top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    transition: opacity 0.4s, transform 0.4s; pointer-events: none;
                 }
-                
                 .dw-icon-moon { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); fill: #000; }
                 .dw-icon-sun { opacity: 0; transform: translate(-50%, -50%) rotate(-90deg); fill: #fff; }
                 
                 /* DARK MODE FILTER */
                 html.dw-dark-mode { filter: invert(1) hue-rotate(180deg); transition: filter 0.4s ease; }
                 
-                /* RE-INVERSION LIST (Iframes are inverted by default now) */
+                /* RE-INVERSION LIST */
                 html.dw-dark-mode img, 
                 html.dw-dark-mode video, 
                 html.dw-dark-mode .dw-ignore,
@@ -70,7 +64,6 @@
                     filter: invert(1) hue-rotate(180deg);
                 }
                 
-                /* WIDGET COLORS IN DARK MODE */
                 html.dw-dark-mode .dw-widget { background-color: #000; box-shadow: 0 4px 10px rgba(255,255,255,0.2); }
                 html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: translate(-50%, -50%) rotate(90deg); }
                 html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }
@@ -104,7 +97,11 @@
         checkPreference() {
             const saved = localStorage.getItem('dw-theme');
             const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (saved === 'dark' || (!saved && this.options.autoMatchOs && system)) {
+            
+            // LOGIC CHANGED: Only use system preference if autoMatchOs is explicitly TRUE
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dw-dark-mode');
+            } else if (!saved && this.options.autoMatchOs && system) {
                 document.documentElement.classList.add('dw-dark-mode');
             }
         }
