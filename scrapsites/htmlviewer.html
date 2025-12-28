@@ -253,6 +253,8 @@ font-size: 10px; gap: 2px; cursor: pointer; padding: 6px;
 <nav class="mobile-nav">
 <button class="mobile-tab active" data-tab="editor"><i class="ph ph-code" style="font-size: 20px;"></i></button>
 <button class="mobile-tab" data-tab="preview"><i class="ph ph-eye" style="font-size: 20px;"></i></button>
+<!-- ADDED: Mobile Clear Button -->
+<button class="mobile-tab" id="mobile-clear-btn"><i class="ph ph-trash" style="font-size: 20px;"></i></button>
 <button class="mobile-tab" id="mobile-theme-btn"><i class="ph ph-moon" style="font-size: 20px;"></i></button>
 </nav>
 <input type="file" id="file-input" accept=".html" hidden>
@@ -704,8 +706,12 @@ const editorPane = document.getElementById('editor-pane');
 const previewPane = document.getElementById('preview-pane');
 tabs.forEach(tab => {
 tab.addEventListener('click', () => {
-if(tab.id === 'mobile-theme-btn') { toggleTheme(); return; }
-tabs.forEach(t => { if(t.id !== 'mobile-theme-btn') t.classList.remove('active'); });
+// Prevent switching tabs for theme OR clear buttons
+if(tab.id === 'mobile-theme-btn' || tab.id === 'mobile-clear-btn') { return; }
+tabs.forEach(t => { 
+// Remove active class from other tabs (but not buttons that don't switch views)
+if(t.id !== 'mobile-theme-btn' && t.id !== 'mobile-clear-btn') t.classList.remove('active'); 
+});
 tab.classList.add('active');
 const target = tab.dataset.tab;
 if (target === 'editor') {
@@ -726,6 +732,14 @@ document.getElementById('format-btn').addEventListener('click', formatCode);
 document.getElementById('sample-btn').addEventListener('click', () => editor.setValue(SAMPLE_HTML, -1));
 document.getElementById('clear-btn').addEventListener('click', () => editor.setValue('', -1));
 document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+// ADDED: Mobile Clear Button Logic
+document.getElementById('mobile-clear-btn').addEventListener('click', () => {
+if(confirm('Are you sure you want to clear all code?')) {
+editor.setValue('', -1);
+}
+});
+// Mobile Theme Logic (already exists in toggleTheme, but adding explicit listener for clarity if needed)
+document.getElementById('mobile-theme-btn').addEventListener('click', toggleTheme);
 document.getElementById('copy-btn').addEventListener('click', () => navigator.clipboard.writeText(editor.getValue()));
 document.getElementById('find-btn').addEventListener('click', () => editor.execCommand('find'));
 document.getElementById('import-btn').addEventListener('click', () => document.getElementById('file-input').click());
