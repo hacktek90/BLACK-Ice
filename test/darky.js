@@ -8,15 +8,6 @@
                         saveState: options.saveState !== false,
                         autoMatchOs: options.autoMatchOs !== false,
                     };
-
-                    this.widget = null;
-                    this.isDragging = false;
-                    this.hasMoved = false;
-                    this.startX = 0;
-                    this.startY = 0;
-                    this.initialLeft = 0;
-                    this.initialTop = 0;
-
                     this.init();
                 }
 
@@ -29,6 +20,7 @@
 
                 injectStyles() {
                     const css = `
+                        /* WIDGET STYLES */
                         .dw-widget {
                             position: fixed;
                             bottom: ${this.options.bottom};
@@ -51,6 +43,8 @@
                             -webkit-tap-highlight-color: transparent;
                         }
                         .dw-widget:active { cursor: grabbing; transform: scale(0.9); }
+
+                        /* ICONS */
                         .dw-icon {
                             width: 18px; height: 18px; position: absolute;
                             top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -59,16 +53,22 @@
                         .dw-icon-moon { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); fill: #000; }
                         .dw-icon-sun { opacity: 0; transform: translate(-50%, -50%) rotate(-90deg); fill: #fff; }
                         
+                        /* DARK MODE FILTER */
                         html.dw-dark-mode { filter: invert(1) hue-rotate(180deg); transition: filter 0.4s ease; }
                         
+                        /* 
+                           RE-INVERSION LIST 
+                           Notice: 'iframe' is REMOVED from this list. 
+                           Only images, videos, and the widget itself are fixed.
+                        */
                         html.dw-dark-mode img, 
                         html.dw-dark-mode video, 
-                        html.dw-dark-mode iframe, 
                         html.dw-dark-mode .dw-ignore,
                         html.dw-dark-mode .dw-widget {
                             filter: invert(1) hue-rotate(180deg);
                         }
                         
+                        /* WIDGET COLORS IN DARK MODE */
                         html.dw-dark-mode .dw-widget { background-color: #000; box-shadow: 0 4px 10px rgba(255,255,255,0.2); }
                         html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: translate(-50%, -50%) rotate(90deg); }
                         html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }
@@ -83,7 +83,6 @@
                     this.widget = document.createElement('div');
                     this.widget.className = 'dw-widget';
                     this.widget.id = 'dw-widget';
-                    this.widget.title = 'Toggle Dark Mode';
                     
                     const moonSvg = `<svg class="dw-icon dw-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
                     const sunSvg = `<svg class="dw-icon dw-icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
@@ -109,43 +108,37 @@
                 }
 
                 attachEvents() {
-                    const start = (e, clientX, clientY) => {
-                        this.isDragging = true;
-                        this.hasMoved = false;
-                        this.startX = clientX;
-                        this.startY = clientY;
+                    let isDragging = false;
+                    let hasMoved = false;
+                    let startX, startY, initialLeft, initialTop;
+
+                    const start = (e, x, y) => {
+                        isDragging = true;
+                        hasMoved = false;
+                        startX = x; startY = y;
                         const rect = this.widget.getBoundingClientRect();
-                        this.initialLeft = rect.left;
-                        this.initialTop = rect.top;
-                        this.widget.style.bottom = 'auto';
-                        this.widget.style.right = 'auto';
-                        this.widget.style.left = this.initialLeft + 'px';
-                        this.widget.style.top = this.initialTop + 'px';
+                        initialLeft = rect.left; initialTop = rect.top;
+                        this.widget.style.bottom = 'auto'; this.widget.style.right = 'auto';
+                        this.widget.style.left = initialLeft + 'px'; this.widget.style.top = initialTop + 'px';
                     };
 
-                    const move = (e, clientX, clientY) => {
-                        if (!this.isDragging) return;
+                    const move = (e, x, y) => {
+                        if (!isDragging) return;
                         if(e.cancelable) e.preventDefault();
-                        const dx = clientX - this.startX;
-                        const dy = clientY - this.startY;
-                        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.hasMoved = true;
-                        
-                        let newL = this.initialLeft + dx;
-                        let newT = this.initialTop + dy;
+                        const dx = x - startX; const dy = y - startY;
+                        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
+                        let newL = initialLeft + dx; let newT = initialTop + dy;
                         const maxL = window.innerWidth - this.widget.offsetWidth;
                         const maxT = window.innerHeight - this.widget.offsetHeight;
-                        
                         if (newL < 0) newL = 0; if (newT < 0) newT = 0;
                         if (newL > maxL) newL = maxL; if (newT > maxT) newT = maxT;
-                        
-                        this.widget.style.left = newL + 'px';
-                        this.widget.style.top = newT + 'px';
+                        this.widget.style.left = newL + 'px'; this.widget.style.top = newT + 'px';
                     };
 
                     const end = () => {
-                        if (!this.isDragging) return;
-                        this.isDragging = false;
-                        if (!this.hasMoved) this.toggleTheme();
+                        if (!isDragging) return;
+                        isDragging = false;
+                        if (!hasMoved) this.toggleTheme();
                     };
 
                     this.widget.addEventListener('mousedown', e => start(e, e.clientX, e.clientY));
@@ -157,8 +150,7 @@
                     document.addEventListener('touchend', end);
                 }
             }
-            
-            // Initializer
+
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => new DarkyWidget());
             } else {
