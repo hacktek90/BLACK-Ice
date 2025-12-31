@@ -1,52 +1,174 @@
 <svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a0a0a;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0" />
-      <stop offset="50%" style="stop-color:#00ff88;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
-    </linearGradient>
-  </defs>
-  
-  <rect width="1200" height="300" fill="url(#bg)"/>
-  
-  <g opacity="0.1">
-    <line x1="0" y1="50" x2="1200" y2="50" stroke="#00ff88" stroke-width="1"/>
-    <line x1="0" y1="150" x2="1200" y2="150" stroke="#00ff88" stroke-width="1"/>
-    <line x1="0" y1="250" x2="1200" y2="250" stroke="#00ff88" stroke-width="1"/>
-  </g>
-  
-  <path d="M50 80 L80 80 L80 50 M50 120 L80 120 L80 150" stroke="#00ff88" stroke-width="3" fill="none" opacity="0.6"/>
-  <path d="M1150 80 L1120 80 L1120 50 M1150 120 L1120 120 L1120 150" stroke="#00ff88" stroke-width="3" fill="none" opacity="0.6"/>
-  
-  <rect x="100" y="100" width="40" height="40" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.8">
-    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
-  </rect>
-  
-  <circle cx="1080" cy="120" r="20" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.8">
-    <animate attributeName="r" values="15;25;15" dur="3s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
-  </circle>
-  
-  <text x="600" y="130" font-family="'Courier New', monospace" font-size="72" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="8">
-    BLACKICE
-  </text>
-  
-  <text x="600" y="170" font-family="'Courier New', monospace" font-size="24" fill="#00ff88" text-anchor="middle" letter-spacing="4">
-    ACADEMY
-  </text>
-  
-  <text x="600" y="200" font-family="monospace" font-size="12" fill="#667eea" text-anchor="middle" opacity="0.7">
-    &lt; ETHICAL HACKING • DEFENSIVE SECURITY • CTF LABS /&gt;
-  </text>
-  
-  <g opacity="0.4">
-    <text x="150" y="240" font-family="monospace" font-size="10" fill="#00ff88">root@blackice:~$</text>
-    <text x="1050" y="240" font-family="monospace" font-size="10" fill="#00ff88" text-anchor="end">[SECURE]</text>
-  </g>
-  
-  <rect x="0" y="0" width="1200" height="300" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.3"/>
+  <a href="https://blackice-ac.vercel.app/" target="_blank" style="text-decoration: none; cursor: pointer;">
+    <defs>
+      <style>
+        /* Hover Animations */
+        a:hover #mainText {
+          fill: #ffffff;
+          filter: url(#intenseGlow);
+        }
+        a:hover #circuitLayer {
+          opacity: 0.6;
+        }
+        a:hover .rotator {
+          stroke: #00ff88;
+        }
+        /* Smooth transitions */
+        #mainText, #circuitLayer, .rotator {
+          transition: all 0.4s ease-in-out;
+        }
+      </style>
+
+      <!-- Deep Space Gradient -->
+      <radialGradient id="bgGradient" cx="50%" cy="50%" r="80%">
+        <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#020617;stop-opacity:1" />
+      </radialGradient>
+
+      <!-- Hexagon Pattern -->
+      <pattern id="hexGrid" x="0" y="0" width="40" height="34.6" patternUnits="userSpaceOnUse" patternTransform="scale(0.5)">
+        <path d="M20 0 L40 11.5 L40 34.6 L20 46.1 L0 34.6 L0 11.5 Z" fill="none" stroke="#1e293b" stroke-width="1"/>
+      </pattern>
+
+      <!-- Circuit Pattern -->
+      <pattern id="circuit" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+        <path d="M10 10 H 30 V 30 H 50" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.1"/>
+        <circle cx="50" cy="30" r="2" fill="#3b82f6" opacity="0.2"/>
+      </pattern>
+
+      <!-- Standard Neon Glow -->
+      <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
+        <feColorMatrix in="blur" type="matrix" values="
+          0 0 0 0 0
+          0 1 0 0 0
+          0 0 1 0 0
+          0 0 0 18 -7" result="glow" />
+        <feMerge>
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+      <!-- Intense Hover Glow -->
+      <filter id="intenseGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+        <feColorMatrix in="blur" type="matrix" values="
+          0 0 0 0 0.8
+          0 1 0 0 1
+          0 0 1 0 0.8
+          0 0 0 1 0" result="glow" />
+        <feMerge>
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+      <!-- Blue/Cyan Secondary Glow -->
+      <filter id="blueGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- 1. Background Layers -->
+    <rect width="1200" height="300" fill="url(#bgGradient)"/>
+    
+    <!-- Side Hexagon Panels -->
+    <rect width="300" height="300" fill="url(#hexGrid)" opacity="0.15"/>
+    <rect x="900" width="300" height="300" fill="url(#hexGrid)" opacity="0.15"/>
+    
+    <!-- Central Circuit Overlay (ID for hover effect) -->
+    <rect id="circuitLayer" x="300" width="600" height="300" fill="url(#circuit)" opacity="0.3"/>
+
+    <!-- Center Glow Spot -->
+    <circle cx="600" cy="150" r="300" fill="#00ff88" opacity="0.02" filter="url(#blueGlow)">
+       <animate attributeName="opacity" values="0.02;0.05;0.02" dur="6s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- 2. Complex HUD Elements -->
+    
+    <!-- Left Rotator -->
+    <g transform="translate(150, 150)" opacity="0.4">
+      <circle class="rotator" cx="0" cy="0" r="80" stroke="#3b82f6" stroke-width="1" fill="none" stroke-dasharray="20, 40">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="20s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="0" r="60" stroke="#00ff88" stroke-width="1" fill="none" stroke-dasharray="10, 10" opacity="0.5">
+         <animateTransform attributeName="transform" type="rotate" from="360 0 0" to="0 0 0" dur="15s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M-90 0 L-70 0 M90 0 L70 0 M0 -90 L0 -70 M0 90 L0 70" stroke="#3b82f6" stroke-width="2"/>
+    </g>
+
+    <!-- Right Rotator -->
+    <g transform="translate(1050, 150)" opacity="0.4">
+      <circle class="rotator" cx="0" cy="0" r="80" stroke="#3b82f6" stroke-width="1" fill="none" stroke-dasharray="60, 20">
+        <animateTransform attributeName="transform" type="rotate" from="360 0 0" to="0 0 0" dur="20s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="0" r="40" stroke="#00ff88" stroke-width="2" fill="none" opacity="0.3"/>
+      <path d="M-10 -10 L10 10 M-10 10 L10 -10" stroke="#00ff88" stroke-width="1"/>
+    </g>
+
+    <!-- Corner Data Blocks -->
+    <g fill="#00ff88" opacity="0.4" font-family="monospace" font-size="8">
+      <text x="20" y="30">ERR_LOG_0x84</text>
+      <text x="20" y="42">SYS_INTEGRITY: 99%</text>
+      <text x="20" y="54">NET_TRACE: ACTIVE</text>
+      
+      <text x="1120" y="30" text-anchor="end">KERNEL_PANIC_AVERTED</text>
+      <text x="1180" y="42" text-anchor="end">MEM: 4096TB</text>
+    </g>
+
+    <!-- 3. Heavy Industrial Corners -->
+    <path d="M10 50 V10 H50" stroke="#00ff88" stroke-width="3" fill="none" filter="url(#neonGlow)" opacity="0.8"/>
+    <path d="M1190 50 V10 H1150" stroke="#00ff88" stroke-width="3" fill="none" filter="url(#neonGlow)" opacity="0.8"/>
+    <path d="M10 250 V290 H50" stroke="#00ff88" stroke-width="3" fill="none" filter="url(#neonGlow)" opacity="0.8"/>
+    <path d="M1190 250 V290 H1150" stroke="#00ff88" stroke-width="3" fill="none" filter="url(#neonGlow)" opacity="0.8"/>
+
+    <!-- 4. Typography -->
+    <g text-anchor="middle">
+      
+      <!-- Large "BLACKICE" Text (ID for hover effect) -->
+      <text id="mainText" x="600" y="145" font-family="'Arial Black', 'Impact', sans-serif" font-size="100" font-weight="900" fill="url(#bgGradient)" stroke="#00ff88" stroke-width="2" letter-spacing="4" filter="url(#neonGlow)" opacity="1">
+        BLACKICE
+      </text>
+      
+      <!-- Inner fill for depth (Static) -->
+      <text x="600" y="145" font-family="'Arial Black', 'Impact', sans-serif" font-size="100" font-weight="900" fill="#f0fdf4" fill-opacity="0.1" letter-spacing="4" pointer-events="none">
+        BLACKICE
+      </text>
+
+      <!-- Subtitle -->
+      <text x="600" y="185" font-family="'Courier New', Courier, monospace" font-size="28" font-weight="bold" fill="#3b82f6" letter-spacing="16" filter="url(#blueGlow)">
+        ACADEMY
+      </text>
+
+      <!-- Decorative Brackets around text -->
+      <path d="M280 120 L260 120 L260 180 L280 180" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.6"/>
+      <path d="M920 120 L940 120 L940 180 L920 180" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.6"/>
+
+      <!-- Tagline Box -->
+      <g transform="translate(600, 230)">
+        <rect x="-240" y="-12" width="480" height="24" fill="#1e293b" stroke="#3b82f6" stroke-width="1" rx="2" opacity="0.8" />
+        <text x="0" y="5" font-family="monospace" font-size="12" fill="#00ff88" font-weight="bold" letter-spacing="3">
+          // DEPLOYING COUNTERMEASURES...
+        </text>
+      </g>
+    </g>
+
+    <!-- 5. Bottom Detail Bar -->
+    <line x1="0" y1="295" x2="1200" y2="295" stroke="#334155" stroke-width="4" />
+    <rect x="0" y="293" width="100" height="4" fill="#00ff88">
+      <animate attributeName="x" values="0;1100;0" dur="12s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </rect>
+
+    <!-- Random Glitch Lines -->
+    <line x1="100" y1="140" x2="1100" y2="140" stroke="#00ff88" stroke-width="1" opacity="0">
+      <animate attributeName="opacity" values="0;0.5;0" dur="5s" begin="1s" repeatCount="indefinite"/>
+      <animate attributeName="x1" values="100;400;100" dur="0.2s" begin="1s" repeatCount="indefinite"/>
+    </line>
+  </a>
 </svg>
