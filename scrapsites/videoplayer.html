@@ -635,6 +635,44 @@ class AdvancedPlayer {
     }
 
     captureCrop() {
+        if (this.state.isYT) {
+            try {
+                // Get ID from player data or playlist
+                // The player stores videoId in internal state usually, but let's rely on our playlist src if reliable
+                let id = null;
+                if (this.ytPlayer && this.ytPlayer.getVideoData) {
+                    const data = this.ytPlayer.getVideoData();
+                    if(data) id = data.video_id;
+                }
+                if (!id && this.state.playlist.length > 0) {
+                     // Fallback to current item src if it looks like an ID
+                     id = this.state.playlist[this.state.currentIdx || 0].src;
+                }
+
+                if (id) {
+                    // Use High Quality Thumbnail
+                    const thumbUrl = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+                    this.addSnapshot(thumbUrl);
+
+                    // UI Feedback
+                    const notify = document.getElementById('snapshotNotify');
+                    if(notify) {
+                        notify.classList.add('show');
+                        setTimeout(() => notify.classList.remove('show'), 2000);
+                    }
+
+                    // Open drawer
+                    this.dom.drawer.classList.add('open');
+                    setTimeout(() => {
+                        const tab = document.querySelector('[data-tab="snaps"]');
+                        if(tab) tab.click();
+                    }, 100);
+                } else {
+                    alert('Could not determine YouTube Video ID');
+                }
+            } catch(e) { console.error(e); alert('Snapshot failed'); }
+            return;
+        }
         const cropRect = this.dom.cropBox.getBoundingClientRect();
         const stageRect = document.querySelector('.video-stage').getBoundingClientRect();
         
@@ -708,13 +746,25 @@ class AdvancedPlayer {
                 <img src="${s.img}" class="snapshot-img" />
                 <div class="snapshot-meta">
                     <span class="snapshot-time">${this.fmt(s.time)}</span>
-                    <button class="snapshot-dl-btn" onclick="app.downloadSnap(${s.id})">
-                        <i data-feather="download" style="width:14px;"></i>
-                    </button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="snapshot-dl-btn" onclick="app.downloadSnap(${s.id})" title="Download">
+                            <i data-feather="download" style="width:14px;"></i>
+                        </button>
+                        <button class="snapshot-dl-btn" onclick="app.deleteSnap(${s.id})" title="Delete" style="color:#ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                            <i data-feather="trash-2" style="width:14px;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join('');
         feather.replace();
+    }
+
+    deleteSnap(id) {
+        if(!confirm('Delete this snapshot?')) return;
+        this.state.snaps = this.state.snaps.filter(s => s.id !== id);
+        this.renderSnaps();
+        this.saveData();
     }
 
     downloadSnap(id) {
@@ -745,8 +795,8 @@ class AdvancedPlayer {
     
     // ... Standard Player Methods (Same as before) ...
     setupCanvas() {
-        const resize = () => { this.dom.canvas.width = this.dom.video.clientWidth; this.dom.canvas.height = this.dom.video.clientHeight; };
-        new ResizeObserver(resize).observe(this.dom.video);
+        const resize = () => { const p = this.dom.video.parentElement; this.dom.canvas.width = p.clientWidth; this.dom.canvas.height = p.clientHeight; };
+        new ResizeObserver(resize).observe(this.dom.video.parentElement);
     }
     togglePlay() {
         this.state.playing = !this.state.playing;
