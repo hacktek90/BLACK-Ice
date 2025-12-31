@@ -150,3 +150,26 @@ MIT License (or replace with your chosen license).
 ## 👾 Credits
 
 Crafted as **BLACKICE Academy** — a training ground for the next-gen red & blue teamers.
+---
+Supported through free host by
+![Vercel](https://img.shields.io/badge/deployed%20on-vercel-black?style=for-the-badge&logo=vercel)
+---
+
+## ▲ Deployment
+
+<p align="center">
+  <a href="https://vercel.com" target="_blank">
+    <img src="https://assets.vercel.com/image/upload/front/favicon/vercel/152x152.png" width="48" alt="Vercel Logo">
+  </a>
+  <br>
+  <strong>Powered by Vercel</strong>
+</p>
+---
+
+## ▲ Deployment
+
+Powered by **Vercel**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com)
+
+
