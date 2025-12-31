@@ -17,6 +17,9 @@ Think of it as a fusion of *CTF labs*, *guided missions*, and a *Defender’s da
 👉 [Live Site](https://blackice-ac.vercel.app/)  
 
 ---
+[![BLACKICE Preview](https://thumb.monster/site/https://blackice-ac.vercel.app/)](https://blackice-ac.vercel.app/)
+
+---
 
 ## 📑 Table of Contents
 - [Features](#-features)
