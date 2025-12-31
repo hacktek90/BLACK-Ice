@@ -899,7 +899,7 @@ class AdvancedPlayer {
         document.getElementById('urlInput').value = '';
     }
     extractYtId(url) {
-        const patterns = [ /(?:youtube\.com\/watch\?v=)([^&]+)/, /(?:youtu\.be\/)([^?]+)/, /(?:youtube\.com\/embed\/)([^?]+)/ ];
+        const patterns = [ /(?:youtube\.com\/watch\?v=)([^&]+)/, /(?:youtu\.be\/)([^?]+)/, /(?:youtube\.com\/embed\/)([^?]+)/, /(?:youtube\.com\/shorts\/)([^?]+)/ ];
         for (let pattern of patterns) { const match = url.match(pattern); if (match) return match[1]; }
         return null;
     }
