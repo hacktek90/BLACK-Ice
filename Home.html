@@ -716,31 +716,8 @@ document.getElementById('fullscreenBtn').onclick = () => {
 </script>
 <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 <script src="/test/darky.js"></script>
-<!-- DOMAIN + MOBILE REDIRECTION SCRIPT -->
-<script>
-(function () {
-  const CANONICAL_DOMAIN = "blackice-ac.vercel.app";
-  const CANONICAL_URL = "https://" + CANONICAL_DOMAIN;
-
-  /* 1️⃣ Force canonical domain */
-  if (location.hostname !== CANONICAL_DOMAIN) {
-    location.replace(
-      CANONICAL_URL + location.pathname + location.search + location.hash
-    );
-    return; // stop further execution
-  }
-
-  /* 2️⃣ Mobile detection */
-  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-    .test(navigator.userAgent);
-
-  const isSmallScreen = window.innerWidth <= 768;
-
-  if ((isMobileUA || isSmallScreen) && !location.pathname.includes("mobile.html")) {
-    location.href = "/mobile.html";
-  }
-})();
-</script>
-
+ <!-- MOBILE REDIRECTION SCRIPT -->
+   <script src="/test/redirect.js"></script>
+        
 </body>
 </html>
