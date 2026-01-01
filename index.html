@@ -74,7 +74,21 @@
 <script>
 (function () {
 
-    // ❗ If this page is inside an iframe
+    const CANONICAL_DOMAIN = "blackice-ac.vercel.app";
+    const CANONICAL_ORIGIN = "https://" + CANONICAL_DOMAIN;
+
+    /* 1️⃣ Force canonical domain (before anything else) */
+    if (location.hostname !== CANONICAL_DOMAIN) {
+        location.replace(
+            CANONICAL_ORIGIN +
+            location.pathname +
+            location.search +
+            location.hash
+        );
+        return;
+    }
+
+    /* 2️⃣ IFRAME CHECK */
     if (window !== window.top) {
         try {
             const parentHost = window.top.location.hostname.toLowerCase();
@@ -85,26 +99,29 @@
                 "uios-eta.vercel.app"
             ];
 
-            // ❌ Do NOT redirect when embedded in allowed domains
+            // ✅ Allowed iframe parents → do nothing
             if (allowedParents.includes(parentHost)) {
                 return;
             }
 
         } catch (e) {
-            // Cross-origin iframe → parent is NOT trusted → redirect
+            // ❌ Cross-origin iframe → untrusted
+            location.replace(CANONICAL_ORIGIN);
+            return;
         }
     }
 
-    // Redirect only on root or index.html
-    const path = location.pathname;
+    /* 3️⃣ Redirect only on root or index.html */
+    const path = location.pathname.toLowerCase();
     const isRoot = (path === "/" || path === "/index.html");
 
     if (isRoot) {
-        location.href = "/Home.html";
+        location.replace("/Home.html");
     }
 
 })();
 </script>
+
 
   <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3a816b5483fd44b39c996e551b885aec"}'></script><!-- End Cloudflare Web Analytics -->
 
