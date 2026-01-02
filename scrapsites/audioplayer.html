@@ -3,17 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bento Player (No Scripts)</title>
+    <title>Swiss Minimal Player</title>
     
     <style>
         :root {
-            --bg: #0f1115;
-            --card-bg: #1c1f26;
-            --text-main: #ffffff;
-            --text-muted: #8b9bb4;
-            --accent: #6366f1;
-            --border: 1px solid rgba(255, 255, 255, 0.08);
-            --radius: 20px;
+            /* Swiss Minimal Palette */
+            --bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #111111;
+            --text-muted: #666666;
+            
+            /* Light Green Accents */
+            --accent-light: #e8f5e9; /* Background green */
+            --accent-main: #81c784;  /* Medium green */
+            --accent-dark: #2e7d32;  /* Darker green for interaction */
+            
+            --border: 1px solid #e0e0e0;
+            --radius: 0px; /* Sharp corners for Swiss style */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,177 +27,255 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            padding: 20px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 40px 20px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
 
         .bento-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0; /* Closed grid for seamless lines */
+            border: 1px solid #e0e0e0;
             max-width: 1000px;
-            margin: 0 auto;
+            width: 100%;
+            background: #fff;
         }
 
         .card {
             background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            border: var(--border);
+            padding: 32px;
+            border-right: var(--border);
+            border-bottom: var(--border);
             position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: background 0.2s ease;
         }
 
+        /* Remove border for last elements to keep grid clean */
+        .card:nth-child(3n) { border-right: none; }
+        .card:nth-last-child(-n+3) { border-bottom: none; }
+
+        /* TYPOGRAPHY */
         .card-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 0.75rem;
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+            width: fit-content;
         }
 
         /* SVG Icon styling */
         .icon {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
         }
 
         /* PLAYER AREA */
         .area-player {
-            grid-column: span 3;
-            grid-row: span 2;
-            min-height: 300px;
+            grid-column: span 2;
+            grid-row: span 1;
+            min-height: 320px;
+            justify-content: space-between;
         }
 
-        .track-meta h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
-        .track-meta p { color: var(--text-muted); font-size: 0.9rem; }
+        .track-meta { margin-bottom: 10px; }
+        .track-meta h1 { 
+            font-size: 2.5rem; 
+            font-weight: 400; 
+            margin-bottom: 4px; 
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .track-meta p { 
+            color: var(--text-muted); 
+            font-size: 1rem; 
+            font-weight: 300;
+        }
 
         #waveform {
             width: 100%;
-            height: 100px;
-            margin: 10px 0 20px 0;
-            border-radius: 8px;
-            opacity: 0.9;
+            height: 80px;
+            margin: 20px 0;
         }
 
-        /* CONTROLS - FIXED */
+        /* CONTROLS */
         .transport-controls {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 24px;
+            gap: 32px;
             margin-top: auto;
-            width: 100%;
-            padding-bottom: 5px;
-            z-index: 10;
         }
 
         .btn-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%; /* Circle for functional affordance */
+            background: #fff;
+            border: 1px solid #111;
+            color: #111;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
         
+        .btn-circle:hover { background: #f0f0f0; }
         .btn-circle:active { transform: scale(0.95); }
 
         .btn-play {
-            width: 72px;
-            height: 72px;
-            background: var(--accent);
-            border: none;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            width: 64px;
+            height: 64px;
+            background: #111;
+            border-color: #111;
+            color: #fff;
         }
         
-        .btn-play .icon { width: 32px; height: 32px; }
+        .btn-play:hover { background: #333; }
+        .btn-play .icon { stroke: #fff; fill: #fff; stroke-width: 0; } /* Fill icons for play button */
 
         /* OTHER AREAS */
-        .area-playlist { grid-column: span 1; grid-row: span 3; background: #15171c; max-height: 600px; }
+        .area-playlist { grid-column: span 1; grid-row: span 2; max-height: 700px; overflow: hidden; }
+        
+        /* SCROLLBAR STYLING FOR PLAYLIST */
+        .playlist-list { list-style: none; overflow-y: auto; flex: 1; padding-right: 5px; }
+        .playlist-list::-webkit-scrollbar { width: 4px; }
+        .playlist-list::-webkit-scrollbar-thumb { background: #ccc; }
+        
+        .playlist-item { 
+            padding: 12px 0; 
+            border-bottom: 1px solid #eee; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: baseline; 
+            gap: 12px; 
+            transition: color 0.2s; 
+            font-size: 0.9rem;
+        }
+        .playlist-item:last-child { border-bottom: none; }
+        .playlist-item:hover { color: var(--accent-dark); }
+        .playlist-item.active { 
+            color: var(--accent-dark); 
+            font-weight: 700; 
+            background-color: transparent; 
+        }
+        .playlist-item .track-num {
+            font-variant-numeric: tabular-nums;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+        .playlist-item.active .track-num { color: var(--accent-dark); }
+
         .area-eq { grid-column: span 1; }
         .area-tools { grid-column: span 1; }
         .area-upload { grid-column: span 1; }
 
-        .upload-container { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+        /* UPLOAD & INPUTS */
+        .upload-container { display: flex; flex-direction: column; gap: 20px; height: 100%; justify-content: center; }
 
         .file-drop {
-            border: 2px dashed rgba(255,255,255,0.15);
-            border-radius: 12px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
+            border: 1px dashed #ccc;
+            padding: 30px 20px;
+            text-align: center;
             cursor: pointer;
-            padding: 10px;
-            background: rgba(255,255,255,0.02);
+            transition: all 0.2s;
+            background: #fafafa;
         }
+        .file-drop:hover { border-color: var(--accent-dark); color: var(--accent-dark); background: var(--accent-light); }
 
         .url-input-group {
             display: flex;
-            gap: 8px;
-            background: rgba(0,0,0,0.2);
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #111;
+            padding-bottom: 4px;
         }
 
         .url-input {
             flex: 1;
             background: transparent;
             border: none;
-            color: white;
-            padding: 8px;
-            font-size: 0.85rem;
+            color: #111;
+            padding: 8px 0;
+            font-size: 0.9rem;
             outline: none;
-            min-width: 0;
+            font-family: inherit;
         }
 
         .btn-url {
-            background: rgba(255,255,255,0.1);
+            background: transparent;
             border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
+            color: #111;
             cursor: pointer;
+            padding: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        .btn-url:hover { color: var(--accent-dark); }
 
-        /* Sliders */
-        .control-group { margin-bottom: 12px; }
-        .control-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; }
-        input[type="range"] { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-
-        /* Playlist */
-        .playlist-list { list-style: none; overflow-y: auto; flex: 1; }
-        .playlist-item { padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; transition: background 0.2s; }
-        .playlist-item:hover { background: rgba(255,255,255,0.05); }
-        .playlist-item.active { background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); }
+        /* SLIDERS */
+        .control-group { margin-bottom: 24px; }
+        .control-label { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            margin-bottom: 12px; 
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="range"] { 
+            width: 100%; 
+            height: 2px; 
+            background: #eee; 
+            border-radius: 0; 
+            appearance: none; 
+            cursor: pointer;
+        }
+        
+        /* Custom Slider Thumb (Square/Minimal) */
+        input[type="range"]::-webkit-slider-thumb { 
+            appearance: none; 
+            width: 12px; 
+            height: 12px; 
+            background: #111; 
+            cursor: pointer; 
+            transform: rotate(45deg); /* Diamond shape */
+            border: 1px solid #fff;
+            box-shadow: 0 0 0 1px #111;
+        }
 
         @media (max-width: 768px) {
-            .bento-container { display: flex; flex-direction: column; gap: 12px; }
-            .area-player { order: 1; min-height: auto; position: sticky; top: 0; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-            .area-playlist { order: 2; max-height: 250px; }
-            .area-eq, .area-tools, .area-upload { order: 3; }
+            body { padding: 0; }
+            .bento-container { 
+                display: flex; 
+                flex-direction: column; 
+                border: none;
+            }
+            .card { 
+                border-right: none; 
+                border-bottom: 1px solid #e0e0e0; 
+                padding: 24px;
+            }
+            .area-player { min-height: auto; padding-bottom: 32px; }
+            .area-playlist { max-height: 300px; border-right: none; }
+            .track-meta h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -201,7 +285,7 @@
         <!-- PLAYER -->
         <div class="card area-player">
             <div class="card-header">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
                 Now Playing
             </div>
             
@@ -233,20 +317,11 @@
             </div>
         </div>
 
-        <!-- PLAYLIST -->
-        <div class="card area-playlist">
-            <div class="card-header">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-                Queue
-            </div>
-            <ul class="playlist-list" id="playlistContainer"></ul>
-        </div>
-
         <!-- EQ -->
         <div class="card area-eq">
             <div class="card-header">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-                EQ
+                Equalizer
             </div>
             <div class="control-group">
                 <div class="control-label"><span>Bass</span> <span>Boost</span></div>
@@ -261,7 +336,7 @@
         <!-- TOOLS -->
         <div class="card area-tools">
             <div class="card-header">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 Tools
             </div>
             <div class="control-group">
@@ -273,30 +348,38 @@
         <!-- UPLOAD -->
         <div class="card area-upload">
             <div class="card-header">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 Add Music
             </div>
             <div class="upload-container">
                 <label class="file-drop">
-                    <svg class="icon" viewBox="0 0 24 24" style="width:24px; height:24px; margin-bottom:5px;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-                    <span>Upload File</span>
+                    <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Upload File</span>
                     <input type="file" id="fileInput" accept="audio/*" hidden>
                 </label>
                 <div class="url-input-group">
                     <input type="text" class="url-input" id="urlInput" placeholder="Paste Audio URL...">
                     <button class="btn-url" id="loadUrlBtn">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
         </div>
+
+        <!-- PLAYLIST -->
+        <div class="card area-playlist">
+            <div class="card-header">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                Queue
+            </div>
+            <ul class="playlist-list" id="playlistContainer"></ul>
+        </div>
+
     </div>
 
     <!-- SCRIPT -->
     <script type="module">
         import WaveSurfer from 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.esm.js';
 
-        // Same Playlist Logic
         let playlist = [
             { title: "Demo Track", artist: "WaveSurfer", url: "https://wavesurfer.xyz/wavesurfer-code/examples/audio/demo.wav" },
             { title: "Stereo Test", artist: "System", url: "https://wavesurfer.xyz/wavesurfer-code/examples/audio/stereo.mp3" }
@@ -305,10 +388,14 @@
 
         const wavesurfer = WaveSurfer.create({
             container: '#waveform',
-            waveColor: '#6b7280',
-            progressColor: '#6366f1',
-            cursorColor: '#ffffff',
-            barWidth: 2, barGap: 3, barRadius: 2, height: 100,
+            // Swiss Colors
+            waveColor: '#e8f5e9', // Very light green background wave
+            progressColor: '#81c784', // Medium green progress
+            cursorColor: '#333333', // Dark cursor
+            barWidth: 3, 
+            barGap: 3, 
+            barRadius: 0, // Sharp bars
+            height: 80,
             normalize: true,
             backend: 'WebAudio',
         });
@@ -326,7 +413,6 @@
              wavesurfer.setFilters([bassFilter, trebleFilter]);
         });
 
-        // Toggle SVG Icons on Play/Pause
         const iconPlay = document.getElementById('iconPlay');
         const iconPause = document.getElementById('iconPause');
 
@@ -356,7 +442,14 @@
             playlist.forEach((track, i) => {
                 const li = document.createElement('li');
                 li.className = `playlist-item ${i === currentTrackIndex ? 'active' : ''}`;
-                li.innerHTML = `<span>${i+1}</span> <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${track.title}</span>`;
+                
+                // Minimalist list item formatting
+                const num = i + 1 < 10 ? '0' + (i+1) : i+1;
+                
+                li.innerHTML = `
+                    <span class="track-num">${num}</span> 
+                    <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${track.title}</span>
+                `;
                 li.onclick = () => { loadTrack(i); wavesurfer.once('ready', () => wavesurfer.play()); };
                 list.appendChild(li);
             });
