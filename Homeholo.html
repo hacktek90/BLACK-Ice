@@ -778,7 +778,7 @@ if (!document.fullscreenElement) document.documentElement.requestFullscreen().ca
 else if (document.exitFullscreen) document.exitFullscreen();
 };
 
-/* === GESTURE LOGIC (ADDED) === */
+/* === GESTURE LOGIC (UPDATED FOR IFRAME SUPPORT) === */
 const gestureState = {
     isEnabled: false,
     camera: null,
@@ -787,24 +787,27 @@ const gestureState = {
     isPinching: false,
     pinchStartTime: 0
 };
+
 const gestureEls = {
     toggle: document.getElementById('gestureToggle'),
     cursor: document.getElementById('gestureCursor'),
     video: document.getElementById('gestureVideo')
 };
+
 gestureEls.toggle.addEventListener('click', toggleGestures);
 
 async function toggleGestures() {
     if (gestureState.isEnabled) {
         // Disable
-        gestureState.camera.stop();
+        if (gestureState.camera) gestureState.camera.stop();
         gestureState.isEnabled = false;
         gestureEls.cursor.classList.remove('active');
         gestureEls.toggle.classList.remove('active');
         gestureEls.toggle.querySelector('span').innerText = "Hand Control";
     } else {
         // Enable
-        if (!window.Hands) { alert("Loading gesture library..."); return; }
+        if (!window.Hands) { alert("Loading gesture library... check internet connection."); return; }
+        
         const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
         hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.5 });
         hands.onResults(onGestureResults);
@@ -813,6 +816,7 @@ async function toggleGestures() {
             onFrame: async () => { await hands.send({image: gestureEls.video}); },
             width: 640, height: 480
         });
+        
         await gestureState.camera.start();
         
         gestureState.isEnabled = true;
@@ -821,33 +825,41 @@ async function toggleGestures() {
         gestureEls.toggle.querySelector('span').innerText = "Gestures On";
     }
 }
+
 function onGestureResults(results) {
     if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) return;
+    
     const landmarks = results.multiHandLandmarks[0];
     const indexTip = landmarks[8];
     const thumbTip = landmarks[4];
     
     // Smooth Move
+    // Mirror X (1 - x) so moving hand right moves cursor right
     const targetX = (1 - indexTip.x) * window.innerWidth;
     const targetY = indexTip.y * window.innerHeight;
+    
+    // Linear Interpolation (Lerp) for smoothness
     gestureState.cursorX += (targetX - gestureState.cursorX) * 0.3;
     gestureState.cursorY += (targetY - gestureState.cursorY) * 0.3;
     
     gestureEls.cursor.style.left = `${gestureState.cursorX}px`;
     gestureEls.cursor.style.top = `${gestureState.cursorY}px`;
     
-    // Pinch Check
+    // Pinch Detection
+    // Distance between Index Tip and Thumb Tip
     const dist = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-    if (dist < 0.05) {
+    
+    if (dist < 0.05) { // Threshold for pinch
         if (!gestureState.isPinching) {
             gestureState.isPinching = true;
             gestureState.pinchStartTime = Date.now();
             gestureEls.cursor.classList.add('pinching');
         } else {
+            // Check if held long enough to register a click
             if (Date.now() - gestureState.pinchStartTime > 200) {
                 triggerGestureClick();
                 gestureState.isPinching = false; 
-                gestureState.pinchStartTime = Date.now() + 1000; // Cooldown
+                gestureState.pinchStartTime = Date.now() + 1000; // 1s Cooldown to prevent double clicks
             }
         }
     } else {
@@ -856,11 +868,13 @@ function onGestureResults(results) {
         gestureEls.cursor.classList.remove('clicked');
     }
 }
+
 function triggerGestureClick() {
+    // 1. Visual Feedback
     gestureEls.cursor.classList.add('clicked');
     setTimeout(() => gestureEls.cursor.classList.remove('clicked'), 200);
     
-    // Ripple
+    // Spawn Ripple
     const ripple = document.createElement('div');
     ripple.className = 'click-ripple';
     ripple.style.left = `${gestureState.cursorX}px`;
@@ -869,14 +883,45 @@ function triggerGestureClick() {
     document.body.appendChild(ripple);
     setTimeout(() => ripple.remove(), 500);
     
-    // Interact
+    // 2. Identify Element Under Cursor
     const el = document.elementFromPoint(gestureState.cursorX, gestureState.cursorY);
+    
     if (el) {
-        const clickable = el.closest('button, .project-card, a, input');
-        if (clickable) {
-            clickable.classList.add('gesture-active-press');
-            clickable.click();
-            setTimeout(() => clickable.classList.remove('gesture-active-press'), 150);
+        // A. Handle IFRAMES
+        if (el.tagName === 'IFRAME') {
+            try {
+                const rect = el.getBoundingClientRect();
+                // Calculate position relative to the iframe
+                const insideX = gestureState.cursorX - rect.left;
+                const insideY = gestureState.cursorY - rect.top;
+                
+                // Access internal document
+                const innerDoc = el.contentDocument || el.contentWindow.document;
+                const innerEl = innerDoc.elementFromPoint(insideX, insideY);
+                
+                if (innerEl) {
+                    console.log("Clicking inside iframe:", innerEl);
+                    // Try to find the nearest clickable parent or click the element itself
+                    const clickable = innerEl.closest('button, a, input, [onclick], .clickable') || innerEl;
+                    clickable.click();
+                    
+                    // Force focus for inputs
+                    if(clickable.tagName === 'INPUT' || clickable.tagName === 'TEXTAREA') {
+                        clickable.focus();
+                    }
+                }
+            } catch (err) {
+                console.warn("Cross-Origin Iframe blocked gesture click.", err);
+            }
+        } 
+        // B. Handle Normal Elements
+        else {
+            const clickable = el.closest('button, .project-card, a, input');
+            if (clickable) {
+                clickable.classList.add('gesture-active-press'); // Visual press effect
+                clickable.click();
+                setTimeout(() => clickable.classList.remove('gesture-active-press'), 150);
+            }
         }
     }
 }
