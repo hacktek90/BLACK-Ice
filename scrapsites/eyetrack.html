@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocular | Intelligent Eye Tracker</title>
+    <!-- MediaPipe Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: #181b21;
+            --accent: #64f4ac; /* Soft Green */
+            --accent-dim: rgba(100, 244, 172, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+            --danger: #ff5f5f;
+            --warning: #ffd166;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* --- UI Layout --- */
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .app-container { grid-template-columns: 1fr; }
+        }
+
+        /* --- Sidebar / Main Status --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main-status-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-ring {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .status-ring.blink {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-dim);
+            transform: scale(1.05);
+        }
+
+        .status-icon { font-size: 3em; }
+        
+        .status-text {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 { font-weight: 300; letter-spacing: -1px; }
+        .header span { font-weight: 600; color: var(--accent); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: transform 0.2s;
+        }
+
+        .card:hover { transform: translateY(-2px); }
+
+        .card-label {
+            color: var(--text-muted);
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .card-value {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .card-sub {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* --- Graph Section --- */
+        .graph-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            height: 200px;
+            position: relative;
+        }
+        
+        canvas#blinkGraph {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- Floating Video (Draggable) --- */
+        .video-pip {
+            position: fixed;
+            /* Default position will be handled by top/left in JS or CSS */
+            bottom: 30px; 
+            right: 30px;
+            width: 200px;
+            height: 150px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: width 0.3s, height 0.3s, border-radius 0.3s; /* Removed 'all' to allow smooth dragging */
+            z-index: 9000;
+            cursor: grab; /* Indicates drag capability */
+            touch-action: none; /* Prevents scroll on mobile while dragging */
+        }
+
+        .video-pip:active {
+            cursor: grabbing;
+        }
+
+        .video-pip.collapsed {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .video-pip.collapsed video, .video-pip.collapsed canvas { display: none; }
+        
+        .pip-toggle {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 9001; /* Above the drag layer */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+        }
+
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            pointer-events: none; /* Lets clicks pass through to container for dragging */
+        }
+
+        /* --- Controls & Alerts --- */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover { background: rgba(255,255,255,0.1); }
+        .btn.primary { background: var(--accent); color: #000; font-weight: 600; }
+        .btn.primary:hover { opacity: 0.9; }
+
+        /* Notification Toast (Fixed) */
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            background: var(--card-bg);
+            padding: 14px 28px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 10000; /* Very high Z-index */
+            white-space: nowrap; /* Prevents text wrapping/cutting */
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .toast.visible { transform: translateX(-50%) translateY(0); }
+        
+        .toast span#toast-msg {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Loader */
+        .loader-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loader-screen" id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: var(--text-muted);">Initializing Engine...</p>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast">
+        <span id="toast-icon">✨</span>
+        <span id="toast-msg">System Active</span>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="main-status-card">
+                <div class="status-ring" id="statusRing">
+                    <span class="status-icon" id="statusIcon">👁️</span>
+                </div>
+                <h2 id="currentStatusText">Active</h2>
+                <div class="status-text">Monitoring Eye Health</div>
+            </div>
+            
+            <div class="card" style="background: rgba(255,255,255,0.02);">
+                <span class="card-label">SETTINGS</span>
+                <div class="controls" style="flex-direction: column;">
+                    <button class="btn primary" onclick="startCalibration()">
+                        🎯 Calibrate Sensitivity
+                    </button>
+                    <button class="btn" onclick="resetStats()">
+                        ↺ Reset Data
+                    </button>
+                </div>
+                <p style="margin-top:15px; font-size: 0.75em; color: var(--text-muted); line-height: 1.4;">
+                    Look at the screen normally and click "Calibrate" to optimize tracking.
+                </p>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="dashboard">
+            <div class="header">
+                <h1>Ocular <span>Monitor</span></h1>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.8em; color: var(--text-muted);">SESSION TIME</div>
+                    <div style="font-family: monospace; font-size: 1.2em;" id="sessionTimer">00:00:00</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="card">
+                    <span class="card-label">TOTAL BLINKS</span>
+                    <div class="card-value" id="blinkCount">0</div>
+                    <div class="card-sub">Rate: <span id="bpmValue">0</span> / min</div>
+                </div>
+                
+                <div class="card">
+                    <span class="card-label">OPEN DURATION</span>
+                    <div class="card-value" id="openTime">00:00</div>
+                    <div class="card-sub">Focus Time</div>
+                </div>
+
+                <div class="card">
+                    <span class="card-label">FATIGUE INDEX</span>
+                    <div class="card-value" id="fatigueScore" style="color: var(--accent);">Low</div>
+                    <div class="card-sub">Based on blink freq</div>
+                </div>
+                
+                <div class="card">
+                    <span class="card-label">LIVE EAR</span>
+                    <div class="card-value" id="earValue">0.00</div>
+                    <div class="card-sub">Threshold: <span id="thresholdDisplay">0.21</span></div>
+                </div>
+            </div>
+
+            <!-- Graph Section -->
+            <div class="card">
+                <span class="card-label">BLINK RATE HISTORY (Last 60s)</span>
+                <div class="graph-container" style="padding: 0; height: 150px; background: transparent;">
+                    <canvas id="blinkGraph"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Video Feed -->
+    <div class="video-pip" id="pipWindow">
+        <div class="pip-toggle" id="pipToggle">−</div>
+        <video id="input_video" style="display: none;" playsinline></video>
+        <canvas id="output_canvas"></canvas>
+    </div>
+
+    <script>
+        /**
+         * DRAGGABLE FUNCTIONALITY
+         */
+        function makeDraggable(element, handle) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            element.addEventListener('mousedown', dragStart);
+            element.addEventListener('touchstart', dragStart, {passive: false});
+
+            function dragStart(e) {
+                // Prevent dragging if clicking the toggle button
+                if (e.target.id === 'pipToggle') return;
+
+                const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+
+                initialLeft = element.getBoundingClientRect().left;
+                initialTop = element.getBoundingClientRect().top;
+                
+                // Clear bottom/right properties so top/left takes over
+                element.style.bottom = 'auto';
+                element.style.right = 'auto';
+                element.style.left = initialLeft + 'px';
+                element.style.top = initialTop + 'px';
+
+                startX = clientX;
+                startY = clientY;
+                isDragging = true;
+
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag, {passive: false});
+                document.addEventListener('mouseup', dragEnd);
+                document.addEventListener('touchend', dragEnd);
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+
+                const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+
+                element.style.left = (initialLeft + dx) + 'px';
+                element.style.top = (initialTop + dy) + 'px';
+            }
+
+            function dragEnd() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('mouseup', dragEnd);
+                document.removeEventListener('touchend', dragEnd);
+            }
+        }
+
+        /**
+         * CONFIGURATION & STATE
+         */
+        const CONFIG = {
+            smoothEAR: 0.25,
+            defaultThreshold: 0.22,
+            calibrationFrames: 60
+        };
+
+        const STATE = {
+            blinkCount: 0,
+            isBlinking: false,
+            earThreshold: CONFIG.defaultThreshold,
+            calibrating: false,
+            calibrationData: [],
+            eyesOpenStart: performance.now(),
+            totalOpenTime: 0,
+            blinkHistory: [],
+            sessionStart: performance.now(),
+            historyGraphData: new Array(60).fill(0)
+        };
+
+        // DOM Elements
+        const el = {
+            video: document.getElementById('input_video'),
+            canvas: document.getElementById('output_canvas'),
+            ctx: document.getElementById('output_canvas').getContext('2d'),
+            statusRing: document.getElementById('statusRing'),
+            statusIcon: document.getElementById('statusIcon'),
+            blinkCount: document.getElementById('blinkCount'),
+            earValue: document.getElementById('earValue'),
+            openTime: document.getElementById('openTime'),
+            bpmValue: document.getElementById('bpmValue'),
+            fatigueScore: document.getElementById('fatigueScore'),
+            thresholdDisplay: document.getElementById('thresholdDisplay'),
+            graphCanvas: document.getElementById('blinkGraph'),
+            toast: document.getElementById('toast'),
+            pip: document.getElementById('pipWindow'),
+            pipToggle: document.getElementById('pipToggle'),
+            loader: document.getElementById('loader')
+        };
+
+        // Initialize Draggable
+        makeDraggable(el.pip);
+
+        // PIP Toggle Logic
+        el.pipToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop drag event
+            el.pip.classList.toggle('collapsed');
+            el.pipToggle.innerText = el.pip.classList.contains('collapsed') ? '+' : '−';
+        });
+
+        // Initialize Graph Context
+        const graphCtx = el.graphCanvas.getContext('2d');
+        
+        /**
+         * CORE LOGIC
+         */
+        const distance = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+        function getEAR(landmarks, indices) {
+            const p = indices.map(i => landmarks[i]);
+            const v1 = distance(p[1], p[5]);
+            const v2 = distance(p[2], p[4]);
+            const h = distance(p[0], p[3]);
+            return (v1 + v2) / (2.0 * h);
+        }
+
+        const RIGHT_EYE = [33, 160, 158, 133, 153, 144];
+        const LEFT_EYE = [362, 385, 387, 263, 373, 380];
+
+        function onResults(results) {
+            el.loader.style.opacity = '0';
+            setTimeout(() => el.loader.style.display = 'none', 500);
+
+            el.canvas.width = el.video.videoWidth;
+            el.canvas.height = el.video.videoHeight;
+            el.ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
+            el.ctx.drawImage(results.image, 0, 0, el.canvas.width, el.canvas.height);
+
+            if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                const landmarks = results.multiFaceLandmarks[0];
+                const leftEAR = getEAR(landmarks, LEFT_EYE);
+                const rightEAR = getEAR(landmarks, RIGHT_EYE);
+                const avgEAR = (leftEAR + rightEAR) / 2;
+
+                el.earValue.innerText = avgEAR.toFixed(3);
+                
+                if (STATE.calibrating) {
+                    handleCalibration(avgEAR);
+                    return;
+                }
+
+                if (avgEAR < STATE.earThreshold) {
+                    if (!STATE.isBlinking) {
+                        STATE.isBlinking = true;
+                        el.statusRing.classList.add('blink');
+                        el.statusIcon.innerText = "😌";
+                        STATE.totalOpenTime += (performance.now() - STATE.eyesOpenStart);
+                    }
+                } else {
+                    if (STATE.isBlinking) {
+                        STATE.isBlinking = false;
+                        STATE.blinkCount++;
+                        STATE.blinkHistory.push(Date.now());
+                        STATE.eyesOpenStart = performance.now();
+                        el.statusRing.classList.remove('blink');
+                        el.statusIcon.innerText = "👁️";
+                        updateStats();
+                    }
+                }
+                drawEyeOverlay(landmarks);
+            }
+        }
+
+        function drawEyeOverlay(landmarks) {
+            el.ctx.strokeStyle = '#64f4ac';
+            el.ctx.lineWidth = 1;
+            [RIGHT_EYE, LEFT_EYE].forEach(eye => {
+                el.ctx.beginPath();
+                el.ctx.moveTo(landmarks[eye[0]].x * el.canvas.width, landmarks[eye[0]].y * el.canvas.height);
+                for(let i=1; i<eye.length; i++) {
+                    const p = landmarks[eye[i]];
+                    el.ctx.lineTo(p.x * el.canvas.width, p.y * el.canvas.height);
+                }
+                el.ctx.closePath();
+                el.ctx.stroke();
+            });
+        }
+
+        function updateStats() {
+            el.blinkCount.innerText = STATE.blinkCount;
+            const now = Date.now();
+            STATE.blinkHistory = STATE.blinkHistory.filter(t => now - t < 60000);
+            const bpm = STATE.blinkHistory.length;
+            el.bpmValue.innerText = bpm;
+
+            let fatigue = "Normal";
+            let color = "#64f4ac"; 
+            if (bpm > 25) { fatigue = "High Stress"; color = "#ff5f5f"; }
+            else if (bpm < 10 && (now - STATE.sessionStart > 60000)) { fatigue = "Staring"; color = "#ffd166"; }
+            
+            el.fatigueScore.innerText = fatigue;
+            el.fatigueScore.style.color = color;
+        }
+
+        setInterval(() => {
+            const diff = performance.now() - STATE.sessionStart;
+            const h = Math.floor(diff / 3600000).toString().padStart(2,'0');
+            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2,'0');
+            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
+            document.getElementById('sessionTimer').innerText = `${h}:${m}:${s}`;
+
+            if (!STATE.isBlinking) {
+                const openDiff = STATE.totalOpenTime + (performance.now() - STATE.eyesOpenStart);
+                const om = Math.floor(openDiff / 60000).toString().padStart(2,'0');
+                const os = Math.floor((openDiff % 60000) / 1000).toString().padStart(2,'0');
+                el.openTime.innerText = `${om}:${os}`;
+            }
+
+            updateGraph();
+        }, 1000);
+
+        function startCalibration() {
+            STATE.calibrating = true;
+            STATE.calibrationData = [];
+            showToast('⏳ Keep eyes open naturally...', 3000);
+        }
+
+        function handleCalibration(ear) {
+            STATE.calibrationData.push(ear);
+            if (STATE.calibrationData.length >= CONFIG.calibrationFrames) {
+                const sum = STATE.calibrationData.reduce((a,b) => a+b, 0);
+                const avg = sum / STATE.calibrationData.length;
+                STATE.earThreshold = avg * 0.8; 
+                STATE.calibrating = false;
+                el.thresholdDisplay.innerText = STATE.earThreshold.toFixed(2);
+                showToast(`✅ Calibrated! Threshold: ${STATE.earThreshold.toFixed(2)}`);
+            }
+        }
+
+        function updateGraph() {
+            const w = el.graphCanvas.width = el.graphCanvas.offsetWidth;
+            const h = el.graphCanvas.height = el.graphCanvas.offsetHeight;
+            STATE.historyGraphData.shift();
+            STATE.historyGraphData.push(STATE.blinkHistory.length);
+            const max = Math.max(...STATE.historyGraphData, 30);
+            const step = w / STATE.historyGraphData.length;
+            graphCtx.clearRect(0, 0, w, h); // Clear previous frame
+
+            graphCtx.beginPath();
+            graphCtx.strokeStyle = '#64f4ac';
+            graphCtx.lineWidth = 2;
+            graphCtx.lineJoin = 'round';
+            STATE.historyGraphData.forEach((val, i) => {
+                const x = i * step;
+                const y = h - ((val / max) * h * 0.8) - 10;
+                if(i===0) graphCtx.moveTo(x, y);
+                else graphCtx.lineTo(x, y);
+            });
+            graphCtx.stroke();
+            
+            graphCtx.lineTo(w, h);
+            graphCtx.lineTo(0, h);
+            const grad = graphCtx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, 'rgba(100, 244, 172, 0.2)');
+            grad.addColorStop(1, 'rgba(100, 244, 172, 0)');
+            graphCtx.fillStyle = grad;
+            graphCtx.fill();
+        }
+
+        function showToast(msg, time=3000) {
+            document.getElementById('toast-msg').innerText = msg;
+            el.toast.classList.add('visible');
+            setTimeout(() => el.toast.classList.remove('visible'), time);
+        }
+
+        function resetStats() {
+            STATE.blinkCount = 0;
+            STATE.eyesOpenStart = performance.now();
+            STATE.totalOpenTime = 0;
+            STATE.blinkHistory = [];
+            STATE.sessionStart = performance.now();
+            updateStats();
+            showToast('Stats Reset');
+        }
+
+        const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+        faceMesh.setOptions({maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5});
+        faceMesh.onResults(onResults);
+        const camera = new Camera(el.video, {onFrame: async () => await faceMesh.send({image: el.video}), width: 640, height: 480});
+        camera.start();
+
+    </script>
+</body>
+</html>
