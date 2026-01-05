@@ -2,9 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MediaPipe Face / Hand (Optimized)</title>
-  <style>
+<title>MediaPipe Face & Hand Detection | Real-Time AI Vision Demo</title>
+<meta name="title" content="MediaPipe Face & Hand Detection | Real-Time AI Vision Demo">
+<meta name="description" content="Real-time face mesh and hand landmark detection using MediaPipe Tasks Vision. Optimized for low-power devices with GPU/CPU support. Runs fully in the browser.">
+<meta name="keywords" content="MediaPipe, Face Detection, Hand Tracking, Face Mesh, AI Vision, Computer Vision, JavaScript AI, Web AI, Real Time Detection">
+<meta name="author" content="Subhankar Das">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0f14">
+
+<!-- Viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Open Graph / Facebook -->
+<meta property="og:description" content="Real-time browser-based face mesh & hand tracking powered by MediaPipe. No backend required.">
+<!-- Twitter -->
+<meta name="twitter:title" content="MediaPipe Face & Hand Detection">
+<meta name="twitter:description" content="Real-time face and hand landmark detection using MediaPipe Tasks Vision. Fully client-side AI.">
+<!-- Performance & SEO hints -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://storage.googleapis.com">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="https://storage.googleapis.com">
+
+<style>
     :root { font-family: system-ui, Arial, sans-serif; }
     body { margin: 16px; background:#0b0f14; color:#e8eef6; }
     .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
@@ -21,8 +40,24 @@
     .stats { display:flex; gap:12px; flex-wrap:wrap; margin-top:10px; }
     .pill { padding:8px 10px; background:#111a24; border:1px solid #2a3645; border-radius:999px; }
   </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MediaPipe Face & Hand Detection",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "Real-time face mesh and hand landmark detection using MediaPipe Tasks Vision.",
+  "author": {
+    "@type": "Person",
+    "name": "Subhankar Das"
+  }
+}
+</script>
+
 </head>
-<body>
+<body><h1 style="display:none;">MediaPipe Face and Hand Detection Demo</h1>
+
 
   <div class="card">
     <div class="row" style="justify-content:space-between;">
