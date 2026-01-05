@@ -3,16 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon SVG -->
   <link
       rel="icon"
       type="image/svg+xml"
       sizes="any"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><filter id='glow' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='1.8' result='blur'/><feMerge><feMergeNode in='blur'/><feMergeNode in='SourceGraphic'/></feMerge></filter><linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230b0f1a'/><stop offset='1' stop-color='%230a0d16'/></linearGradient></defs><style>:root{color-scheme:light dark}.tile{fill:url(%23bg)}.grid{stroke:%2313233a;stroke-width:.3;opacity:.8}.neon{fill:none;stroke:%2300e5ff;stroke-width:5;filter:url(%23glow)}.accent{fill:%2300e5ff}.slash{stroke-linecap:round}@media (prefers-color-scheme: dark){.grid{stroke:%23193454;opacity:.9}.neon,.accent{stroke:%2300ffd1;fill:%2300ffd1}}</style><rect class='tile' x='0' y='0' width='64' height='64' rx='10' ry='10'/><g class='grid'><path d='M8 6v52 M16 6v52 M24 6v52 M32 6v52 M40 6v52 M48 6v52 M56 6v52'/><path d='M6 8h52 M6 16h52 M6 24h52 M6 32h52 M6 40h52 M6 48h52 M6 56h52'/></g><path class='neon' d='M44 22 q-6 -8 -16 -6 q-10 2 -12 12 q-2 10 6 16 q8 6 16 0'/><g class='neon slash'><path d='M36 18 L50 30'/><path d='M32 22 L46 34'/></g><circle class='accent' cx='48' cy='16' r='2.2'/></svg>"
     />
-
-    <!-- Optional PNG/ICO fallbacks if a browser ignores SVG or data: URLs as favicons [web:1]. -->
-    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQ..." />
-    <link rel="icon" href="favicon.ico" />
   <title>Vortbyte</title>
   <style>
     /* Scoped tokens to avoid conflicts */
@@ -22,8 +19,6 @@
       --cx-neon:#00ffe0;
       --cx-neon-2:#ff0099;
       --cx-text:#e6f7ff;
-      --cx-clean-bg:#ffffff;
-      --cx-clean-text:#0e1116;
     }
 
     .cx-reset { box-sizing:border-box }
@@ -45,10 +40,7 @@
         radial-gradient(1200px 800px at 50% 130%, rgba(0,255,224,0.08), transparent 55%),
         radial-gradient(900px 600px at 10% -10%, rgba(255,0,153,0.07), transparent 60%),
         var(--cx-bg);
-      transition:opacity .6s ease, visibility .6s ease;
     }
-
-    .cx-intro--hidden { opacity:0; visibility:hidden }
 
     .cx-grid {
       position:absolute; inset:0;
@@ -106,39 +98,6 @@
     .cx-btn:active { transform:translateY(1px) scale(0.995) }
     .cx-btn:focus-visible { outline:2px solid var(--cx-neon-2); outline-offset:3px }
 
-    /* Clean default screen */
-    .cx-app {
-      position:fixed; inset:0;
-      background:var(--cx-clean-bg); color:var(--cx-clean-text);
-      display:flex; align-items:center; justify-content:center;
-      opacity:0; visibility:hidden;
-      transition:opacity .6s ease, visibility .6s ease;
-    }
-
-    .cx-app--visible { opacity:1; visibility:visible }
-    
-
-   
-   .cx-app__inner {
-  max-width:100%;
-  width:100%;
-  height:100%;
-  padding:0;              /* Remove padding to fit screen */
-  margin:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;         /* Hide scrollbars */
-}
-
-iframe {
-  border:none;
-  width:100vw;             /* Full viewport width */
-  height:100vh;            /* Full viewport height */
-  display:block;
-  overflow:hidden;         /* Hide iframe internal scroll */
-}
-
   </style>
 </head>
 <body class="cx-reset cx-scope">
@@ -153,58 +112,17 @@ iframe {
     </div>
   </section>
 
-  <!-- Clean default app -->
-  <main class="cx-app" id="cx-app" aria-live="polite">
-    <div class="cx-app__inner">
-      <iframe src="https://black-ice-3dbk.onrender.com" title="Responsive Iframe"></iframe>
-    </div>
-  </main>
-
-  <!-- Audio -->
-  <audio id="cx-audio" preload="auto" crossorigin="anonymous" loop>
-    <source src="https://cdn.pixabay.com/audio/2025/04/21/audio_ed6f0ed574.mp3" type="audio/mpeg">
-  </audio>
-
   <script>
-    (function (root) {
-      const cx = (root.cx = root.cx || {});
+    (function () {
       const btn = document.getElementById('cx-enter');
-      const intro = document.getElementById('cx-intro');
-      const app = document.getElementById('cx-app');
-      const audio = document.getElementById('cx-audio');
-
-      audio.loop = true;
-
-      cx.play = () => { try { audio.currentTime = 0; audio.play(); } catch(e){} };
-      cx.stop = () => { try { audio.pause(); } catch(e){} };
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') audio.load();
-      });
-
-      let activated = false;
-
+      
       function start(ev){
-        if (activated) return;
-        activated = true;
-
-        try {
-          audio.currentTime = 0;
-          const p = audio.play();
-          if (p && typeof p.then === 'function') {
-            p.catch(() => { activated = false; });
-          }
-        } catch(_) { activated = false; }
-
-        intro.classList.add('cx-intro--hidden');
-        app.classList.add('cx-app--visible');
-
-        btn.removeEventListener('click', start);
-        btn.removeEventListener('touchend', start);
-        document.removeEventListener('keydown', keyStart);
+        // Open link in new tab
+        window.open('https://blackice-ac.vercel.app/Homeholo.html', '_blank');
       }
 
       function keyStart(e){
+        // Support Enter or Space key to trigger the button
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           start(e);
@@ -215,6 +133,7 @@ iframe {
       btn.addEventListener('touchend', start, { passive:true });
       document.addEventListener('keydown', keyStart);
     })(window);
-  </script><script src="https://cdn.jsdelivr.net/gh/hacktek90/cursor@main/rightclkblock.js" defer></script>
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/hacktek90/cursor@main/rightclkblock.js" defer></script>
 </body>
 </html>
