@@ -1,399 +1,494 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Elegant Site Store — Showcase</title>
-<link rel="icon" href="[data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23007aff'/%3E%3Cstop offset='100%25' stop-color='%230056cc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' fill='url(%23g)'/%3E%3Cpath d='M32 16 L34 24 L42 26 L34 28 L32 36 L30 28 L22 26 L30 24 Z' fill='%23facc15'/%3E%3C/svg%3E](data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23007aff'/%3E%3Cstop offset='100%25' stop-color='%230056cc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' fill='url(%23g)'/%3E%3Cpath d='M32 16 L34 24 L42 26 L34 28 L32 36 L30 28 L22 26 L30 24 Z' fill='%23facc15'/%3E%3C/svg%3E)" />
-<link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@600&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@600&display=swap)" rel="stylesheet">
-<style>
-:root{
---bg:#0b0c10; --ink:#e7e7ea; --muted:#a1a1aa;
---surface:#121317; --panel:#161821; --border:rgba(255,255,255,.10);
---ring:#60a5fa; --brand:#60a5fa; --accent:#a78bfa;
---radius:16px; --shadow-2: 0 10px 24px rgba(0,0,0,.30); --shadow-3: 0 24px 48px rgba(0,0,0,.35);
---font:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto,Helvetica,Arial;
---serif:"Playfair Display",ui-serif,Georgia,"Times New Roman",serif;
-/* VISIT button theme */
---visit-bg:#0f1115; --visit-text:#e9eef6; --visit-shadow:rgba(0,0,0,.25); --visit-speed:2800ms;
-}
-@media (prefers-color-scheme: light){
-:root{
---bg:#f6f7fb; --ink:#121318; --muted:#546071;
---surface:#ffffff; --panel:#ffffff; --border:rgba(0,0,0,.10);
---ring:#2563eb; --brand:#2563eb; --accent:#7c3aed;
---visit-bg:#0f1115; --visit-text:#f1f5f9;
-}
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-margin:0; color:var(--ink); font-family:var(--font);
-background:
-radial-gradient(1200px 700px at 80% -10%, rgba(96,165,250,.14), transparent 60%),
-radial-gradient(900px 600px at -10% 110%, rgba(167,139,250,.12), transparent 55%),
-var(--bg);
-}
-.shell{max-width:1200px; margin:0 auto; padding:clamp(16px,4vw,48px)}
-/* Header */
-.header{
-background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
-box-shadow:var(--shadow-2); padding:clamp(16px,2.5vw,24px) clamp(16px,2.5vw,28px);
-display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
-}
-.brand{display:flex; align-items:center; gap:14px}
-.logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--accent))}
-.title{margin:0;font:600 clamp(24px,4vw,36px)/1.1 var(--serif)}
-.subtitle{margin:4px 0 0 0;color:var(--muted)}
-.btn{
-appearance:none; cursor:pointer; user-select:none; padding:12px 16px; border-radius:12px;
-font-weight:800; letter-spacing:.2px; border:1px solid var(--border);
-background: linear-gradient(135deg, var(--brand), var(--accent)); color:white;
-box-shadow:0 8px 24px rgba(0,0,0,.25); text-decoration:none; display:inline-flex; align-items:center; gap:8px;
-transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
-}
-.btn.secondary{
-background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--ink);
-}
-.btn:hover{ transform: translateY(-1px); box-shadow:0 12px 28px rgba(0,0,0,.30) }
-.btn:focus-visible{ outline:none; box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 40%, transparent), 0 8px 24px rgba(0,0,0,.25) }
-/* Hero */
-.hero{
-margin-top:20px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
-box-shadow:var(--shadow-2); padding: clamp(20px,3vw,28px); display:grid; gap:12px;
-}
-.hero h2{margin:0; font:800 clamp(26px,6vw,48px)/1.05 var(--serif)}
-.hero p{margin:0;color:var(--muted);max-width:80ch}
-.toolbar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:12px}
-.search{display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:var(--surface); min-width:260px}
-.search input{border:none; outline:none; background:transparent; color:inherit; width:220px}
-/* Panel and grid */
-.panel{ margin-top:18px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-2); padding: clamp(16px,2.4vw,22px) }
-.grid{display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))}
-/* Cards */
-.site-card{
-background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow-2);
-transition: transform .16s ease, box-shadow .24s ease, border-color .24s ease; padding:14px;
-}
-.site-card:hover{ transform: translateY(-2px); box-shadow:var(--shadow-3) }
-.site-row{ display:grid; grid-template-columns: auto 1fr; gap:12px; align-items:center }
-/* Adaptive-style compact icon */
-.app-icon{
-width:64px; height:64px; border-radius:16px; object-fit:cover;
-background:linear-gradient(135deg,var(--brand),var(--accent)); border:1px solid var(--border);
-box-shadow:0 4px 10px rgba(0,0,0,.20);
-}
-.app-fallback{
-width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center;
-font-weight:900; color:white; background:linear-gradient(135deg,var(--brand),var(--accent)); border:1px solid var(--border);
-box-shadow:0 4px 10px rgba(0,0,0,.20);
-}
-.site-title{margin:0; font-weight:800; font-size:18px; letter-spacing:.2px; line-height:1.2;
-display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1; overflow:hidden}
-.site-desc{margin:6px 0 12px 0; color:var(--muted); font-size:14px; line-height:1.5;
-display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden}
-/* Animated gradient-ring VISIT button */
-@property --angle { syntax:'<angle>'; inherits:false; initial-value:0deg; }
-.visit{
-position:relative; display:inline-flex; align-items:center; justify-content:center; gap:8px;
-padding:10px 14px; border-radius:12px; font-weight:900; text-decoration:none; color:var(--visit-text);
-border:2px solid transparent;
-background:
-linear-gradient(var(--visit-bg), var(--visit-bg)) padding-box,
-conic-gradient(from var(--angle), #7dd3fc, #a78bfa, #f472b6, #7dd3fc) border-box;
-box-shadow: 0 8px 22px var(--visit-shadow);
-transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
-animation: spin var(--visit-speed) linear infinite;
-}
-.visit:hover{ transform: translateY(-1px); box-shadow:0 12px 28px var(--visit-shadow); filter:saturate(1.05) contrast(1.02) }
-.visit:active{ transform: translateY(0) scale(.99); filter:brightness(.98) }
-.visit:focus-visible{
-outline:none;
-box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 40%, transparent), 0 12px 28px var(--visit-shadow);
-}
-@keyframes spin{ to{ --angle: 360deg } }
-@media (prefers-reduced-motion: reduce){ .visit{ animation:none; transition:none } }
-.site-actions{ display:flex; gap:10px; align-items:center }
-.delete{ margin-left:auto; padding:8px 10px; border-radius:10px; border:1px solid rgba(244,63,94,.5); background:rgba(244,63,94,.08); color:#fecaca; font-weight:800; cursor:pointer }
-/* Form */
-.form{ margin-top:18px; display:none }
-.form.show{ display:block }
-.field{ margin:10px 0 }
-.label{ display:block; font-weight:800; margin-bottom:6px }
-.input,.textarea{
-width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:inherit; outline:none;
-transition: box-shadow .15s ease, border-color .15s ease;
-}
-.textarea{ min-height:110px; resize:vertical }
-.input:focus,.textarea:focus{ border-color: color-mix(in oklab, var(--ring) 40%, var(--border)); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 18%, transparent) }
-.footer{ margin:22px 0 0; color:var(--muted); font-size:13px; text-align:center }
-.admin-ribbon{
-position:fixed; top:8px; right:-60px; transform: rotate(35deg); background:#ef4444; color:white;
-padding:6px 80px; font-weight:800; letter-spacing:.4px; border:1px solid rgba(255,255,255,.25)
-}
-/* Fluid type and spacing ensure readability across sizes */
-.title { font-size: clamp(24px, 6vw, 36px); }
-.hero h2 { font-size: clamp(22px, 7vw, 48px); }
-/* Ensure interactive elements meet minimum target sizes */
-.btn, .visit, .delete {
-min-height: 44px; /* meets 24px AA and approaches 44px AAA */
-min-width: 44px; /* better touch area */
-padding: 10px 16px;
-}
-/* Breakpoints */
-@media (max-width: 900px){
-.shell { padding: 16px; }
-.grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-.site-desc { -webkit-line-clamp: 3; } /* allow 3 lines on midsize screens */
-}
-@media (max-width: 768px){
-/* Stack header: brand on top, actions below */
-.header { gap: 12px; }
-.header > div:last-child { width: 100%; display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { flex: 1 1 auto; }
-/* Full-width search */
-.toolbar { gap: 8px; }
-.search { width: 100%; min-width: 0; }
-.search input { width: 100%; }
-/* Single-column grid for easier scanning */
-.grid { grid-template-columns: 1fr; }
-/* Slightly smaller icons to fit narrow rows */
-.app-icon, .app-fallback { width: 56px; height: 56px; border-radius: 14px; }
-/* Soften shadows on small screens */
-.site-card { box-shadow: 0 10px 20px rgba(0,0,0,.25); }
-}
-@media (max-width: 480px){
-.shell { padding: 12px; }
-.hero { padding: 16px; }
-.panel { padding: 14px; }
-/* Compact list row */
-.site-row { gap: 10px; }
-.app-icon, .app-fallback { width: 48px; height: 48px; border-radius: 12px; }
-/* Tighter text to avoid overflow while keeping legibility */
-.site-title { font-size: 16px; -webkit-line-clamp: 2; }
-.site-desc { font-size: 13px; -webkit-line-clamp: 3; }
-/* Buttons fill width for easier reach */
-.site-actions { gap: 8px; }
-.visit { flex: 1 1 auto; text-align: center; }
-}
-/* Respect reduced motion on mobile as well */
-@media (prefers-reduced-motion: reduce){
-.btn, .visit { transition: none; }
-}
-#open-builder { display: none; }
-:root{
-  /* add near your other tokens */
-  --warn-bg: rgba(234,179,8,.12);
-  --warn-border: rgba(234,179,8,.35);
-}
-@media (prefers-color-scheme: light){
-  :root{
-    --warn-bg:#fff8e1;
-    --warn-border:#facc15;
-  }
-}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Store</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
 
-/* Accessible utility for hidden text announced by AT */
-.visually-hidden{
-  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
-  overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0;
-}
+  <style>
+    :root {
+      /* Deep Space Theme */
+      --bg: #050507;
+      --glass-panel: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-highlight: rgba(255, 255, 255, 0.15);
+      
+      --text-main: #ededed;
+      --text-muted: #888899;
+      
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.4);
+      --danger: #ef4444;
+      
+      --radius: 16px;
+      --font-family: 'Inter', sans-serif;
+    }
 
-/* Banner styles */
-.host-banner{
-  display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-  background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:12px;
-  padding:12px 14px; margin-bottom:12px;
-}
+    * { box-sizing: border-box; }
 
-/* Show banner only when form is open */
-.form.show .host-banner{ display:flex }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--bg);
+      color: var(--text-main);
+      /* Ambient spotlight effect */
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 60%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1), transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
 
-</style>
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Floating Navbar */
+    header {
+      position: sticky;
+      top: 16px;
+      z-index: 50;
+      margin-bottom: 40px;
+    }
+    
+    .nav-island {
+      background: rgba(10, 10, 12, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 99px; /* Pill shape */
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(to right, #fff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Modern Glass Buttons */
+    .btn {
+      appearance: none;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-panel);
+      color: var(--text-main);
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background: var(--glass-highlight);
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.2);
+    }
+    
+    .btn.primary {
+      background: var(--text-main);
+      color: #000;
+      border: none;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    .btn.primary:hover {
+      background: #fff;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Search Area */
+    .controls {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      padding: 16px 20px;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+      background: rgba(0,0,0,0.5);
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      padding-bottom: 60px;
+    }
+
+    /* Glass Cards */
+    .card {
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  box-shadow 0.3s ease, 
+                  border-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Hover State: Subtle Lift + Glow */
+    .card:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #1a1a20, #000);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .icon-img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .meta h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+    .meta p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .actions {
+      margin-top: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .visit-btn {
+      flex: 1;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid transparent;
+      padding: 12px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .visit-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    /* Modal / Drawer */
+    .drawer {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .drawer.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .drawer-content {
+      background: #0f0f11;
+      border: 1px solid var(--glass-border);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .drawer.open .drawer-content { transform: scale(1); }
+
+    .form-stack { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+    label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+    
+    .input-field {
+      width: 100%;
+      background: #18181b;
+      border: 1px solid #27272a;
+      padding: 12px;
+      border-radius: 10px;
+      color: white;
+      font-family: inherit;
+      outline: none;
+    }
+    .input-field:focus { border-color: var(--accent); }
+    
+    .delete-chip {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    @media (max-width: 600px) {
+      header { top: 0; margin-bottom: 24px; }
+      .nav-island { border-radius: 0; border-top: none; border-left: none; border-right: none; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<div class="shell">
-<header class="header">
-<div class="brand">
-<div class="logo" aria-hidden="true"></div>
-<div>
-<h1 class="title">Elegant Site Store</h1>
-<p class="subtitle">Discover and share beautiful websites</p>
-</div>
-</div>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
-<button id="toggle-form" class="btn">+ Submit Site</button>
-<a href="[projects.html](https://black-ice-3dbk.onrender.com/projects.html)" class="btn secondary" rel="nofollow">← Back</a>
-</div>
-</header>
-<section class="hero">
-<h2>Showcase your best builds</h2>
-<p>Submit your site, inspire the community, and explore a curated feed of modern web experiences.</p>
-<div class="toolbar">
-<div class="search">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-<input id="q" type="search" placeholder="Search by title…" aria-label="Search sites">
-</div>
-<div>
-<button id="open-builder" class="btn secondary" >Launch Builder</button>
-</div>
-</div>
-</section>
-<section id="submit-form" class="panel form" aria-label="Submit your site">
 
-<div class="field">
-<label class="label" for="site-title">Site Title</label>
-<input id="site-title" class="input" placeholder="My Awesome Site">
-</div>
-<div class="field">
-<label class="label" for="site-url">Site URL</label>
-<input id="site-url" class="input" type="url" placeholder="https://mysite.com">
-</div>
-<div class="field">
-<label class="label" for="site-image">Image URL</label>
-<input id="site-image" class="input" type="url" placeholder="https://example.com/icon.png">
-<div class="site-desc" style="margin:6px 0 0">Use square icons with safe padding so they crop well across rounded masks, similar to adaptive icons.</div>
-</div>
-<div class="field">
-<label class="label" for="site-description">Description</label>
-<textarea id="site-description" class="textarea" placeholder="Describe your site..."></textarea>
-</div>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
-<button id="submit-site" class="btn">Submit</button>
-<button id="cancel-submit" class="btn secondary">Cancel</button>
-<div id="host-banner" class="host-banner" role="status" aria-live="polite" aria-atomic="true">
-  <div>
-    <strong>Not having a url but have html code?</strong>
-    <div>Request the site owner to host your site on the web.</div>
+  <header>
+    <div class="nav-island">
+      <h1>Site Store</h1>
+      <div style="display:flex; gap:8px;">
+        <button id="open-submit" class="btn primary">
+          <span>+</span> Submit
+        </button>
+        <a href="https://black-ice-3dbk.onrender.com/projects.html" class="btn">Back</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <div class="controls">
+      <div class="search-wrap">
+        <input id="q" type="search" class="search-input" placeholder="Search for inspiration..." autocomplete="off">
+      </div>
+    </div>
+
+    <main id="grid" class="grid" aria-live="polite">
+      <!-- Loading Skeleton -->
+      <article class="card">
+        <div class="card-header">
+          <div class="icon-box"></div>
+          <div class="meta">
+            <h3 style="background:var(--glass-border); color:transparent; border-radius:4px; width:120px">Loading</h3>
+            <p style="background:var(--glass-border); color:transparent; border-radius:4px; margin-top:6px; width:180px">Loading description content.</p>
+          </div>
+        </div>
+      </article>
+    </main>
   </div>
-  <a
-    class="btn secondary"
-    href="https://black-ice-3dbk.onrender.com/Htmlsub.html"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Request owner <span class="visually-hidden">(opens in new tab)</span>
-  </a>
-</div>
 
-</div>
-<p class="site-desc" style="margin-top:6px">One-time submission; please review carefully before sending.</p>
-</section>
-<main id="grid-wrap" class="panel" aria-live="polite">
-<div class="grid" id="sites-grid">
-<article class="site-card" aria-hidden="true">
-<div class="site-row">
-<div class="app-fallback">S</div>
-<div>
-<h3 class="site-title" style="opacity:.7">Loading…</h3>
-<p class="site-desc" style="opacity:.6">Please wait while sites are fetched.</p>
-<div class="site-actions"><a class="visit" href="[javascript:void(0)](about:blank)">VISIT</a></div>
-</div>
-</div>
-</article>
-</div>
-</main>
-<footer class="footer">Images use native lazy loading and text is clamped for clean previews on all cards.</footer>
-</div>
-<div id="admin-ribbon" class="admin-ribbon" style="display:none">ADMIN MODE</div>
-<!-- Firebase + App -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-const firebaseConfig = {
-apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-authDomain: "h-90-8a7c5.firebaseapp.com",
-databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-projectId: "h-90-8a7c5",
-storageBucket: "h-90-8a7c5.firebasestorage.app",
-messagingSenderId: "367196609301",
-appId: "1:367196609301:web:156e24c1b4532c26af671c"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const $ = s => document.querySelector(s);
-const grid = $('#sites-grid');
-const form = $('#submit-form');
-const q = $('#q');
-const sanitizeHTML = (str) => { const el = document.createElement('div'); el.textContent = str; return el.innerHTML; };
-// UI actions
-$('#toggle-form').addEventListener('click', ()=> form.classList.toggle('show'));
-$('#cancel-submit').addEventListener('click', ()=> form.classList.remove('show'));
-$('#open-builder').addEventListener('click', ()=> { window.location.href = 'elegant-builder.html'; });
-// Submit site
-$('#submit-site').addEventListener('click', async ()=>{
-const title = $('#site-title').value.trim();
-const url = $('#site-url').value.trim();
-const image = $('#site-image').value.trim();
-const description = $('#site-description').value.trim();
-if(!title || !url || !description){ alert('Please fill Title, URL, and Description.'); return; }
-try{ new URL(url) }catch{ alert('Please enter a valid Site URL (e.g., https://example.com)'); return; }
-try{
-await push(ref(db,'sites'), { title, url, image, description, timestamp: Date.now() });
-form.classList.remove('show');
-$('#site-title').value=''; $('#site-url').value=''; $('#site-image').value=''; $('#site-description').value='';
-alert('Site submitted successfully!');
-}catch(e){ alert('Error submitting site: '+ e.message) }
-});
-// Load and render sites
-let allSites = [];
-onValue(ref(db,'sites'), (snapshot)=>{
-const sites = snapshot.val();
-if(!sites){
-grid.innerHTML = '<article class="site-card"><div class="site-row"><div class="app-fallback">S</div><div><h3 class="site-title">No sites yet</h3><p class="site-desc">Be the first to submit!</p><div class="site-actions"><a class="visit" href="#">VISIT</a></div></div></div></article>';
-return;
-}
-allSites = Object.entries(sites).map(([id, s])=>({ id, ...s })).sort((a,b)=> b.timestamp - a.timestamp);
-render(allSites);
-});
-function render(list){
-const isAdmin = window.adminMode;
-const term = (q.value||'').toLowerCase();
-const items = term ? list.filter(s => (s.title||'').toLowerCase().includes(term)) : list;
-grid.innerHTML = items.map(site=>{
-const safeTitle = sanitizeHTML(site.title||'');
-const safeDesc = sanitizeHTML(site.description||'');
-const safeUrl = sanitizeHTML(site.url||'#');
-const safeImg = sanitizeHTML(site.image||'');
-const letter = safeTitle.charAt(0).toUpperCase() || 'S';
-const delBtn = isAdmin ? `<button class="delete" onclick="deleteSite('${site.id}')">Delete</button>` : '';
-const iconHTML = safeImg
-? `<img class="app-icon" src="${safeImg}" alt="${safeTitle}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" width="128" height="128">
-<div class="app-fallback" style="display:none">${letter}</div>`
-: `<div class="app-fallback">${letter}</div>`;
-return `
-<article class="site-card">
-<div class="site-row">
-<div style="position:relative">${iconHTML}</div>
-<div>
-<h3 class="site-title">${safeTitle}</h3>
-<p class="site-desc">${safeDesc}</p>
-<div class="site-actions">
-<a class="visit" href="${safeUrl}" target="_blank" rel="noopener noreferrer">VISIT</a>
-${delBtn}
-</div>
-</div>
-</div>
-</article>
-`;
-}).join('');
-}
-q.addEventListener('input', ()=> render(allSites));
-// Admin mode
-const params = new URLSearchParams(location.search);
-if(params.get('admin') === 'elite'){
-window.adminMode = true;
-const ribbon = document.getElementById('admin-ribbon');
-ribbon.style.display = 'block';
-document.title = '🔴 ADMIN MODE — ' + document.title;
-}
-// Delete
-window.deleteSite = async (id)=>{
-if(confirm('Delete this site permanently?')){
-try{ await remove(ref(db, `sites/${id}`)) }catch(e){ alert('Error deleting: '+ e.message) }
-}
-};
-</script><script> document.addEventListener('contextmenu', event => event.preventDefault()); </script>
+  <!-- Submit Modal -->
+  <div id="drawer" class="drawer">
+    <div class="drawer-content">
+      <h2 style="margin:0 0 8px; font-size:20px;">Submit Site</h2>
+      <p style="margin:0; color:var(--text-muted); font-size:14px;">Share your creation with the world.</p>
+      
+      <div class="form-stack">
+        <div>
+          <label>Project Name</label>
+          <input id="f-title" class="input-field" placeholder="e.g. Portfolio v2">
+        </div>
+        <div>
+          <label>Live URL</label>
+          <input id="f-url" type="url" class="input-field" placeholder="https://...">
+        </div>
+        <div>
+          <label>Icon URL</label>
+          <input id="f-img" type="url" class="input-field" placeholder="https://... (square png/jpg)">
+        </div>
+        <div>
+          <label>Description</label>
+          <textarea id="f-desc" class="input-field" rows="3" placeholder="Briefly describe functionality..."></textarea>
+        </div>
+        
+        <!-- Hosting Hint -->
+        <div style="font-size:12px; color:var(--text-muted); background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
+          No URL? <a href="https://black-ice-3dbk.onrender.com/Htmlsub.html" target="_blank" style="color:var(--accent); text-decoration:none;">Request hosting here</a>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <button id="do-submit" class="btn primary" style="flex:1; justify-content:center;">Publish</button>
+          <button id="close-drawer" class="btn" style="flex:1; justify-content:center;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+      authDomain: "h-90-8a7c5.firebaseapp.com",
+      databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+      projectId: "h-90-8a7c5",
+      storageBucket: "h-90-8a7c5.firebasestorage.app",
+      messagingSenderId: "367196609301",
+      appId: "1:367196609301:web:156e24c1b4532c26af671c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const $ = id => document.getElementById(id);
+
+    // Drawer Logic
+    const drawer = $('drawer');
+    $('open-submit').onclick = () => drawer.classList.add('open');
+    $('close-drawer').onclick = () => drawer.classList.remove('open');
+    drawer.onclick = (e) => { if(e.target === drawer) drawer.classList.remove('open'); }
+
+    // Submit Logic
+    $('do-submit').onclick = async () => {
+      const title = $('f-title').value.trim();
+      const url = $('f-url').value.trim();
+      const image = $('f-img').value.trim();
+      const description = $('f-desc').value.trim();
+
+      if(!title || !url || !description) return alert('Please fill in required fields.');
+
+      try {
+        await push(ref(db, 'sites'), { title, url, image, description, timestamp: Date.now() });
+        drawer.classList.remove('open');
+        ['f-title','f-url','f-img','f-desc'].forEach(id => $(id).value = '');
+      } catch(e) {
+        alert(e.message);
+      }
+    };
+
+    // Render Logic
+    let sitesCache = [];
+    const grid = $('grid');
+    const params = new URLSearchParams(location.search);
+    const isAdmin = params.get('admin') === 'elite';
+
+    onValue(ref(db, 'sites'), (snap) => {
+      const data = snap.val();
+      if(!data) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted)">No sites found.</div>`;
+        return;
+      }
+      sitesCache = Object.entries(data).map(([k,v]) => ({id:k, ...v})).sort((a,b) => b.timestamp - a.timestamp);
+      render(sitesCache);
+    });
+
+    const esc = t => { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+
+    function render(list) {
+      const q = $('q').value.toLowerCase();
+      const filtered = q ? list.filter(s => (s.title||'').toLowerCase().includes(q)) : list;
+      
+      grid.innerHTML = filtered.map(s => {
+        const title = esc(s.title);
+        const desc = esc(s.description);
+        const url = esc(s.url);
+        const img = esc(s.image);
+        const letter = title.charAt(0).toUpperCase();
+
+        const iconHTML = img 
+          ? `<img src="${img}" class="icon-img" onerror="this.style.display='none';this.parentNode.innerText='${letter}'">`
+          : letter;
+
+        const delHTML = isAdmin 
+          ? `<button class="delete-chip" onclick="delSite('${s.id}')">Delete</button>` 
+          : '';
+
+        return `
+          <article class="card">
+            <div class="card-header">
+              <div class="icon-box">${iconHTML}</div>
+              <div class="meta">
+                <h3>${title}</h3>
+                <p>${desc}</p>
+              </div>
+            </div>
+            <div class="actions">
+              <a href="${url}" target="_blank" class="visit-btn">Visit Site &rarr;</a>
+              ${delHTML}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    $('q').oninput = () => render(sitesCache);
+    
+    window.delSite = async (id) => {
+      if(confirm('Delete?')) await remove(ref(db, `sites/${id}`));
+    }
+  </script>
 </body>
 </html>
