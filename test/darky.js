@@ -156,4 +156,50 @@
         new DarkyWidget();
     }
 })();
+// ASCII credit 
 
+        // 1. ASCII ART LOGO
+        const asciiLogo = `
+    ▄▀█ ▀▄▀ █▀█ ▄▀█ █▀▄ █▀▀ █▀█
+    █▀█ █░█ █▀▄ █▀█ █▄▀ ██▄ █▀▄`;
+
+        // 2. TECHIE DESCRIPTION
+        // Formatted to look like a system boot sequence or terminal status output
+        const description = `
+// SYSTEM STATUS: ONLINE
+// PROTOCOL: BLACKICE ACADEMY
+---------------------------------------------------
+[+] TARGET:      Ethical Hacking & Cyberwarfare Mastery
+[+] MODULES:     Offensive Ops | Red Teaming | CTF
+[+] CLEARANCE:   Admin Access Granted By Subho
+---------------------------------------------------
+>> INITIATE TRAINING SEQUENCE BELOW:`;
+
+        // 3. STYLES
+        // Neon Green style for the logo
+        const logoStyle = [
+            'color: #00ff41',
+            'font-weight: bold',
+            'font-family: monospace',
+            'font-size: 20px',
+            'text-shadow: 0 0 10px #00ff41'
+        ].join(';');
+
+        // Cyan/Blue style for the tech info
+        const descStyle = [
+            'color: #00ffff', 
+            'font-family: monospace',
+            'font-size: 12px',
+            'line-height: 1.5'
+        ].join(';');
+
+        // 4. EXECUTION
+        // Log the Logo
+        console.log('%c' + asciiLogo, logoStyle);
+        
+        // Log the Description
+        console.log('%c' + description, descStyle);
+        
+        // Log the Link (Left unstyled to ensure it remains clickable in all browsers)
+        console.log('https://blackice-ac.vercel.app/');
+   
