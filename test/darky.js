@@ -171,7 +171,7 @@
 ---------------------------------------------------
 [+] TARGET:      Ethical Hacking & Cyberwarfare Mastery
 [+] MODULES:     Offensive Ops | Red Teaming | CTF
-[+] CLEARANCE:   Admin Access Granted By Subho
+[+] CLEARANCE:   Client Access Granted By Subho
 ---------------------------------------------------
 >> INITIATE TRAINING SEQUENCE BELOW:`;
 
