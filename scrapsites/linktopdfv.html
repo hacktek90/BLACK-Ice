@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Doc Reader & Player</title>
+    <title>Dynamic PDF Reader</title>
     
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <style>
-        /* Layout Fix: Prevent entire site scroll */
+        /* CRITICAL: Prevent body from scrolling */
         html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
             overflow: hidden; 
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: #0f172a;
             display: flex;
             flex-direction: column;
         }
 
+        /* Fixed Header */
         #main-header {
             flex-shrink: 0;
             background: #ffffff;
@@ -31,30 +30,36 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
             z-index: 1000;
-            transition: transform 0.3s ease;
         }
 
-        .header-hidden { transform: translateY(-100%); margin-bottom: -60px; }
+        .header-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            margin-bottom: -60px; /* Pulls viewer up to fill the gap */
+        }
 
-        .controls-group {
+        .input-group {
             display: flex;
             align-items: center;
-            background: #f1f5f9;
+            background: #f8fafc;
             border-radius: 12px;
             padding: 4px 12px;
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             border: 1px solid #e2e8f0;
         }
 
-        input {
+        input[type="text"] {
             flex-grow: 1;
             border: none;
             background: transparent;
             outline: none;
             padding: 10px;
             font-size: 14px;
+            color: #1e293b;
         }
 
         .icon-btn {
@@ -64,150 +69,125 @@
             padding: 8px;
             border-radius: 8px;
             display: flex;
+            align-items: center;
+            transition: all 0.2s;
             color: #64748b;
-            transition: 0.2s;
         }
 
-        .icon-btn:hover { background: #e2e8f0; color: #0f172a; }
-        .active-mode { color: #6366f1; background: #eef2ff; }
+        .icon-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .upload-trigger { color: #0ea5e9; }
+        .load-trigger { color: #6366f1; }
 
-        /* Content Area */
-        #content-area {
-            flex-grow: 1;
-            position: relative;
-            background: #000;
-        }
-
-        .viewer-pane {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: none;
-        }
-
-        .active-pane { display: block; }
-
-        /* Plyr custom sizing to fill container */
-        .plyr { height: 100%; width: 100%; }
-
+        /* Floating Show Button */
         #show-header-btn {
             position: fixed;
-            top: 15px; right: 15px; z-index: 1001;
-            background: #ffffff; border: 1px solid #ddd;
-            border-radius: 8px; padding: 8px; cursor: pointer; display: none;
+            top: 15px;
+            right: 15px;
+            z-index: 1001;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
+
+        /* Viewer Area */
+        #pdf-viewer {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            background: #1e293b;
+        }
+
+        #file-input { display: none; }
     </style>
 </head>
 <body>
 
-    <button id="show-header-btn"><i data-lucide="maximize"></i></button>
+    <button id="show-header-btn" title="Show Controls">
+        <i data-lucide="maximize-2"></i>
+    </button>
 
     <header id="main-header">
-        <div style="display:flex; gap:10px;">
-             <button class="icon-btn active-mode" id="mode-pdf" title="Switch to PDF">
-                 <i data-lucide="file-text"></i>
-             </button>
-             <button class="icon-btn" id="mode-video" title="Switch to Video">
-                 <i data-lucide="video"></i>
-             </button>
+        <div style="display:flex; align-items:center; gap:10px;">
+             <i data-lucide="book-open" style="color:#6366f1;"></i>
+             <span style="font-weight:700; font-size:16px; color:#1e293b; letter-spacing:-0.5px;">PDF View</span>
         </div>
 
-        <div class="controls-group">
-            <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Upload File">
-                <i data-lucide="upload"></i>
+        <div class="input-group">
+            <button class="icon-btn upload-trigger" onclick="document.getElementById('file-input').click()" title="Upload from Device">
+                <i data-lucide="file-plus"></i>
             </button>
-            <input type="file" id="file-input" style="display:none">
+            <input type="file" id="file-input" accept="application/pdf">
+
+            <input type="text" id="pdf-url-input" placeholder="Paste PDF link here...">
             
-            <input type="text" id="url-input" placeholder="Paste PDF or Video URL here...">
-            
-            <button class="icon-btn" id="load-btn" style="color:#6366f1">
+            <button class="icon-btn load-trigger" id="load-btn" title="Fetch Document">
                 <i data-lucide="external-link"></i>
             </button>
         </div>
 
-        <button class="icon-btn" id="hide-btn"><i data-lucide="minimize"></i></button>
+        <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
+            <i data-lucide="minimize-2"></i>
+        </button>
     </header>
 
-    <main id="content-area">
-        <div id="pdf-pane" class="viewer-pane active-pane">
-            <div id="pdf-container" style="height: 100%; width: 100%;"></div>
-        </div>
-
-        <div id="video-pane" class="viewer-pane">
-            <video id="player" playsinline controls>
-                <source src="" type="video/mp4" />
-            </video>
-        </div>
-    </main>
+    <div id="pdf-viewer"></div>
 
     <script type="module">
         import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
+
+        // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Initialize Video Player
-        const videoPlayer = new Plyr('#player');
-        
-        const pdfPane = document.getElementById('pdf-pane');
-        const videoPane = document.getElementById('video-pane');
-        const urlInput = document.getElementById('url-input');
-        
-        let currentMode = 'pdf';
+        const header = document.getElementById('main-header');
+        const showBtn = document.getElementById('show-header-btn');
+        const hideBtn = document.getElementById('hide-btn');
+        const container = document.getElementById('pdf-viewer');
+        const urlInput = document.getElementById('pdf-url-input');
+        const loadBtn = document.getElementById('load-btn');
+        const fileInput = document.getElementById('file-input');
 
-        function switchMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.viewer-pane').forEach(p => p.classList.remove('active-pane'));
-            document.getElementById(`${mode}-pane`).classList.add('active-pane');
-            
-            document.getElementById('mode-pdf').classList.toggle('active-mode', mode === 'pdf');
-            document.getElementById('mode-video').classList.toggle('active-mode', mode === 'video');
+        function renderPDF(source) {
+            container.innerHTML = ''; // Wipe old instance
+            EmbedPDF.init({
+                type: 'container',
+                target: container,
+                src: source,
+                openLinksInNewWindow: true
+            });
         }
 
-        function loadContent(src) {
-            if (currentMode === 'pdf') {
-                document.getElementById('pdf-container').innerHTML = '';
-                EmbedPDF.init({
-                    type: 'container',
-                    target: document.getElementById('pdf-container'),
-                    src: src
-                });
-            } else {
-                videoPlayer.source = {
-                    type: 'video',
-                    sources: [{ src: src, type: 'video/mp4' }]
-                };
-                videoPlayer.play();
-            }
-        }
+        // Action: Fetch from URL
+        loadBtn.onclick = () => { if(urlInput.value) renderPDF(urlInput.value); };
+        urlInput.onkeypress = (e) => { if(e.key === 'Enter' && urlInput.value) renderPDF(urlInput.value); };
 
-        // Event Listeners
-        document.getElementById('mode-pdf').onclick = () => switchMode('pdf');
-        document.getElementById('mode-video').onclick = () => switchMode('video');
-
-        document.getElementById('load-btn').onclick = () => loadContent(urlInput.value);
-        urlInput.onkeypress = (e) => { if(e.key === 'Enter') loadContent(urlInput.value); };
-
-        document.getElementById('file-input').onchange = (e) => {
+        // Action: Load Local File
+        fileInput.onchange = (e) => {
             const file = e.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                loadContent(url);
-                urlInput.value = file.name;
+            if (file && file.type === "application/pdf") {
+                const blobUrl = URL.createObjectURL(file);
+                renderPDF(blobUrl);
+                urlInput.value = `Local: ${file.name}`;
             }
         };
 
         // UI Toggles
-        const header = document.getElementById('main-header');
-        const showBtn = document.getElementById('show-header-btn');
-        document.getElementById('hide-btn').onclick = () => {
+        hideBtn.onclick = () => {
             header.classList.add('header-hidden');
             showBtn.style.display = 'block';
         };
+
         showBtn.onclick = () => {
             header.classList.remove('header-hidden');
             showBtn.style.display = 'none';
         };
 
-        // Initial PDF Load
-        loadContent('');
+        // Default view
+        renderPDF('https://snippet.embedpdf.com/ebook.pdf');
     </script>
+
 </body>
 </html>
