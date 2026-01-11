@@ -186,7 +186,199 @@
         };
 
         // Default view
+        renderPDF('<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic PDF Reader</title>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* CRITICAL: Prevent body from scrolling */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; 
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: #0f172a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fixed Header */
+        #main-header {
+            flex-shrink: 0;
+            background: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .header-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            margin-bottom: -60px; /* Pulls viewer up to fill the gap */
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 4px 12px;
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid #e2e8f0;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            padding: 10px;
+            font-size: 14px;
+            color: #1e293b;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+
+        .icon-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .upload-trigger { color: #0ea5e9; }
+        .load-trigger { color: #6366f1; }
+
+        /* Floating Show Button */
+        #show-header-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1001;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        /* Viewer Area */
+        #pdf-viewer {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            background: #1e293b;
+        }
+
+        #file-input { display: none; }
+    </style>
+</head>
+<body>
+
+    <button id="show-header-btn" title="Show Controls">
+        <i data-lucide="maximize-2"></i>
+    </button>
+
+    <header id="main-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+             <i data-lucide="book-open" style="color:#6366f1;"></i>
+             <span style="font-weight:700; font-size:16px; color:#1e293b; letter-spacing:-0.5px;">PDF View</span>
+        </div>
+
+        <div class="input-group">
+            <button class="icon-btn upload-trigger" onclick="document.getElementById('file-input').click()" title="Upload from Device">
+                <i data-lucide="file-plus"></i>
+            </button>
+            <input type="file" id="file-input" accept="application/pdf">
+
+            <input type="text" id="pdf-url-input" placeholder="Paste PDF link here...">
+            
+            <button class="icon-btn load-trigger" id="load-btn" title="Fetch Document">
+                <i data-lucide="external-link"></i>
+            </button>
+        </div>
+
+        <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
+            <i data-lucide="minimize-2"></i>
+        </button>
+    </header>
+
+    <div id="pdf-viewer"></div>
+
+    <script type="module">
+        import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        const header = document.getElementById('main-header');
+        const showBtn = document.getElementById('show-header-btn');
+        const hideBtn = document.getElementById('hide-btn');
+        const container = document.getElementById('pdf-viewer');
+        const urlInput = document.getElementById('pdf-url-input');
+        const loadBtn = document.getElementById('load-btn');
+        const fileInput = document.getElementById('file-input');
+
+        function renderPDF(source) {
+            container.innerHTML = ''; // Wipe old instance
+            EmbedPDF.init({
+                type: 'container',
+                target: container,
+                src: source,
+                openLinksInNewWindow: true
+            });
+        }
+
+        // Action: Fetch from URL
+        loadBtn.onclick = () => { if(urlInput.value) renderPDF(urlInput.value); };
+        urlInput.onkeypress = (e) => { if(e.key === 'Enter' && urlInput.value) renderPDF(urlInput.value); };
+
+        // Action: Load Local File
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const blobUrl = URL.createObjectURL(file);
+                renderPDF(blobUrl);
+                urlInput.value = `Local: ${file.name}`;
+            }
+        };
+
+        // UI Toggles
+        hideBtn.onclick = () => {
+            header.classList.add('header-hidden');
+            showBtn.style.display = 'block';
+        };
+
+        showBtn.onclick = () => {
+            header.classList.remove('header-hidden');
+            showBtn.style.display = 'none';
+        };
+
+        // Default view
         renderPDF('https://snippet.embedpdf.com/ebook.pdf');
+    </script>
+
+</body>
+</html>');
     </script>
 
 </body>
