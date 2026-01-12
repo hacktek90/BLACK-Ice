@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Swiss Task 2025 Mobile</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Google Fonts: Inter Tight -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Flowbite CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
     
     <script>
         tailwind.config = {
@@ -54,6 +59,43 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        
+        /* Custom checkbox styling that works with Flowbite */
+        .flowbite-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .flowbite-checkbox.checked {
+            background-color: #000;
+        }
+        
+        .flowbite-checkbox.checked::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 1px;
+        }
+        
+        @media (min-width: 768px) {
+            .flowbite-checkbox {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .flowbite-checkbox.checked::after {
+                width: 10px;
+                height: 10px;
+            }
+        }
     </style>
 </head>
 <body class="bg-white text-black font-sans min-h-screen selection:bg-swiss-red selection:text-white pb-24 md:pb-0">
@@ -78,9 +120,9 @@
             <!-- DESKTOP NAV: Vertical Stack -->
             <nav class="sticky top-0 bg-white/95 backdrop-blur-sm py-4 md:py-0 md:static md:mt-0 w-[calc(100%+3rem)] -ml-6 px-6 md:w-auto md:ml-0 md:px-0 border-b border-gray-100 md:border-none flex md:flex-col items-center md:items-start gap-6 md:gap-2 overflow-x-auto no-scrollbar snap-x whitespace-nowrap">
                 
-                <button onclick="filterTasks('all')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-black" data-filter="all">All</button>
-                <button onclick="filterTasks('active')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-gray-300" data-filter="active">Active</button>
-                <button onclick="filterTasks('completed')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-gray-300" data-filter="completed">Done</button>
+                <button onclick="filterTasks('all')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-black hover:text-swiss-red focus:outline-none focus:ring-2 focus:ring-swiss-red focus:ring-offset-2 rounded-sm px-2" data-filter="all">All</button>
+                <button onclick="filterTasks('active')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-gray-300 hover:text-black focus:outline-none focus:ring-2 focus:ring-swiss-red focus:ring-offset-2 rounded-sm px-2" data-filter="active">Active</button>
+                <button onclick="filterTasks('completed')" class="filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors text-gray-300 hover:text-black focus:outline-none focus:ring-2 focus:ring-swiss-red focus:ring-offset-2 rounded-sm px-2" data-filter="completed">Done</button>
                 
                 <!-- Spacer for Mobile Scroll -->
                 <div class="w-4 md:hidden"></div>
@@ -88,31 +130,31 @@
                 <!-- Desktop Spacer -->
                 <div class="hidden md:block h-8"></div> 
                 
-                <button onclick="clearCompleted()" class="hidden md:block text-sm font-bold uppercase tracking-widest hover:text-swiss-red transition-colors text-gray-400 text-left">
+                <button onclick="clearCompleted()" class="hidden md:block text-sm font-bold uppercase tracking-widest hover:text-swiss-red transition-colors text-gray-400 text-left focus:outline-none focus:ring-2 focus:ring-swiss-red focus:ring-offset-2 rounded-sm px-2 py-1">
                     Clear Completed
                 </button>
             </nav>
 
             <!-- Stats (Desktop Only mostly, or bottom of list on mobile) -->
             <div class="hidden md:block text-xs text-gray-300 mt-8">
-                <span id="items-left">0</span> ITEMS LEFT
+                <span id="items-left" class="font-bold text-black">0</span> ITEMS LEFT
             </div>
         </header>
 
         <!-- MAIN TASK LIST SECTION -->
         <main class="md:col-span-8 relative mt-4 md:mt-0">
             
-            <!-- INPUT AREA -->
+            <!-- INPUT AREA with Flowbite styling -->
             <div class="mb-8 md:mb-16 input-group group relative">
                 <input 
                     type="text" 
                     id="taskInput" 
                     placeholder="New task..." 
-                    class="w-full text-4xl md:text-5xl font-medium placeholder-gray-200 border-none outline-none bg-transparent py-4 rounded-none"
+                    class="w-full text-4xl md:text-5xl font-medium placeholder-gray-200 border-none outline-none bg-transparent py-4 rounded-none focus:ring-0 focus:outline-none"
                     onkeydown="handleEnter(event)"
                     autocomplete="off"
                 >
-                <!-- Dynamic Line -->
+                <!-- Dynamic Line with Flowbite color classes -->
                 <div class="input-line h-1 w-8 md:w-12 bg-black transition-all duration-500 ease-out group-focus-within:w-full group-focus-within:bg-swiss-red"></div>
             </div>
 
@@ -129,15 +171,25 @@
         </main>
     </div>
 
-    <!-- MOBILE FLOATING ACTION (Optional for easier clearing on mobile) -->
+    <!-- MOBILE FLOATING ACTION with Flowbite button styling -->
     <div class="md:hidden fixed bottom-6 right-6 z-40">
-        <button onclick="clearCompleted()" class="bg-black text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+        <button onclick="clearCompleted()" class="bg-black text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-90 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-gray-300">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
             </svg>
         </button>
     </div>
+    
+    <!-- Flowbite Toast Container for Notifications -->
+    <div id="flowbite-toast-container" class="fixed top-4 right-4 z-50 space-y-4 hidden md:block"></div>
+    
+    <!-- Mobile Toast Container -->
+    <div id="mobile-toast-container" class="fixed top-4 right-4 left-4 z-50 space-y-4 md:hidden"></div>
 
+    <!-- Flowbite JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+    
+    <!-- Application JavaScript -->
     <script>
         let tasks = JSON.parse(localStorage.getItem('swissTodos')) || [];
         let currentFilter = 'all';
@@ -146,7 +198,10 @@
         const itemsLeftEl = document.getElementById('items-left');
         const inputEl = document.getElementById('taskInput');
         const filterBtns = document.querySelectorAll('.filter-btn');
+        const desktopToastContainer = document.getElementById('flowbite-toast-container');
+        const mobileToastContainer = document.getElementById('mobile-toast-container');
 
+        // Initialize the app
         render();
 
         function handleEnter(e) {
@@ -155,9 +210,16 @@
 
         function addTask() {
             const text = inputEl.value.trim();
-            if (!text) return;
+            if (!text) {
+                showToast('Please enter a task', 'warning');
+                return;
+            }
+            
             // Prevent duplicate rapid entry
-            if(tasks.length > 0 && tasks[0].text === text) return;
+            if(tasks.length > 0 && tasks[0].text === text) {
+                showToast('Task already exists', 'info');
+                return;
+            }
 
             const newTask = {
                 id: Date.now(),
@@ -169,30 +231,50 @@
             tasks.unshift(newTask);
             saveAndRender();
             inputEl.value = '';
-            // Keep focus on mobile? often better to blur to hide keyboard
-            // inputEl.blur(); 
+            
+            // Show success notification using Flowbite toast
+            showToast('Task added successfully', 'success');
         }
 
         function toggleTask(id) {
             tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
             saveAndRender();
+            
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                showToast(`Task marked as ${task.completed ? 'completed' : 'active'}`, 'info');
+            }
         }
 
         function deleteTask(id) {
+            const task = tasks.find(t => t.id === id);
             tasks = tasks.filter(t => t.id !== id);
             saveAndRender();
+            
+            if (task) {
+                showToast(`"${task.text}" deleted`, 'warning');
+            }
         }
 
         function clearCompleted() {
-            tasks = tasks.filter(t => !t.completed);
-            saveAndRender();
+            const completedCount = tasks.filter(t => t.completed).length;
+            if (completedCount === 0) {
+                showToast('No completed tasks to clear', 'info');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${completedCount} completed task${completedCount > 1 ? 's' : ''}?`)) {
+                tasks = tasks.filter(t => !t.completed);
+                saveAndRender();
+                showToast(`Cleared ${completedCount} completed task${completedCount > 1 ? 's' : ''}`, 'success');
+            }
         }
 
         function filterTasks(filterType) {
             currentFilter = filterType;
             filterBtns.forEach(btn => {
                 const isActive = btn.dataset.filter === filterType;
-                btn.className = `filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors ${isActive ? 'text-black' : 'text-gray-300'}`;
+                btn.className = `filter-btn snap-start text-xl md:text-3xl font-semibold transition-colors ${isActive ? 'text-black hover:text-swiss-red' : 'text-gray-300 hover:text-black'} focus:outline-none focus:ring-2 focus:ring-swiss-red focus:ring-offset-2 rounded-sm px-2`;
             });
             render();
         }
@@ -203,6 +285,7 @@
         }
 
         function render() {
+            // Update items left counter
             if(itemsLeftEl) itemsLeftEl.innerText = tasks.filter(t => !t.completed).length;
 
             let visibleTasks = tasks;
@@ -218,12 +301,11 @@
             } else {
                 emptyStateEl.classList.add('hidden');
                 taskListEl.innerHTML = visibleTasks.map(task => `
-                    <li class="group flex items-start py-4 md:py-6 border-b border-gray-100 active:bg-gray-50 transition-colors duration-200">
+                    <li class="group flex items-start py-4 md:py-6 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
                         
-                        <!-- CHECKBOX -->
+                        <!-- CHECKBOX with Flowbite-like styling -->
                         <div class="pt-1.5 md:pt-2 w-10 md:w-12 flex-shrink-0 cursor-pointer" onclick="toggleTask(${task.id})">
-                            <div class="w-5 h-5 md:w-6 md:h-6 border-2 border-black ${task.completed ? 'bg-black' : 'bg-transparent'} flex items-center justify-center transition-colors duration-200">
-                                ${task.completed ? '<div class="w-2 h-2 bg-white"></div>' : ''}
+                            <div class="flowbite-checkbox ${task.completed ? 'checked' : ''}" onclick="event.stopPropagation(); toggleTask(${task.id})">
                             </div>
                         </div>
 
@@ -231,22 +313,132 @@
                         <div class="flex-grow pr-4">
                             <span 
                                 onclick="toggleTask(${task.id})"
-                                class="text-xl md:text-3xl font-medium cursor-pointer leading-tight block break-words ${task.completed ? 'text-gray-200 line-through decoration-swiss-red' : 'text-black'}"
+                                class="text-xl md:text-3xl font-medium cursor-pointer leading-tight block break-words ${task.completed ? 'text-gray-400 line-through decoration-swiss-red' : 'text-black hover:text-gray-700'}"
                             >
-                                ${task.text}
+                                ${escapeHtml(task.text)}
                             </span>
+                            <div class="mt-1 flex items-center gap-3">
+                                <span class="text-xs text-gray-400">
+                                    ${formatDate(task.createdAt)}
+                                </span>
+                                ${task.completed ? '<span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">Completed</span>' : '<span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Active</span>'}
+                            </div>
                         </div>
 
-                        <!-- DELETE (Always visible on mobile as small X, hover on desktop) -->
+                        <!-- DELETE Button with Flowbite styling -->
                         <button 
                             onclick="deleteTask(${task.id})"
-                            class="md:opacity-0 md:group-hover:opacity-100 text-gray-300 hover:text-swiss-red px-2 py-1"
+                            class="md:opacity-0 md:group-hover:opacity-100 text-gray-400 hover:text-swiss-red px-2 py-1 rounded-full hover:bg-red-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-200"
+                            aria-label="Delete task"
                         >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
                         </button>
                     </li>
                 `).join('');
             }
+        }
+
+        // Helper function to show Flowbite-like toasts
+        function showToast(message, type = 'info') {
+            const isMobile = window.innerWidth < 768;
+            const container = isMobile ? mobileToastContainer : desktopToastContainer;
+            
+            const toastId = 'toast-' + Date.now();
+            const typeClasses = {
+                success: 'bg-green-100 border-green-500 text-green-900',
+                warning: 'bg-yellow-100 border-yellow-500 text-yellow-900',
+                error: 'bg-red-100 border-red-500 text-red-900',
+                info: 'bg-blue-100 border-blue-500 text-blue-900'
+            };
+            
+            const icon = {
+                success: '✓',
+                warning: '⚠',
+                error: '✗',
+                info: 'ℹ'
+            };
+            
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `flex items-center w-full max-w-xs p-4 mb-4 rounded-lg shadow border ${typeClasses[type]} animate-fade-in`;
+            toast.innerHTML = `
+                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
+                    <span class="text-lg font-bold">${icon[type]}</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">${message}</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 hover:bg-white/20 inline-flex items-center justify-center h-8 w-8" onclick="document.getElementById('${toastId}').remove()">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            container.classList.remove('hidden');
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (document.getElementById(toastId)) {
+                    document.getElementById(toastId).remove();
+                    if (container.children.length === 0) {
+                        container.classList.add('hidden');
+                    }
+                }
+            }, 4000);
+        }
+
+        // Helper function to format dates
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add some CSS for the fade-in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fade-in {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .animate-fade-in {
+                animation: fade-in 0.3s ease-out;
+            }
+            
+            /* Flowbite-like focus styles */
+            .focus-ring:focus {
+                outline: 2px solid transparent;
+                outline-offset: 2px;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize with a welcome message
+        if (tasks.length === 0) {
+            setTimeout(() => {
+                showToast('Welcome! Add your first task above.', 'info');
+            }, 1000);
         }
     </script>
 </body>
