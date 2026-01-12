@@ -1,724 +1,102 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BlackICE Portal – Projects & Tools</title>
-<meta name='description' content='a multi purpose application, all utility tool, converter , changer , how to apps, AI based Web OS application.'>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="index, follow">
-<link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
-<link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
-<link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
-<script src="https://cdn.tailwindcss.com/"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackICE Portal Host</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
 
-<script src="https://cdn.lgrckt-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
-<script>window.LogRocket && window.LogRocket.init('r3bczh/blackice-portal');</script>
-<script type="text/javascript">
-(function(c,l,a,r,i,t,y){
-c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, "clarity", "script", "ujy4ecml45");
-</script>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-N36FJFW2');</script>
-<!-- End Google Tag Manager -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-BJ7N8R2CLY');
-</script>
-<script>
-tailwind.config = {
-darkMode: 'class',
-theme: {
-extend: {
-fontFamily: { sans: ['Satoshi', 'sans-serif'] },
-colors: {
-background: '#09090b',
-surface: '#18181b',
-border: '#27272a',
-primary: '#3b82f6',
-text: '#e4e4e7',
-muted: '#a1a1aa'
-}
-}
-}
-}
-</script>
-<style>
-body{
-background-color:#050505;
-color:#e4e4e7;
-overflow:hidden;
-background-image:
-linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
-linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
-background-size:30px 30px;
-}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:10px;}
-::-webkit-scrollbar-thumb:hover{background:#52525b;}
-.solid-panel{background:#18181b;border-bottom:1px solid #27272a;}
-#sidebar{transition:width .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);}
-.sidebar-collapsed .hide-on-collapse{display:none !important;opacity:0;pointer-events:none;}
-.sidebar-collapsed{width:60px !important;}
-.sidebar-collapsed .project-card{padding:8px;justify-content:center;}
-.sidebar-collapsed .center-on-collapse{justify-content:center;margin:0;}
-.project-card{
-transition:background .2s ease, transform .1s;
-position:relative;
-overflow:hidden;
-}
-.project-card::after{
-content:"";
-position:absolute;
-top:var(--y,0);
-left:var(--x,0);
-width:250px;height:250px;
-background:radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
-transform:translate(-50%,-50%);
-opacity:0;
-transition:opacity .3s;
-pointer-events:none;
-z-index:1;
-}
-.project-card:hover::after{opacity:1;}
-.project-card > *{position:relative;z-index:2;}
-.project-card:hover{background:#27272a;}
-.project-card.active{
-background:rgba(59,130,246,0.08);
-border:1px solid rgba(59,130,246,0.2);
-}
-.project-card.active::before{
-content:'';
-position:absolute;
-left:0; top:6px; bottom:6px; width:3px;
-background:#3b82f6;
-border-radius:0 4px 4px 0;
-box-shadow:0 0 10px rgba(59,130,246,0.5);
-z-index:3;
-}
-.project-card.active .title-text{color:#60a5fa;font-weight:700;}
-.screenshot-img{opacity:0;transition:opacity .3s;}
-.screenshot-img.loaded{opacity:1;}
-/* Simple Loader */
-.loader-spinner {
-border: 4px solid #27272a;
-border-top: 4px solid #3b82f6;
-border-radius: 50%;
-width: 48px;
-height: 48px;
-animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
-}
-/* Split view */
-.split-pane{
-position:relative;
-overflow:hidden;
-height:100%;
-transition:opacity .2s ease;
-}
-.split-pane.inactive{opacity:0.45;}
-.split-pane.active{opacity:1;}
-.pane-indicator{
-position:absolute;
-top:10px; right:10px;
-z-index:30;
-background:rgba(9,9,11,0.75);
-border:1px solid #27272a;
-color:#a1a1aa;
-padding:4px 10px;
-border-radius:8px;
-font-size:10px;
-font-weight:800;
-letter-spacing:0.08em;
-display:none;
-backdrop-filter:blur(4px);
-pointer-events:auto;
-cursor:pointer;
-transition: all 0.2s ease;
-}
-.pane-indicator:hover {
-background: rgba(39, 39, 42, 0.9);
-color: white;
-border-color: #52525b;
-}
-.split-view-active .pane-indicator{display:block;}
-.split-pane.active .pane-indicator{
-border-color:rgba(59,130,246,0.35);
-background:rgba(59,130,246,0.12);
-color:#60a5fa;
-pointer-events: none;
-}
-.split-resizer{
-width:6px;
-background:#18181b;
-cursor:col-resize;
-flex:0 0 auto;
-border-left:1px solid #27272a;
-border-right:1px solid #27272a;
-position:relative;
-z-index:50;
-}
-.split-resizer:hover,.split-resizer.dragging{
-background:#3b82f6;
-border-color:#3b82f6;
-}
-.split-resizer::after{
-content:'';
-position:absolute;
-top:50%; left:50%;
-transform:translate(-50%,-50%);
-width:4px; height:26px;
-background:#52525b;
-border-radius:999px;
-}
-.split-resizer:hover::after,.split-resizer.dragging::after{background:#fff;}
-/* NEW: History styling in navbar */
-.no-scrollbar::-webkit-scrollbar {
-display: none;
-}
-.no-scrollbar {
--ms-overflow-style: none;
-scrollbar-width: none;
-}
-/* === MODIFIED BUTTON STYLES === */
-/* Copy Link Button */
-.copy-btn {
-opacity: 0;
-transition: opacity 0.2s, background 0.2s;
-pointer-events: none; /* Can't click when hidden */
-}
-/* Show buttons only when card is active/selected */
-.project-card.active .copy-btn {
-opacity: 1;
-pointer-events: auto;
-}
-.copy-btn:hover {
-background: #3f3f46 !important;
-}
-.copy-btn.copied {
-background: #10b981 !important;
-color: white !important;
-}
-/* Pin button visibility */
-.pin-toggle-btn {
-opacity: 0;
-transition: opacity 0.2s, background 0.2s;
-pointer-events: none;
-}
-/* Keep pinned items visible always */
-.project-card .pin-toggle-btn.is-pinned {
-opacity: 1;
-pointer-events: auto;
-}
-/* Show pin button on active card */
-.project-card.active .pin-toggle-btn {
-opacity: 1;
-pointer-events: auto;
-}
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #09090b;
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+        }
 
-/* AUDIO DROPDOWN STYLING */
-#audioDropdown {
-    transform-origin: bottom right;
-    animation: scaleIn 0.1s ease-out forwards;
-}
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-.track-option.active {
-    background: rgba(59,130,246,0.1);
-    color: #60a5fa;
-}
-</style>
+        .hero-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            margin: 0 0 12px 0;
+            font-size: 24px; font-weight: 600;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            margin: 0; color: #a1a1aa; font-size: 14px; line-height: 1.6;
+        }
+
+        /* Visual Hint Container */
+        .hint-wrap {
+            margin-top: 32px;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+
+        /* The Visual "Fake Button" Icon */
+        .hint-icon {
+            width: 48px; height: 48px;
+            background: rgba(24, 24, 27, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #3b82f6;
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            animation: pulse-blue 2s infinite;
+        }
+
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .hint-text {
+            font-size: 12px; font-weight: 500;
+            color: #71717a; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+
+        .glow {
+            position: absolute; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(0,0,0,0) 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            pointer-events: none; z-index: -1;
+        }
+    </style>
 </head>
-<body class="h-screen w-screen flex bg-transparent">
-    <script defer src="https://unpkg.com/lucide@latest"></script>
-<script defer src="https://unpkg.com/quicklink/dist/quicklink.umd.js"></script>
-<script defer>
-window.addEventListener('load', () => window.quicklink && quicklink());
-</script>
-    <script type="module" defer>
-import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate@1.0.0/index.min.js';
-window.autoAnimate = autoAnimate;
-</script>
-<!-- Background Audio Player (Default source, no autoplay) -->
-<audio id="backgroundAudio" src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3" loop></audio>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N36FJFW2"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-<!-- Command Palette -->
-<div id="cmdPalette" class="fixed inset-0 z-[100] bg-[#09090b] hidden flex items-start justify-center pt-[15vh] transition-all">
-<div class="w-full max-w-lg bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="cmdContent">
-<div class="p-3 border-b border-[#27272a] flex items-center gap-2">
-<i data-lucide="terminal" class="w-5 h-5 text-primary"></i>
-<input id="cmdInput" type="text" placeholder="Type a command or search..."
-class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 font-mono text-sm">
-<span class="text-[10px] text-gray-500 bg-[#27272a] px-2 py-1 rounded border border-[#3f3f46]">ESC</span>
-</div>
-<div id="cmdResults" class="max-h-[300px] overflow-y-auto p-2 space-y-1"></div>
-<div class="p-2 bg-[#09090b] border-t border-[#27272a] text-[10px] text-gray-500 flex justify-between px-4">
-<span>Select <kbd class="font-sans text-gray-300">↵</kbd></span>
-<span>Navigate <kbd class="font-sans text-gray-300">↑↓</kbd></span>
-</div>
-</div>
-</div>
-<!-- REMOVED MOBILE HEADER AND OVERLAY -->
-<!-- Sidebar -->
-<aside id="sidebar" class="relative top-0 left-0 h-full w-[240px] bg-[#18181b] border-r border-[#27272a] flex flex-col z-50 transition-all duration-300 overflow-hidden">
-<div class="p-3 border-b border-[#27272a] min-h-[57px]">
-<div class="flex items-center justify-between mb-3 center-on-collapse">
-<div class="flex items-center gap-1.5 hide-on-collapse">
-<h1 class="text-base font-bold tracking-tight text-white">Portal</h1>
-<div class="flex gap-1 items-center">
-<button id="splitViewBtn" class="flex p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Split View">
-<i data-lucide="columns-2" class="w-3.5 h-3.5"></i>
-</button>
-<button id="fullscreenBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Fullscreen">
-<i data-lucide="expand" class="w-3.5 h-3.5"></i>
-</button>
-</div>
-</div>
-<button id="sidebarToggle" class="flex p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Collapse Sidebar">
-<i data-lucide="panel-left-close" class="w-4 h-4"></i>
-</button>
-<button id="osApkBtn" class="hide-on-collapse text-[9px] font-bold px-1.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1">
-<i data-lucide="smartphone" class="w-3 h-3"></i> OS
-</button>
-</div>
-<div class="relative group hide-on-collapse">
-<i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#a1a1aa] w-3.5 h-3.5 group-focus-within:text-primary transition-colors"></i>
-<input id="searchInput" placeholder="Search..."
-class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#e4e4e7] outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-[#a1a1aa]/60">
-<span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-[#a1a1aa] border border-[#27272a] px-1 rounded bg-[#27272a] block">⌘K</span>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto p-2 scroll-smooth">
-<div id="pinnedSection" class="hidden mb-3">
-<div class="px-2 mb-1 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider flex items-center gap-1 hide-on-collapse">
-<i data-lucide="pin" class="w-2.5 h-2.5"></i> Pinned
-</div>
-<div id="pinnedList" class="space-y-1"></div>
-<div class="h-px bg-[#27272a] mx-2 my-2 hide-on-collapse"></div>
-</div>
-<div class="px-2 mb-1 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider hide-on-collapse">All Projects</div>
-<div id="projectList" class="space-y-1">
-<div class="animate-pulse space-y-2 p-1">
-<div class="h-9 bg-[#1e1e22] rounded-lg w-full"></div>
-<div class="h-9 bg-[#1e1e22] rounded-lg w-full"></div>
-</div>
-</div>
-</div>
-<div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse relative">
-<div class="flex items-center gap-2">
-<button id="homeBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Go Home">
-<i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-</button>
-<div class="flex items-center gap-1.5 hide-on-collapse">
-<span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
-<span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
-</div>
-</div>
+<body>
+    
+    <div class="glow"></div>
 
-<!-- Audio Control & Dropdown Trigger -->
-<div class="relative hide-on-collapse">
-    <button id="audioControlBtn" title="Music Controls" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all">
-        <i data-lucide="play" class="w-4 h-4"></i>
-    </button>
-    <!-- Audio Dropdown Menu -->
-    <div id="audioDropdown" class="hidden absolute bottom-full right-0 mb-2 w-48 bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl z-50 overflow-hidden">
-        <div class="p-2 border-b border-[#27272a] flex items-center justify-between">
-            <span class="text-[10px] font-bold text-[#a1a1aa] uppercase tracking-wider">Select Track</span>
-            <button id="playPauseToggle" class="text-xs text-primary hover:text-white">Play</button>
-        </div>
-        <div class="p-1 space-y-0.5">
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2 active" 
-                    data-src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Quantum Leap
-            </button>
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/2019-10-06_-_Villainous_-_David_Fesliyan.mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Villainous
-            </button>
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/2018-10-03_-_Inspirational_Advertising_1_-_David_Fesliyan.mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Inspirational
-            </button>
-             <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/Hans_Zimmer_-_Flight_(FeelMP3.com).mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Flight-Hans Zimmer
-            </button>
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/02 Cornfield Chase.mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Cornfield Chase-Interstellar
-            </button>
+    <div class="hero-card">
+        <h1>Welcome to BlackICE</h1>
+        <p>Your portal is ready.</p>
+        
+        <div class="hint-wrap">
+            <div class="hint-icon">
+                <!-- Grid Icon matching the widget -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </div>
+            <div class="hint-text">Click the button below to launch projects</div>
         </div>
     </div>
-</div>
 
-</div>
-</aside>
-<!-- Main -->
-<main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
-<div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden">
-<div class="flex items-center gap-1.5 text-[#a1a1aa]">
-<i data-lucide="clock" class="w-3 h-3"></i>
-</div>
-<div id="historyChips" class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-<span class="text-[10px] text-[#a1a1aa]/50 italic">No recent history</span>
-</div>
-</div>
-<div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
-<div class="flex flex-col items-center justify-center gap-4">
-<div class="loader-spinner"></div>
-<span class="text-sm text-[#a1a1aa] font-medium tracking-wide">Loading</span>
-</div>
-</div>
-<div id="splitContainer" class="flex-1 relative flex w-full h-full">
-<div id="leftPane" class="split-pane active" style="width: 100%;">
-<div class="pane-indicator" title="Set as Active Pane">LEFT</div>
-<iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
-</div>
-<div id="splitResizer" class="split-resizer hidden"></div>
-<div id="rightPane" class="split-pane inactive hidden" style="width: 0%;">
-<div class="pane-indicator" title="Set as Active Pane">RIGHT</div>
-<iframe id="portalFrame2" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
-</div>
-</div>
-<div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
-<div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
-<div class="w-20 h-20 bg-[#18181b] rounded-3xl border border-[#27272a] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-<i data-lucide="layers" class="w-10 h-10 text-primary"></i>
-</div>
-<h2 class="text-3xl font-black mb-2 text-black tracking-tight">Hii Buddy !!</h2>
-<p class="text-[#a1a1aa] mb-8 text-sm">Select a tool from the sidebar.</p>
-</div>
-</div>
-</main>
-<!--  SCRIPT (BG music, History Bar Logic,Split View Feature,Sidebar Collapse Feature) -->
-<script src="/test/some.js"></script> 
+    <script src="https://cdn.jsdelivr.net/gh/hacktek90/cursor@main/mobportal.js" defer></script>
 
-<!-- MAIN SCRIPT (Firebase, Search, Rendering) -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-    authDomain: "h-90-8a7c5.firebaseapp.com",
-    databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-    projectId: "h-90-8a7c5",
-    storageBucket: "h-90-8a7c5.appspot.com",
-    messagingSenderId: "367196609301",
-    appId: "1:367196609301:web:156e24c1b4532c26af671c"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// Elements needed for rendering
-const els = {
-    list: document.getElementById('projectList'),
-    pinnedList: document.getElementById('pinnedList'),
-    pinnedSection: document.getElementById('pinnedSection'),
-    frame: document.getElementById('portalFrame'),
-    frame2: document.getElementById('portalFrame2'),
-    loader: document.getElementById('frameLoader'),
-    empty: document.getElementById('emptyState'),
-    search: document.getElementById('searchInput'),
-    cmdPalette: document.getElementById('cmdPalette'),
-    cmdInput: document.getElementById('cmdInput'),
-    cmdResults: document.getElementById('cmdResults'),
-};
-
-// AUDIO CLICK SOUND (Kept here as general UI sound, not background music)
-const clickAudio = new Audio('/test/914-preview.mp3');
-clickAudio.preload = 'auto';
-function playClickSound() {
-    clickAudio.currentTime = 0;
-    clickAudio.play().catch(err => console.log('Audio play failed:', err));
-}
-
-if (window.autoAnimate && els.list) window.autoAnimate(els.list);
-if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
-lucide.createIcons();
-
-// ONLINE/OFFLINE STATUS
-function updateStatus() {
-    const d = document.getElementById('statusDot');
-    const t = document.getElementById('pingText');
-    if (!d || !t) return;
-    if (navigator.onLine) {
-        d.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]";
-        t.innerText = "ONLINE";
-        t.className = "text-[9px] font-mono text-green-500 hide-on-collapse";
-    } else {
-        d.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]";
-        t.innerText = "OFFLINE";
-        t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
-    }
-}
-window.addEventListener('online', updateStatus);
-window.addEventListener('offline', updateStatus);
-updateStatus();
-
-// CARD HOVER EFFECT
-document.addEventListener('mousemove', (e) => {
-    document.querySelectorAll('.project-card').forEach(card => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--x', `${e.clientX - rect.left}px`);
-        card.style.setProperty('--y', `${e.clientY - rect.top}px`);
-    });
-});
-
-let allSites = [];
-let pinnedIds = JSON.parse(localStorage.getItem('pinnedProjects') || '[]');
-
-// Helper to convert URL
-function convertToLocalHostUrl(url) {
-    try {
-        const u = new URL(url);
-        if (window.location.protocol === 'file:') return u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
-        return window.location.origin + u.pathname;
-    } catch {
-        return url;
-    }
-}
-
-// MAIN LOAD FUNCTION
-window.loadProject = function(url, btnElement) {
-    playClickSound();
-    els.loader.classList.remove('hidden');
-    els.empty.classList.add('hidden');
-    
-    document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
-    if (btnElement) btnElement.classList.add('active');
-    
-    // Check if Split View is active (variables set by app.js)
-    const targetFrame = (window.splitViewEnabled && window.currentActivePane === 'right') ? els.frame2 : els.frame;
-    
-    targetFrame.src = convertToLocalHostUrl(url);
-    targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
-    
-    const site = allSites.find(s => convertToLocalHostUrl(s.url) === convertToLocalHostUrl(url) || s.url === url);
-    if (site) {
-        // Call the history function from app.js
-        if (typeof window.addToHistory === 'function') {
-            window.addToHistory(site.title, site.url);
-        }
-        
-        const projectParam = encodeURIComponent(site.title || site.id || site.url);
-        const newUrl = `${window.location.pathname}?project=${projectParam}`;
-        window.history.pushState({}, '', newUrl);
-    }
-}
-
-// CREATE CARD
-function createCard(site, isPinned) {
-    const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
-    const btn = document.createElement('button');
-    btn.className = 'project-card w-full text-left p-1.5 rounded-lg mb-1 flex items-center gap-2 border border-transparent select-none group';
-    const projectParam = encodeURIComponent(site.title || site.id || site.url);
-    const shareableLink = `${window.location.origin}${window.location.pathname}?project=${projectParam}`;
-    btn.innerHTML = `
-    <div class="w-7 h-7 rounded bg-[#18181b] border border-[#27272a] overflow-hidden shrink-0 relative">
-    <img src="${screenshot}" class="screenshot-img w-full h-full object-cover" loading="lazy"
-    onload="this.classList.add('loaded')" onerror="this.style.display='none'">
-    <div class="absolute inset-0 flex items-center justify-center bg-[#18181b] -z-10">
-    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#a1a1aa]">
-    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 14 22l7-4A2 2 0 0 0 21 16z"></path>
-    </svg>
-    </div>
-    </div>
-    <div class="min-w-0 flex-1 hide-on-collapse">
-    <div class="title-text text-xs font-medium truncate leading-tight group-hover:text-white transition-colors">${site.title || 'Untitled'}</div>
-    <div class="text-[9px] text-[#a1a1aa] truncate mt-0.5 group-hover:text-gray-300">Project</div>
-    </div>
-    <div class="flex items-center gap-1 hide-on-collapse">
-    <button onclick="copyProjectLink(event, '${shareableLink}', this)"
-    class="copy-btn p-1 rounded text-[#a1a1aa] hover:text-white transition-colors"
-    title="Copy shareable link">
-    <i data-lucide="link" class="w-3 h-3"></i>
-    </button>
-    <div onclick="togglePin('${site.id || site.url}', event)"
-    class="pin-toggle-btn p-1 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white transition-opacity ${isPinned ? 'is-pinned text-primary' : ''}">
-    <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i>
-    </div>
-    </div>
-    `;
-    btn.onclick = (e) => {
-        if (!e.target.closest('.copy-btn') && !e.target.closest('[onclick*="togglePin"]')) {
-            loadProject(site.url, btn);
-        }
-    };
-    return btn;
-}
-
-// RENDER PROJECTS
-function renderProjects() {
-    els.list.innerHTML = '';
-    els.pinnedList.innerHTML = '';
-    const pinned = [];
-    const others = [];
-    allSites.forEach(site => {
-        const id = site.id || site.url;
-        if (pinnedIds.includes(id)) pinned.push(site);
-        else others.push(site);
-    });
-    if (pinned.length > 0) {
-        els.pinnedSection.classList.remove('hidden');
-        pinned.forEach(site => els.pinnedList.appendChild(createCard(site, true)));
-    } else {
-        els.pinnedSection.classList.add('hidden');
-    }
-    others.forEach(site => els.list.appendChild(createCard(site, false)));
-    lucide.createIcons();
-}
-
-function loadProjectFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectParam = urlParams.get('project');
-    if (projectParam && allSites.length > 0) {
-        const decodedParam = decodeURIComponent(projectParam);
-        const project = allSites.find(site =>
-            site.title === decodedParam ||
-            site.id === decodedParam ||
-            site.url === decodedParam ||
-            (site.title || '').toLowerCase() === decodedParam.toLowerCase()
-        );
-        if (project) {
-            setTimeout(() => {
-                const projectCard = Array.from(document.querySelectorAll('.project-card'))
-                    .find(card => card.textContent.includes(project.title));
-                loadProject(project.url, projectCard);
-            }, 300);
-        }
-    }
-}
-
-// FIREBASE LISTENER
-onValue(ref(db, 'sites'), (snapshot) => {
-    const data = snapshot.val();
-    if (!data) {
-        els.list.innerHTML = '<div class="p-3 text-center text-[10px] text-[#a1a1aa]">No projects found</div>';
-        return;
-    }
-    allSites = Object.entries(data)
-        .map(([key, value]) => ({ ...value, id: key || value.url }))
-        .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-    renderProjects();
-    loadProjectFromURL();
-});
-
-// SEARCH
-els.search.oninput = (e) => {
-    const q = e.target.value.toLowerCase();
-    document.querySelectorAll('.project-card').forEach(btn => {
-        const text = btn.innerText.toLowerCase();
-        btn.style.display = text.includes(q) ? 'flex' : 'none';
-    });
-};
-
-// PIN TOGGLE
-window.togglePin = function(id, e) {
-    e.stopPropagation();
-    if (pinnedIds.includes(id)) pinnedIds = pinnedIds.filter(pid => pid !== id);
-    else pinnedIds.push(id);
-    localStorage.setItem('pinnedProjects', JSON.stringify(pinnedIds));
-    renderProjects();
-}
-
-// COPY LINK
-window.copyProjectLink = function(event, link, buttonElement) {
-    event.stopPropagation();
-    navigator.clipboard.writeText(link).then(() => {
-        const icon = buttonElement.querySelector('i');
-        const originalIcon = icon.outerHTML;
-        buttonElement.classList.add('copied');
-        icon.outerHTML = '<i data-lucide="check" class="w-3 h-3"></i>';
-        lucide.createIcons();
-        setTimeout(() => {
-            buttonElement.classList.remove('copied');
-            buttonElement.querySelector('i').outerHTML = originalIcon;
-            lucide.createIcons();
-        }, 2000);
-    }).catch(err => {
-        console.error('Failed to copy link:', err);
-        alert(' copied link to clipboard');
-    });
-};
-
-// COMMAND PALETTE
-document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        els.cmdPalette.classList.remove('hidden');
-        els.cmdInput.focus();
-        setTimeout(() => document.getElementById('cmdContent').classList.remove('scale-95', 'opacity-0'), 10);
-    }
-    if (e.key === 'Escape') closeCmd();
-});
-function closeCmd() {
-    document.getElementById('cmdContent').classList.add('scale-95', 'opacity-0');
-    setTimeout(() => els.cmdPalette.classList.add('hidden'), 200);
-}
-els.cmdPalette.addEventListener('click', (e) => {
-    if (e.target === els.cmdPalette) closeCmd();
-});
-els.cmdInput.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase();
-    const results = allSites.filter(s => (s.title || '').toLowerCase().includes(q));
-    els.cmdResults.innerHTML = results.slice(0, 5).map(site => `
-    <button onclick="loadProjectFromCmd('${site.url}')" class="w-full text-left p-2 rounded hover:bg-[#27272a] flex items-center justify-between group">
-    <span class="text-sm text-gray-300 group-hover:text-white">${site.title}</span>
-    <span class="text-[10px] text-gray-500">Jump to</span>
-    </button>
-    `).join('');
-});
-window.loadProjectFromCmd = (url) => { loadProject(url); closeCmd(); };
-
-// STATIC BUTTONS
-document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
-document.getElementById('homeBtn').onclick = () => {
-    els.loader.classList.remove('hidden');
-    els.empty.classList.add('hidden');
-    
-    // Uses variable from app.js if split view is active
-    const targetFrame = (window.splitViewEnabled && window.currentActivePane === 'right') ? els.frame2 : els.frame;
-    
-    targetFrame.src = '/index.html';
-    targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
-    
-    if (typeof window.addToHistory === 'function') window.addToHistory('Home', '/index.html');
-    window.history.pushState({}, '', window.location.pathname);
-};
-document.getElementById('fullscreenBtn').onclick = () => {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
-    else if (document.exitFullscreen) document.exitFullscreen();
-};
-</script>
-<script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
-<script src="/test/darky.js"></script>
- <!-- MOBILE REDIRECTION SCRIPT -->
-   <script src="/test/redirect.js"></script>
-        
 </body>
-</html> 
+</html>
