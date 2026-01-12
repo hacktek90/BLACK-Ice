@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -246,10 +247,18 @@ pointer-events: auto;
     background: rgba(59,130,246,0.1);
     color: #60a5fa;
 }
+    body { overflow: auto; }
+main { overflow: hidden; min-height: 0; }
+.split-pane { min-height: 0; }
+
 </style>
 </head>
 <body class="h-screen w-screen flex bg-transparent">
     <script defer src="https://unpkg.com/lucide@latest"></script>
+<script defer src="https://unpkg.com/quicklink/dist/quicklink.umd.js"></script>
+<script defer>
+window.addEventListener('load', () => window.quicklink && quicklink());
+</script>
     <script type="module" defer>
 import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate@1.0.0/index.min.js';
 window.autoAnimate = autoAnimate;
@@ -716,4 +725,4 @@ document.getElementById('fullscreenBtn').onclick = () => {
    <script src="/test/redirect.js"></script>
         
 </body>
-</html>
+</html> 
