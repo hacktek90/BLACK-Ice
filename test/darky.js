@@ -2,11 +2,11 @@
     class DarkyWidget {
         constructor(options = {}) {
             this.options = {
-                bottom: options.bottom || '32px',
+                top: options.top || '32px', // Default to top
                 right: options.right || '32px',
                 left: options.left || 'unset',
-                saveState: options.saveState !== false, // Default: true (remember choice)
-                autoMatchOs: options.autoMatchOs === true, // CHANGED: Default false (manual only)
+                saveState: options.saveState !== false,
+                autoMatchOs: options.autoMatchOs === true,
             };
             this.init();
         }
@@ -23,7 +23,7 @@
                 /* WIDGET STYLES */
                 .dw-widget {
                     position: fixed;
-                    bottom: ${this.options.bottom};
+                    top: ${this.options.top};
                     right: ${this.options.right};
                     left: ${this.options.left};
                     width: 32px;
@@ -98,7 +98,6 @@
             const saved = localStorage.getItem('dw-theme');
             const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            // LOGIC CHANGED: Only use system preference if autoMatchOs is explicitly TRUE
             if (saved === 'dark') {
                 document.documentElement.classList.add('dw-dark-mode');
             } else if (!saved && this.options.autoMatchOs && system) {
@@ -117,8 +116,12 @@
                 startX = x; startY = y;
                 const rect = this.widget.getBoundingClientRect();
                 initialLeft = rect.left; initialTop = rect.top;
-                this.widget.style.bottom = 'auto'; this.widget.style.right = 'auto';
-                this.widget.style.left = initialLeft + 'px'; this.widget.style.top = initialTop + 'px';
+                
+                // Clear initial positioning for smooth drag
+                this.widget.style.bottom = 'auto'; 
+                this.widget.style.right = 'auto';
+                this.widget.style.left = initialLeft + 'px'; 
+                this.widget.style.top = initialTop + 'px';
             };
 
             const move = (e, x, y) => {
@@ -156,16 +159,13 @@
         new DarkyWidget();
     }
 })();
-// ASCII credit 
 
-        // 1. ASCII ART LOGO
-        const asciiLogo = `
+// Console Credits
+const asciiLogo = `
     ▄▀█ ▀▄▀ █▀█ ▄▀█ █▀▄ █▀▀ █▀█
     █▀█ █░█ █▀▄ █▀█ █▄▀ ██▄ █▀▄`;
 
-        // 2. TECHIE DESCRIPTION
-        // Formatted to look like a system boot sequence or terminal status output
-        const description = `
+const description = `
 // SYSTEM STATUS: ONLINE
 // PROTOCOL: BLACKICE ACADEMY
 ---------------------------------------------------
@@ -175,31 +175,9 @@
 ---------------------------------------------------
 >> INITIATE TRAINING SEQUENCE BELOW:`;
 
-        // 3. STYLES
-        // Neon Green style for the logo
-        const logoStyle = [
-            'color: #00ff41',
-            'font-weight: bold',
-            'font-family: monospace',
-            'font-size: 20px',
-            'text-shadow: 0 0 10px #00ff41'
-        ].join(';');
+const logoStyle = 'color: #00ff41; font-weight: bold; font-family: monospace; font-size: 20px; text-shadow: 0 0 10px #00ff41';
+const descStyle = 'color: #00ffff; font-family: monospace; font-size: 12px; line-height: 1.5';
 
-        // Cyan/Blue style for the tech info
-        const descStyle = [
-            'color: #00ffff', 
-            'font-family: monospace',
-            'font-size: 12px',
-            'line-height: 1.5'
-        ].join(';');
-
-        // 4. EXECUTION
-        // Log the Logo
-        console.log('%c' + asciiLogo, logoStyle);
-        
-        // Log the Description
-        console.log('%c' + description, descStyle);
-        
-        // Log the Link (Left unstyled to ensure it remains clickable in all browsers)
-        console.log('https://blackice-ac.vercel.app/');
-   
+console.log('%c' + asciiLogo, logoStyle);
+console.log('%c' + description, descStyle);
+console.log('https://blackice-ac.vercel.app/');
