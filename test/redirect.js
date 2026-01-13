@@ -1,19 +1,24 @@
-(function() {
+(function () {
+  const VERCEL_HOST = "blackice-ac.vercel.app";
+  const VERCEL_HOME = "https://blackice-ac.vercel.app/Home.html";
 
-// Basic mobile detection regex
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+    .test(navigator.userAgent);
 
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  const isSmallScreen = window.innerWidth <= 768;
+  const isMobile = isMobileUA || isSmallScreen;
 
-window.location.href = "/mobile.html";
+  const currentHost = window.location.hostname;
+  const currentPath = window.location.pathname;
 
-}
+  // 1️⃣ Redirect ANY non-Vercel domain to Vercel Home
+  if (currentHost !== VERCEL_HOST) {
+    window.location.replace(VERCEL_HOME);
+    return; // stop further execution
+  }
 
-// Fallback: Check screen width
-
-if(window.innerWidth <= 768) {
-
-window.location.href = "/mobile.html";
-
-}
-
+  // 2️⃣ Mobile redirect (only on Vercel)
+  if (isMobile && currentPath !== "/mobile.html") {
+    window.location.replace("/mobile.html");
+  }
 })();
