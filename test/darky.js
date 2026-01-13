@@ -2,9 +2,7 @@
     class DarkyWidget {
         constructor(options = {}) {
             this.options = {
-                top: options.top || '32px', // Default to top
-                right: options.right || '32px',
-                left: options.left || 'unset',
+                side: options.side || 'right', 
                 saveState: options.saveState !== false,
                 autoMatchOs: options.autoMatchOs === true,
             };
@@ -19,44 +17,46 @@
         }
 
         injectStyles() {
+            const isRight = this.options.side === 'right';
             const css = `
-                /* WIDGET STYLES */
+                /* MINI SIDE TAB */
                 .dw-widget {
                     position: fixed;
-                    top: ${this.options.top};
-                    right: ${this.options.right};
-                    left: ${this.options.left};
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
-                    cursor: grab;
+                    top: 50%;
+                    ${isRight ? 'right: 0;' : 'left: 0;'}
+                    transform: translateY(-50%);
+                    width: 24px;   /* Smaller width */
+                    height: 34px;  /* Smaller height */
+                    border-radius: ${isRight ? '4px 0 0 4px' : '0 4px 4px 0'};
+                    cursor: pointer;
                     z-index: 2147483647;
                     background-color: #fff; 
                     mix-blend-mode: difference;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                    box-shadow: 0 0 5px rgba(0,0,0,0.1);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    touch-action: none; 
+                    transition: width 0.2s, background-color 0.4s;
                     user-select: none;
-                    transition: transform 0.1s, background-color 0.4s;
                     -webkit-tap-highlight-color: transparent;
                 }
-                .dw-widget:active { cursor: grabbing; transform: scale(0.9); }
+                
+                .dw-widget:hover {
+                    width: 28px; /* Subtle growth on hover */
+                }
 
-                /* ICONS (22px) */
                 .dw-icon {
-                    width: 22px; height: 22px; position: absolute;
-                    top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    width: 16px; height: 16px; /* Scaled down icon */
+                    position: absolute;
                     transition: opacity 0.4s, transform 0.4s; pointer-events: none;
                 }
-                .dw-icon-moon { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); fill: #000; }
-                .dw-icon-sun { opacity: 0; transform: translate(-50%, -50%) rotate(-90deg); fill: #fff; }
+                .dw-icon-moon { opacity: 1; fill: #000; }
+                .dw-icon-sun { opacity: 0; fill: #fff; }
                 
                 /* DARK MODE FILTER */
                 html.dw-dark-mode { filter: invert(1) hue-rotate(180deg); transition: filter 0.4s ease; }
                 
-                /* RE-INVERSION LIST */
+                /* RE-INVERSION */
                 html.dw-dark-mode img, 
                 html.dw-dark-mode video, 
                 html.dw-dark-mode .dw-ignore,
@@ -64,9 +64,9 @@
                     filter: invert(1) hue-rotate(180deg);
                 }
                 
-                html.dw-dark-mode .dw-widget { background-color: #000; box-shadow: 0 4px 10px rgba(255,255,255,0.2); }
-                html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: translate(-50%, -50%) rotate(90deg); }
-                html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }
+                html.dw-dark-mode .dw-widget { background-color: #000; }
+                html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: scale(0.6) rotate(45deg); }
+                html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: scale(1) rotate(0deg); }
             `;
             const style = document.createElement('style');
             style.type = 'text/css';
@@ -80,7 +80,7 @@
             this.widget.id = 'dw-widget';
             
             const moonSvg = `<svg class="dw-icon dw-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
-            const sunSvg = `<svg class="dw-icon dw-icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
+            const sunSvg = `<svg class="dw-icon dw-icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3" stroke="white" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="white" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="white" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="white" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="white" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="white" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="white" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="white" stroke-width="2"/></svg>`;
 
             this.widget.innerHTML = moonSvg + sunSvg;
             document.body.appendChild(this.widget);
@@ -96,60 +96,15 @@
 
         checkPreference() {
             const saved = localStorage.getItem('dw-theme');
-            const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
             if (saved === 'dark') {
                 document.documentElement.classList.add('dw-dark-mode');
-            } else if (!saved && this.options.autoMatchOs && system) {
+            } else if (!saved && this.options.autoMatchOs && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.documentElement.classList.add('dw-dark-mode');
             }
         }
 
         attachEvents() {
-            let isDragging = false;
-            let hasMoved = false;
-            let startX, startY, initialLeft, initialTop;
-
-            const start = (e, x, y) => {
-                isDragging = true;
-                hasMoved = false;
-                startX = x; startY = y;
-                const rect = this.widget.getBoundingClientRect();
-                initialLeft = rect.left; initialTop = rect.top;
-                
-                // Clear initial positioning for smooth drag
-                this.widget.style.bottom = 'auto'; 
-                this.widget.style.right = 'auto';
-                this.widget.style.left = initialLeft + 'px'; 
-                this.widget.style.top = initialTop + 'px';
-            };
-
-            const move = (e, x, y) => {
-                if (!isDragging) return;
-                if(e.cancelable) e.preventDefault();
-                const dx = x - startX; const dy = y - startY;
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
-                let newL = initialLeft + dx; let newT = initialTop + dy;
-                const maxL = window.innerWidth - this.widget.offsetWidth;
-                const maxT = window.innerHeight - this.widget.offsetHeight;
-                if (newL < 0) newL = 0; if (newT < 0) newT = 0;
-                if (newL > maxL) newL = maxL; if (newT > maxT) newT = maxT;
-                this.widget.style.left = newL + 'px'; this.widget.style.top = newT + 'px';
-            };
-
-            const end = () => {
-                if (!isDragging) return;
-                isDragging = false;
-                if (!hasMoved) this.toggleTheme();
-            };
-
-            this.widget.addEventListener('mousedown', e => start(e, e.clientX, e.clientY));
-            document.addEventListener('mousemove', e => move(e, e.clientX, e.clientY));
-            document.addEventListener('mouseup', end);
-
-            this.widget.addEventListener('touchstart', e => start(e, e.touches[0].clientX, e.touches[0].clientY), {passive:false});
-            document.addEventListener('touchmove', e => move(e, e.touches[0].clientX, e.touches[0].clientY), {passive:false});
-            document.addEventListener('touchend', end);
+            this.widget.addEventListener('click', () => this.toggleTheme());
         }
     }
 
@@ -160,24 +115,8 @@
     }
 })();
 
-// Console Credits
+// Credits
 const asciiLogo = `
     ▄▀█ ▀▄▀ █▀█ ▄▀█ █▀▄ █▀▀ █▀█
     █▀█ █░█ █▀▄ █▀█ █▄▀ ██▄ █▀▄`;
-
-const description = `
-// SYSTEM STATUS: ONLINE
-// PROTOCOL: BLACKICE ACADEMY
----------------------------------------------------
-[+] TARGET:      Ethical Hacking & Cyberwarfare Mastery
-[+] MODULES:     Offensive Ops | Red Teaming | CTF
-[+] CLEARANCE:   Client Access Granted By Subho
----------------------------------------------------
->> INITIATE TRAINING SEQUENCE BELOW:`;
-
-const logoStyle = 'color: #00ff41; font-weight: bold; font-family: monospace; font-size: 20px; text-shadow: 0 0 10px #00ff41';
-const descStyle = 'color: #00ffff; font-family: monospace; font-size: 12px; line-height: 1.5';
-
-console.log('%c' + asciiLogo, logoStyle);
-console.log('%c' + description, descStyle);
-console.log('https://blackice-ac.vercel.app/');
+console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: monospace;');
