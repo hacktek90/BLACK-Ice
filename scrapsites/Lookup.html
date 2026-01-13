@@ -6,166 +6,508 @@
     <title>Identity Scanner // Swiss Minimal</title>
     <meta name="theme-color" content="#F4F4F4">
 
-    <!-- FONTS: Inter Tight for that Neo-Grotesque Swiss look -->
+    <!-- FONTS: Inter Tight for Neo-Grotesque Swiss look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Inter Tight"', 'sans-serif'],
-                    },
-                    colors: {
-                        'swiss-red': '#FF3333', /* International Style Red */
-                        'swiss-bg': '#F4F4F4',
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
-        body {
-            background-color: var(--swiss-bg);
-            color: #111;
+        :root {
+            --swiss-red: #FF3333;
+            --swiss-bg: #F4F4F4;
+            --text-primary: #111111;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --border-color: rgba(0, 0, 0, 0.05);
+            --grid-color: rgba(0, 0, 0, 0.06);
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--swiss-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        ::selection {
+            background: var(--text-primary);
+            color: white;
+        }
+
         /* Grid Guidelines (The soul of Swiss Design) */
         .grid-line {
             position: absolute;
-            background-color: rgba(0,0,0,0.06);
+            background-color: var(--grid-color);
             pointer-events: none;
             z-index: 0;
         }
 
-        /* Interactive Elements */
+        .grid-line.vertical {
+            width: 1px;
+            top: 0;
+            bottom: 0;
+        }
+
+        .grid-line.horizontal {
+            height: 1px;
+            left: 0;
+            right: 0;
+        }
+
+        .grid-line.v1 { left: 25%; }
+        .grid-line.v2 { left: 50%; }
+        .grid-line.v3 { left: 75%; }
+        .grid-line.h1 { top: 120px; }
+        .grid-line.h2 { bottom: 80px; }
+
+        @media (max-width: 768px) {
+            .grid-line.vertical { display: none; }
+        }
+
+        /* Main Container */
+        main {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 769px) {
+            main {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: 120px 1fr;
+            }
+        }
+
+        /* Header */
+        header {
+            grid-column: span 4;
+            height: 120px;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @media (min-width: 769px) {
+            header { padding: 0 3rem; }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--swiss-red);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.9); }
+        }
+
+        .header-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+        }
+
+        .header-status {
+            display: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        @media (min-width: 769px) {
+            .header-status { display: block; }
+        }
+
+        /* Sections */
+        .section-speed {
+            grid-column: span 4;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        @media (min-width: 769px) {
+            .section-speed {
+                grid-column: span 2;
+                padding: 4rem 3rem;
+                border-bottom: none;
+                border-right: 1px solid var(--border-color);
+            }
+        }
+
+        .section-network {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 769px) {
+            .section-network { grid-column: span 2; }
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        /* Speed Display */
+        .speed-display {
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+        }
+
+        .speed-value {
+            font-size: 6rem;
+            line-height: 0.9;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.03em;
+            margin-left: -4px;
+        }
+
+        @media (min-width: 769px) {
+            .speed-value { font-size: 8rem; }
+        }
+
+        .speed-unit {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 1px;
+            background-color: #E5E7EB;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: var(--swiss-red);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .net-type {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        /* Action Button */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0;
+            margin-top: 3rem;
+            transition: color 0.2s ease;
+        }
+
+        @media (min-width: 769px) {
+            .action-btn { margin-top: 0; }
+        }
+
+        .action-btn:hover { color: var(--swiss-red); }
+        .action-btn:hover .action-line { background-color: var(--swiss-red); }
+
+        .action-line {
+            width: 2rem;
+            height: 1px;
+            background-color: var(--text-primary);
+            transition: background-color 0.2s ease;
+        }
+
+        /* Network Identity Section */
+        .network-identity {
+            flex-grow: 1;
+            padding: 3rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        @media (min-width: 769px) {
+            .network-identity { padding: 3rem; }
+        }
+
+        .ip-display {
+            font-size: 2.25rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            word-break: break-all;
+        }
+
+        @media (min-width: 769px) {
+            .ip-display { font-size: 3rem; }
+        }
+
+        .isp-display {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Action Link */
         .action-link {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-top: 2rem;
             position: relative;
             padding-bottom: 2px;
         }
+
         .action-link::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 0%;
+            width: 0;
             height: 1px;
-            background-color: #FF3333;
+            background-color: var(--swiss-red);
             transition: width 0.3s ease;
         }
-        .action-link:hover::after {
-            width: 100%;
+
+        .action-link:hover::after { width: 100%; }
+
+        /* Data Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex-grow: 1;
         }
 
-        .metric-value {
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -0.02em;
+        .data-cell {
+            padding: 1.5rem;
         }
+
+        @media (min-width: 769px) {
+            .data-cell { padding: 3rem; }
+        }
+
+        .data-cell:first-child {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .data-item {
+            margin-top: 1rem;
+        }
+
+        .data-item:first-child { margin-top: 0; }
+
+        .data-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .data-value {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .data-value.small { font-size: 1.125rem; }
+
+        .map-link {
+            display: none;
+            font-size: 0.75rem;
+            color: var(--swiss-red);
+            text-decoration: none;
+            margin-top: 0.5rem;
+        }
+
+        .map-link:hover { text-decoration: underline; }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 10;
+            height: 80px;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (min-width: 769px) {
+            footer { padding: 0 3rem; }
+        }
+
+        .footer-secure {
+            display: none;
+            font-family: monospace;
+            text-transform: uppercase;
+        }
+
+        @media (min-width: 769px) {
+            .footer-secure { display: block; }
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen w-screen overflow-x-hidden relative selection:bg-black selection:text-white flex flex-col">
+<body>
 
     <!-- THE GRID (Visualized) -->
-    <div class="hidden md:block grid-line top-0 bottom-0 left-[25%] w-px"></div>
-    <div class="hidden md:block grid-line top-0 bottom-0 left-[50%] w-px"></div>
-    <div class="hidden md:block grid-line top-0 bottom-0 left-[75%] w-px"></div>
-    <div class="grid-line left-0 right-0 top-[120px] h-px"></div>
-    <div class="grid-line left-0 right-0 bottom-[80px] h-px"></div>
+    <div class="grid-line vertical v1"></div>
+    <div class="grid-line vertical v2"></div>
+    <div class="grid-line vertical v3"></div>
+    <div class="grid-line horizontal h1"></div>
+    <div class="grid-line horizontal h2"></div>
 
     <!-- MAIN CONTENT -->
-    <main class="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:grid md:grid-cols-4 md:grid-rows-[120px_1fr]">
+    <main>
 
         <!-- HEADER -->
-        <header class="col-span-4 h-[120px] px-6 md:px-12 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-swiss-red rounded-full animate-pulse"></span>
-                <h1 class="text-sm font-medium tracking-tight uppercase">Identity Scanner v2.0</h1>
+        <header>
+            <div class="header-left">
+                <span class="status-dot"></span>
+                <h1 class="header-title">Identity Scanner v2.0</h1>
             </div>
-            <div class="hidden md:block text-[10px] uppercase tracking-widest text-gray-400 font-mono">
-                System Ready // Awaiting Input
-            </div>
+            <div class="header-status">System Ready // Awaiting Input</div>
         </header>
 
         <!-- COL 1: SPEED TEST -->
-        <section class="col-span-4 md:col-span-2 px-6 md:px-12 py-12 md:py-16 border-b md:border-b-0 md:border-r border-black/5 flex flex-col justify-between">
+        <section class="section-speed">
             <div>
-                <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">01 / Connection Speed</h2>
+                <h2 class="section-title">01 / Connection Speed</h2>
                 
-                <div class="flex items-baseline gap-1">
-                    <span id="speed-value" class="metric-value text-[6rem] md:text-[8rem] leading-[0.9] font-medium -ml-1">0.0</span>
-                    <span class="text-xl text-gray-400 font-normal">Mbps</span>
+                <div class="speed-display">
+                    <span id="speed-value" class="speed-value">0.0</span>
+                    <span class="speed-unit">Mbps</span>
                 </div>
                 
                 <!-- Progress Line -->
-                <div class="w-full h-px bg-gray-200 mt-8 relative overflow-hidden">
-                    <div id="gauge-fill" class="absolute top-0 left-0 h-full bg-swiss-red w-0 transition-all duration-300"></div>
+                <div class="progress-bar">
+                    <div id="gauge-fill" class="progress-fill"></div>
                 </div>
                 
-                <div id="net-type" class="mt-4 text-sm text-gray-500 font-mono">Net Type: Detecting...</div>
+                <div id="net-type" class="net-type">Net Type: Detecting...</div>
             </div>
 
-            <button onclick="runSpeedTest()" id="speed-btn-text" class="group flex items-center gap-4 text-lg font-medium hover:text-swiss-red transition-colors mt-12 md:mt-0">
-                <span class="w-8 h-px bg-black group-hover:bg-swiss-red transition-colors"></span>
-                Run Speed Test
+            <button onclick="runSpeedTest()" id="speed-btn" class="action-btn">
+                <span class="action-line"></span>
+                <span id="speed-btn-text">Run Speed Test</span>
             </button>
         </section>
 
         <!-- COL 2: NETWORK & SYSTEM -->
-        <section class="col-span-4 md:col-span-2 flex flex-col">
+        <section class="section-network">
             
             <!-- ROW 1: NETWORK ID -->
-            <div class="flex-grow px-6 md:px-12 py-12 border-b border-black/5">
-                <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">02 / Network Identity</h2>
+            <div class="network-identity">
+                <h2 class="section-title">02 / Network Identity</h2>
                 
-                <div class="space-y-2">
-                    <div id="ip-text" class="metric-value text-4xl md:text-5xl font-medium tracking-tight break-all">?.?.?.?</div>
-                    <div id="isp-text" class="text-sm text-gray-500">Provider: Unknown</div>
+                <div>
+                    <div id="ip-text" class="ip-display">?.?.?.?</div>
+                    <div id="isp-text" class="isp-display">Provider: Unknown</div>
                 </div>
 
-                <div class="mt-8">
-                    <button onclick="fullScan()" class="action-link text-sm font-medium">Initialize Full System Scan</button>
+                <div>
+                    <button onclick="fullScan()" class="action-link">Initialize Full System Scan</button>
                 </div>
             </div>
 
             <!-- ROW 2: DATA GRID -->
-            <div class="flex-grow grid grid-cols-2">
+            <div class="data-grid">
                 
                 <!-- GPS -->
-                <div class="p-6 md:p-12 border-r border-black/5">
-                    <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">03 / Location</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Latitude</span>
-                            <span id="lat-text" class="text-xl font-medium">0.00</span>
-                        </div>
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Longitude</span>
-                            <span id="long-text" class="text-xl font-medium">0.00</span>
-                        </div>
-                        <a id="map-link" href="#" target="_blank" class="hidden text-xs text-swiss-red hover:underline mt-2">View Map &rarr;</a>
+                <div class="data-cell">
+                    <h2 class="section-title">03 / Location</h2>
+                    <div class="data-item">
+                        <span class="data-label">Latitude</span>
+                        <span id="lat-text" class="data-value">0.00</span>
                     </div>
+                    <div class="data-item">
+                        <span class="data-label">Longitude</span>
+                        <span id="long-text" class="data-value">0.00</span>
+                    </div>
+                    <a id="map-link" href="#" target="_blank" class="map-link">View Map &rarr;</a>
                 </div>
 
                 <!-- SPECS -->
-                <div class="p-6 md:p-12">
-                    <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">04 / Device</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">OS</span>
-                            <span id="os-text" class="text-lg font-medium">-</span>
-                        </div>
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Browser</span>
-                            <span id="browser-text" class="text-lg font-medium">-</span>
-                        </div>
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Display</span>
-                            <span id="screen-text" class="text-lg font-medium">-</span>
-                        </div>
+                <div class="data-cell">
+                    <h2 class="section-title">04 / Device</h2>
+                    <div class="data-item">
+                        <span class="data-label">OS</span>
+                        <span id="os-text" class="data-value small">-</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Browser</span>
+                        <span id="browser-text" class="data-value small">-</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Display</span>
+                        <span id="screen-text" class="data-value small">-</span>
                     </div>
                 </div>
 
@@ -175,9 +517,9 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="relative z-10 h-[80px] w-full max-w-[1600px] mx-auto px-6 md:px-12 flex items-center justify-between text-xs text-gray-400 border-t border-black/5">
+    <footer>
         <div>&copy; 2025 Swiss Series</div>
-        <div class="hidden md:block font-mono uppercase">Secure Connection</div>
+        <div class="footer-secure">Secure Connection</div>
     </footer>
 
 <script>
@@ -185,18 +527,19 @@
     async function runSpeedTest() {
         const speedVal = document.getElementById('speed-value');
         const gauge = document.getElementById('gauge-fill');
-        const btn = document.getElementById('speed-btn-text');
+        const btn = document.getElementById('speed-btn');
+        const btnText = document.getElementById('speed-btn-text');
         const netType = document.getElementById('net-type');
 
         btn.disabled = true;
-        btn.innerHTML = '<span class="w-8 h-px bg-gray-400"></span> Testing...';
-        speedVal.innerText = "0.0";
+        btnText.textContent = 'Testing...';
+        speedVal.textContent = "0.0";
         gauge.style.width = "0%";
 
         if (navigator.connection) {
             const type = navigator.connection.effectiveType || 'Unknown';
             const downlink = navigator.connection.downlink || '?';
-            netType.innerText = `Net Type: ${type.toUpperCase()} (~${downlink} Mbps)`;
+            netType.textContent = `Net Type: ${type.toUpperCase()} (~${downlink} Mbps)`;
         }
 
         const startTime = new Date().getTime();
@@ -222,15 +565,15 @@
             const duration = (endTime - startTime) / 1000;
             const bitsLoaded = receivedLength * 8;
             const speedBps = bitsLoaded / duration;
-            const speedMbps = (speedBps / 1024 / 1024).toFixed(1); // One decimal for cleaner look
+            const speedMbps = (speedBps / 1024 / 1024).toFixed(1);
             
-            speedVal.innerText = speedMbps;
+            speedVal.textContent = speedMbps;
             gauge.style.width = "100%";
-            btn.innerHTML = '<span class="w-8 h-px bg-black group-hover:bg-swiss-red"></span> Test Again';
+            btnText.textContent = 'Test Again';
             btn.disabled = false;
         } catch (e) {
-            speedVal.innerText = "Err";
-            btn.innerHTML = 'Retry';
+            speedVal.textContent = "Err";
+            btnText.textContent = 'Retry';
             btn.disabled = false;
         }
     }
@@ -241,16 +584,16 @@
         try {
             const res = await fetch('https://ipapi.co/json/');
             const data = await res.json();
-            document.getElementById('ip-text').innerText = data.ip || 'Unavailable';
-            document.getElementById('isp-text').innerText = `Provider: ${data.org || 'Unknown'}`;
+            document.getElementById('ip-text').textContent = data.ip || 'Unavailable';
+            document.getElementById('isp-text').textContent = `Provider: ${data.org || 'Unknown'}`;
         } catch(e) {
-            document.getElementById('ip-text').innerText = "Error";
+            document.getElementById('ip-text').textContent = "Error";
         }
 
         // Device Info
-        document.getElementById('os-text').innerText = getOS();
-        document.getElementById('browser-text').innerText = getBrowser();
-        document.getElementById('screen-text').innerText = `${window.screen.width} × ${window.screen.height}`;
+        document.getElementById('os-text').textContent = getOS();
+        document.getElementById('browser-text').textContent = getBrowser();
+        document.getElementById('screen-text').textContent = `${window.screen.width} × ${window.screen.height}`;
 
         // GPS
         if("geolocation" in navigator) {
@@ -258,18 +601,18 @@
                 const lat = pos.coords.latitude.toFixed(4);
                 const long = pos.coords.longitude.toFixed(4);
                 
-                document.getElementById('lat-text').innerText = lat;
-                document.getElementById('long-text').innerText = long;
+                document.getElementById('lat-text').textContent = lat;
+                document.getElementById('long-text').textContent = long;
                 
                 const map = document.getElementById('map-link');
                 map.style.display = "inline-block";
                 map.href = `https://www.google.com/maps?q=${lat},${long}`;
             }, err => {
-                document.getElementById('lat-text').innerText = "Denied";
-                document.getElementById('long-text').innerText = "Denied";
+                document.getElementById('lat-text').textContent = "Denied";
+                document.getElementById('long-text').textContent = "Denied";
             });
         } else {
-            document.getElementById('lat-text').innerText = "N/A";
+            document.getElementById('lat-text').textContent = "N/A";
         }
     }
 
@@ -282,6 +625,7 @@
         if (navigator.userAgent.indexOf("like Mac")!=-1) return "iOS";
         return "Unknown";
     }
+    
     function getBrowser() {
         if (navigator.userAgent.indexOf("Chrome")!=-1) return "Chrome";
         if (navigator.userAgent.indexOf("Firefox")!=-1) return "Firefox";
