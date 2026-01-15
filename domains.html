@@ -4,217 +4,197 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <!-- SEO Meta Tags -->
-  <title>Hosting, Analytics & AI Portal - Manage Your Deployment & Models</title>
-  <meta name="description" content="Centralized dashboard for managing Vercel, Render, and Netlify deployments, accessing advanced AI models like DeepSeek and Qwen, and monitoring analytics via LogRocket and Clarity." />
-  <meta name="keywords" content="Hosting, Vercel, Netlify, Render, AI Models, DeepSeek, Qwen, Z.AI, ERNIE, Kimi AI, Analytics, LogRocket, Microsoft Clarity, Umami, Dashboard, Web Development" />
-  <meta name="author" content="BlackIce" />
-  <meta name="robots" content="index, follow" />
-
-  <!-- Open Graph / Social Media Meta Tags -->
-  <meta property="og:title" content="Hosting, Analytics & AI Portal" />
-  <meta property="og:description" content="A unified dashboard for cloud deployments, generative AI tools, and real-time user analytics." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://blackice-ac.vercel.app/" />
-  <meta property="og:image" content="https://blackice-ac.vercel.app/og-image.jpg" /> <!-- Replace with actual image URL -->
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄️</text></svg>">
-  <!-- Alternatively, link to a real file: <link rel="icon" href="/favicon.ico" /> -->
-
-  <!-- Google Fonts: Inter (The standard for modern UI) -->
+  <!-- SEO & Meta Tags -->
+  <title>Portal | Unified Dashboard</title>
+  <meta name="description" content="Centralized hub for hosting deployments, AI models, and analytics monitoring." />
+  
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
     :root {
-      /* Minimalist Color Palette */
-      --bg-color: #F9FAFB;
-      --card-bg: #FFFFFF;
-      --text-primary: #0f172a; /* Slightly darker for better readability */
-      --text-secondary: #64748b;
-      --accent-color: #2563EB; /* Royal Blue */
-      --border-color: #E2E8F0;
-      --hover-bg: #F1F5F9;
-      
-      /* Spacing & Radius */
-      --radius: 16px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --bg: #ffffff;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #d1d5db;
+      --border-light: #e5e7eb;
+      --accent: #3b82f6;
+      --card-bg: #ffffff;
+      --radius: 12px;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* MODERN FONT STACK */
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-primary);
-      line-height: 1.5; /* Tighter line height for modern feel */
-      padding: 60px 20px;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
     }
 
-    /* LAYOUT CONTAINER */
     .container {
-      max-width: 1100px;
-      margin: 0 auto;
+      max-width: 1200px;
+      width: 100%;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 40px;
+      background: var(--bg);
     }
 
+    /* Header with Bottom Border */
     header {
-      margin-bottom: 60px;
       text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
     }
 
     h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      letter-spacing: -0.03em; /* Modern tight tracking */
-      margin-bottom: 12px;
-      color: var(--text-primary);
+      font-weight: 300;
+      font-size: 2.8rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
     }
 
     .subtitle {
-      color: var(--text-secondary);
-      font-size: 1.125rem;
+      color: var(--text-light);
       font-weight: 400;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
     }
 
-    /* GRID SYSTEM */
+    /* Section Headers with Left Border Line */
     .section-title {
       font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-secondary);
+      letter-spacing: 0.15em;
+      color: var(--text-light);
       font-weight: 600;
-      margin-bottom: 24px;
-      margin-top: 60px;
+      margin: 40px 0 24px 0;
       padding-left: 12px;
-      border-left: 3px solid var(--accent-color);
+      border-left: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .grid-hosting, .grid-ai {
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
+    }
+
+    /* Grid Layouts */
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      margin-bottom: 20px;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      margin-bottom: 24px;
     }
 
     .grid-analytics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     }
 
-    /* CARD COMPONENT */
+    /* Card Design - STATIC */
     .card {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 32px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 28px;
       display: flex;
       flex-direction: column;
+      text-decoration: none;
+      color: inherit;
       position: relative;
+      overflow: hidden;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--accent-color);
-    }
-
-    /* CARD ICONS (SVG) */
+    /* Card Content */
     .icon-wrapper {
-      width: 48px;
-      height: 48px;
-      background: #EFF6FF;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 20px;
-      color: var(--accent-color);
+      color: var(--accent);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+    }
+
+    .icon-wrapper i {
+      width: 22px;
+      height: 22px;
     }
 
     .card h2 {
-      font-size: 1.25rem;
-      font-weight: 600; /* Semi-bold is cleaner than bold for cards */
+      font-size: 1.15rem;
+      font-weight: 600;
       margin-bottom: 8px;
       letter-spacing: -0.01em;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 8px;
     }
 
     .card p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-bottom: 24px;
+      color: var(--text-light);
+      font-size: 0.92rem;
+      margin-bottom: 20px;
+      padding-top: 12px;
       flex-grow: 1;
       line-height: 1.6;
     }
 
-    /* LINKS & BUTTONS */
-    .btn-link {
+    /* Button Styles - STATIC */
+    .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      text-decoration: none;
-      padding: 12px 24px;
-      background: var(--text-primary);
-      color: #fff;
+      padding: 12px 16px;
       border-radius: 8px;
-      font-weight: 500; /* Medium weight for buttons */
+      font-weight: 500;
       font-size: 0.9rem;
-      transition: all 0.2s;
+      text-align: center;
       width: 100%;
+      border: 1px solid var(--border);
     }
 
-    .btn-link:hover {
-      background: #000;
+    .btn-primary {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
     }
-    
-    /* Outline variation for secondary links */
-    .btn-link.outline {
+
+    .btn-outline {
       background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-    }
-    .btn-link.outline:hover {
-      border-color: var(--text-primary);
-      background: var(--hover-bg);
+      color: var(--text);
     }
 
-    /* Responsive Text for small mobile */
-    @media (max-width: 600px) {
-      h1 { font-size: 2.25rem; }
-      .grid-analytics, .grid-hosting, .grid-ai { grid-template-columns: 1fr; }
-      .section-title { margin-top: 40px; }
-      body { padding: 40px 20px; }
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2.2rem; }
+      .grid, .grid-analytics { grid-template-columns: 1fr; }
+      .section-title { margin-top: 30px; }
+      body { padding: 20px 12px; }
+      .container { padding: 24px; }
+      .card { padding: 24px; }
     }
   </style>
-
-  <!-- Scripts (Preserved from original) -->
-  <!-- LogRocket -->
-  <script>
-    window.LogRocket = window.LogRocket || function(){(LogRocket.q = LogRocket.q || []).push(arguments)};
-    LogRocket.init("your/logrocket-id"); 
-  </script>
-
-  <!-- Microsoft Clarity -->
-  <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "YOUR_CLARITY_ID");
-  </script>
 </head>
 
 <body>
@@ -222,153 +202,143 @@
   <div class="container">
     <header>
       <h1>Platform Portal</h1>
-      <p class="subtitle">Manage Hosting, AI Models & Analytics</p>
+      <p class="subtitle">Host • Analyze • Generate</p>
     </header>
 
-    <!-- HOSTING PLATFORMS -->
+    <!-- Deployment Environments -->
     <div class="section-title">Deployment Environments</div>
-    <div class="grid-hosting">
-      <!-- Vercel -->
-      <a href="https://blackice-ac.vercel.app/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+    <div class="grid">
+      <a href="https://blackice-ac.vercel.app/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Globe Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <i data-lucide="globe"></i>
         </div>
         <h2>Vercel</h2>
-        <p>Production deployment platform for frontend frameworks.</p>
-        <div class="btn-link">Visit App</div>
+        <p>Frontend deployment platform for modern web apps.</p>
+        <div class="btn btn-outline">Visit App</div>
       </a>
 
-      <!-- Render -->
-      <a href="https://black-ice-3dbk.onrender.com/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+      <a href="https://black-ice-3dbk.onrender.com/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Server Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          <i data-lucide="server"></i>
         </div>
         <h2>Render</h2>
-        <p>Unified cloud to build and run all your apps and sites.</p>
-        <div class="btn-link">Visit App</div>
+        <p>Cloud platform for apps and sites with zero config.</p>
+        <div class="btn btn-outline">Visit App</div>
       </a>
 
-      <!-- Netlify -->
-      <a href="https://blackiceac.netlify.app/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+      <a href="https://blackiceac.netlify.app/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Cloud Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          <i data-lucide="cloud"></i>
         </div>
         <h2>Netlify</h2>
         <p>Essential platform for modern web development.</p>
-        <div class="btn-link">Visit App</div>
+        <div class="btn btn-outline">Visit App</div>
       </a>
     </div>
 
-    <!-- AI MODELS SECTION -->
+    <!-- AI Models -->
     <div class="section-title">Generative AI Models</div>
-    <div class="grid-ai">
-      <!-- DeepSeek -->
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+    <div class="grid">
+      <a href="https://aistudio.xiaomimimo.com/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Brain Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"></path></svg>
+          <i data-lucide="sparkles"></i>
+        </div>
+        <h2>MiMo AI</h2>
+        <p>Xiaomi's MiMo AI Studio for creative and technical tasks.</p>
+        <div class="btn btn-outline">Start Chat</div>
+      </a>
+
+      <a href="https://chat.deepseek.com/" target="_blank" class="card">
+        <div class="icon-wrapper">
+          <i data-lucide="brain"></i>
         </div>
         <h2>DeepSeek</h2>
         <p>Advanced open-source LLM focused on coding and reasoning.</p>
-        <div class="btn-link">Start Chat</div>
+        <div class="btn btn-outline">Start Chat</div>
       </a>
 
-      <!-- Qwen -->
-      <a href="https://chat.qwen.ai/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+      <a href="https://chat.qwen.ai/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Sparkle/Star Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          <i data-lucide="star"></i>
         </div>
         <h2>Qwen</h2>
-        <p>Alibaba's large language model series for enterprise and creative tasks.</p>
-        <div class="btn-link">Start Chat</div>
+        <p>Alibaba's large language model for enterprise tasks.</p>
+        <div class="btn btn-outline">Start Chat</div>
       </a>
 
-      <!-- Z.AI -->
-      <a href="https://z.ai/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+      <a href="https://z.ai/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Chip/CPU Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+          <i data-lucide="cpu"></i>
         </div>
         <h2>Z.AI</h2>
-        <p>Zhipu AI platform featuring the GLM series of powerful models.</p>
-        <div class="btn-link">Start Chat</div>
-      </a>      <!-- ERNIE (Baidu) -->
-      <a href="https://ernie.baidu.com/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+        <p>Zhipu AI platform with GLM series models.</p>
+        <div class="btn btn-outline">Start Chat</div>
+      </a>
+
+      <a href="https://ernie.baidu.com/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Robot Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+          <i data-lucide="bot"></i>
         </div>
         <h2>ERNIE</h2>
-        <p>Baidu's knowledge-enhanced large language model with strong Chinese and English understanding and multimodal abilities.</p>
-        <div class="btn-link">Start Chat</div>
+        <p>Baidu's knowledge-enhanced multimodal LLM.</p>
+        <div class="btn btn-outline">Start Chat</div>
       </a>
 
-      <!-- Kimi AI -->
-      <a href="https://www.kimi.com/" target="_blank" class="card" style="text-decoration: none; color: inherit;">
+      <a href="https://www.kimi.com/" target="_blank" class="card">
         <div class="icon-wrapper">
-          <!-- Message Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <i data-lucide="message-circle"></i>
         </div>
         <h2>Kimi AI</h2>
-        <p>Moonshot AI's intelligent assistant optimized for long-context analysis.</p>
-        <div class="btn-link">Start Chat</div>
+        <p>Moonshot AI's long-context intelligent assistant.</p>
+        <div class="btn btn-outline">Start Chat</div>
       </a>
     </div>
 
-    <!-- ANALYTICS & TOOLS -->
+    <!-- Analytics & Monitoring -->
     <div class="section-title">Analytics & Monitoring</div>
-    <div class="grid-analytics">
-      
-      <!-- LogRocket -->
+    <div class="grid grid-analytics">
       <div class="card">
         <div class="icon-wrapper">
-          <!-- Video/Camera Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+          <i data-lucide="video"></i>
         </div>
         <h2>LogRocket</h2>
-        <p>Records performance, console errors, and full session replay (like a browser CCTV).</p>
-        <a href="https://app.logrocket.com/r3bczh/blackice-portal" target="_blank" class="btn-link outline">Open Dashboard</a>
+        <p>Session replay, performance monitoring, and error tracking.</p>
+        <a href="https://app.logrocket.com/r3bczh/blackice-portal" target="_blank" class="btn btn-outline">Open Dashboard</a>
       </div>
 
-      <!-- Microsoft Clarity -->
       <div class="card">
         <div class="icon-wrapper">
-          <!-- Activity Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          <i data-lucide="activity"></i>
         </div>
         <h2>Microsoft Clarity</h2>
-        <p>Provides heatmaps, user interactions, click-tracking, and unlimited session recordings.</p>
-        <a href="https://clarity.microsoft.com/projects/view/ujy4ecml45/dashboard" target="_blank" class="btn-link outline">Open Dashboard</a>
+        <p>Heatmaps, click-tracking, and session recordings.</p>
+        <a href="https://clarity.microsoft.com/projects/view/ujy4ecml45/dashboard" target="_blank" class="btn btn-outline">Open Dashboard</a>
       </div>
 
-      <!-- Umami -->
       <div class="card">
         <div class="icon-wrapper">
-          <!-- Map Pin/Analytics Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          <i data-lucide="bar-chart-2"></i>
         </div>
         <h2>Cloud Umami</h2>
-        <p>Privacy-friendly analytics that tracks location, device type, referrers, and real-time metrics with a world map view.</p>
-        <a href="https://cloud.umami.is/analytics/us/websites" target="_blank" class="btn-link outline">Open Dashboard</a>
+        <p>Privacy-focused analytics with real-time metrics.</p>
+        <a href="https://cloud.umami.is/analytics/us/websites" target="_blank" class="btn btn-outline">Open Dashboard</a>
       </div>
 
-      <!-- Crisp -->
       <div class="card">
         <div class="icon-wrapper">
-          <!-- Chat Icon -->
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          <i data-lucide="message-square"></i>
         </div>
         <h2>Crisp</h2>
-        <p>Live chat, co-browsing, and interactive support tools. Guide visitors in real-time with visual cursor highlights.</p>
-        <a href="https://crisp.chat/" target="_blank" class="btn-link outline">Open Dashboard</a>
+        <p>Live chat, co-browsing, and support tools.</p>
+        <a href="https://crisp.chat/" target="_blank" class="btn btn-outline">Open Dashboard</a>
       </div>
-
     </div>
   </div>
+
+  <!-- Initialize Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
 
 </body>
 </html>
