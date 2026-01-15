@@ -576,6 +576,26 @@
           </button>
         </div>
       </div>
+
+      <div class="card card-note">
+        <div class="icon-wrapper">
+          <i data-lucide="git-branch"></i>
+        </div>
+        <h2>Instant GitHub Pages Deploy</h2>
+        <p>Push sites instantly via gh-pages branch using Cloudflare Pages live preview.</p>
+        <div class="note-content">
+          <span class="note-label">Deploy URL</span>
+          <div class="note-value" id="ghPagesUrl">https://black-ice.pages.dev/</div>
+          <button class="copy-btn" id="copyGhPagesBtn">
+            <i data-lucide="copy"></i>
+            <span>Copy</span>
+          </button>
+          <a href="https://livecodes.io/" target="_blank" class="copy-btn" style="margin-top: 8px; text-decoration: none;">
+            <i data-lucide="code"></i>
+            <span>Open IDE</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -681,14 +701,16 @@
       }
     })();
 
-    // Copy DNS Server Functionality
-    (function() {
-      const dnsServer = document.getElementById('dnsServer');
-      const copyBtn = document.getElementById('copyDnsBtn');
+    // Generic Copy Functionality
+    function setupCopyButton(valueId, btnId) {
+      const valueEl = document.getElementById(valueId);
+      const copyBtn = document.getElementById(btnId);
+      if (!valueEl || !copyBtn) return;
+      
       const copyBtnText = copyBtn.querySelector('span');
 
       copyBtn.addEventListener('click', async () => {
-        const textToCopy = dnsServer.textContent;
+        const textToCopy = valueEl.textContent;
 
         try {
           await navigator.clipboard.writeText(textToCopy);
@@ -712,7 +734,11 @@
           console.error('Failed to copy:', err);
         }
       });
-    })();
+    }
+
+    // Initialize all copy buttons
+    setupCopyButton('dnsServer', 'copyDnsBtn');
+    setupCopyButton('ghPagesUrl', 'copyGhPagesBtn');
   </script>
 
 </body>
