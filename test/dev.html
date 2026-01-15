@@ -179,14 +179,216 @@
       text-decoration: none;
     }
 
+    /* PIN Lock Overlay */
+    .pin-lock-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .pin-lock-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .pin-lock-container {
+      text-align: center;
+      padding: 60px 40px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .pin-lock-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #000000;
+    }
+
+    .pin-lock-icon i {
+      width: 32px;
+      height: 32px;
+    }
+
+    .pin-lock-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .pin-lock-subtitle {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+    }
+
+    .pin-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .pin-input {
+      width: 56px;
+      height: 64px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #000000;
+      color: var(--text);
+      font-size: 1.75rem;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 0.1em;
+      transition: border-color 0.2s ease;
+    }
+
+    .pin-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .pin-input.error {
+      border-color: #ef4444;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .pin-error-message {
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      min-height: 22px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .pin-error-message.visible {
+      opacity: 1;
+    }
+
+    .pin-unlock-btn {
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      background: var(--accent);
+      color: #000000;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      width: 100%;
+      max-width: 200px;
+    }
+
+    .pin-unlock-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Notes Section */
+    .grid-notes {
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    }
+
+    .card-note {
+      border-color: var(--accent);
+    }
+
+    .note-content {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .note-label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .note-value {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #000000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+      font-size: 0.95rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .copy-btn:hover {
+      background: var(--border);
+    }
+
+    .copy-btn.copied {
+      background: #22c55e;
+      border-color: #22c55e;
+      color: #000000;
+    }
+
+    .copy-btn i {
+      width: 16px;
+      height: 16px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       h1 { font-size: 2.2rem; }
-      .grid, .grid-analytics { grid-template-columns: 1fr; }
+      .grid, .grid-analytics, .grid-notes { grid-template-columns: 1fr; }
       .section-title { margin-top: 30px; }
       body { padding: 20px 12px; }
       .container { padding: 24px; }
       .card { padding: 24px; }
+      .pin-input { width: 48px; height: 56px; font-size: 1.5rem; }
     }
 
     /* Ensure all text is fully visible */
@@ -199,6 +401,27 @@
 </head>
 
 <body>
+
+  <!-- PIN Lock Overlay -->
+  <div class="pin-lock-overlay" id="pinLockOverlay">
+    <div class="pin-lock-container">
+      <div class="pin-lock-icon">
+        <i data-lucide="lock"></i>
+      </div>
+      <h2 class="pin-lock-title">Access Restricted</h2>
+      <p class="pin-lock-subtitle">Enter your 3-digit PIN to access the portal</p>
+      
+      <div class="pin-error-message" id="pinErrorMessage">Incorrect PIN. Please try again.</div>
+      
+      <div class="pin-inputs">
+        <input type="password" class="pin-input" id="pin1" maxlength="1" inputmode="numeric" autocomplete="off">
+        <input type="password" class="pin-input" id="pin2" maxlength="1" inputmode="numeric" autocomplete="off">
+        <input type="password" class="pin-input" id="pin3" maxlength="1" inputmode="numeric" autocomplete="off">
+      </div>
+      
+      <button class="pin-unlock-btn" id="pinUnlockBtn">Unlock</button>
+    </div>
+  </div>
 
   <div class="container">
     <header>
@@ -334,11 +557,162 @@
         <a href="https://crisp.chat/" target="_blank" class="btn">Open Dashboard</a>
       </div>
     </div>
+
+    <!-- Special Notes -->
+    <div class="section-title">Special Notes</div>
+    <div class="grid grid-notes">
+      <div class="card card-note">
+        <div class="icon-wrapper">
+          <i data-lucide="shield"></i>
+        </div>
+        <h2>DNS-over-TLS/QUIC</h2>
+        <p>Encrypted DNS resolver configuration for enhanced privacy and security.</p>
+        <div class="note-content">
+          <span class="note-label">Server Address</span>
+          <div class="note-value" id="dnsServer">6aaee6.dns.nextdns.io</div>
+          <button class="copy-btn" id="copyDnsBtn">
+            <i data-lucide="copy"></i>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Initialize Lucide Icons -->
   <script>
     lucide.createIcons();
+  </script>
+
+  <!-- PIN Lock Functionality -->
+  <script>
+    (function() {
+      const CORRECT_PIN = '589';
+      
+      const pin1 = document.getElementById('pin1');
+      const pin2 = document.getElementById('pin2');
+      const pin3 = document.getElementById('pin3');
+      const unlockBtn = document.getElementById('pinUnlockBtn');
+      const errorMessage = document.getElementById('pinErrorMessage');
+      const overlay = document.getElementById('pinLockOverlay');
+      
+      function getPin() {
+        return pin1.value + pin2.value + pin3.value;
+      }
+      
+      function checkPin() {
+        const entered = getPin();
+        if (entered.length === 3) {
+          if (entered === CORRECT_PIN) {
+            // Success - unlock
+            overlay.classList.add('hidden');
+            // Clear any stored PIN in session
+            sessionStorage.setItem('portalUnlocked', 'true');
+          } else {
+            // Error - shake and reset
+            [pin1, pin2, pin3].forEach(input => {
+              input.classList.add('error');
+              input.value = '';
+            });
+            errorMessage.classList.add('visible');
+            pin1.focus();
+            
+            // Remove error class after animation
+            setTimeout(() => {
+              [pin1, pin2, pin3].forEach(input => {
+                input.classList.remove('error');
+              });
+            }, 400);
+          }
+        }
+      }
+      
+      function moveToNext(current, next) {
+        if (current.value.length === 1 && next) {
+          next.focus();
+        }
+      }
+      
+      function moveToPrev(current, prev, e) {
+        if (e.key === 'Backspace' && current.value === '' && prev) {
+          prev.focus();
+        }
+      }
+      
+      // Input event listeners
+      pin1.addEventListener('input', () => {
+        errorMessage.classList.remove('visible');
+        moveToNext(pin1, pin2);
+        checkPin();
+      });
+      
+      pin2.addEventListener('input', () => {
+        errorMessage.classList.remove('visible');
+        moveToNext(pin2, pin3);
+        checkPin();
+      });
+      
+      pin3.addEventListener('input', () => {
+        errorMessage.classList.remove('visible');
+        checkPin();
+      });
+      
+      // Keyboard navigation
+      pin1.addEventListener('keydown', (e) => moveToPrev(pin1, null, e));
+      pin2.addEventListener('keydown', (e) => moveToPrev(pin2, pin1, e));
+      pin3.addEventListener('keydown', (e) => moveToPrev(pin3, pin2, e));
+      
+      // Click on unlock button
+      unlockBtn.addEventListener('click', checkPin);
+      
+      // Enter key to submit
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !overlay.classList.contains('hidden')) {
+          checkPin();
+        }
+      });
+      
+      // Auto-focus first PIN input on load
+      setTimeout(() => pin1.focus(), 100);
+      
+      // Check if already unlocked in this session
+      if (sessionStorage.getItem('portalUnlocked') === 'true') {
+        overlay.classList.add('hidden');
+      }
+    })();
+
+    // Copy DNS Server Functionality
+    (function() {
+      const dnsServer = document.getElementById('dnsServer');
+      const copyBtn = document.getElementById('copyDnsBtn');
+      const copyBtnText = copyBtn.querySelector('span');
+
+      copyBtn.addEventListener('click', async () => {
+        const textToCopy = dnsServer.textContent;
+
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+
+          // Visual feedback
+          copyBtn.classList.add('copied');
+          copyBtn.querySelector('i').setAttribute('data-lucide', 'check');
+          copyBtnText.textContent = 'Copied!';
+
+          // Reinitialize icon
+          lucide.createIcons();
+
+          // Reset after 2 seconds
+          setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            copyBtn.querySelector('i').setAttribute('data-lucide', 'copy');
+            copyBtnText.textContent = 'Copy';
+            lucide.createIcons();
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      });
+    })();
   </script>
 
 </body>
