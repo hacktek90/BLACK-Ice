@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swiss Text To Hand | Pro</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- HTML2Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -30,7 +27,24 @@
             --ink-opacity: 1;
         }
         
-        body { font-family: 'Inter Tight', sans-serif; }
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter Tight', sans-serif;
+            background-color: white;
+            color: black;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        ::selection {
+            background-color: var(--accent);
+            color: white;
+        }
         
         /* Font Classes */
         .font-hand-1 { font-family: 'Indie Flower', cursive; }
@@ -101,105 +115,416 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #000; }
-    </style>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'swiss-accent': '#FF4F00',
-                    }
-                }
+        
+        /* Header Styles */
+        .header {
+            width: 100%;
+            border-bottom: 2px solid black;
+            padding: 16px;
+            flex-shrink: 0;
+            background-color: white;
+            z-index: 20;
+        }
+        
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin: 0;
+        }
+        
+        .header h1 span {
+            color: var(--accent);
+        }
+        
+        .header-subtitle {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.4;
+            text-align: right;
+            display: none;
+        }
+        
+        /* Main Layout */
+        .main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 0;
+        }
+        
+        /* Controls Section */
+        .controls {
+            border-bottom: 2px solid black;
+            background-color: white;
+            order: 2;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+        
+        .controls-content {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            opacity: 0.6;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .font-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .font-button {
+            border: 1px solid black;
+            padding: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: white;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .font-button:hover {
+            background-color: black;
+            color: white;
+        }
+        
+        .slider-container {
+            margin-bottom: 24px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .slider-label label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .slider-value {
+            font-size: 0.75rem;
+            font-family: monospace;
+            opacity: 0.5;
+        }
+        
+        .slider-note {
+            font-size: 0.625rem;
+            margin-top: 4px;
+            color: #9ca3af;
+        }
+        
+        .paper-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .paper-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid black;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .paper-button:hover, .paper-button:focus {
+            background-color: var(--accent);
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        .paper-button-lined {
+            background-image: linear-gradient(black 1px, transparent 1px);
+            background-size: 100% 4px;
+        }
+        
+        .paper-button-grid {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjMDAwIi8+PC9zdmc+');
+        }
+        
+        .ink-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .ink-button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .ink-button:hover {
+            transform: scale(1.25);
+        }
+        
+        .ink-black { background-color: black; }
+        .ink-blue { background-color: #1e3a8a; }
+        .ink-red { background-color: #b91c1c; }
+        .ink-green { background-color: #14532d; }
+        .ink-gray { background-color: #6b7280; }
+        
+        /* Preview Section */
+        .preview {
+            background-color: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            order: 1;
+            position: relative;
+            padding-bottom: 80px; /* Space for download button */
+        }
+        
+        .preview-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 16px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        
+        .input-container {
+            width: 100%;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 16px;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            min-height: 100px;
+            font-family: 'Inter Tight', sans-serif;
+            font-size: 0.875rem;
+            resize: vertical;
+            outline: none;
+        }
+        
+        .text-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+        
+        .preview-stage {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .capture-area {
+            background-color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 800px;
+            min-height: 1000px;
+            transition: all 0.1s linear;
+        }
+        
+        .output {
+            font-family: 'Indie Flower', cursive;
+            color: black;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Download Button */
+        .download-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 50;
+            background-color: var(--accent);
+            color: white;
+            padding: 16px 32px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+        }
+        
+        .download-button:hover {
+            background-color: black;
+        }
+        
+        .download-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .header {
+                padding: 24px;
+            }
+            
+            .header h1 {
+                font-size: 3.75rem;
+            }
+            
+            .header-subtitle {
+                display: block;
+            }
+            
+            .controls {
+                border-bottom: none;
+                border-right: 2px solid black;
+                height: calc(100vh - 140px);
+                overflow-y: auto;
+                order: 1;
+            }
+            
+            .preview {
+                order: 2;
+                height: calc(100vh - 140px);
+                overflow-y: auto;
+                padding-bottom: 0;
+            }
+            
+            .main {
+                grid-template-columns: 1fr 2fr;
+            }
+            
+            .download-button {
+                bottom: 40px;
+                right: 40px;
+                padding: 16px 32px;
+                font-size: 1rem;
             }
         }
-    </script>
+        
+        @media (min-width: 1280px) {
+            .main {
+                grid-template-columns: 1fr 3fr;
+            }
+        }
+    </style>
 </head>
-<body class="bg-white text-black min-h-screen flex flex-col selection:bg-swiss-accent selection:text-white">
+<body>
 
     <!-- Header -->
-    <header class="w-full border-b-2 border-black p-4 md:p-6 shrink-0 bg-white z-20">
-        <div class="max-w-[1800px] mx-auto flex justify-between items-end">
-            <h1 class="text-3xl md:text-6xl font-extrabold tracking-tighter uppercase leading-[0.9]">
+    <header class="header">
+        <div class="header-content">
+            <h1>
                 Text To<br>
-                <span class="text-swiss-accent">Handwriting</span>
+                <span>Handwriting</span>
             </h1>
-            <div class="hidden md:block text-xs font-bold uppercase tracking-widest opacity-40 text-right">
-                
+            <div class="header-subtitle">
+                <!-- Empty subtitle -->
             </div>
         </div>
     </header>
 
     <!-- Main Grid -->
-    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0">
+    <main class="main">
         
         <!-- COLUMN 1: CONTROLS (Scrollable) -->
-        <section class="lg:col-span-4 xl:col-span-3 border-b-2 lg:border-b-0 lg:border-r-2 border-black flex flex-col bg-white order-2 lg:order-1 h-full lg:h-[calc(100vh-140px)] lg:overflow-y-auto">
+        <section class="controls">
             
-            <div class="p-6 md:p-8 space-y-10">
+            <div class="controls-content">
                 
                 <!-- 1. Typography Selection -->
                 <div>
-                    <h2 class="text-xs font-bold uppercase tracking-widest mb-4 opacity-60 border-b border-gray-200 pb-2">1. Typeface</h2>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setFont('font-hand-1')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-1 truncate">Indie Flower</button>
-                        <button onclick="setFont('font-hand-2')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-2 truncate">Caveat</button>
-                        <button onclick="setFont('font-hand-3')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-3 truncate">Shadows</button>
-                        <button onclick="setFont('font-hand-4')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-4 truncate">Architects</button>
-                        <button onclick="setFont('font-hand-5')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-5 truncate">Patrick</button>
-                        <button onclick="setFont('font-hand-6')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-6 truncate">Gochi</button>
-                        <button onclick="setFont('font-hand-7')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-7 truncate">Marker</button>
-                        <button onclick="setFont('font-hand-8')" class="border border-black p-2 hover:bg-black hover:text-white transition-colors text-sm font-hand-8 truncate">Reenie</button>
+                    <h2 class="section-title">1. Typeface</h2>
+                    <div class="font-buttons">
+                        <button onclick="setFont('font-hand-1')" class="font-button font-hand-1">Indie Flower</button>
+                        <button onclick="setFont('font-hand-2')" class="font-button font-hand-2">Caveat</button>
+                        <button onclick="setFont('font-hand-3')" class="font-button font-hand-3">Shadows</button>
+                        <button onclick="setFont('font-hand-4')" class="font-button font-hand-4">Architects</button>
+                        <button onclick="setFont('font-hand-5')" class="font-button font-hand-5">Patrick</button>
+                        <button onclick="setFont('font-hand-6')" class="font-button font-hand-6">Gochi</button>
+                        <button onclick="setFont('font-hand-7')" class="font-button font-hand-7">Marker</button>
+                        <button onclick="setFont('font-hand-8')" class="font-button font-hand-8">Reenie</button>
                     </div>
                 </div>
 
                 <!-- 2. Fine Tuning (New Features) -->
                 <div>
-                    <h2 class="text-xs font-bold uppercase tracking-widest mb-6 opacity-60 border-b border-gray-200 pb-2">2. Adjustments</h2>
+                    <h2 class="section-title">2. Adjustments</h2>
                     
-                    <div class="space-y-6">
+                    <div>
                         <!-- Font Size -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase">Size</label>
-                                <span id="val-size" class="text-xs font-mono opacity-50">24px</span>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Size</label>
+                                <span id="val-size" class="slider-value">24px</span>
                             </div>
                             <input type="range" min="12" max="64" value="24" oninput="updateVar('--hand-size', this.value + 'px', 'val-size')">
                         </div>
 
                         <!-- Letter Spacing -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase">Letter Spacing</label>
-                                <span id="val-space" class="text-xs font-mono opacity-50">0px</span>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Letter Spacing</label>
+                                <span id="val-space" class="slider-value">0px</span>
                             </div>
                             <input type="range" min="-2" max="10" step="0.5" value="0" oninput="updateVar('--hand-spacing', this.value + 'px', 'val-space')">
                         </div>
 
                         <!-- Word Spacing -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase">Word Spacing</label>
-                                <span id="val-wspace" class="text-xs font-mono opacity-50">0px</span>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Word Spacing</label>
+                                <span id="val-wspace" class="slider-value">0px</span>
                             </div>
                             <input type="range" min="-5" max="30" step="1" value="0" oninput="updateVar('--word-spacing', this.value + 'px', 'val-wspace')">
                         </div>
 
                         <!-- Line Height (Synced with Lines) -->
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase text-swiss-accent">Line Height</label>
-                                <span id="val-line" class="text-xs font-mono opacity-50">40px</span>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label style="color: var(--accent);">Line Height</label>
+                                <span id="val-line" class="slider-value">40px</span>
                             </div>
                             <input type="range" min="20" max="100" value="40" oninput="updateVar('--line-height', this.value + 'px', 'val-line')">
-                            <p class="text-[10px] mt-1 text-gray-400">*Syncs with paper lines</p>
+                            <p class="slider-note">*Syncs with paper lines</p>
                         </div>
 
                          <!-- Ink Opacity -->
-                         <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase">Ink Flow</label>
-                                <span id="val-flow" class="text-xs font-mono opacity-50">100%</span>
+                         <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Ink Flow</label>
+                                <span id="val-flow" class="slider-value">100%</span>
                             </div>
                             <input type="range" min="0.3" max="1" step="0.1" value="1" oninput="updateVar('--ink-opacity', this.value, 'val-flow', '%')">
                         </div>
@@ -208,27 +533,27 @@
 
                 <!-- 3. Paper Settings -->
                 <div>
-                    <h2 class="text-xs font-bold uppercase tracking-widest mb-4 opacity-60 border-b border-gray-200 pb-2">3. Surface</h2>
+                    <h2 class="section-title">3. Surface</h2>
                     
-                    <div class="flex gap-4 mb-6">
-                        <button onclick="setPaper('paper-plain')" class="w-8 h-8 border border-black hover:bg-swiss-accent focus:ring-2 ring-swiss-accent ring-offset-2"></button>
-                        <button onclick="setPaper('paper-lined')" class="w-8 h-8 border border-black bg-[linear-gradient(black_1px,transparent_1px)] bg-[length:100%_4px] hover:bg-swiss-accent focus:ring-2 ring-swiss-accent ring-offset-2"></button>
-                        <button onclick="setPaper('paper-grid')" class="w-8 h-8 border border-black bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjMDAwIi8+PC9zdmc+')] hover:bg-swiss-accent focus:ring-2 ring-swiss-accent ring-offset-2"></button>
+                    <div class="paper-buttons">
+                        <button onclick="setPaper('paper-plain')" class="paper-button"></button>
+                        <button onclick="setPaper('paper-lined')" class="paper-button paper-button-lined"></button>
+                        <button onclick="setPaper('paper-grid')" class="paper-button paper-button-grid"></button>
                     </div>
 
                     <!-- Margins -->
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase">Top Margin</label>
-                                <span id="val-mt" class="text-xs font-mono opacity-50">48px</span>
+                    <div>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Top Margin</label>
+                                <span id="val-mt" class="slider-value">48px</span>
                             </div>
                             <input type="range" min="0" max="200" value="48" oninput="updateVar('--paper-pt', this.value + 'px', 'val-mt')">
                         </div>
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <label class="text-xs font-bold uppercase">Side Margin</label>
-                                <span id="val-mx" class="text-xs font-mono opacity-50">48px</span>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Side Margin</label>
+                                <span id="val-mx" class="slider-value">48px</span>
                             </div>
                             <input type="range" min="10" max="150" value="48" oninput="updateVar('--paper-px', this.value + 'px', 'val-mx')">
                         </div>
@@ -237,13 +562,13 @@
 
                  <!-- 4. Ink Color -->
                  <div>
-                    <h2 class="text-xs font-bold uppercase tracking-widest mb-4 opacity-60 border-b border-gray-200 pb-2">4. Ink Color</h2>
-                    <div class="flex gap-3">
-                        <button onclick="setInk('text-black')" class="w-6 h-6 rounded-full bg-black border border-gray-300 hover:scale-125 transition-transform"></button>
-                        <button onclick="setInk('text-blue-800')" class="w-6 h-6 rounded-full bg-blue-800 border border-gray-300 hover:scale-125 transition-transform"></button>
-                        <button onclick="setInk('text-red-700')" class="w-6 h-6 rounded-full bg-red-700 border border-gray-300 hover:scale-125 transition-transform"></button>
-                        <button onclick="setInk('text-green-700')" class="w-6 h-6 rounded-full bg-green-700 border border-gray-300 hover:scale-125 transition-transform"></button>
-                        <button onclick="setInk('text-gray-500')" class="w-6 h-6 rounded-full bg-gray-500 border border-gray-300 hover:scale-125 transition-transform"></button>
+                    <h2 class="section-title">4. Ink Color</h2>
+                    <div class="ink-buttons">
+                        <button onclick="setInk('text-black')" class="ink-button ink-black"></button>
+                        <button onclick="setInk('text-blue-800')" class="ink-button ink-blue"></button>
+                        <button onclick="setInk('text-red-700')" class="ink-button ink-red"></button>
+                        <button onclick="setInk('text-green-700')" class="ink-button ink-green"></button>
+                        <button onclick="setInk('text-gray-500')" class="ink-button ink-gray"></button>
                     </div>
                 </div>
 
@@ -252,37 +577,35 @@
 
 
         <!-- COLUMN 2: INPUT & PREVIEW AREA -->
-        <section class="lg:col-span-8 xl:col-span-9 bg-gray-50 flex flex-col items-center order-1 lg:order-2 lg:h-[calc(100vh-140px)] lg:overflow-y-auto relative">
+        <section class="preview">
             
-            <div class="w-full max-w-[900px] p-4 md:p-8 flex flex-col gap-8">
+            <div class="preview-container">
                 
                 <!-- Input Box (Minimal) -->
-                <div class="w-full">
+                <div class="input-container">
                     <textarea 
                         id="textInput" 
                         placeholder="Type your notes here..." 
-                        class="w-full p-4 bg-white border border-gray-300 focus:border-swiss-accent focus:ring-1 focus:ring-swiss-accent outline-none min-h-[100px] font-sans text-sm resize-y"
+                        class="text-input"
                         oninput="updatePreview()"
                     ></textarea>
                 </div>
 
                 <!-- Preview Stage -->
-                <div class="w-full flex justify-center pb-20"> <!-- pb-20 for button space -->
-                    <div id="captureArea" class="bg-white shadow-2xl w-full max-w-[800px] min-h-[1000px] paper-plain transition-all duration-100 ease-linear">
-                        <div id="output" class="font-hand-1 text-black whitespace-pre-wrap break-words w-full h-full"></div>
+                <div class="preview-stage">
+                    <div id="captureArea" class="capture-area paper-plain">
+                        <div id="output" class="output font-hand-1 text-black"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Floating Download Button -->
-            <div class="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50">
-                <button onclick="downloadImage()" class="bg-swiss-accent text-white px-8 py-4 text-sm md:text-base font-bold uppercase tracking-widest hover:bg-black transition-colors shadow-xl flex items-center gap-3">
-                    Download
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                </button>
-            </div>
+            <button onclick="downloadImage()" class="download-button">
+                Download
+                <svg xmlns="http://www.w3.org/2000/svg" class="download-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+            </button>
 
         </section>
 
