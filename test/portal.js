@@ -254,6 +254,14 @@
         opacity: 0; pointer-events: none; transition: opacity 0.4s;
         }
         #bi-overlay.visible { opacity: 1; pointer-events: auto; }
+        
+        /* CRISP CHAT Z-INDEX FIX */
+        #crisp-chatbox {
+        z-index: 2147483648 !important;
+        }
+        .crisp-client .crisp-1s7z6t4 {
+        z-index: 2147483648 !important;
+        }
         `;
         const s = document.createElement('style');
         s.textContent = css;
@@ -343,8 +351,25 @@
         };
         
         document.getElementById('bi-chat-btn').onclick = () => {
+        // Close iframe if open
+        const container = document.getElementById('bi-iframe-container');
+        if (container.classList.contains('active')) {
+            this.closeProject();
+        }
+        
+        // Open chat
         window.$crisp.push(["do", "chat:open"]);
         window.$crisp.push(["do", "chat:show"]);
+        
+        // Ensure chat is on top
+        setTimeout(() => {
+            const chatElements = document.querySelectorAll('[class*="crisp-"]');
+            chatElements.forEach(el => {
+                if (el.style.zIndex) {
+                    el.style.zIndex = '2147483648';
+                }
+            });
+        }, 100);
         };
         
         document.getElementById('bi-search').oninput = (e) => {
@@ -529,6 +554,9 @@
         container.classList.add('active');
         
         document.body.style.overflow = 'hidden';
+        
+        // Hide chat when opening a project
+        window.$crisp.push(["do", "chat:hide"]);
         
         // If the sidebar is open, close it (optional, depends on UX preference)
         if(this.isOpen) this.toggle();
