@@ -122,12 +122,6 @@
       color: inherit;
       position: relative;
       overflow: hidden;
-      transition: all 0.2s ease;
-    }
-
-    .card:hover {
-      border-color: var(--accent);
-      background: #111111;
     }
 
     /* Card Content */
@@ -168,7 +162,7 @@
       line-height: 1.6;
     }
 
-    /* Button Styles - PURE BLACK */
+    /* Button Styles - PURE BLACK - NO HOVER */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -180,15 +174,9 @@
       text-align: center;
       width: 100%;
       border: 1px solid var(--border);
-      transition: all 0.2s ease;
- background: #000000;
+      background: #000000;
       color: var(--text);
-    }
-
-    .btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: #0a0a0a;
+      text-decoration: none;
     }
 
     /* Responsive */
@@ -199,24 +187,6 @@
       body { padding: 20px 12px; }
       .container { padding: 24px; }
       .card { padding: 24px; }
-    }
-
-    /* Pure Black Enhancements */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--border);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .card:hover::before {
-      opacity: 1;
-      background: var(--accent);
     }
 
     /* Ensure all text is fully visible */
