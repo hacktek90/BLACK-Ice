@@ -1,722 +1,698 @@
 <!DOCTYPE html>
-<html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Blackiceportal</title><meta name="title" content="Blackiceportal"><meta name="description" content="a website built for multitool project"><meta charset="UTF-8">
+<html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Untitled Project</title><meta name="title" content="Untitled Project"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./style.css"><script src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" async=""></script><script type="importmap">{
   "imports": {}
 }</script></head><body>
 
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlackICE Portal Widget Demo</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&amp;display=swap" rel="stylesheet">
 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PeerJS Checkers</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        /* -----------------------------------------------------------
-           GLOBAL PAGE STYLES
-           ----------------------------------------------------------- */
         :root {
-            --bg-gradient: radial-gradient(circle at 50% 0%, #2e1065, #000000);
+            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --panel-bg: rgba(255, 255, 255, 0.1);
+            --text-color: #ffffff;
+            --board-light: #f0d9b5;
+            --board-dark: #b58863;
+            --highlight-move: rgba(100, 255, 100, 0.5);
+            --highlight-selected: rgba(255, 255, 0, 0.6);
+            --red-piece: #e74c3c;
+            --black-piece: #2c3e50;
+            --accent: #e94560;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
             margin: 0;
-            padding: 0;
-            font-family: 'Inter Tight', sans-serif;
-            background: #000;
-            background-image: var(--bg-gradient);
-            color: white;
+            display: flex;
+            flex-direction: column;
             height: 100vh;
             overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        #room-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s;
+        }
+
+        #room-display:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- MAIN AREA --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .hud {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .player-badge {
+            background: var(--panel-bg);
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-align: center;
+            opacity: 0.5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .player-badge.active {
+            opacity: 1;
+            transform: scale(1.05);
+            background: rgba(233, 69, 96, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .board-wrapper {
+            width: 100%;
+            max-width: min(90vw, 500px);
+            aspect-ratio: 1/1;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 100%;
+            height: 100%;
+            border: 2px solid #444;
+        }
+
+        .square {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .square.light {
+            background: var(--board-light);
+        }
+
+        .square.dark {
+            background: var(--board-dark);
+        }
+
+        .square.selected {
+            background: var(--highlight-selected) !important;
+        }
+
+        .square.highlight::after {
+            content: '';
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            background: #2ecc71;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .square.highlight {
+            cursor: pointer;
+        }
+
+        /* --- PIECES --- */
+        .piece {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.5), 0 3px 5px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s;
+            z-index: 2;
+            position: relative;
+        }
+
+        .piece.red {
+            background: radial-gradient(circle at 30% 30%, #ff7b7b, var(--red-piece));
+            border: 2px solid #c0392b;
+        }
+
+        .piece.black {
+            background: radial-gradient(circle at 30% 30%, #7f8c8d, var(--black-piece));
+            border: 2px solid #000;
+        }
+
+        .piece.king::after {
+            content: '👑';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -55%);
+            font-size: 1.5rem;
+            text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- SCREENS --- */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 20, 30, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            width: 240px;
+            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        input {
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 240px;
+            border-radius: 30px;
+            border: 2px solid #444;
+            background: #222;
+            color: #fff;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .divider {
             display: flex;
             align-items: center;
-            justify-content: center;
+            width: 240px;
+            margin: 15px 0;
+            color: #888;
+            font-size: 0.9rem;
         }
 
-        .bg-grid {
-            position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: 0;
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #444;
+            margin: 0 10px;
         }
-
-        .hero-text {
-            text-align: center;
-            z-index: 1;
-            padding: 20px;
-            pointer-events: none;
-        }
-        .hero-text h1 {
-            font-size: 4rem;
-            margin: 0;
-            background: linear-gradient(to bottom right, #fff, #71717a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.05em;
-        }
-        .hero-text p {
-            color: #71717a;
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-
-        /* -----------------------------------------------------------
-           WIDGET STYLES
-           ----------------------------------------------------------- */
-        
-            /* Reset & Base */
-            .bi-reset { all: initial; }
-            .bi-root { 
-                font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif; 
-                box-sizing: border-box; 
-                -webkit-font-smoothing: antialiased; 
-            }
-            .bi-root * { box-sizing: border-box; }
-
-            /* Trigger Button */
-            #bi-trigger {
-                position: fixed; 
-                bottom: 30px; 
-                right: 30px;
-                width: 56px; 
-                height: 56px;
-                background: #18181b;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 18px;
-                cursor: grab;
-                z-index: 2147483647; 
-                display: flex; 
-                flex-direction: column; 
-                align-items: center; 
-                justify-content: center;
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0,0,0,0.5);
-                transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-                color: #ffffff;
-                animation: bi-wiggle 2s ease-in-out 1.5s;
-                user-select: none;
-            }
-            
-            @keyframes bi-wiggle {
-                0%, 100% { transform: rotate(0deg); }
-                10% { transform: rotate(-10deg); }
-                20% { transform: rotate(10deg); }
-                30% { transform: rotate(-6deg); }
-                40% { transform: rotate(6deg); }
-                50% { transform: rotate(0deg); }
-            }
-
-            #bi-trigger:hover { 
-                transform: scale(1.08); 
-                box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px #3b82f6;
-                border-color: #3b82f6;
-            }
-            #bi-trigger:active { cursor: grabbing; transform: scale(0.95); }
-            
-            .bi-grip-lines { display: flex; gap: 2px; margin-top: 4px; opacity: 0.4; }
-            .bi-grip-line { width: 12px; height: 2px; background: white; border-radius: 2px; }
-
-            .bi-icon-wrap { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-            
-            /* Fixed SVG styling for the main trigger button */
-            #bi-trigger svg { 
-                position: absolute; 
-                width: 24px; 
-                height: 24px; 
-                transition: all 0.4s ease; 
-                fill: none; 
-                stroke: currentColor; 
-                stroke-width: 2; 
-                stroke-linecap: round; 
-                stroke-linejoin: round; 
-            }
-
-            #bi-trigger.open .bi-menu-icon { transform: rotate(90deg); opacity: 0; }
-            .bi-close-icon { opacity: 0; transform: scale(0.5); }
-            #bi-trigger.open .bi-close-icon { opacity: 1; transform: scale(1); transform: rotate(0deg); }
-            
-            #bi-drag-tip {
-                position: absolute; right: 70px; top: 50%; transform: translateY(-50%);
-                background: rgba(24, 24, 27, 0.9);
-                backdrop-filter: blur(8px);
-                border: 1px solid rgba(255,255,255,0.1);
-                color: #e4e4e7; padding: 8px 12px; border-radius: 10px;
-                font-family: 'Inter Tight', sans-serif; font-size: 10px; font-weight: 600; 
-                text-transform: uppercase; letter-spacing: 0.05em;
-                pointer-events: none; opacity: 1; transition: opacity 0.5s; white-space: nowrap;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            }
-            #bi-drag-tip::after {
-                content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
-                border-width: 4px; border-style: solid;
-                border-color: transparent transparent transparent rgba(24, 24, 27, 0.9);
-            }
-
-            /* Sidebar */
-            #bi-sidebar {
-                position: fixed; top: 10px; bottom: 10px; right: 10px;
-                width: 340px; max-width: 90vw;
-                background: rgba(9, 9, 11, 0.95);
-                backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 24px;
-                z-index: 2147483646;
-                transform: translateX(120%);
-                opacity: 0;
-                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                display: flex; flex-direction: column;
-                box-shadow: -20px 0 50px rgba(0,0,0,0.5);
-                overflow: hidden;
-            }
-            #bi-sidebar.open { transform: translateX(0); opacity: 1; }
-            
-            .bi-header {
-                padding: 16px 20px;
-                display: flex; align-items: center; gap: 8px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                background: rgba(255,255,255,0.02);
-            }
-            .bi-logo { width: 24px; height: 24px; border-radius: 6px; background: #3b82f6; display: grid; place-items: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0; }
-            .bi-title { font-weight: 600; font-size: 15px; color: #ffffff; letter-spacing: -0.02em; margin-right: auto; }
-            
-            .bi-action-btn {
-                background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(255,255,255,0.1);
-                color: #a1a1aa;
-                border-radius: 8px;
-                padding: 6px; cursor: pointer;
-                display: flex; align-items: center; justify-content: center;
-                transition: all 0.2s; font-size: 11px; font-weight: 600;
-            }
-            .bi-action-btn:hover { background: rgba(255,255,255,0.1); color: white; }
-            #bi-home-btn:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
-            
-            /* Icon styling for header buttons */
-            .bi-action-btn svg { stroke: currentColor; width: 16px; height: 16px; }
-
-            .bi-btn-os { padding: 6px 10px; gap: 6px; }
-            
-            .bi-search-wrap { padding: 12px 12px 4px 12px; }
-            .bi-search-box {
-                background: rgba(0,0,0,0.2);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 12px;
-                display: flex; align-items: center;
-                padding: 8px 12px; gap: 8px;
-                transition: border-color 0.2s;
-            }
-            .bi-search-box:focus-within { border-color: #3b82f6; }
-            .bi-search-box svg { width: 14px; height: 14px; color: #a1a1aa; stroke: currentColor; }
-            .bi-input {
-                background: transparent; border: none; outline: none;
-                color: white; font-size: 13px; width: 100%; font-family: inherit;
-            }
-            .bi-input::placeholder { color: #52525b; }
-
-            .bi-content { flex: 1; overflow-y: auto; padding: 8px 12px; }
-            .bi-content::-webkit-scrollbar { width: 0px; background: transparent; }
-            
-            /* Project Card */
-            .bi-card {
-                display: flex; align-items: center; gap: 14px;
-                padding: 12px; margin-bottom: 4px;
-                border-radius: 12px; text-decoration: none;
-                transition: all 0.2s ease;
-                background: transparent; border: 1px solid transparent;
-                cursor: pointer;
-                position: relative;
-            }
-            .bi-card:hover {
-                background: rgba(255,255,255,0.03);
-                border-color: rgba(255, 255, 255, 0.08);
-                transform: translateX(4px);
-            }
-            .bi-card.pinned { border-left: 2px solid #3b82f6; background: rgba(59,130,246,0.05); }
-
-            /* Generic Icon replacing the screenshot image */
-            .bi-card-img {
-                width: 38px; height: 38px; border-radius: 10px;
-                background: #27272a;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                display: flex; align-items: center; justify-content: center;
-            }
-            .bi-card-img svg {
-                width: 18px; height: 18px; color: #a1a1aa;
-            }
-
-            .bi-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-            .bi-card-title { color: #f4f4f5; font-size: 14px; font-weight: 500; }
-            .bi-card-desc { color: #71717a; font-size: 11px; }
-
-            /* Card Actions */
-            .bi-card-actions {
-                display: flex; gap: 4px;
-                opacity: 0; pointer-events: none; transition: opacity 0.2s;
-            }
-            .bi-card:hover .bi-card-actions { opacity: 1; pointer-events: auto; }
-            
-            .bi-card-btn {
-                padding: 6px; border-radius: 6px; color: #71717a;
-                background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-                transition: all 0.2s;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .bi-card-btn svg { width: 14px; height: 14px; stroke: currentColor; }
-            .bi-card-btn:hover { color: white; background: rgba(255,255,255,0.1); }
-            .bi-card-btn.active-pin { color: #3b82f6; border-color: #3b82f6; background: rgba(59,130,246,0.1); }
-
-            /* Iframe Container */
-            #bi-iframe-container {
-                position: fixed; inset: 0; width: 100%; height: 100%;
-                background: #fff; z-index: 2147483645; 
-                opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-                display: flex;
-                flex-direction: column;
-            }
-            #bi-iframe-container.active { opacity: 1; pointer-events: auto; }
-            
-            /* Loading/Status bar for iframe */
-            #bi-iframe-status {
-                background: #09090b;
-                color: white;
-                padding: 8px 20px;
-                font-size: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center; /* Centered now that link is gone */
-                border-bottom: 1px solid #18181b;
-            }
-            
-            #bi-iframe {
-                flex: 1;
-                width: 100%;
-                border: 0; display: block; background: #fff;
-            }
-            
-            /* Overlay */
-            #bi-overlay {
-                position: fixed; inset: 0; background: rgba(0,0,0,0.3);
-                backdrop-filter: blur(4px); z-index: 2147483645;
-                opacity: 0; pointer-events: none; transition: opacity 0.4s;
-            }
-            #bi-overlay.visible { opacity: 1; pointer-events: auto; }
-
-        </style>
+    </style>
 
 
 
-    <!-- Background visuals -->
-    <div class="bg-grid"></div>
-    <div class="hero-text">
-        <h1>BlackICE</h1>
-        <p>Portal Interface v4.2</p>
-        <p style="font-size: 0.9rem; color: #52525b; margin-top: 40px;">(Drag button in the bottom right)</p>
-    </div>
 
-    <!-- WIDGET HTML STRUCTURE -->
-    
-    <!-- The Overlay for closing the sidebar -->
-    <div id="bi-overlay"></div>
+    <header>
+        <h1>CHECKERS</h1>
+        <div id="room-display" onclick="Utils.copyCode()" title="Click to Copy"></div>
+    </header>
 
-    <!-- The Fullscreen Iframe Container -->
-    <div id="bi-iframe-container" class="bi-root">
-        <div id="bi-iframe-status">
-            <span id="bi-current-title">Loading...</span>
+    <main>
+        <div class="hud">
+            <div class="player-badge" id="p1-card">YOU (Red)</div>
+            <div class="player-badge" id="p2-card">OPP (Black)</div>
         </div>
-        <iframe id="bi-iframe" src="about:blank" allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera; midi; encrypted-media; autoplay"></iframe>
-    </div>
 
-    <!-- The Trigger Button -->
-    <div id="bi-trigger">
-        <div id="bi-drag-tip">DRAG OR CLICK TO OPEN</div>
-        <div class="bi-icon-wrap">
-            <!-- Added stroke="currentColor" to ensure visibility -->
-            <svg class="bi-menu-icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            <svg class="bi-close-icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <div class="board-wrapper">
+            <div id="board" class="board"></div>
         </div>
-        <div class="bi-grip-lines"><div class="bi-grip-line" style="width:4px"></div><div class="bi-grip-line" style="width:16px"></div><div class="bi-grip-line" style="width:4px"></div></div>
-    </div>
+    </main>
 
-    <!-- The Sidebar -->
-    <div id="bi-sidebar" class="bi-root">
-        <div class="bi-header">
-            <div class="bi-logo">B</div>
-            <div class="bi-title">BlackICE</div>
-            
-            <!-- Header Icons -->
-            <button id="bi-dev-btn" class="bi-action-btn" title="Open Dev Mode">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            </button>
+    <div id="toast">Notification</div>
 
-            <button id="bi-home-btn" class="bi-action-btn" title="Exit App / Home">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </button>
-            <button id="bi-chat-btn" class="bi-action-btn" title="Support Chat">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            </button>
-            <button id="bi-fs-btn" class="bi-action-btn" title="Toggle Fullscreen">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-            </button>
-            <button id="bi-os-btn" class="bi-action-btn bi-btn-os">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                OS
-            </button>
-        </div>
-        
-        <div class="bi-search-wrap">
-            <div class="bi-search-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="bi-search" class="bi-input" placeholder="Search projects...">
-            </div>
-        </div>
-        
-        <div class="bi-content" id="bi-list">
-            <div style="padding:20px; text-align:center; color:#52525b; font-size:12px;">Loading...</div>
+    <div id="menu-screen" class="screen">
+        <h1 style="font-size: 2.5rem; margin-bottom: 40px; color: var(--accent);">CHECKERS</h1>
+
+        <button class="btn" onclick="GameApp.startPvC()">Play vs Computer</button>
+
+        <div class="divider">OR PLAY ONLINE</div>
+
+        <button class="btn" onclick="GameApp.hostGame()">Create Room</button>
+
+        <div style="margin-top: 20px;">
+            <input type="text" id="join-input" placeholder="ROOM CODE" maxlength="6">
+            <br>
+            <button class="btn" style="background: #444;" onclick="GameApp.joinGame()">Join Room</button>
         </div>
     </div>
 
-    <!-- WIDGET JAVASCRIPT LOGIC -->
+    <div id="game-over-screen" class="screen hidden">
+        <h1 id="winner-text" style="font-size: 2rem; margin-bottom: 20px;">Winner!</h1>
+        <button class="btn" onclick="location.reload()">Back to Menu</button>
+    </div>
+
     <script>
-    (function() {
-        // Prevent double initialization
-        if (window.BlackICEWidget) return;
-
-        class BlackICEWidget {
-            constructor() {
-                this.dbUrl = "https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
-                this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
-                this.devUrl = "https://blackice-ac.vercel.app/test/dev.html";
-                this.homeUrl = "https://blackice-ac.vercel.app/"; 
-                this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf"; 
-                
-                this.theme = {
-                    font: "'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif",
-                    glassBg: "rgba(9, 9, 11, 0.95)", 
-                    glassBorder: "rgba(255, 255, 255, 0.08)",
-                    accent: "#3b82f6",
-                    textMain: "#ffffff",
-                    textMuted: "#a1a1aa"
-                };
-                
-                this.isOpen = false;
-                this.allProjects = [];
-                this.pinnedIds = JSON.parse(localStorage.getItem('bi_pinned') || '[]');
-                this.iframeTimeout = null; 
-                
-                this.init();
-            }
-
-            init() {
-                this.loadCrisp();
-                this.setupDraggable();
-                this.setupActions();
-                this.fetchProjects();
-                
-                setTimeout(() => {
-                    const tooltip = document.getElementById('bi-drag-tip');
-                    if(tooltip) tooltip.style.opacity = '0';
-                }, 6000);
-            }
-
-            loadCrisp() {
-                window.$crisp = [];
-                window.CRISP_WEBSITE_ID = this.crispId;
-                const d = document;
-                const s = d.createElement("script");
-                s.src = "https://client.crisp.chat/l.js";
-                s.async = 1;
-                d.getElementsByTagName("head")[0].appendChild(s);
-                window.$crisp.push(["do", "chat:hide"]);
-                window.$crisp.push(["on", "chat:closed", () => {
-                    window.$crisp.push(["do", "chat:hide"]);
-                }]);
-            }
-
-            async fetchProjects() {
-                try {
-                    const res = await fetch(this.dbUrl);
-                    const data = await res.json();
-                    if (data) {
-                        this.allProjects = Object.entries(data).map(([key, val]) => ({ id: key, ...val }));
-                        this.allProjects.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                        this.renderProjects(this.allProjects);
-                        
-                        // Check for shared link on startup
-                        this.checkSharedLink();
-                    }
-                } catch (err) {
-                    const list = document.getElementById('bi-list');
-                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#71717a">Unable to load portal. <br> <small>${err.message}</small></div>`;
+        /* --- UTILITIES --- */
+        const Utils = {
+            // Generate a random 6-character alphanumeric code
+            generateId: () => {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < 6; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
                 }
+                return result;
+            },
+            
+            copyCode: () => {
+                const code = document.getElementById('room-display').innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    GameApp.showToast("Room Code Copied!");
+                });
             }
+        };
 
-            checkSharedLink() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const projectParam = urlParams.get('project');
-                
-                if (projectParam && this.allProjects.length > 0) {
-                    const decodedParam = decodeURIComponent(projectParam);
-                    const project = this.allProjects.find(site => 
-                        site.title === decodedParam || 
-                        site.id === decodedParam || 
-                        site.url === decodedParam ||
-                        (site.title || '').toLowerCase() === decodedParam.toLowerCase()
-                    );
-
-                    if (project) {
-                        // Use the URL directly from Firebase now
-                        this.openProject(project.url, project.title);
+        /* --- LOGIC ENGINE --- */
+        const Engine = {
+            // 0: Empty, 1: Red, 2: Black, 3: Red King, 4: Black King
+            initBoard: () => {
+                let b = Array(64).fill(0);
+                for(let i=0; i<64; i++) {
+                    let r = Math.floor(i/8), c = i%8;
+                    if((r+c)%2 !== 0) {
+                        if(r < 3) b[i] = 2; // Black
+                        if(r > 4) b[i] = 1; // Red
                     }
                 }
-            }
+                return b;
+            },
 
-            renderProjects(projects) {
-                const list = document.getElementById('bi-list');
-                list.innerHTML = ""; 
-                if(projects.length === 0) {
-                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#52525b; font-size:12px;">No results found.</div>`;
-                    return;
-                }
+            // Returns array of valid moves: {from, to, capture}
+            getMoves: (board, color) => {
+                let moves = [], jumps = [];
+                // Red moves up (-), Black moves down (+)
+                let forwardDirs = color === 'red' ? [[-1, -1], [-1, 1]] : [[1, -1], [1, 1]];
+                
+                board.forEach((v, i) => {
+                    // Check if piece belongs to current player
+                    if((color === 'red' && (v === 1 || v === 3)) || (color === 'black' && (v === 2 || v === 4))) {
+                        let r = Math.floor(i/8), c = i%8;
+                        let isKing = (v === 3 || v === 4);
+                        // Kings move all 4 directions
+                        let dirs = isKing ? [[-1,-1],[-1,1],[1,-1],[1,1]] : forwardDirs;
 
-                const pinned = [];
-                const others = [];
+                        // Check Jumps (Priority)
+                        dirs.forEach(([dr, dc]) => {
+                            let mr = r + dr, mc = c + dc;      // Middle square
+                            let tr = r + dr*2, tc = c + dc*2;  // Target square (landing)
+                            
+                            if(tr >= 0 && tr < 8 && tc >= 0 && tc < 8) {
+                                let mid = mr*8 + mc;
+                                let dest = tr*8 + tc;
+                                
+                                // Check if middle is enemy
+                                let isEnemy = false;
+                                if(color === 'red') isEnemy = (board[mid] === 2 || board[mid] === 4);
+                                else isEnemy = (board[mid] === 1 || board[mid] === 3);
 
-                projects.forEach(p => {
-                    if(this.pinnedIds.includes(p.id)) pinned.push(p);
-                    else others.push(p);
+                                if(isEnemy && board[dest] === 0) {
+                                    jumps.push({from: i, to: dest, capture: mid});
+                                }
+                            }
+                        });
+
+                        // Check Regular Moves (Only if no jumps exist globally)
+                        if(jumps.length === 0) {
+                            dirs.forEach(([dr, dc]) => {
+                                let tr = r + dr, tc = c + dc;
+                                if(tr >= 0 && tr < 8 && tc >= 0 && tc < 8) {
+                                    if(board[tr*8 + tc] === 0) {
+                                        moves.push({from: i, to: tr*8 + tc, capture: null});
+                                    }
+                                }
+                            });
+                        }
+                    }
                 });
 
-                const createCard = (p, isPinned) => {
-                    const el = document.createElement('div'); 
-                    el.className = `bi-card ${isPinned ? 'pinned' : ''}`;
-                    
-                    el.onclick = (e) => {
-                        if (e.target.closest('.bi-card-btn')) return;
-                        // Use the direct URL from Firebase
-                        this.openProject(p.url, p.title);
-                        
-                        const projectParam = encodeURIComponent(p.title || p.id || p.url);
-                        const newUrl = `${window.location.pathname}?project=${projectParam}`;
-                        window.history.pushState({}, '', newUrl);
-                    };
-                    
-                    el.innerHTML = `
-                        <!-- Generic Link Icon instead of Microlink Screenshot -->
-                        <div class="bi-card-img">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        </div>
-                        <div class="bi-card-info">
-                            <div class="bi-card-title">${p.title || 'Untitled Project'}</div>
-                            <div class="bi-card-desc">${new URL(p.url).hostname}</div>
-                        </div>
-                        <div class="bi-card-actions">
-                             <button class="bi-card-btn bi-copy-btn" title="Copy Shareable Link">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                            </button>
-                            <button class="bi-card-btn bi-pin-btn ${isPinned ? 'active-pin' : ''}" title="${isPinned ? 'Unpin' : 'Pin'}">
-                                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4-8c.41-1.16 1.52-2 2.82-2h.36c1.3 0 2.41.84 2.82 2H8zm5.18 0H16c-.41-1.16-1.52-2-2.82-2h-.36c-1.3 0-2.41.84-2.82 2z"></path><path d="M10 18h4v-2h-4v2z"></path></svg>
-                            </button>
-                        </div>
-                    `;
-                    
-                    const copyBtn = el.querySelector('.bi-copy-btn');
-                    copyBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const projectParam = encodeURIComponent(p.title || p.id || p.url);
-                        const shareableLink = `${window.location.origin}${window.location.pathname}?project=${projectParam}`;
+                // Force Jump Rule: If any jump exists, ignore regular moves
+                return jumps.length > 0 ? jumps : moves;
+            },
 
-                        navigator.clipboard.writeText(shareableLink);
-                        
-                        // Visual Feedback
-                        const originalHTML = copyBtn.innerHTML;
-                        copyBtn.innerHTML = `<svg viewBox="0 0 24 24" stroke="#10b981" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-                        setTimeout(() => {
-                             copyBtn.innerHTML = originalHTML;
-                        }, 1500);
-                    };
-
-                    const pinBtn = el.querySelector('.bi-pin-btn');
-                    pinBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.togglePin(p.id);
-                    };
-
-                    return el;
-                };
-
-                pinned.forEach(p => list.appendChild(createCard(p, true)));
+            applyMove: (board, move) => {
+                let nb = [...board];
+                let piece = nb[move.from];
                 
-                if(pinned.length > 0 && others.length > 0) {
-                     const hr = document.createElement('div');
-                     hr.style.cssText = "height:1px; background:rgba(255,255,255,0.1); margin:8px 4px;";
-                     list.appendChild(hr);
-                }
+                nb[move.from] = 0;
+                nb[move.to] = piece;
+                
+                if(move.capture !== null) nb[move.capture] = 0;
 
-                others.forEach(p => list.appendChild(createCard(p, false)));
+                // King Promotion
+                let r = Math.floor(move.to / 8);
+                if(piece === 1 && r === 0) nb[move.to] = 3;
+                if(piece === 2 && r === 7) nb[move.to] = 4;
+
+                return nb;
             }
+        };
 
-            togglePin(id) {
-                if(this.pinnedIds.includes(id)) {
-                    this.pinnedIds = this.pinnedIds.filter(pid => pid !== id);
-                } else {
-                    this.pinnedIds.push(id);
+        /* --- GAME APP --- */
+        const GameApp = {
+            peer: null,
+            conn: null,
+            mode: 'local', 
+            turn: 'red',
+            myColor: 'red',
+            board: [],
+            selected: null,
+            legalMoves: [], // Stores all valid moves for current turn
+
+            init: () => {
+                // Pre-render an empty board for visuals
+                GameApp.board = Engine.initBoard();
+                GameApp.renderBoard();
+            },
+
+            /* --- MODES --- */
+            startPvC: () => {
+                GameApp.mode = 'local';
+                GameApp.myColor = 'red';
+                GameApp.turn = 'red';
+                GameApp.board = Engine.initBoard();
+                document.getElementById('menu-screen').classList.add('hidden');
+                document.getElementById('p2-card').innerText = "COMPUTER";
+                GameApp.updateGame();
+            },
+
+            hostGame: () => {
+                GameApp.mode = 'p2p';
+                GameApp.myColor = 'red';
+                document.getElementById('menu-screen').classList.add('hidden');
+                
+                const shortCode = Utils.generateId();
+                const roomDisplay = document.getElementById('room-display');
+                roomDisplay.innerText = "Connecting...";
+                roomDisplay.style.display = 'block';
+
+                // Force PeerJS to use our short code
+                GameApp.peer = new Peer(shortCode);
+                
+                GameApp.peer.on('open', (id) => {
+                    roomDisplay.innerText = id;
+                    GameApp.showToast("Room created! Share the code.");
+                    GameApp.board = Engine.initBoard();
+                    GameApp.turn = 'red';
+                    GameApp.updateGame();
+                });
+
+                GameApp.peer.on('connection', (c) => {
+                    GameApp.conn = c;
+                    GameApp.setupConnection();
+                    GameApp.showToast("Opponent Connected!");
+                    document.getElementById('p2-card').innerText = "OPPONENT";
+                    // Send initial state
+                    setTimeout(() => GameApp.sendState(), 500);
+                });
+
+                GameApp.peer.on('error', (err) => {
+                    GameApp.showToast("Error: Code might be taken. Try again.");
+                    setTimeout(() => location.reload(), 2000);
+                });
+            },
+
+            joinGame: () => {
+                let code = document.getElementById('join-input').value.trim().toUpperCase();
+                if(code.length !== 6) return GameApp.showToast("Invalid Code Length");
+
+                GameApp.mode = 'p2p';
+                GameApp.myColor = 'black'; // Joiner is black
+                document.getElementById('menu-screen').classList.add('hidden');
+                document.getElementById('p1-card').innerText = "OPPONENT";
+                document.getElementById('p2-card').innerText = "YOU (Black)";
+
+                GameApp.peer = new Peer(); // Let PeerJS assign random ID to joiner
+                
+                GameApp.peer.on('open', () => {
+                    GameApp.conn = GameApp.peer.connect(code);
+                    GameApp.setupConnection();
+                });
+                
+                GameApp.peer.on('error', (err) => {
+                    GameApp.showToast("Connection Failed. Check Code.");
+                    document.getElementById('menu-screen').classList.remove('hidden');
+                });
+            },
+
+            setupConnection: () => {
+                GameApp.conn.on('open', () => {
+                    GameApp.conn.on('data', (data) => {
+                        if(data.type === 'state') {
+                            GameApp.board = data.board;
+                            GameApp.turn = data.turn;
+                            GameApp.updateGame();
+                            GameApp.checkWin();
+                        }
+                    });
+                });
+            },
+
+            sendState: () => {
+                if(GameApp.conn && GameApp.conn.open) {
+                    GameApp.conn.send({
+                        type: 'state',
+                        board: GameApp.board,
+                        turn: GameApp.turn
+                    });
                 }
-                localStorage.setItem('bi_pinned', JSON.stringify(this.pinnedIds));
+            },
+
+            /* --- GAMEPLAY --- */
+            updateGame: () => {
+                // Calculate legal moves for whoever's turn it is
+                GameApp.legalMoves = Engine.getMoves(GameApp.board, GameApp.turn);
+                GameApp.renderBoard();
+                GameApp.checkWin();
                 
-                const term = document.getElementById('bi-search').value.toLowerCase();
-                const filtered = this.allProjects.filter(p => (p.title || '').toLowerCase().includes(term));
-                this.renderProjects(filtered);
-            }
-            
-            openProject(url, title) {
-                const iframe = document.getElementById('bi-iframe');
-                const container = document.getElementById('bi-iframe-container');
-                const titleEl = document.getElementById('bi-current-title');
-                
-                if(!url.startsWith('http')) {
-                    console.warn("Blocked non-http URL");
+                // AI Turn Trigger
+                if(GameApp.mode === 'local' && GameApp.turn === 'black') {
+                    setTimeout(GameApp.aiMove, 1000);
+                }
+            },
+
+            aiMove: () => {
+                if(GameApp.legalMoves.length > 0) {
+                    let randomMove = GameApp.legalMoves[Math.floor(Math.random() * GameApp.legalMoves.length)];
+                    GameApp.executeMove(randomMove);
+                }
+            },
+
+            handleSquareClick: (index) => {
+                // Prevent interaction if not your turn
+                if(GameApp.mode === 'p2p' && GameApp.turn !== GameApp.myColor) return;
+                if(GameApp.mode === 'local' && GameApp.turn === 'black') return; // AI turn
+
+                // If clicking a highlighted move square
+                let move = GameApp.legalMoves.find(m => m.from === GameApp.selected && m.to === index);
+                if(move) {
+                    GameApp.executeMove(move);
                     return;
                 }
 
-                titleEl.textContent = title || "Loading App...";
+                // If clicking a piece to select it
+                let piece = GameApp.board[index];
+                let isMyPiece = (GameApp.turn === 'red' && (piece === 1 || piece === 3)) ||
+                                (GameApp.turn === 'black' && (piece === 2 || piece === 4));
                 
-                if(this.iframeTimeout) clearTimeout(this.iframeTimeout);
-
-                // Load URL directly into iframe
-                iframe.src = url;
-                container.classList.add('active');
-                document.body.style.overflow = 'hidden'; 
-                
-                if(this.isOpen) this.toggle(); 
-            }
-
-            closeProject() {
-                const container = document.getElementById('bi-iframe-container');
-                const iframe = document.getElementById('bi-iframe');
-                
-                container.classList.remove('active');
-                document.body.style.overflow = '';
-                
-                setTimeout(() => { iframe.src = 'about:blank'; }, 300);
-            }
-
-            setupDraggable() {
-                let isDragging = false;
-                let startX, startY, initLeft, initTop;
-                let totalMove = 0;
-                const btn = document.getElementById('bi-trigger');
-
-                const onDown = (e) => {
-                    const tip = document.getElementById('bi-drag-tip');
-                    if(tip) tip.style.opacity = '0';
-                    
-                    const evt = e.touches ? e.touches[0] : e;
-                    isDragging = true;
-                    totalMove = 0;
-                    startX = evt.clientX; startY = evt.clientY;
-                    const rect = btn.getBoundingClientRect();
-                    initLeft = rect.left; initTop = rect.top;
-                    e.preventDefault();
-                    document.addEventListener('mousemove', onMove);
-                    document.addEventListener('touchmove', onMove, { passive: false });
-                    document.addEventListener('mouseup', onUp);
-                    document.addEventListener('touchend', onUp);
-                };
-
-                const onMove = (e) => {
-                    if (!isDragging) return;
-                    const evt = e.touches ? e.touches[0] : e;
-                    const dx = evt.clientX - startX;
-                    const dy = evt.clientY - startY;
-                    totalMove += Math.abs(dx) + Math.abs(dy);
-                    btn.style.left = `${initLeft + dx}px`;
-                    btn.style.top = `${initTop + dy}px`;
-                    btn.style.right = 'auto'; btn.style.bottom = 'auto';
-                };
-
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('touchmove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                    document.removeEventListener('touchend', onUp);
-                    if (totalMove < 5) this.toggle();
-                };
-
-                btn.addEventListener('mousedown', onDown);
-                btn.addEventListener('touchstart', onDown, { passive: false });
-            }
-
-            toggle() {
-                this.isOpen = !this.isOpen;
-                const sidebar = document.getElementById('bi-sidebar');
-                const btn = document.getElementById('bi-trigger');
-                const overlay = document.getElementById('bi-overlay');
-
-                if (this.isOpen) {
-                    sidebar.classList.add('open');
-                    btn.classList.add('open');
-                    overlay.classList.add('visible');
-                } else {
-                    sidebar.classList.remove('open');
-                    btn.classList.remove('open');
-                    overlay.classList.remove('visible');
-                }
-            }
-
-            setupActions() {
-                // Dev Button
-                const devBtn = document.getElementById('bi-dev-btn');
-                if (devBtn) {
-                    devBtn.onclick = () => {
-                        this.openProject(this.devUrl, "Dev Mode");
-                    };
-                }
-
-                // Home Button: Opens Home URL in iframe
-                const homeBtn = document.getElementById('bi-home-btn');
-                if (homeBtn) {
-                    homeBtn.onclick = () => {
-                        this.openProject(this.homeUrl, "Home");
-                    };
-                }
-
-                document.getElementById('bi-os-btn').onclick = () => window.open(this.osUrl, '_blank');
-                document.getElementById('bi-fs-btn').onclick = () => {
-                    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e));
-                    else document.exitFullscreen();
-                };
-                
-                document.getElementById('bi-chat-btn').onclick = () => {
-                    if(window.$crisp) {
-                        window.$crisp.push(["do", "chat:open"]);
-                        window.$crisp.push(["do", "chat:show"]);
+                if(isMyPiece) {
+                    // Check if this piece specifically has valid moves
+                    let hasMoves = GameApp.legalMoves.some(m => m.from === index);
+                    if(hasMoves) {
+                        GameApp.selected = index;
+                        GameApp.renderBoard();
+                    } else {
+                        // User clicked a piece, but rules (forced jump) might prevent moving it
+                        if(GameApp.legalMoves.length > 0) {
+                            GameApp.showToast("Locked! Forced Jump Active.");
+                        }
                     }
-                };
+                } else {
+                    GameApp.selected = null;
+                    GameApp.renderBoard();
+                }
+            },
 
-                document.getElementById('bi-search').oninput = (e) => {
-                    const term = e.target.value.toLowerCase();
-                    const filtered = this.allProjects.filter(p => (p.title || '').toLowerCase().includes(term));
-                    this.renderProjects(filtered);
-                };
+            executeMove: (move) => {
+                GameApp.board = Engine.applyMove(GameApp.board, move);
+                GameApp.turn = GameApp.turn === 'red' ? 'black' : 'red';
+                GameApp.selected = null;
+                
+                if(GameApp.mode === 'p2p') GameApp.sendState();
+                GameApp.updateGame();
+            },
 
-                // Overlay click closes sidebar
-                document.getElementById('bi-overlay').onclick = () => this.toggle();
+            renderBoard: () => {
+                const b = document.getElementById('board');
+                b.innerHTML = '';
+
+                // Update HUD
+                const isRedTurn = GameApp.turn === 'red';
+                document.getElementById('p1-card').className = `player-badge ${isRedTurn ? 'active' : ''}`;
+                document.getElementById('p2-card').className = `player-badge ${!isRedTurn ? 'active' : ''}`;
+
+                GameApp.board.forEach((cell, i) => {
+                    let d = document.createElement('div');
+                    let r = Math.floor(i/8), c = i%8;
+                    d.className = `square ${(r+c)%2!==0 ? 'dark' : 'light'}`;
+                    
+                    // Selected highlight
+                    if(GameApp.selected === i) d.classList.add('selected');
+
+                    // Move highlight
+                    if(GameApp.selected !== null) {
+                        let isDest = GameApp.legalMoves.some(m => m.from === GameApp.selected && m.to === i);
+                        if(isDest) {
+                            d.classList.add('highlight');
+                            d.onclick = (e) => { e.stopPropagation(); GameApp.handleSquareClick(i); };
+                        }
+                    }
+
+                    if(cell !== 0) {
+                        let p = document.createElement('div');
+                        let isKing = (cell === 3 || cell === 4);
+                        let color = (cell === 1 || cell === 3) ? 'red' : 'black';
+                        p.className = `piece ${color} ${isKing ? 'king' : ''}`;
+                        p.onclick = (e) => {
+                            e.stopPropagation(); // Stop bubble
+                            GameApp.handleSquareClick(i);
+                        };
+                        d.appendChild(p);
+                    }
+                    
+                    if(!d.onclick && !d.children.length) {
+                        // Empty square click (to deselect)
+                        d.onclick = () => { GameApp.selected = null; GameApp.renderBoard(); };
+                    }
+
+                    b.appendChild(d);
+                });
+            },
+
+            checkWin: () => {
+                let red = GameApp.board.filter(x => x === 1 || x === 3).length;
+                let black = GameApp.board.filter(x => x === 2 || x === 4).length; // Fixed syntax error here
+                
+                if(red === 0 || black === 0) {
+                    let msg = red === 0 ? "Black Wins!" : "Red Wins!";
+                    document.getElementById('winner-text').innerText = msg;
+                    document.getElementById('game-over-screen').classList.remove('hidden');
+                }
+                // Stalemate check: valid moves length is 0 but pieces exist
+                else if (GameApp.legalMoves.length === 0 && GameApp.board.length > 0) {
+                     // Check whose turn it is. If they have no moves, they lose.
+                     let msg = GameApp.turn === 'red' ? "Black Wins (No Moves)!" : "Red Wins (No Moves)!";
+                     document.getElementById('winner-text').innerText = msg;
+                     document.getElementById('game-over-screen').classList.remove('hidden');
+                }
+            },
+
+            showToast: (msg) => {
+                let t = document.getElementById('toast');
+                t.innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2500);
             }
-        }
+        };
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => new BlackICEWidget());
-        } else {
-            new BlackICEWidget();
-        }
-    })();
+        window.onload = GameApp.init;
     </script>
+
 
 <script src="./script.js"></script></body></html>
