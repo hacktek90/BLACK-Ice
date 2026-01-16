@@ -114,6 +114,15 @@
             margin: 20px 0;
         }
 
+        /* Visualizer Canvas */
+        #visualizer {
+            width: 100%;
+            height: 120px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            background-color: #fafafa;
+        }
+
         /* CONTROLS */
         .transport-controls {
             display: flex;
@@ -261,6 +270,120 @@
             box-shadow: 0 0 0 1px #111;
         }
 
+        /* Visualizer Mode Selector */
+        .viz-mode-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .viz-mode-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background: transparent;
+            border: 1px solid #e0e0e0;
+            color: #666;
+            cursor: pointer;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .viz-mode-btn:hover {
+            border-color: #111;
+            color: #111;
+        }
+
+        .viz-mode-btn.active {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .color-swatch.active {
+            border-color: #111;
+            transform: scale(1.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Color Picker Container */
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-presets {
+            display: flex;
+            gap: 6px;
+        }
+
+        .color-presets .color-swatch {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Native Color Input (Color Wheel) */
+        .color-wheel-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .color-wheel-wrapper input[type="color"] {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+
+        .color-wheel-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 2px;
+        }
+
+        .color-wheel-wrapper input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 2px;
+        }
+
+        .color-wheel-wrapper input[type="color"]:hover {
+            border-color: #111;
+        }
+
+        .color-wheel-label {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             body { padding: 0; }
             .bento-container { 
@@ -295,6 +418,7 @@
             </div>
 
             <div id="waveform"></div>
+            <canvas id="visualizer"></canvas>
 
             <div class="transport-controls">
                 <!-- PREV SVG -->
@@ -343,6 +467,35 @@
                 <div class="control-label"><span>Speed</span> <span id="speedVal">1.0x</span></div>
                 <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
             </div>
+            
+            <!-- Visualizer Mode Selector -->
+            <div class="control-group">
+                <div class="control-label"><span>Visualizer</span></div>
+                <div class="viz-mode-selector">
+                    <button class="viz-mode-btn active" data-mode="bars">Bars</button>
+                    <button class="viz-mode-btn" data-mode="wave">Wave</button>
+                    <button class="viz-mode-btn" data-mode="circular">Circular</button>
+                </div>
+            </div>
+            
+            <!-- Color Picker -->
+            <div class="control-group">
+                <div class="control-label"><span>Color</span></div>
+                <div class="color-picker-container">
+                    <div class="color-presets">
+                        <button class="color-swatch active" data-color="#81c784" style="background: #81c784" title="Swiss Green"></button>
+                        <button class="color-swatch" data-color="#64b5f6" style="background: #64b5f6" title="Sky Blue"></button>
+                        <button class="color-swatch" data-color="#ff8a65" style="background: #ff8a65" title="Coral"></button>
+                        <button class="color-swatch" data-color="#ba68c8" style="background: #ba68c8" title="Purple"></button>
+                        <button class="color-swatch" data-color="#f06292" style="background: #f06292" title="Pink"></button>
+                        <button class="color-swatch" data-color="#4db6ac" style="background: #4db6ac" title="Teal"></button>
+                    </div>
+                    <div class="color-wheel-wrapper">
+                        <input type="color" id="colorWheel" value="#81c784" title="Custom Color">
+                        <span class="color-wheel-label">Custom</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- UPLOAD -->
@@ -381,8 +534,8 @@
         import WaveSurfer from 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.esm.js';
 
         let playlist = [
-            { title: "Demo Track", artist: "WaveSurfer", url: "https://wavesurfer.xyz/wavesurfer-code/examples/audio/demo.wav" },
-            { title: "Stereo Test", artist: "System", url: "https://wavesurfer.xyz/wavesurfer-code/examples/audio/stereo.mp3" }
+            { title: "Stereo", artist: "WaveSurfer", url: "https://wavesurfer.xyz/wavesurfer-code/examples/audio/stereo.mp3" },
+            { title: "Demo Track", artist: "WaveSurfer", url: "https://wavesurfer.xyz/wavesurfer-code/examples/audio/demo.wav" }
         ];
         let currentTrackIndex = 0;
 
@@ -397,20 +550,252 @@
             barRadius: 0, // Sharp bars
             height: 80,
             normalize: true,
-            backend: 'WebAudio',
+            backend: 'MediaElement', // Use MediaElement backend for easier visualizer integration
         });
 
-        // Filters
-        let audioContext, bassFilter, trebleFilter;
+        // Visualizer setup
+        const visualizerCanvas = document.getElementById('visualizer');
+        const vizCtx = visualizerCanvas.getContext('2d');
+        let visualizerMode = 'bars';
+        let visualizerColor = '#81c784';
+        let animationId;
+        let analyser, dataArray, timeDataArray, bufferLength;
+        let audioContext;
+        let sourceConnected = false;
+        let mediaElementSource = null;
+        let bassFilter, trebleFilter;
+
+        // Set canvas size
+        function resizeCanvas() {
+            visualizerCanvas.width = visualizerCanvas.offsetWidth * window.devicePixelRatio;
+            visualizerCanvas.height = visualizerCanvas.offsetHeight * window.devicePixelRatio;
+            vizCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Visualizer mode buttons
+        document.querySelectorAll('.viz-mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.viz-mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                visualizerMode = this.dataset.mode;
+            });
+        });
+
+        // Color swatch buttons
+        const colorWheelInput = document.getElementById('colorWheel');
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                visualizerColor = this.dataset.color;
+                // Update color wheel to match
+                colorWheelInput.value = this.dataset.color;
+            });
+        });
+
+        // Color wheel (native color picker)
+        colorWheelInput.addEventListener('input', function() {
+            // Remove active state from presets when using custom color
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            visualizerColor = this.value;
+        });
+
+        // Initialize audio context and analyser
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.8;
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                timeDataArray = new Uint8Array(bufferLength);
+                console.log('Audio context created');
+            }
+            
+            // Resume audio context if suspended
+            if (audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    console.log('Audio context resumed');
+                });
+            }
+        }
+
+        // Set up visualizer source
+        function setupVisualizer() {
+            initAudioContext();
+            
+            if (sourceConnected) return;
+            
+            try {
+                const mediaElement = wavesurfer.getMediaElement();
+                if (!mediaElement) {
+                    console.warn('Media element not found');
+                    return;
+                }
+                
+                // Create source from media element
+                mediaElementSource = audioContext.createMediaElementSource(mediaElement);
+                
+                // Create EQ filters
+                bassFilter = audioContext.createBiquadFilter();
+                bassFilter.type = 'lowshelf';
+                bassFilter.frequency.value = 200;
+                bassFilter.gain.value = document.getElementById('bassSlider').value;
+                
+                trebleFilter = audioContext.createBiquadFilter();
+                trebleFilter.type = 'highshelf';
+                trebleFilter.frequency.value = 2000;
+                trebleFilter.gain.value = document.getElementById('trebleSlider').value;
+                
+                // Connect audio graph: source -> bass -> treble -> analyser -> destination
+                mediaElementSource.connect(bassFilter);
+                bassFilter.connect(trebleFilter);
+                trebleFilter.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                sourceConnected = true;
+                console.log('Visualizer connected');
+                
+            } catch (error) {
+                console.error('Error setting up visualizer:', error);
+            }
+        }
+
+        // Visualization loop
+        function visualize() {
+            animationId = requestAnimationFrame(visualize);
+            
+            if (!analyser || !dataArray) return;
+            
+            // Get audio data
+            analyser.getByteFrequencyData(dataArray);
+            analyser.getByteTimeDomainData(timeDataArray);
+            
+            // Clear canvas with fade effect
+            const width = visualizerCanvas.width / window.devicePixelRatio;
+            const height = visualizerCanvas.height / window.devicePixelRatio;
+            
+            vizCtx.fillStyle = 'rgba(250, 250, 250, 0.3)';
+            vizCtx.fillRect(0, 0, width, height);
+            
+            switch(visualizerMode) {
+                case 'bars':
+                    drawBars(width, height);
+                    break;
+                case 'wave':
+                    drawWave(width, height);
+                    break;
+                case 'circular':
+                    drawCircular(width, height);
+                    break;
+            }
+        }
+
+        function drawBars(width, height) {
+            const barWidth = (width / bufferLength) * 2.5;
+            let x = 0;
+            
+            // Convert hex to RGB for color manipulation
+            const hex = visualizerColor;
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            
+            for (let i = 0; i < bufferLength; i++) {
+                const barHeight = (dataArray[i] / 255) * height * 0.8;
+                
+                // Color intensity based on frequency level
+                // Lighten the color as intensity increases
+                const intensity = dataArray[i] / 255;
+                
+                // Mix with white based on intensity for a glowing effect
+                const mix = intensity * 0.4;
+                const r2 = Math.floor(r + (255 - r) * mix);
+                const g2 = Math.floor(g + (255 - g) * mix);
+                const b2 = Math.floor(b + (255 - b) * mix);
+                
+                vizCtx.fillStyle = `rgb(${r2}, ${g2}, ${b2})`;
+                vizCtx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+                x += barWidth;
+            }
+        }
+
+        function drawWave(width, height) {
+            vizCtx.lineWidth = 2;
+            vizCtx.strokeStyle = visualizerColor;
+            vizCtx.beginPath();
+            
+            const sliceWidth = width / bufferLength;
+            let x = 0;
+            
+            for (let i = 0; i < bufferLength; i++) {
+                const v = timeDataArray[i] / 128.0;
+                const y = v * height / 2;
+                
+                if (i === 0) {
+                    vizCtx.moveTo(x, y);
+                } else {
+                    vizCtx.lineTo(x, y);
+                }
+                
+                x += sliceWidth;
+            }
+            
+            vizCtx.stroke();
+        }
+
+        function drawCircular(width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(centerX, centerY) - 20;
+            
+            // Draw background circle
+            vizCtx.beginPath();
+            vizCtx.arc(centerX, centerY, radius - 5, 0, Math.PI * 2);
+            vizCtx.strokeStyle = 'rgba(224, 224, 224, 0.5)';
+            vizCtx.lineWidth = 1;
+            vizCtx.stroke();
+            
+            // Convert hex to RGB
+            const hex = visualizerColor;
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            
+            // Draw frequency bars
+            for (let i = 0; i < bufferLength; i++) {
+                const angle = (i / bufferLength) * Math.PI * 2;
+                const barHeight = (dataArray[i] / 255) * radius * 0.6;
+                
+                const x1 = centerX + Math.cos(angle) * radius;
+                const y1 = centerY + Math.sin(angle) * radius;
+                const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+                const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+                
+                const intensity = dataArray[i] / 255;
+                
+                // Mix with white based on intensity for a glowing effect
+                const mix = intensity * 0.4;
+                const r2 = Math.floor(r + (255 - r) * mix);
+                const g2 = Math.floor(g + (255 - g) * mix);
+                const b2 = Math.floor(b + (255 - b) * mix);
+                
+                vizCtx.strokeStyle = `rgb(${r2}, ${g2}, ${b2})`;
+                vizCtx.lineWidth = 2;
+                vizCtx.beginPath();
+                vizCtx.moveTo(x1, y1);
+                vizCtx.lineTo(x2, y2);
+                vizCtx.stroke();
+            }
+        }
+
+        // Initialize on ready
         wavesurfer.on('ready', () => {
-             if (!wavesurfer.backend) return;
-             audioContext = wavesurfer.backend.ac;
-             bassFilter = audioContext.createBiquadFilter();
-             bassFilter.type = 'lowshelf'; bassFilter.frequency.value = 200;
-             trebleFilter = audioContext.createBiquadFilter();
-             trebleFilter.type = 'highshelf'; trebleFilter.frequency.value = 2000;
-             wavesurfer.backend.disconnectFilters();
-             wavesurfer.setFilters([bassFilter, trebleFilter]);
+            console.log('WaveSurfer ready');
+            setupVisualizer();
         });
 
         const iconPlay = document.getElementById('iconPlay');
@@ -419,6 +804,10 @@
         wavesurfer.on('play', () => {
             iconPlay.style.display = 'none';
             iconPause.style.display = 'block';
+            // Ensure audio context is running when playing
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
         });
         wavesurfer.on('pause', () => {
             iconPlay.style.display = 'block';
@@ -433,6 +822,11 @@
             document.getElementById('mainTitle').textContent = playlist[idx].title;
             document.getElementById('mainArtist').textContent = playlist[idx].artist;
             renderPlaylist();
+            
+            // Reset visualizer for new track
+            sourceConnected = false;
+            mediaElementSource = null;
+            
             wavesurfer.load(playlist[idx].url);
         };
 
@@ -443,7 +837,6 @@
                 const li = document.createElement('li');
                 li.className = `playlist-item ${i === currentTrackIndex ? 'active' : ''}`;
                 
-                // Minimalist list item formatting
                 const num = i + 1 < 10 ? '0' + (i+1) : i+1;
                 
                 li.innerHTML = `
@@ -464,8 +857,12 @@
         };
 
         // Inputs
-        document.getElementById('bassSlider').oninput = (e) => { if(bassFilter) bassFilter.gain.value = e.target.value; };
-        document.getElementById('trebleSlider').oninput = (e) => { if(trebleFilter) trebleFilter.gain.value = e.target.value; };
+        document.getElementById('bassSlider').oninput = (e) => { 
+            if(bassFilter) bassFilter.gain.value = e.target.value; 
+        };
+        document.getElementById('trebleSlider').oninput = (e) => { 
+            if(trebleFilter) trebleFilter.gain.value = e.target.value; 
+        };
         document.getElementById('speedSlider').oninput = (e) => { 
             wavesurfer.setPlaybackRate(parseFloat(e.target.value));
             document.getElementById('speedVal').textContent = e.target.value + 'x';
@@ -494,6 +891,10 @@
         document.getElementById('loadUrlBtn').onclick = loadFromUrl;
         document.getElementById('urlInput').onkeydown = (e) => { if(e.key === 'Enter') loadFromUrl(); };
 
+        // Start visualization loop
+        visualize();
+
+        // Load initial track
         loadTrack(0);
     </script>
 </body>
