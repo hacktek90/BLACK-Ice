@@ -363,6 +363,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       width: 100%;
+      text-decoration: none;
     }
 
     .copy-btn:hover {
@@ -586,11 +587,12 @@
         <div class="note-content">
           <span class="note-label">Deploy URL</span>
           <div class="note-value" id="ghPagesUrl">https://black-ice.pages.dev/</div>
-          <button class="copy-btn" id="copyGhPagesBtn">
-            <i data-lucide="copy"></i>
-            <span>Copy</span>
-          </button>
-          <a href="https://livecodes.io/" target="_blank" class="copy-btn" style="margin-top: 8px; text-decoration: none;">
+          <!-- CHANGED: Button is now a link that opens in a new tab -->
+          <a href="https://black-ice.pages.dev/" target="_blank" class="copy-btn">
+            <i data-lucide="external-link"></i>
+            <span>Open Link</span>
+          </a>
+          <a href="https://livecodes.io/" target="_blank" class="copy-btn" style="margin-top: 8px;">
             <i data-lucide="code"></i>
             <span>Open IDE</span>
           </a>
@@ -736,9 +738,8 @@
       });
     }
 
-    // Initialize all copy buttons
+    // Initialize all copy buttons (Removed ghPagesUrl from here)
     setupCopyButton('dnsServer', 'copyDnsBtn');
-    setupCopyButton('ghPagesUrl', 'copyGhPagesBtn');
   </script>
 
 </body>
