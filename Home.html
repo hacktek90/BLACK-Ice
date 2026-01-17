@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -51,7 +49,7 @@
       crossorigin
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -85,7 +83,7 @@
         object-fit: cover;
       }
 
-      /* Overlay to darken video for better text contrast */
+      /* Overlay */
       .video-wrapper::after {
         content: '';
         position: absolute;
@@ -93,7 +91,8 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(9, 9, 11, 0.7);
+        background: rgba(9, 9, 11, 0.75); /* Slightly darker for better text contrast */
+        backdrop-filter: blur(2px); /* Subtle blur for depth */
       }
 
       html,
@@ -108,109 +107,213 @@
       body {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 40px;
-        padding: 32px 16px;
+        /* Remove fixed padding, handle inside container */
         position: relative;
         z-index: 1;
       }
 
-      /* Glow effect on top of video overlay */
+      /* Glow effect */
       .glow {
         position: fixed;
-        width: 320px;
-        height: 320px;
+        width: 600px; /* Larger glow */
+        height: 600px;
         background: radial-gradient(
           circle,
-          rgba(59, 130, 246, 0.12) 0%,
+          rgba(59, 130, 246, 0.08) 0%,
           rgba(0, 0, 0, 0) 70%
         );
-        top: 50%;
+        top: 40%;
         left: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: -1;
       }
 
+      /* Main Responsive Container */
+      .container {
+        width: 90%;
+        max-width: 1400px; /* Significantly wider than before */
+        margin: 0 auto;
+        padding: 60px 20px; /* Generous vertical padding */
+        display: flex;
+        flex-direction: column;
+        gap: 80px; /* Space between Hero and Content */
+        min-height: 100vh;
+        justify-content: center;
+      }
+
       /* Hero Section */
       .hero-section {
         text-align: center;
-        padding: 40px;
+        max-width: 900px;
+        margin: 0 auto;
       }
 
       h1 {
-        margin: 0 0 12px 0;
-        font-size: 24px;
-        font-weight: 600;
-        background: linear-gradient(to right, #ffffff, #a1a1aa);
+        /* Fluid typography: scales from 32px to 72px depending on screen width */
+        font-size: clamp(2rem, 5vw, 4.5rem); 
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 24px 0;
+        background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         cursor: pointer;
+        letter-spacing: -0.02em;
+        transition: opacity 0.2s ease;
       }
 
-      .hero-section p {
-        margin: 0;
-        font-size: 14px;
+      h1:hover {
+        opacity: 0.9;
+      }
+
+      .hero-subtitle {
+        font-size: clamp(1rem, 1.5vw, 1.25rem); /* 16px to 20px */
         line-height: 1.6;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.85);
+        max-width: 700px;
+        margin: 0 auto;
+        font-weight: 400;
       }
 
+      /* Hint Section */
       .hint-wrap {
-        margin-top: 32px;
+        margin-top: 48px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
+        opacity: 0.9;
       }
 
       .hint-icon {
-        width: 48px;
-        height: 48px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
+        width: 56px; /* Slightly larger */
+        height: 56px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #3b82f6;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease;
+      }
+
+      .hint-icon:hover {
+        transform: translateY(-2px);
       }
 
       .hint-text {
-        font-size: 12px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.6);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      /* SEO Content */
-      .seo-content {
-        max-width: 760px;
-        width: 100%;
-        font-size: 13px;
-        line-height: 1.6;
-        color: rgba(255, 255, 255, 0.6);
-        text-align: center;
-      }
-
-      .seo-content h2,
-      .seo-content h3 {
         font-size: 14px;
         font-weight: 600;
-        color: #d4d4d8;
-        margin-top: 16px;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        
+        /* Curly Underline Styles */
+        text-decoration-line: underline;
+        text-decoration-style: wavy;
+        text-decoration-color: #3b82f6;
+        text-underline-offset: 6px;
+        text-decoration-thickness: 2px;
+        
+        transition: all 0.3s ease;
+      }
+      
+      .hint-text:hover {
+        color: #ffffff;
+        text-decoration-color: #60a5fa;
       }
 
-      .seo-content ul {
-        max-width: 520px;
-        margin: 12px auto;
-        padding-left: 18px;
+      /* Content Section - Grid Layout */
+      .content-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .seo-header {
+        text-align: center;
+        max-width: 800px;
+        margin-bottom: 40px;
+      }
+
+      .seo-header h2 {
+        font-size: clamp(1.5rem, 3vw, 2.5rem); /* 24px to 40px */
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #ffffff;
+      }
+
+      .seo-header p {
+        font-size: clamp(1rem, 1.2vw, 1.125rem); /* 16px to 18px */
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.7;
+      }
+
+      /* Grid for list items */
+      .feature-grid {
+        display: grid;
+        /* 2 columns on tablet/desktop, 1 on mobile */
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+        width: 100%;
         text-align: left;
       }
 
-      .seo-content li {
-        color: rgba(255, 255, 255, 0.7);
+      .feature-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 24px;
+        transition: background 0.3s ease, transform 0.3s ease;
+      }
+
+      .feature-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-2px);
+      }
+
+      .feature-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+        color: #e4e4e7;
+        font-weight: 600;
+      }
+
+      .feature-card p {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.6;
+      }
+      
+      .final-cta {
+        text-align: center;
+        margin-top: 60px;
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.5);
+        max-width: 600px;
+      }
+
+      /* Mobile Adjustments */
+      @media (max-width: 768px) {
+        .container {
+          padding: 40px 16px;
+          gap: 60px;
+        }
+        
+        .feature-grid {
+          grid-template-columns: 1fr; /* Force single column on mobile */
+          gap: 20px;
+        }
+        
+        .glow {
+          width: 300px;
+          height: 300px;
+        }
       }
     </style>
   </head>
@@ -225,65 +328,85 @@
 
     <div class="glow"></div>
 
-    <main class="hero-section">
-      <h1
-        role="button"
-        tabindex="0"
-        onclick="window.open('/test/dev.html', '_blank')"
-        onkeydown="if(event.key==='Enter'){window.open('/test/dev.html','_blank')}"
-      >
-        Welcome to BlackICE
-      </h1>
-
-      <p>A minimal portal for AI tools, productivity apps, and web utilities.</p>
-
-      <div class="hint-wrap">
-        <div class="hint-icon">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-        </div>
-        <div class="hint-text">Click the icon toggle below to launch projects</div>
-      </div>
-    </main>
-
-    <!-- SEO INDEXABLE CONTENT -->
-    <section class="seo-content">
-      <h2>All-in-One Web Tools & AI Utilities Platform</h2>
-      <p>
-        BlackICE Portal is a browser-based platform combining AI-powered tools,
-        productivity apps, developer utilities, document creation systems, media
-        tools, and real-time collaboration in a single minimal interface.
-      </p>
-
-      <h3>What You Can Do</h3>
-      <ul>
-        <li>Use AI tools for focus, health tracking, and automation</li>
-        <li>Manage tasks, habits, notes, and planning workflows</li>
-        <li>Create documents, slides, mind maps, and whiteboards</li>
-        <li>Access developer utilities like HTML viewers and Git fetchers</li>
-        <li>Collaborate via chat, calls, shared docs, and drawing boards</li>
-      </ul>
-
-      <p>
-        BlackICE is designed as a lightweight web operating system — fast,
-        distraction-free, and accessible instantly without installation.
-      </p>
-
+    <!-- Main Container -->
+    <div class="container">
       
-    </section>
+      <main class="hero-section">
+        <h1
+          role="button"
+          tabindex="0"
+          onclick="window.open('/test/dev.html', '_blank')"
+          onkeydown="if(event.key==='Enter'){window.open('/test/dev.html','_blank')}"
+        >
+          Welcome to BlackICE
+        </h1>
+
+        <p class="hero-subtitle">
+          A minimal portal for AI tools, productivity apps, and web utilities. 
+          Access everything instantly in your browser.
+        </p>
+
+        <div class="hint-wrap">
+          <div class="hint-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <div class="hint-text">Click the icon toggle below to launch projects</div>
+        </div>
+      </main>
+
+      <!-- SEO & Feature Content (Grid Layout) -->
+      <section class="content-section">
+        <div class="seo-header">
+          <h2>All-in-One Platform</h2>
+          <p>
+            BlackICE Portal is a browser-based platform combining AI-powered tools,
+            productivity apps, developer utilities, document creation, media tools,
+            and real-time collaboration.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h3>AI & Productivity</h3>
+            <p>Use AI tools for focus, health tracking, and automation. Manage tasks, habits, notes, and planning workflows with intelligent assistance.</p>
+          </div>
+
+          <div class="feature-card">
+            <h3>Creation Suite</h3>
+            <p>Create documents, slides, mind maps, and whiteboards instantly. Access developer utilities like HTML viewers and Git fetchers.</p>
+          </div>
+
+          <div class="feature-card">
+            <h3>Real-time Collaboration</h3>
+            <p>Collaborate seamlessly via chat, calls, shared docs, and drawing boards. Work together without friction.</p>
+          </div>
+
+          <div class="feature-card">
+            <h3>Developer Utilities</h3>
+            <p>Access raw HTML viewers, code fetchers, and browser-based debugging tools directly from the portal interface.</p>
+          </div>
+        </div>
+        
+        <div class="final-cta">
+            BlackICE is designed as a lightweight web operating system — fast, distraction-free, and accessible instantly without installation.
+        </div>
+      </section>
+
+    </div>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
