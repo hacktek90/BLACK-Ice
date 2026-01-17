@@ -3,16 +3,12 @@
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Favicon -->
     <link rel="icon" href="/output-onlinepngtools.png" type="image/png" />
 
-    <!-- Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Title -->
     <title>BlackICE Portal — AI, Productivity & Web Tools Platform</title>
 
-    <!-- Primary Meta -->
     <meta
       name="description"
       content="BlackICE Portal is a minimal, modern web-based platform offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration — accessible instantly in your browser."
@@ -20,12 +16,10 @@
     <meta name="author" content="BlackICE" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Theme -->
     <meta name="theme-color" content="#09090b" />
     <meta name="color-scheme" content="dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
-    <!-- Open Graph -->
     <meta property="og:title" content="BlackICE Portal" />
     <meta
       property="og:description"
@@ -35,32 +29,52 @@
     <meta property="og:site_name" content="BlackICE" />
     <meta property="og:image" content="/preview-image.png" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
     <style>
+      :root {
+        --bg-dark: #09090b;
+        --glass-bg: rgba(9, 9, 11, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --accent-blue: #3b82f6;
+        --accent-glow: rgba(59, 130, 246, 0.5);
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
 
-      /* Video Background Container */
+      html,
+      body {
+        width: 100%;
+        min-height: 100vh;
+        font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg-dark);
+        color: var(--text-main);
+        overflow-x: hidden;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* --- Background Video & Overlay --- */
       .video-wrapper {
         position: fixed;
         top: 0;
@@ -81,245 +95,188 @@
         left: 50%;
         transform: translate(-50%, -50%);
         object-fit: cover;
+        opacity: 0.6; /* Dimmed naturally */
       }
 
-      /* Overlay */
+      /* Noise texture overlay for cyberpunk feel */
       .video-wrapper::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(9, 9, 11, 0.75); /* Slightly darker for better text contrast */
-        backdrop-filter: blur(2px); /* Subtle blur for depth */
-      }
-
-      html,
-      body {
-        width: 100%;
-        min-height: 100vh;
-        font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #09090b;
-        color: #ffffff;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-        /* Remove fixed padding, handle inside container */
-        position: relative;
+        background: radial-gradient(circle at center, transparent 0%, #09090b 120%),
+          linear-gradient(to bottom, rgba(9, 9, 11, 0.4), rgba(9, 9, 11, 0.9));
         z-index: 1;
       }
 
-      /* Glow effect */
       .glow {
         position: fixed;
-        width: 600px; /* Larger glow */
+        width: 600px;
         height: 600px;
         background: radial-gradient(
           circle,
-          rgba(59, 130, 246, 0.08) 0%,
+          rgba(59, 130, 246, 0.15) 0%,
           rgba(0, 0, 0, 0) 70%
         );
-        top: 40%;
+        top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: -1;
       }
 
-      /* Main Responsive Container */
-      .container {
-        width: 90%;
-        max-width: 1400px; /* Significantly wider than before */
-        margin: 0 auto;
-        padding: 60px 20px; /* Generous vertical padding */
+      /* --- Layout Container --- */
+      .main-container {
+        width: 100%;
+        max-width: 900px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 80px; /* Space between Hero and Content */
-        min-height: 100vh;
-        justify-content: center;
+        align-items: center;
+        gap: 60px;
+        animation: fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        opacity: 0;
+        transform: translateY(20px);
       }
 
-      /* Hero Section */
+      /* --- Hero Section --- */
       .hero-section {
         text-align: center;
-        max-width: 900px;
-        margin: 0 auto;
+        position: relative;
       }
 
       h1 {
-        /* Fluid typography: scales from 32px to 72px depending on screen width */
-        font-size: clamp(2rem, 5vw, 4.5rem); 
+        font-size: clamp(2.5rem, 5vw, 4rem);
         font-weight: 700;
+        letter-spacing: -0.03em;
         line-height: 1.1;
-        margin: 0 0 24px 0;
-        background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+        margin-bottom: 20px;
+        background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         cursor: pointer;
-        letter-spacing: -0.02em;
-        transition: opacity 0.2s ease;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
       }
 
       h1:hover {
         opacity: 0.9;
+        transform: scale(1.01);
+        text-shadow: 0 0 60px rgba(59, 130, 246, 0.3);
       }
 
-      .hero-subtitle {
-        font-size: clamp(1rem, 1.5vw, 1.25rem); /* 16px to 20px */
-        line-height: 1.6;
-        color: rgba(255, 255, 255, 0.85);
-        max-width: 700px;
+      .hero-section p {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        max-width: 500px;
         margin: 0 auto;
-        font-weight: 400;
+        line-height: 1.6;
+        font-weight: 300;
       }
 
-      /* Hint Section */
-      .hint-wrap {
-        margin-top: 48px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        opacity: 0.9;
+      /* --- Glass Card for Features --- */
+      .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 40px;
+        width: 100%;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        text-align: center;
       }
 
-      .hint-icon {
-        width: 56px; /* Slightly larger */
-        height: 56px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #3b82f6;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        transition: transform 0.2s ease;
-      }
-
-      .hint-icon:hover {
-        transform: translateY(-2px);
-      }
-
-      .hint-text {
-        font-size: 14px;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.7);
+      .section-title {
+        font-size: 0.875rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        
-        /* Curly Underline Styles */
-        text-decoration-line: underline;
-        text-decoration-style: wavy;
-        text-decoration-color: #3b82f6;
-        text-underline-offset: 6px;
-        text-decoration-thickness: 2px;
-        
-        transition: all 0.3s ease;
-      }
-      
-      .hint-text:hover {
-        color: #ffffff;
-        text-decoration-color: #60a5fa;
+        color: var(--accent-blue);
+        margin-bottom: 24px;
+        display: block;
+        font-weight: 600;
       }
 
-      /* Content Section - Grid Layout */
-      .content-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        text-align: left;
         margin-top: 20px;
       }
 
-      .seo-header {
-        text-align: center;
-        max-width: 800px;
-        margin-bottom: 40px;
-      }
-
-      .seo-header h2 {
-        font-size: clamp(1.5rem, 3vw, 2.5rem); /* 24px to 40px */
-        font-weight: 700;
-        margin-bottom: 16px;
-        color: #ffffff;
-      }
-
-      .seo-header p {
-        font-size: clamp(1rem, 1.2vw, 1.125rem); /* 16px to 18px */
-        color: rgba(255, 255, 255, 0.7);
-        line-height: 1.7;
-      }
-
-      /* Grid for list items */
-      .feature-grid {
-        display: grid;
-        /* 2 columns on tablet/desktop, 1 on mobile */
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 32px;
-        width: 100%;
-        text-align: left;
-      }
-
-      .feature-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+      .feature-item {
+        padding: 16px;
         border-radius: 12px;
-        padding: 24px;
-        transition: background 0.3s ease, transform 0.3s ease;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: transform 0.2s ease, background 0.2s ease;
       }
 
-      .feature-card:hover {
+      .feature-item:hover {
         background: rgba(255, 255, 255, 0.06);
         transform: translateY(-2px);
       }
 
-      .feature-card h3 {
-        font-size: 1.25rem;
-        margin-bottom: 12px;
-        color: #e4e4e7;
-        font-weight: 600;
+      .feature-item h3 {
+        font-size: 0.95rem;
+        color: #fff;
+        margin-bottom: 6px;
+        font-weight: 500;
       }
 
-      .feature-card p {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.65);
-        line-height: 1.6;
-      }
-      
-      .final-cta {
-        text-align: center;
-        margin-top: 60px;
-        font-size: 0.9rem;
-        color: rgba(255,255,255,0.5);
-        max-width: 600px;
+      .feature-item p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.4;
       }
 
-      /* Mobile Adjustments */
-      @media (max-width: 768px) {
-        .container {
-          padding: 40px 16px;
-          gap: 60px;
+      /* --- Hint/Launcher HUD --- */
+      .hint-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
+        margin-top: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      .hint-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      /* --- Animations --- */
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        .feature-grid {
-          grid-template-columns: 1fr; /* Force single column on mobile */
-          gap: 20px;
-        }
-        
-        .glow {
-          width: 300px;
-          height: 300px;
-        }
+      }
+
+      /* SEO hidden content for structure but visual separation */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
       }
     </style>
   </head>
 
   <body>
-    <!-- Video Background -->
     <div class="video-wrapper">
       <video autoplay muted loop playsinline>
         <source src="https://blackice-ac.vercel.app/scrapsites/integrated-loop-optimized.mp4" type="video/mp4">
@@ -328,8 +285,7 @@
 
     <div class="glow"></div>
 
-    <!-- Main Container -->
-    <div class="container">
+    <div class="main-container">
       
       <main class="hero-section">
         <h1
@@ -337,78 +293,58 @@
           tabindex="0"
           onclick="window.open('/test/dev.html', '_blank')"
           onkeydown="if(event.key==='Enter'){window.open('/test/dev.html','_blank')}"
+          title="Enter Developer Mode"
         >
-          Welcome to BlackICE
+          BlackICE Portal
         </h1>
-
-        <p class="hero-subtitle">
-          A minimal portal for AI tools, productivity apps, and web utilities. 
-          Access everything instantly in your browser.
-        </p>
-
+        <p>The operating system for your web productivity.<br>Seamlessly integrated AI, Utilities, and Workspace tools.</p>
+        
         <div class="hint-wrap">
-          <div class="hint-icon">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-          </div>
-          <div class="hint-text">Click the icon toggle below to launch projects</div>
+          <div class="hint-text">Click the button toggle at right bottom to open projects</div>
         </div>
       </main>
 
-      <!-- SEO & Feature Content (Grid Layout) -->
-      <section class="content-section">
-        <div class="seo-header">
-          <h2>All-in-One Platform</h2>
+      <section class="glass-card">
+        <span class="section-title">System Capabilities</span>
+        
+        <div class="features-grid">
+          <div class="feature-item">
+            <h3>AI Core</h3>
+            <p>Focus enhancement, health tracking, and automated intelligence workflows.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Productivity</h3>
+            <p>Task management, habit tracking, and advanced planning systems.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Creation</h3>
+            <p>Docs, slides, whiteboards, and mind maps in one unified interface.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Dev Tools</h3>
+            <p>HTML viewers, Git utilities, and minimal developer environments.</p>
+          </div>
+        </div>
+
+        <div class="sr-only">
+          <h2>All-in-One Web Tools & AI Utilities Platform</h2>
           <p>
             BlackICE Portal is a browser-based platform combining AI-powered tools,
-            productivity apps, developer utilities, document creation, media tools,
-            and real-time collaboration.
+            productivity apps, developer utilities, document creation systems, media
+            tools, and real-time collaboration in a single minimal interface.
           </p>
-        </div>
-
-        <div class="feature-grid">
-          <div class="feature-card">
-            <h3>AI & Productivity</h3>
-            <p>Use AI tools for focus, health tracking, and automation. Manage tasks, habits, notes, and planning workflows with intelligent assistance.</p>
-          </div>
-
-          <div class="feature-card">
-            <h3>Creation Suite</h3>
-            <p>Create documents, slides, mind maps, and whiteboards instantly. Access developer utilities like HTML viewers and Git fetchers.</p>
-          </div>
-
-          <div class="feature-card">
-            <h3>Real-time Collaboration</h3>
-            <p>Collaborate seamlessly via chat, calls, shared docs, and drawing boards. Work together without friction.</p>
-          </div>
-
-          <div class="feature-card">
-            <h3>Developer Utilities</h3>
-            <p>Access raw HTML viewers, code fetchers, and browser-based debugging tools directly from the portal interface.</p>
-          </div>
-        </div>
-        
-        <div class="final-cta">
-            BlackICE is designed as a lightweight web operating system — fast, distraction-free, and accessible instantly without installation.
+          <ul>
+            <li>Use AI tools for focus, health tracking, and automation</li>
+            <li>Manage tasks, habits, notes, and planning workflows</li>
+            <li>Create documents, slides, mind maps, and whiteboards</li>
+            <li>Access developer utilities like HTML viewers and Git fetchers</li>
+            <li>Collaborate via chat, calls, shared docs, and drawing boards</li>
+          </ul>
         </div>
       </section>
 
     </div>
 
-    <!-- Structured Data -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -425,7 +361,6 @@
       }
     </script>
 
-    <!-- Scripts -->
     <script src="/test/portal.js" defer></script>
     <script src="/test/redirect.js" defer></script>
     <script src="/test/darky.js" defer></script>
