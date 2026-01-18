@@ -10,7 +10,7 @@
         constructor() {
         this.dbUrl = "https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
         this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
-        this.homeUrl = "https://blackice-ac.vercel.app/"; // Added home URL
+        this.homeUrl = "https://blackice-ac.vercel.app/"; 
         this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";
         
         this.theme = {
@@ -365,9 +365,9 @@
         setTimeout(() => {
             const chatElements = document.querySelectorAll('[class*="crisp-"]');
             chatElements.forEach(el => {
-                if (el.style.zIndex) {
-                    el.style.zIndex = '2147483648';
-                }
+            if (el.style.zIndex) {
+                el.style.zIndex = '2147483648';
+            }
             });
         }, 100);
         };
@@ -378,11 +378,9 @@
         this.renderProjects(filtered);
         };
         
-        // Modified home button to open the home URL in iframe
+        // UPDATED: Home button now navigates the main window instead of opening iframe
         document.getElementById('bi-home-btn').onclick = () => {
-        this.openProject(this.homeUrl, "BlackICE Home");
-        // Clear URL param on home click
-        window.history.pushState({}, '', window.location.pathname);
+            window.location.href = this.homeUrl;
         };
         }
         
