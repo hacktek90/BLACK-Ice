@@ -54,6 +54,7 @@
             line-height: 1.5;
             padding: 2rem 1rem;
             min-height: 100vh;
+            transition: background-color 0.3s ease;
         }
 
         /* --- Layout --- */
@@ -318,14 +319,14 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Audio Player */
+        /* Custom Audio Player */
         .player-wrapper {
             background: #1e293b;
             border-radius: var(--radius);
             padding: 1.25rem;
             margin-top: 1.5rem;
             color: white;
-            display: none; /* Hidden by default */
+            display: none;
             animation: slideUp 0.3s ease-out;
             box-shadow: var(--shadow-lg);
         }
@@ -341,7 +342,6 @@
             gap: 1rem;
         }
 
-        /* Single Toggle Button */
         .play-toggle-btn {
             width: 52px;
             height: 52px;
@@ -538,6 +538,72 @@
             opacity: 1;
         }
 
+        /* -----------------------------------------------------------
+           DEV MODE SPECIFIC STYLES (When URL params are present)
+        ----------------------------------------------------------- */
+        
+        body.dev-mode-active {
+            background-color: #fff;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        body.dev-mode-active .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        /* Hide everything except the dev-result-wrapper */
+        body.dev-mode-active .container > *:not(#dev-result-wrapper) {
+            display: none !important;
+        }
+
+        #dev-result-wrapper {
+            display: none; /* Hidden by default */
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        #dev-result-wrapper.visible {
+            display: block;
+        }
+
+        #dev-result-text {
+            font-size: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        /* Native Audio Player Styling Override for clean look */
+        body.dev-mode-active audio {
+            width: 100%;
+            outline: none;
+            border-radius: 30px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .dev-loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .dev-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border-width: 4px;
+            margin: 0 auto 1rem auto;
+            color: var(--primary);
+        }
+
+        /* ----------------------------------------------------------- */
+
         /* Mobile adjustments */
         @media (max-width: 640px) {
             .header h1 { font-size: 1.75rem; }
@@ -554,13 +620,36 @@
 <body>
 
     <div class="container">
-        <!-- Header -->
+        <!-- Dev Result Wrapper (Only visible in Dev Mode) -->
+        <div id="dev-result-wrapper">
+            <div id="dev-loading-indicator" class="dev-loading hidden">
+                <div class="spinner"></div>
+                <p>Generating Neural Audio...</p>
+            </div>
+
+            <div id="dev-content" class="hidden">
+                <p id="dev-result-text">"Audio Text Here"</p>
+                <!-- Native Browser Audio Player -->
+                <audio id="native-audio" controls></audio>
+                <div style="margin-top: 1.5rem;">
+                    <a id="dev-download-link" href="#" class="btn-secondary" style="display: inline-flex; width: auto; margin: 0 auto;">
+                        <i data-lucide="download" width="16"></i> Download MP3
+                    </a>
+                </div>
+            </div>
+            
+            <div id="dev-error-msg" class="status-box error hidden" style="margin-top: 1rem;">
+                Error loading audio.
+            </div>
+        </div>
+
+        <!-- Header (Hidden in Dev Mode) -->
         <header class="header">
             <h1>Text-To-Speech Engine </h1>
             <p>Experience Standard, Neural, and AI voices.</p>
         </header>
 
-        <!-- Input Section -->
+        <!-- Input Section (Hidden in Dev Mode) -->
         <section class="card">
             <div class="card-header">
                 <i data-lucide="message-square"></i>
@@ -578,7 +667,7 @@
             </div>
         </section>
 
-        <!-- Configuration Section -->
+        <!-- Configuration Section (Hidden in Dev Mode) -->
         <section class="card">
             <div class="card-header">
                 <i data-lucide="sliders"></i>
@@ -612,7 +701,7 @@
             </div>
         </section>
 
-        <!-- Engine Selection -->
+        <!-- Engine Selection (Hidden in Dev Mode) -->
         <section class="card">
             <div class="card-header">
                 <i data-lucide="cpu"></i>
@@ -654,14 +743,12 @@
                 <span id="status-text">Select an engine above to generate audio.</span>
             </div>
 
-            <!-- Custom Audio Player -->
+            <!-- Custom Audio Player (Hidden in Dev Mode) -->
             <div id="audio-player" class="player-wrapper">
                 <div class="player-controls">
-                    <!-- Single Toggle Button -->
                     <button id="play-toggle" class="play-toggle-btn" title="Play/Pause">
                         <i data-lucide="play" fill="currentColor" stroke="none"></i>
                     </button>
-
                     <div class="progress-container">
                         <div class="progress-track" id="progress-track">
                             <div class="progress-bar" id="progress-bar"></div>
@@ -671,7 +758,6 @@
                             <span id="total-duration">0:00</span>
                         </div>
                     </div>
-
                     <div class="player-actions">
                         <button class="icon-btn" onclick="downloadAudio()" title="Download MP3">
                             <i data-lucide="download" width="18"></i>
@@ -681,7 +767,7 @@
             </div>
         </section>
 
-        <!-- Developer Section -->
+        <!-- Developer Section (Hidden in Dev Mode) -->
         <section class="card dev-section" id="developer-section">
             <div class="card-header">
                 <i data-lucide="terminal"></i>
@@ -690,7 +776,7 @@
             
             <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
                 Generate audio directly via URL parameters. Use this to share audio configurations or test deep links. 
-                <br><em>Forces Neural engine.</em>
+                <br><em>Forces Neural engine and Native Player.</em>
             </p>
 
             <div class="dev-inputs">
@@ -754,6 +840,7 @@
             currentEngine: null,
             audioBlob: null,
             audioUrl: null,
+            isDevMode: false, // NEW: Track if we are in URL-only mode
             // Voice mapping for the Developer section
             voiceMap: {
                 male: 'Matthew',
@@ -785,7 +872,15 @@
             // Dev Elements
             devGender: document.getElementById('dev-gender'),
             devLang: document.getElementById('dev-lang'),
-            urlOutput: document.getElementById('url-output')
+            urlOutput: document.getElementById('url-output'),
+            // Dev Result Wrapper Elements
+            devWrapper: document.getElementById('dev-result-wrapper'),
+            devResultText: document.getElementById('dev-result-text'),
+            devLoading: document.getElementById('dev-loading-indicator'),
+            devContent: document.getElementById('dev-content'),
+            devErrorMsg: document.getElementById('dev-error-msg'),
+            nativeAudio: document.getElementById('native-audio'),
+            devDownloadLink: document.getElementById('dev-download-link')
         };
 
         // --- Preset Texts ---
@@ -803,7 +898,7 @@
             if (len > 3000) els.input.value = els.input.value.substring(0, 3000);
         });
 
-        // Single Toggle Button Logic
+        // Single Toggle Button Logic (Custom Player)
         els.playToggleBtn.addEventListener('click', togglePlayback);
         
         els.audio.addEventListener('timeupdate', updateProgress);
@@ -825,7 +920,7 @@
 
         function setPreset(num) {
             els.input.value = presets[num];
-            els.input.dispatchEvent(new Event('input')); // Trigger counter update
+            els.input.dispatchEvent(new Event('input'));
         }
 
         function showToast(msg) {
@@ -838,6 +933,9 @@
         }
 
         function setStatus(type, msg, isLoading = false) {
+            // Don't show status box in dev mode, handle via dev wrappers
+            if (state.isDevMode) return;
+
             els.statusBox.className = 'status-box';
             if (type) els.statusBox.classList.add(type);
             
@@ -851,61 +949,68 @@
             }
             
             els.statusBox.innerHTML = html;
-            if (isLoading) {
-                // Re-inject spinner styles if needed, handled by CSS class
-            } else {
+            if (!isLoading) {
                 lucide.createIcons();
             }
         }
 
         function selectEngine(engine) {
             if (state.isGenerating) return;
-
-            // Visual selection
             Object.values(els.cards).forEach(c => c.classList.remove('active'));
             els.cards[engine].classList.add('active');
-
             generateSpeech(engine);
         }
 
         async function generateSpeech(engine) {
             const text = els.input.value.trim();
             if (!text) {
-                setStatus('error', 'Please enter some text first.');
+                if (!state.isDevMode) setStatus('error', 'Please enter some text first.');
+                else showDevError("No text provided");
                 return;
             }
 
             state.currentEngine = engine;
             state.isGenerating = true;
-            els.audioWrapper.style.display = 'none';
             
-            // UI Loading State
-            setStatus('loading', `Synthesizing with ${engine.charAt(0).toUpperCase() + engine.slice(1)} engine...`, true);
-            Object.values(els.cards).forEach(c => c.style.opacity = '0.6');
-            if(els.cards[engine]) els.cards[engine].style.opacity = '1';
+            // --- UI Handling based on Mode ---
+            if (state.isDevMode) {
+                // Dev Mode: Show loading spinner in the minimal wrapper
+                els.devWrapper.classList.add('visible');
+                els.devLoading.classList.remove('hidden');
+                els.devContent.classList.add('hidden');
+                els.devErrorMsg.classList.add('hidden');
+            } else {
+                // Normal Mode
+                els.audioWrapper.style.display = 'none';
+                setStatus('loading', `Synthesizing with ${engine.charAt(0).toUpperCase() + engine.slice(1)} engine...`, true);
+                Object.values(els.cards).forEach(c => c.style.opacity = '0.6');
+                if(els.cards[engine]) els.cards[engine].style.opacity = '1';
+            }
 
             try {
                 // Puter.js API Call
                 let audioEl;
                 
-                // Use inputs from main config unless overridden by dev mode logic
+                // Force Neural if in Dev Mode
+                const actualEngine = state.isDevMode ? 'neural' : engine;
+
+                // Use inputs
                 const voiceToUse = els.voice.value;
                 const langToUse = els.language.value;
                 
-                if (engine === 'generative') {
+                if (actualEngine === 'generative') {
                     audioEl = await puter.ai.txt2speech(text, {
                         voice: voiceToUse,
                         model: 'eleven_multilingual_v2', 
                         language: langToUse
                     });
-                } else if (engine === 'neural') {
+                } else if (actualEngine === 'neural') {
                     audioEl = await puter.ai.txt2speech(text, {
                         voice: voiceToUse,
                         engine: 'neural', 
                         language: langToUse
                     });
                 } else {
-                    // Standard fallback
                     audioEl = await puter.ai.txt2speech(text, {
                         voice: voiceToUse,
                         language: langToUse
@@ -916,37 +1021,72 @@
                     throw new Error("Audio generation returned no source.");
                 }
 
-                // Setup Audio Player
-                els.audio.src = audioEl.src;
+                // --- Output Handling based on Mode ---
                 
-                // Attempt to create a blob for downloading
+                // 1. Fetch Blob for Download capability
+                let blobUrl = audioEl.src;
                 try {
                     const response = await fetch(audioEl.src);
-                    state.audioBlob = await response.blob();
-                    state.audioUrl = audioEl.src; 
+                    const blob = await response.blob();
+                    state.audioBlob = blob;
+                    // Create a blob URL for download button
+                    blobUrl = URL.createObjectURL(blob);
                 } catch (e) {
-                    console.warn("Could not fetch blob for download.");
+                    console.warn("Could not fetch blob.");
                     state.audioBlob = null;
                 }
 
-                els.audio.load(); 
-                els.audioWrapper.style.display = 'block';
-                setStatus('success', 'Audio generated successfully!');
-                
-                // Auto-play
-                els.audio.play().catch(e => console.log('Autoplay prevented'));
+                if (state.isDevMode) {
+                    // --- DEV MODE OUTPUT ---
+                    els.devResultText.textContent = text;
+                    els.nativeAudio.src = blobUrl;
+                    els.devDownloadLink.href = blobUrl;
+                    els.devDownloadLink.download = `audio-${Date.now()}.mp3`;
+                    
+                    // Show Content
+                    els.devLoading.classList.add('hidden');
+                    els.devContent.classList.remove('hidden');
+                    
+                    // Attempt Autoplay (might be blocked by browser policy)
+                    try {
+                        await els.nativeAudio.play();
+                    } catch(e) {
+                        // Autoplay blocked is expected, user will click play
+                        console.log("Autoplay prevented (expected)");
+                    }
+
+                } else {
+                    // --- NORMAL MODE OUTPUT ---
+                    els.audio.src = blobUrl; // Use blob URL for consistency
+                    els.audio.load(); 
+                    els.audioWrapper.style.display = 'block';
+                    setStatus('success', 'Audio generated successfully!');
+                    els.audio.play().catch(e => console.log('Autoplay prevented'));
+                }
 
             } catch (err) {
                 console.error(err);
-                setStatus('error', `Failed to generate audio: ${err.message}`);
-                els.audioWrapper.style.display = 'none';
+                if (state.isDevMode) {
+                    showDevError(err.message);
+                } else {
+                    setStatus('error', `Failed to generate audio: ${err.message}`);
+                    els.audioWrapper.style.display = 'none';
+                }
             } finally {
                 state.isGenerating = false;
-                Object.values(els.cards).forEach(c => c.style.opacity = '1');
+                if (!state.isDevMode) {
+                    Object.values(els.cards).forEach(c => c.style.opacity = '1');
+                }
             }
         }
 
-        // --- Player Logic ---
+        function showDevError(msg) {
+            els.devLoading.classList.add('hidden');
+            els.devErrorMsg.classList.remove('hidden');
+            els.devErrorMsg.textContent = msg;
+        }
+
+        // --- Player Logic (Normal Mode) ---
 
         function togglePlayback() {
             if (els.audio.paused) {
@@ -992,7 +1132,6 @@
                 a.download = `tts-${state.currentEngine}-${Date.now()}.mp3`;
                 document.body.appendChild(a);
                 a.click();
-                
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
@@ -1021,28 +1160,20 @@
         }
 
         function copyDevLink() {
-            // Update the display first to ensure it matches current text
             const url = updateUrlDisplay();
-            
             if (!url) return;
-
             navigator.clipboard.writeText(url).then(() => {
                 showToast("Link copied to clipboard!");
-            }).catch(err => {
-                showToast("Failed to copy link");
-                console.error(err);
-            });
+            }).catch(err => showToast("Failed to copy link"));
         }
 
         function updateUrlDisplay() {
             const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             const params = new URLSearchParams();
-            
             params.set('text', els.input.value);
             params.set('gender', els.devGender.value);
             params.set('lang', els.devLang.value);
-            // Force engine=neural in the link for clarity
-            params.set('engine', 'neural');
+            params.set('engine', 'neural'); // explicit
 
             const finalUrl = `${baseUrl}?${params.toString()}`;
             els.urlOutput.textContent = finalUrl;
@@ -1053,37 +1184,39 @@
         function handleUrlParams() {
             const params = new URLSearchParams(window.location.search);
             
+            // Check if we are in Dev Mode (Link Mode)
             if (params.has('text')) {
-                els.input.value = params.get('text');
-                els.input.dispatchEvent(new Event('input'));
-            }
+                state.isDevMode = true;
+                document.body.classList.add('dev-mode-active');
 
-            if (params.has('gender')) {
-                const g = params.get('gender');
-                if (['male', 'female'].includes(g)) {
-                    els.devGender.value = g;
+                // Extract Params
+                if (params.has('text')) {
+                    els.input.value = params.get('text');
+                    els.input.dispatchEvent(new Event('input'));
                 }
-            }
+                if (params.has('gender')) {
+                    const g = params.get('gender');
+                    if (['male', 'female'].includes(g)) els.devGender.value = g;
+                }
+                if (params.has('lang')) {
+                    els.devLang.value = params.get('lang');
+                }
 
-            if (params.has('lang')) {
-                els.devLang.value = params.get('lang');
-            }
+                // Apply logic to internal state variables
+                els.voice.value = state.voiceMap[els.devGender.value];
+                els.language.value = els.devLang.value;
 
-            // If we have specific params, we should auto-generate
-            if (params.has('text')) {
-                // Give a slight delay for UI to settle
-                setTimeout(() => {
-                    generateDevLink();
-                    showToast("Loaded configuration from URL");
-                }, 500);
+                // Generate Immediately
+                generateSpeech('neural'); // Forced Neural
+                
+            } else {
+                // Normal Mode Init
+                updatePlayIcon();
+                els.input.dispatchEvent(new Event('input'));
             }
         }
 
         // --- Initialization ---
-        updatePlayIcon();
-        els.input.dispatchEvent(new Event('input'));
-        
-        // Check for URL params on load
         window.addEventListener('DOMContentLoaded', handleUrlParams);
 
     </script>
