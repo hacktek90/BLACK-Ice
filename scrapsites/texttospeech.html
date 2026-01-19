@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTS Engine Comparison Tool</title>
+    <title>TTS Engine & Developer Tool</title>
     <meta name="description" content="Compare standard, neural, and generative text-to-speech engines with Puter.js">
     
     <!-- Puter.js Library -->
@@ -40,6 +40,7 @@
             
             --radius: 12px;
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'Fira Code', 'Courier New', monospace;
             
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -424,21 +425,118 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 3rem;
+        /* Developer Section */
+        .dev-section {
+            border: 2px dashed var(--border-light);
+            background: #fdfdfd;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dev-section::before {
+            content: "API / DEV";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--border-light);
             color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-bottom-left-radius: 8px;
+        }
+
+        .dev-controls {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .dev-inputs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dev-inputs .form-control {
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-light);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-family: var(--font-mono);
             font-size: 0.9rem;
         }
 
-        .footer a {
-            color: var(--primary);
-            text-decoration: none;
+        .btn-secondary:hover {
+            background: var(--bg-input);
         }
 
-        /* Utilities */
-        .hidden { display: none !important; }
+        .url-display {
+            background: var(--bg-input);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            word-break: break-all;
+            display: none;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
 
         /* Mobile adjustments */
         @media (max-width: 640px) {
@@ -446,7 +544,11 @@
             .player-controls { flex-direction: column; align-items: stretch; }
             .player-actions { justify-content: center; margin-top: 0.5rem; }
             .play-toggle-btn { width: 64px; height: 64px; margin: 0 auto; }
+            .dev-controls { grid-template-columns: 1fr; }
+            .dev-inputs { flex-direction: column; }
         }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -579,6 +681,55 @@
             </div>
         </section>
 
+        <!-- Developer Section -->
+        <section class="card dev-section" id="developer-section">
+            <div class="card-header">
+                <i data-lucide="terminal"></i>
+                <span class="card-title">Developer Quick Link (Neural)</span>
+            </div>
+            
+            <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                Generate audio directly via URL parameters. Use this to share audio configurations or test deep links. 
+                <br><em>Forces Neural engine.</em>
+            </p>
+
+            <div class="dev-inputs">
+                <div class="form-control">
+                    <label>Gender</label>
+                    <select id="dev-gender">
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label>Language (Code)</label>
+                    <select id="dev-lang">
+                        <option value="en-US">en-US</option>
+                        <option value="en-GB">en-GB</option>
+                        <option value="es-ES">es-ES</option>
+                        <option value="fr-FR">fr-FR</option>
+                        <option value="de-DE">de-DE</option>
+                        <option value="ja-JP">ja-JP</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="dev-controls">
+                <div style="font-size: 0.85rem; color: var(--text-muted); align-self: center;">
+                    <i data-lucide="link" width="14" style="vertical-align: middle; margin-right: 4px;"></i>
+                    Link updates automatically with input text.
+                </div>
+                <button class="btn-secondary" onclick="copyDevLink()">
+                    <i data-lucide="copy" width="16"></i> Copy Link
+                </button>
+                <button class="btn-primary" onclick="generateDevLink()">
+                    <i data-lucide="play-circle" width="16"></i> Generate
+                </button>
+            </div>
+            
+            <div id="url-output" class="url-display"></div>
+        </section>
+
         <footer class="footer">
             <p> Use it for free .</p>
         </footer>
@@ -586,6 +737,12 @@
 
     <!-- Hidden Audio Element to handle the stream -->
     <audio id="audio-element" preload="metadata"></audio>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check" width="16"></i>
+        <span id="toast-msg">Action Successful</span>
+    </div>
 
     <script>
         // --- Initialization ---
@@ -596,7 +753,12 @@
             isGenerating: false,
             currentEngine: null,
             audioBlob: null,
-            audioUrl: null
+            audioUrl: null,
+            // Voice mapping for the Developer section
+            voiceMap: {
+                male: 'Matthew',
+                female: 'Joanna'
+            }
         };
 
         // --- DOM Elements ---
@@ -619,7 +781,11 @@
                 standard: document.getElementById('card-standard'),
                 neural: document.getElementById('card-neural'),
                 generative: document.getElementById('card-generative')
-            }
+            },
+            // Dev Elements
+            devGender: document.getElementById('dev-gender'),
+            devLang: document.getElementById('dev-lang'),
+            urlOutput: document.getElementById('url-output')
         };
 
         // --- Preset Texts ---
@@ -660,6 +826,15 @@
         function setPreset(num) {
             els.input.value = presets[num];
             els.input.dispatchEvent(new Event('input')); // Trigger counter update
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
         function setStatus(type, msg, isLoading = false) {
@@ -707,30 +882,33 @@
             // UI Loading State
             setStatus('loading', `Synthesizing with ${engine.charAt(0).toUpperCase() + engine.slice(1)} engine...`, true);
             Object.values(els.cards).forEach(c => c.style.opacity = '0.6');
-            els.cards[engine].style.opacity = '1';
+            if(els.cards[engine]) els.cards[engine].style.opacity = '1';
 
             try {
                 // Puter.js API Call
                 let audioEl;
                 
+                // Use inputs from main config unless overridden by dev mode logic
+                const voiceToUse = els.voice.value;
+                const langToUse = els.language.value;
+                
                 if (engine === 'generative') {
-                    // Try using a high-elevenlabs model or generative parameter
                     audioEl = await puter.ai.txt2speech(text, {
-                        voice: els.voice.value,
+                        voice: voiceToUse,
                         model: 'eleven_multilingual_v2', 
-                        language: els.language.value
+                        language: langToUse
                     });
                 } else if (engine === 'neural') {
                     audioEl = await puter.ai.txt2speech(text, {
-                        voice: els.voice.value,
+                        voice: voiceToUse,
                         engine: 'neural', 
-                        language: els.language.value
+                        language: langToUse
                     });
                 } else {
                     // Standard fallback
                     audioEl = await puter.ai.txt2speech(text, {
-                        voice: els.voice.value,
-                        language: els.language.value
+                        voice: voiceToUse,
+                        language: langToUse
                     });
                 }
 
@@ -779,23 +957,15 @@
         }
 
         function updatePlayIcon() {
-            // Determine which icon to show based on audio state
             const iconName = els.audio.paused ? 'play' : 'pause';
-            
-            // Find the SVG element inside the button
             const svg = els.playToggleBtn.querySelector('svg');
-            
-            // Update the data-lucide attribute
             svg.setAttribute('data-lucide', iconName);
-            
-            // Re-create icons to update the visual SVG
             lucide.createIcons();
         }
 
         function updateProgress() {
             const { currentTime, duration } = els.audio;
             if (isNaN(duration)) return;
-            
             const percent = (currentTime / duration) * 100;
             els.progressBar.style.width = `${percent}%`;
             els.currTime.textContent = formatTime(currentTime);
@@ -833,10 +1003,88 @@
             }
         }
 
-        // Initialize Play Icon State
+        // --- Developer / URL Logic ---
+
+        function generateDevLink() {
+            // 1. Sync Dev Inputs to Main Inputs
+            const gender = els.devGender.value;
+            const lang = els.devLang.value;
+            
+            els.voice.value = state.voiceMap[gender];
+            els.language.value = lang;
+
+            // 2. Trigger Neural Generation
+            selectEngine('neural');
+            
+            // 3. Update UI to reflect the URL that would generate this
+            updateUrlDisplay();
+        }
+
+        function copyDevLink() {
+            // Update the display first to ensure it matches current text
+            const url = updateUrlDisplay();
+            
+            if (!url) return;
+
+            navigator.clipboard.writeText(url).then(() => {
+                showToast("Link copied to clipboard!");
+            }).catch(err => {
+                showToast("Failed to copy link");
+                console.error(err);
+            });
+        }
+
+        function updateUrlDisplay() {
+            const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            const params = new URLSearchParams();
+            
+            params.set('text', els.input.value);
+            params.set('gender', els.devGender.value);
+            params.set('lang', els.devLang.value);
+            // Force engine=neural in the link for clarity
+            params.set('engine', 'neural');
+
+            const finalUrl = `${baseUrl}?${params.toString()}`;
+            els.urlOutput.textContent = finalUrl;
+            els.urlOutput.style.display = 'block';
+            return finalUrl;
+        }
+
+        function handleUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has('text')) {
+                els.input.value = params.get('text');
+                els.input.dispatchEvent(new Event('input'));
+            }
+
+            if (params.has('gender')) {
+                const g = params.get('gender');
+                if (['male', 'female'].includes(g)) {
+                    els.devGender.value = g;
+                }
+            }
+
+            if (params.has('lang')) {
+                els.devLang.value = params.get('lang');
+            }
+
+            // If we have specific params, we should auto-generate
+            if (params.has('text')) {
+                // Give a slight delay for UI to settle
+                setTimeout(() => {
+                    generateDevLink();
+                    showToast("Loaded configuration from URL");
+                }, 500);
+            }
+        }
+
+        // --- Initialization ---
         updatePlayIcon();
-        // Initialize Character Count
         els.input.dispatchEvent(new Event('input'));
+        
+        // Check for URL params on load
+        window.addEventListener('DOMContentLoaded', handleUrlParams);
 
     </script>
 </body>
