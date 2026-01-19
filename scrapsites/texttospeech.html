@@ -6,6 +6,9 @@
     <title>TTS Engine & Developer Tool</title>
     <meta name="description" content="Compare standard, neural, and generative text-to-speech engines with Puter.js">
     
+    <!-- Google Fonts: Inter Tight -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Puter.js Library -->
     <script src="https://js.puter.com/v2/"></script>
     
@@ -15,22 +18,15 @@
     <style>
         /* --- CSS Variables & Reset --- */
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --primary-light: #eef2ff;
-            --secondary: #ec4899;
-            --success: #10b981;
-            --success-bg: #d1fae5;
-            --warning: #f59e0b;
-            --warning-bg: #fef3c7;
-            --error: #ef4444;
-            --error-bg: #fee2e2;
+            --primary: #000000; /* Plain Black for primary actions */
+            --primary-hover: #333333;
+            --primary-light: #f0f0f0;
             
-            --bg-body: #f8fafc;
+            --bg-body: #ffffff;
             --bg-card: #ffffff;
             --bg-input: #f1f5f9;
             
-            --text-main: #0f172a;
+            --text-main: #000000; /* Plain Black */
             --text-muted: #64748b;
             --border-light: #e2e8f0;
             
@@ -39,7 +35,7 @@
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
             
             --radius: 12px;
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-sans: 'Inter Tight', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-mono: 'Fira Code', 'Courier New', monospace;
             
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,9 +68,7 @@
             font-size: 2.25rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #000000;
             letter-spacing: -0.025em;
         }
 
@@ -203,7 +197,7 @@
             border-radius: 8px;
             font-size: 0.95rem;
             color: var(--text-main);
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 0.5rem center;
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
@@ -273,9 +267,9 @@
         }
 
         /* Specific Gradients for Icons */
-        .grad-standard { background: linear-gradient(135deg, #64748b, #475569); }
-        .grad-neural { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .grad-generative { background: linear-gradient(135deg, #10b981, #059669); }
+        .grad-standard { background: #000000; }
+        .grad-neural { background: #000000; }
+        .grad-generative { background: #000000; }
 
         /* Status Bar */
         .status-box {
@@ -321,7 +315,7 @@
 
         /* Custom Audio Player */
         .player-wrapper {
-            background: #1e293b;
+            background: #000000;
             border-radius: var(--radius);
             padding: 1.25rem;
             margin-top: 1.5rem;
@@ -347,7 +341,7 @@
             height: 52px;
             border-radius: 50%;
             background: white;
-            color: #1e293b;
+            color: #000000;
             border: none;
             display: flex;
             align-items: center;
@@ -359,9 +353,7 @@
 
         .play-toggle-btn:hover {
             transform: scale(1.05);
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            background: #cccccc;
         }
         
         .play-toggle-btn:active {
@@ -379,7 +371,7 @@
         .progress-track {
             width: 100%;
             height: 6px;
-            background: #334155;
+            background: #333333;
             border-radius: 3px;
             cursor: pointer;
             position: relative;
@@ -388,7 +380,7 @@
 
         .progress-bar {
             height: 100%;
-            background: var(--primary);
+            background: white;
             width: 0%;
             border-radius: 3px;
             transition: width 0.1s linear;
@@ -398,7 +390,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: #999999;
             font-family: monospace;
         }
 
@@ -464,7 +456,7 @@
         }
 
         .btn-primary {
-            background: var(--text-main);
+            background: #000000;
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -478,13 +470,13 @@
         }
         
         .btn-primary:hover {
-            opacity: 0.9;
+            opacity: 0.8;
             transform: translateY(-1px);
         }
 
         .btn-secondary {
             background: white;
-            color: var(--text-main);
+            color: #000000;
             border: 1px solid var(--border-light);
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
@@ -520,7 +512,7 @@
             bottom: 2rem;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
+            background: #000000;
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 50px;
@@ -543,12 +535,13 @@
         ----------------------------------------------------------- */
         
         body.dev-mode-active {
-            background-color: #fff;
-            padding: 0;
+            background-color: transparent; /* Transparent for embedding */
+            padding: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            margin: 0;
         }
 
         body.dev-mode-active .container {
@@ -564,34 +557,35 @@
 
         #dev-result-wrapper {
             display: none; /* Hidden by default */
-            background: white;
-            padding: 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            border: none;
+            width: 100%;
         }
 
         #dev-result-wrapper.visible {
             display: block;
         }
 
-        #dev-result-text {
-            font-size: 1.25rem;
-            color: var(--text-main);
-            margin-bottom: 1.5rem;
-            font-style: italic;
+        /* Explicitly hide text and download buttons in Dev Mode */
+        body.dev-mode-active #dev-result-text,
+        body.dev-mode-active .dev-download-link {
+            display: none !important;
         }
 
-        /* Native Audio Player Styling Override for clean look */
+        /* Native Audio Player Styling for Clean Embed */
         body.dev-mode-active audio {
             width: 100%;
             outline: none;
-            border-radius: 30px;
-            box-shadow: var(--shadow-md);
+            max-width: 500px;
+            margin: 0 auto;
         }
         
         .dev-loading {
             text-align: center;
             padding: 2rem;
+            color: #000000;
         }
         
         .dev-loading .spinner {
@@ -599,7 +593,7 @@
             height: 40px;
             border-width: 4px;
             margin: 0 auto 1rem auto;
-            color: var(--primary);
+            color: #000000;
         }
 
         /* ----------------------------------------------------------- */
@@ -628,14 +622,11 @@
             </div>
 
             <div id="dev-content" class="hidden">
-                <p id="dev-result-text">"Audio Text Here"</p>
-                <!-- Native Browser Audio Player -->
+                <!-- 
+                   In Dev Mode, we only show the Native Audio Player. 
+                   No text, no download button, no cards.
+                -->
                 <audio id="native-audio" controls></audio>
-                <div style="margin-top: 1.5rem;">
-                    <a id="dev-download-link" href="#" class="btn-secondary" style="display: inline-flex; width: auto; margin: 0 auto;">
-                        <i data-lucide="download" width="16"></i> Download MP3
-                    </a>
-                </div>
             </div>
             
             <div id="dev-error-msg" class="status-box error hidden" style="margin-top: 1rem;">
@@ -840,7 +831,7 @@
             currentEngine: null,
             audioBlob: null,
             audioUrl: null,
-            isDevMode: false, // NEW: Track if we are in URL-only mode
+            isDevMode: false,
             // Voice mapping for the Developer section
             voiceMap: {
                 male: 'Matthew',
@@ -875,12 +866,11 @@
             urlOutput: document.getElementById('url-output'),
             // Dev Result Wrapper Elements
             devWrapper: document.getElementById('dev-result-wrapper'),
-            devResultText: document.getElementById('dev-result-text'),
             devLoading: document.getElementById('dev-loading-indicator'),
             devContent: document.getElementById('dev-content'),
             devErrorMsg: document.getElementById('dev-error-msg'),
-            nativeAudio: document.getElementById('native-audio'),
-            devDownloadLink: document.getElementById('dev-download-link')
+            nativeAudio: document.getElementById('native-audio')
+            // devDownloadLink and devResultText removed from JS references as they are hidden
         };
 
         // --- Preset Texts ---
@@ -1023,13 +1013,12 @@
 
                 // --- Output Handling based on Mode ---
                 
-                // 1. Fetch Blob for Download capability
+                // 1. Fetch Blob for Playback
                 let blobUrl = audioEl.src;
                 try {
                     const response = await fetch(audioEl.src);
                     const blob = await response.blob();
                     state.audioBlob = blob;
-                    // Create a blob URL for download button
                     blobUrl = URL.createObjectURL(blob);
                 } catch (e) {
                     console.warn("Could not fetch blob.");
@@ -1038,26 +1027,23 @@
 
                 if (state.isDevMode) {
                     // --- DEV MODE OUTPUT ---
-                    els.devResultText.textContent = text;
+                    // Only set the source on the native audio tag
                     els.nativeAudio.src = blobUrl;
-                    els.devDownloadLink.href = blobUrl;
-                    els.devDownloadLink.download = `audio-${Date.now()}.mp3`;
                     
-                    // Show Content
+                    // Show Content (Hide Loading)
                     els.devLoading.classList.add('hidden');
                     els.devContent.classList.remove('hidden');
                     
-                    // Attempt Autoplay (might be blocked by browser policy)
+                    // Attempt Autoplay
                     try {
                         await els.nativeAudio.play();
                     } catch(e) {
-                        // Autoplay blocked is expected, user will click play
                         console.log("Autoplay prevented (expected)");
                     }
 
                 } else {
                     // --- NORMAL MODE OUTPUT ---
-                    els.audio.src = blobUrl; // Use blob URL for consistency
+                    els.audio.src = blobUrl; 
                     els.audio.load(); 
                     els.audioWrapper.style.display = 'block';
                     setStatus('success', 'Audio generated successfully!');
