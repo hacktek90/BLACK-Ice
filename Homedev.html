@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,12 +9,12 @@
 <link rel="icon" href="https://black-ice-3dbk.onrender.com/output-onlinepngtools.png" type="image/png">
 <link rel="preconnect" href="https://blackice-ac.vercel.app/index.html">
 <link rel="dns-prefetch" href="https://blackice-ac.vercel.app/index.html">
-<script src="https://cdn.tailwindcss.com/"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet">
-
 <script src="https://cdn.lgrckt-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
 <script>window.LogRocket && window.LogRocket.init('r3bczh/blackice-portal');</script>
+
+<!-- External Analytics Scripts (Kept as is) -->
 <script type="text/javascript">
 (function(c,l,a,r,i,t,y){
 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -25,14 +22,7 @@ t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 })(window, document, "clarity", "script", "ujy4ecml45");
 </script>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-N36FJFW2');</script>
-<!-- End Google Tag Manager -->
-<!-- Google tag (gtag.js) -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N36FJFW2');</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -40,384 +30,715 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-BJ7N8R2CLY');
 </script>
-<script>
-tailwind.config = {
-darkMode: 'class',
-theme: {
-extend: {
-fontFamily: { sans: ['Satoshi', 'sans-serif'] },
-colors: {
-background: '#09090b',
-surface: '#18181b',
-border: '#27272a',
-primary: '#3b82f6',
-text: '#e4e4e7',
-muted: '#a1a1aa'
-}
-}
-}
-}
-</script>
-<style>
-body{
-background-color:#050505;
-color:#e4e4e7;
-overflow:hidden;
-background-image:
-linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
-linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
-background-size:30px 30px;
-}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:10px;}
-::-webkit-scrollbar-thumb:hover{background:#52525b;}
-.solid-panel{background:#18181b;border-bottom:1px solid #27272a;}
-#sidebar{transition:width .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);}
-.sidebar-collapsed .hide-on-collapse{display:none !important;opacity:0;pointer-events:none;}
-.sidebar-collapsed{width:60px !important;}
-.sidebar-collapsed .project-card{padding:8px;justify-content:center;}
-.sidebar-collapsed .center-on-collapse{justify-content:center;margin:0;}
-.project-card{
-transition:background .2s ease, transform .1s;
-position:relative;
-overflow:hidden;
-}
-.project-card::after{
-content:"";
-position:absolute;
-top:var(--y,0);
-left:var(--x,0);
-width:250px;height:250px;
-background:radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
-transform:translate(-50%,-50%);
-opacity:0;
-transition:opacity .3s;
-pointer-events:none;
-z-index:1;
-}
-.project-card:hover::after{opacity:1;}
-.project-card > *{position:relative;z-index:2;}
-.project-card:hover{background:#27272a;}
-.project-card.active{
-background:rgba(59,130,246,0.08);
-border:1px solid rgba(59,130,246,0.2);
-}
-.project-card.active::before{
-content:'';
-position:absolute;
-left:0; top:6px; bottom:6px; width:3px;
-background:#3b82f6;
-border-radius:0 4px 4px 0;
-box-shadow:0 0 10px rgba(59,130,246,0.5);
-z-index:3;
-}
-.project-card.active .title-text{color:#60a5fa;font-weight:700;}
-.screenshot-img{opacity:0;transition:opacity .3s;}
-.screenshot-img.loaded{opacity:1;}
-/* Simple Loader */
-.loader-spinner {
-border: 4px solid #27272a;
-border-top: 4px solid #3b82f6;
-border-radius: 50%;
-width: 48px;
-height: 48px;
-animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
-}
-/* Split view */
-.split-pane{
-position:relative;
-overflow:hidden;
-height:100%;
-transition:opacity .2s ease;
-}
-.split-pane.inactive{opacity:0.45;}
-.split-pane.active{opacity:1;}
-.pane-indicator{
-position:absolute;
-top:10px; right:10px;
-z-index:30;
-background:rgba(9,9,11,0.75);
-border:1px solid #27272a;
-color:#a1a1aa;
-padding:4px 10px;
-border-radius:8px;
-font-size:10px;
-font-weight:800;
-letter-spacing:0.08em;
-display:none;
-backdrop-filter:blur(4px);
-pointer-events:auto;
-cursor:pointer;
-transition: all 0.2s ease;
-}
-.pane-indicator:hover {
-background: rgba(39, 39, 42, 0.9);
-color: white;
-border-color: #52525b;
-}
-.split-view-active .pane-indicator{display:block;}
-.split-pane.active .pane-indicator{
-border-color:rgba(59,130,246,0.35);
-background:rgba(59,130,246,0.12);
-color:#60a5fa;
-pointer-events: none;
-}
-.split-resizer{
-width:6px;
-background:#18181b;
-cursor:col-resize;
-flex:0 0 auto;
-border-left:1px solid #27272a;
-border-right:1px solid #27272a;
-position:relative;
-z-index:50;
-}
-.split-resizer:hover,.split-resizer.dragging{
-background:#3b82f6;
-border-color:#3b82f6;
-}
-.split-resizer::after{
-content:'';
-position:absolute;
-top:50%; left:50%;
-transform:translate(-50%,-50%);
-width:4px; height:26px;
-background:#52525b;
-border-radius:999px;
-}
-.split-resizer:hover::after,.split-resizer.dragging::after{background:#fff;}
-/* NEW: History styling in navbar */
-.no-scrollbar::-webkit-scrollbar {
-display: none;
-}
-.no-scrollbar {
--ms-overflow-style: none;
-scrollbar-width: none;
-}
-/* === MODIFIED BUTTON STYLES === */
-/* Copy Link Button */
-.copy-btn {
-opacity: 0;
-transition: opacity 0.2s, background 0.2s;
-pointer-events: none; /* Can't click when hidden */
-}
-/* Show buttons only when card is active/selected */
-.project-card.active .copy-btn {
-opacity: 1;
-pointer-events: auto;
-}
-.copy-btn:hover {
-background: #3f3f46 !important;
-}
-.copy-btn.copied {
-background: #10b981 !important;
-color: white !important;
-}
-/* Pin button visibility */
-.pin-toggle-btn {
-opacity: 0;
-transition: opacity 0.2s, background 0.2s;
-pointer-events: none;
-}
-/* Keep pinned items visible always */
-.project-card .pin-toggle-btn.is-pinned {
-opacity: 1;
-pointer-events: auto;
-}
-/* Show pin button on active card */
-.project-card.active .pin-toggle-btn {
-opacity: 1;
-pointer-events: auto;
-}
 
-/* AUDIO DROPDOWN STYLING */
-#audioDropdown {
-    transform-origin: bottom right;
-    animation: scaleIn 0.1s ease-out forwards;
-}
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-.track-option.active {
-    background: rgba(59,130,246,0.1);
-    color: #60a5fa;
-}
+<style>
+    /* --- CSS VARIABLES & RESET --- */
+    :root {
+        --bg-body: #050505;
+        --bg-app: #09090b;
+        --bg-surface: #18181b;
+        --bg-input: #09090b;
+        
+        --border-color: #27272a;
+        --border-hover: #3f3f46;
+        
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --primary-dim: rgba(59, 130, 246, 0.1);
+        
+        --text-main: #e4e4e7;
+        --text-muted: #a1a1aa;
+        
+        --font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+        
+        --sidebar-width: 240px;
+        --sidebar-collapsed-width: 60px;
+        --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        font-family: var(--font-family);
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+        /* Grid Background */
+        background-image:
+            linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+        background-size: 30px 30px;
+    }
+
+    /* --- UTILITIES --- */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .gap-1 { gap: 0.25rem; }
+    .gap-1\.5 { gap: 0.375rem; }
+    .gap-2 { gap: 0.5rem; }
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .text-primary { color: var(--primary); }
+    .font-bold { font-weight: 700; }
+    .text-sm { font-size: 0.875rem; }
+    .text-xs { font-size: 0.75rem; }
+    .pointer-events-none { pointer-events: none; }
+    .pointer-events-auto { pointer-events: auto; }
+    
+    /* --- SCROLLBARS --- */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* --- LAYOUT --- */
+    .app-container {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+        background: transparent;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+        width: var(--sidebar-width);
+        background-color: var(--bg-surface);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 50;
+        transition: width 0.3s cubic-bezier(.4,0,.2,1);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .sidebar-collapsed { width: var(--sidebar-collapsed-width) !important; }
+    .sidebar-collapsed .hide-on-collapse { display: none !important; opacity: 0; pointer-events: none; }
+    .sidebar-collapsed .center-on-collapse { justify-content: center; margin: 0; }
+
+    .sidebar-header {
+        padding: 12px;
+        border-bottom: 1px solid var(--border-color);
+        min-height: 57px;
+    }
+
+    .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+    }
+
+    .sidebar-footer {
+        padding: 10px;
+        border-top: 1px solid var(--border-color);
+        background-color: #121214;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* --- COMPONENTS --- */
+    
+    /* Buttons */
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        border-radius: 6px;
+        color: var(--text-muted);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-icon:hover { background-color: var(--border-color); color: white; }
+    .btn-icon svg { width: 14px; height: 14px; }
+    .btn-icon.small svg { width: 12px; height: 12px; }
+
+    .btn-primary {
+        background-color: var(--primary-dim);
+        color: var(--primary);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        padding: 4px 6px;
+        border-radius: 4px;
+        font-size: 9px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.2s;
+    }
+    .btn-primary:hover { background-color: rgba(59, 130, 246, 0.2); }
+
+    /* Inputs */
+    .input-wrapper { position: relative; width: 100%; }
+    .input-field {
+        width: 100%;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 6px 8px 6px 32px;
+        font-size: 12px;
+        color: var(--text-main);
+        outline: none;
+        transition: border 0.2s;
+    }
+    .input-field:focus { border-color: var(--primary); }
+    .input-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px; height: 14px;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+    .input-kbd {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 9px;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 0 4px;
+        border-radius: 4px;
+        background: var(--border-color);
+    }
+
+    /* Project Cards */
+    .project-card {
+        width: 100%;
+        text-align: left;
+        padding: 6px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: background 0.2s ease, transform 0.1s;
+    }
+    
+    /* Card Hover Glow Effect */
+    .project-card::after {
+        content: "";
+        position: absolute;
+        top: var(--y, 0);
+        left: var(--x, 0);
+        width: 250px; height: 250px;
+        background: radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .project-card:hover::after { opacity: 1; }
+    .project-card:hover { background-color: #27272a; }
+    
+    /* Active State */
+    .project-card.active {
+        background-color: rgba(59,130,246,0.08);
+        border: 1px solid rgba(59,130,246,0.2);
+    }
+    .project-card.active::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 6px; bottom: 6px; width: 3px;
+        background-color: var(--primary);
+        border-radius: 0 4px 4px 0;
+        box-shadow: 0 0 10px rgba(59,130,246,0.5);
+        z-index: 3;
+    }
+    .project-card.active .title-text { color: #60a5fa; font-weight: 700; }
+
+    .card-icon {
+        width: 28px; height: 28px;
+        border-radius: 6px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .card-icon img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s; }
+    .card-icon img.loaded { opacity: 1; }
+    
+    .card-info { flex: 1; min-width: 0; }
+    .title-text { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .subtitle-text { font-size: 9px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+    .card-actions { display: flex; align-items: center; gap: 4px; }
+
+    /* Action Buttons on Card */
+    .copy-btn {
+        opacity: 0;
+        padding: 4px;
+        border-radius: 4px;
+        color: var(--text-muted);
+        cursor: pointer;
+        pointer-events: none;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+    }
+    .copy-btn:hover { background-color: #3f3f46; color: white; }
+    .project-card.active .copy-btn { opacity: 1; pointer-events: auto; }
+    .copy-btn.copied { background-color: #10b981 !important; color: white !important; }
+
+    .pin-toggle-btn {
+        opacity: 0;
+        padding: 4px;
+        border-radius: 4px;
+        color: var(--text-muted);
+        cursor: pointer;
+        pointer-events: none;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+    }
+    .pin-toggle-btn:hover { background-color: #3f3f46; color: white; }
+    .pin-toggle-btn.is-pinned { opacity: 1; color: var(--primary); pointer-events: auto; }
+    .project-card.active .pin-toggle-btn { opacity: 1; pointer-events: auto; }
+
+    /* --- MAIN AREA --- */
+    .main-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+    }
+
+    .history-bar {
+        height: 36px;
+        background-color: var(--bg-app);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 8px;
+        overflow: hidden;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+    .history-chips { display: flex; gap: 8px; overflow-x: auto; }
+
+    /* Split View */
+    .split-container {
+        flex: 1;
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+    .split-pane {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        transition: opacity 0.2s ease;
+    }
+    .split-pane iframe { width: 100%; height: 100%; border: none; background: white; }
+    
+    .split-pane.inactive { opacity: 0.45; }
+    .split-pane.active { opacity: 1; }
+
+    .pane-indicator {
+        position: absolute;
+        top: 10px; right: 10px;
+        z-index: 30;
+        background: rgba(9,9,11,0.75);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        display: none;
+        backdrop-filter: blur(4px);
+        pointer-events: auto;
+        cursor: pointer;
+    }
+    .split-view-active .pane-indicator { display: block; }
+    .split-pane.active .pane-indicator {
+        border-color: rgba(59,130,246,0.35);
+        background: rgba(59,130,246,0.12);
+        color: #60a5fa;
+        pointer-events: none;
+    }
+
+    .split-resizer {
+        width: 6px;
+        background: var(--bg-surface);
+        cursor: col-resize;
+        flex: 0 0 auto;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+        position: relative;
+        z-index: 50;
+        display: none; /* Hidden by default */
+    }
+    .split-view-active .split-resizer { display: block; }
+    
+    .split-resizer::after {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 4px; height: 26px;
+        background: #52525b;
+        border-radius: 99px;
+    }
+    .split-resizer:hover, .split-resizer.dragging { background: var(--primary); border-color: var(--primary); }
+    .split-resizer:hover::after, .split-resizer.dragging::after { background: white; }
+
+    /* Empty State */
+    .empty-state {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 24px;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .empty-icon {
+        width: 80px; height: 80px;
+        background: var(--bg-surface);
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        box-shadow: 0 0 30px rgba(59,130,246,0.1);
+    }
+
+    /* Loader */
+    .loader-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        background: var(--bg-app);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .loader-spinner {
+        border: 4px solid var(--border-color);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        width: 48px; height: 48px;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Command Palette */
+    .cmd-palette {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(9,9,11,0.8);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 15vh;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+    .cmd-palette.open { opacity: 1; pointer-events: auto; }
+    
+    .cmd-content {
+        width: 100%;
+        max-width: 512px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        transform: scale(0.95);
+        transition: transform 0.2s;
+    }
+    .cmd-palette.open .cmd-content { transform: scale(1); }
+
+    .cmd-header { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+    .cmd-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: white;
+        font-family: monospace;
+        font-size: 14px;
+    }
+    .cmd-input::placeholder { color: #6b7280; }
+    
+    .cmd-results { max-height: 300px; overflow-y: auto; padding: 8px; }
+    .cmd-item {
+        width: 100%;
+        text-align: left;
+        padding: 8px 12px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        color: #d1d5db;
+    }
+    .cmd-item:hover { background: var(--border-color); color: white; }
+
+    /* Audio Dropdown */
+    .audio-dropdown {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        margin-bottom: 8px;
+        width: 192px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        z-index: 50;
+        overflow: hidden;
+        animation: scaleIn 0.1s ease-out forwards;
+    }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    
+    .track-option {
+        width: 100%;
+        text-align: left;
+        padding: 6px 8px;
+        font-size: 12px;
+        color: #d1d5db;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .track-option:hover { background: var(--border-color); }
+    .track-option.active { background: rgba(59,130,246,0.1); color: #60a5fa; }
+
+    /* Section Headers */
+    .section-header {
+        padding: 0 8px;
+        margin-bottom: 4px;
+        font-size: 9px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .divider { height: 1px; background: var(--border-color); margin: 8px 8px; }
+
 </style>
 </head>
-<body class="h-screen w-screen flex bg-transparent">
-    <script defer src="https://unpkg.com/lucide@latest"></script>
+<body class="app-container">
+
+<!-- External Scripts (Icons & Animation) -->
+<script defer src="https://unpkg.com/lucide@latest"></script>
 <script defer src="https://unpkg.com/quicklink/dist/quicklink.umd.js"></script>
-<script defer>
-window.addEventListener('load', () => window.quicklink && quicklink());
-</script>
-    <script type="module" defer>
+<script defer>window.addEventListener('load', () => window.quicklink && quicklink());</script>
+<script type="module" defer>
 import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate@1.0.0/index.min.js';
 window.autoAnimate = autoAnimate;
 </script>
-<!-- Background Audio Player (Default source, no autoplay) -->
-<audio id="backgroundAudio" src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3" loop></audio>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N36FJFW2"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-<!-- Command Palette -->
-<div id="cmdPalette" class="fixed inset-0 z-[100] bg-[#09090b] hidden flex items-start justify-center pt-[15vh] transition-all">
-<div class="w-full max-w-lg bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="cmdContent">
-<div class="p-3 border-b border-[#27272a] flex items-center gap-2">
-<i data-lucide="terminal" class="w-5 h-5 text-primary"></i>
-<input id="cmdInput" type="text" placeholder="Type a command or search..."
-class="w-full bg-transparent outline-none text-white placeholder-gray-500 h-8 font-mono text-sm">
-<span class="text-[10px] text-gray-500 bg-[#27272a] px-2 py-1 rounded border border-[#3f3f46]">ESC</span>
-</div>
-<div id="cmdResults" class="max-h-[300px] overflow-y-auto p-2 space-y-1"></div>
-<div class="p-2 bg-[#09090b] border-t border-[#27272a] text-[10px] text-gray-500 flex justify-between px-4">
-<span>Select <kbd class="font-sans text-gray-300">↵</kbd></span>
-<span>Navigate <kbd class="font-sans text-gray-300">↑↓</kbd></span>
-</div>
-</div>
-</div>
-<!-- REMOVED MOBILE HEADER AND OVERLAY -->
-<!-- Sidebar -->
-<aside id="sidebar" class="relative top-0 left-0 h-full w-[240px] bg-[#18181b] border-r border-[#27272a] flex flex-col z-50 transition-all duration-300 overflow-hidden">
-<div class="p-3 border-b border-[#27272a] min-h-[57px]">
-<div class="flex items-center justify-between mb-3 center-on-collapse">
-<div class="flex items-center gap-1.5 hide-on-collapse">
-<h1 class="text-base font-bold tracking-tight text-white">Portal</h1>
-<div class="flex gap-1 items-center">
-<button id="splitViewBtn" class="flex p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Split View">
-<i data-lucide="columns-2" class="w-3.5 h-3.5"></i>
-</button>
-<button id="fullscreenBtn" class="p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Toggle Fullscreen">
-<i data-lucide="expand" class="w-3.5 h-3.5"></i>
-</button>
-</div>
-</div>
-<button id="sidebarToggle" class="flex p-1 rounded hover:bg-[#27272a] text-[#a1a1aa] hover:text-white transition-colors" title="Collapse Sidebar">
-<i data-lucide="panel-left-close" class="w-4 h-4"></i>
-</button>
-<button id="osApkBtn" class="hide-on-collapse text-[9px] font-bold px-1.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded hover:bg-primary/20 transition-colors flex items-center gap-1">
-<i data-lucide="smartphone" class="w-3 h-3"></i> OS
-</button>
-</div>
-<div class="relative group hide-on-collapse">
-<i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#a1a1aa] w-3.5 h-3.5 group-focus-within:text-primary transition-colors"></i>
-<input id="searchInput" placeholder="Search..."
-class="w-full bg-[#09090b] border border-[#27272a] rounded-lg pl-8 pr-7 py-1.5 text-xs text-[#e4e4e7] outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-[#a1a1aa]/60">
-<span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-[#a1a1aa] border border-[#27272a] px-1 rounded bg-[#27272a] block">⌘K</span>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto p-2 scroll-smooth">
-<div id="pinnedSection" class="hidden mb-3">
-<div class="px-2 mb-1 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider flex items-center gap-1 hide-on-collapse">
-<i data-lucide="pin" class="w-2.5 h-2.5"></i> Pinned
-</div>
-<div id="pinnedList" class="space-y-1"></div>
-<div class="h-px bg-[#27272a] mx-2 my-2 hide-on-collapse"></div>
-</div>
-<div class="px-2 mb-1 text-[9px] uppercase font-bold text-[#a1a1aa] tracking-wider hide-on-collapse">All Projects</div>
-<div id="projectList" class="space-y-1">
-<div class="animate-pulse space-y-2 p-1">
-<div class="h-9 bg-[#1e1e22] rounded-lg w-full"></div>
-<div class="h-9 bg-[#1e1e22] rounded-lg w-full"></div>
-</div>
-</div>
-</div>
-<div class="p-2.5 border-t border-[#27272a] bg-[#121214] flex items-center justify-between center-on-collapse relative">
-<div class="flex items-center gap-2">
-<button id="homeBtn" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all duration-200 group" title="Go Home">
-<i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-</button>
-<div class="flex items-center gap-1.5 hide-on-collapse">
-<span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"></span>
-<span id="pingText" class="text-[9px] font-mono text-[#a1a1aa]">ONLINE</span>
-</div>
-</div>
 
-<!-- Audio Control & Dropdown Trigger -->
-<div class="relative hide-on-collapse">
-    <button id="audioControlBtn" title="Music Controls" class="p-1.5 rounded-lg hover:bg-[#27272a] text-[#a1a1aa] hover:text-primary transition-all">
-        <i data-lucide="play" class="w-4 h-4"></i>
-    </button>
-    <!-- Audio Dropdown Menu -->
-    <div id="audioDropdown" class="hidden absolute bottom-full right-0 mb-2 w-48 bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl z-50 overflow-hidden">
-        <div class="p-2 border-b border-[#27272a] flex items-center justify-between">
-            <span class="text-[10px] font-bold text-[#a1a1aa] uppercase tracking-wider">Select Track</span>
-            <button id="playPauseToggle" class="text-xs text-primary hover:text-white">Play</button>
+<!-- Audio -->
+<audio id="backgroundAudio" src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3" loop></audio>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N36FJFW2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- Command Palette -->
+<div id="cmdPalette" class="cmd-palette">
+    <div class="cmd-content">
+        <div class="cmd-header">
+            <i data-lucide="terminal" class="text-primary" style="width: 20px;"></i>
+            <input id="cmdInput" type="text" placeholder="Type a command or search..." class="cmd-input">
+            <span style="font-size: 10px; color: #6b7280; background: #27272a; padding: 2px 8px; border-radius: 4px; border: 1px solid #3f3f46;">ESC</span>
         </div>
-        <div class="p-1 space-y-0.5">
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2 active" 
-                    data-src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Quantum Leap
-            </button>
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/2019-10-06_-_Villainous_-_David_Fesliyan.mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Villainous
-            </button>
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/2018-10-03_-_Inspirational_Advertising_1_-_David_Fesliyan.mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Inspirational
-            </button>
-             <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/Hans_Zimmer_-_Flight_(FeelMP3.com).mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Flight-Hans Zimmer
-            </button>
-            <button class="track-option w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-[#27272a] rounded flex items-center gap-2" 
-                    data-src="https://blackice-ac.vercel.app/test/02 Cornfield Chase.mp3">
-                <i data-lucide="music" class="w-3 h-3"></i> Cornfield Chase-Interstellar
-            </button>
+        <div id="cmdResults" class="cmd-results"></div>
+        <div style="padding: 8px; background: #09090b; border-top: 1px solid #27272a; font-size: 10px; color: #6b7280; display: flex; justify-content: space-between; padding: 8px 16px;">
+            <span>Select <span style="font-family: sans-serif; color: #d1d5db;">↵</span></span>
+            <span>Navigate <span style="font-family: sans-serif; color: #d1d5db;">↑↓</span></span>
         </div>
     </div>
 </div>
 
-</div>
-</aside>
-<!-- Main -->
-<main class="flex-1 flex flex-col relative h-full bg-transparent overflow-hidden">
-<div id="historyBar" class="h-9 bg-[#09090b] border-b border-[#27272a] items-center px-3 gap-2 overflow-hidden z-10 shrink-0 hidden">
-<div class="flex items-center gap-1.5 text-[#a1a1aa]">
-<i data-lucide="clock" class="w-3 h-3"></i>
-</div>
-<div id="historyChips" class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-<span class="text-[10px] text-[#a1a1aa]/50 italic">No recent history</span>
-</div>
-</div>
-<div id="frameLoader" class="hidden absolute inset-0 z-20 bg-[#09090b] flex flex-col items-center justify-center">
-<div class="flex flex-col items-center justify-center gap-4">
-<div class="loader-spinner"></div>
-<span class="text-sm text-[#a1a1aa] font-medium tracking-wide">Loading</span>
-</div>
-</div>
-<div id="splitContainer" class="flex-1 relative flex w-full h-full">
-<div id="leftPane" class="split-pane active" style="width: 100%;">
-<div class="pane-indicator" title="Set as Active Pane">LEFT</div>
-<iframe id="portalFrame" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
-</div>
-<div id="splitResizer" class="split-resizer hidden"></div>
-<div id="rightPane" class="split-pane inactive hidden" style="width: 0%;">
-<div class="pane-indicator" title="Set as Active Pane">RIGHT</div>
-<iframe id="portalFrame2" class="w-full h-full border-none bg-white" src="about:blank"></iframe>
-</div>
-</div>
-<div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 pointer-events-none">
-<div class="pointer-events-auto w-full max-w-md flex flex-col items-center">
-<div class="w-20 h-20 bg-[#18181b] rounded-3xl border border-[#27272a] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-<i data-lucide="layers" class="w-10 h-10 text-primary"></i>
-</div>
-<h2 class="text-3xl font-black mb-2 text-black tracking-tight">Hii Buddy !!</h2>
-<p class="text-[#a1a1aa] mb-8 text-sm">Select a tool from the sidebar.</p>
-</div>
-</div>
-</main>
-<!--  SCRIPT (BG music, History Bar Logic,Split View Feature,Sidebar Collapse Feature) -->
-<script src="/test/some.js"></script> 
+<!-- Sidebar -->
+<aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <div class="flex justify-between mb-3 center-on-collapse">
+            <div class="flex items-center gap-1.5 hide-on-collapse">
+                <h1 class="text-sm font-bold text-white" style="font-size: 16px;">Portal</h1>
+                <div class="flex gap-1 items-center">
+                    <button id="splitViewBtn" class="btn-icon small" title="Toggle Split View">
+                        <i data-lucide="columns-2"></i>
+                    </button>
+                    <button id="fullscreenBtn" class="btn-icon small" title="Toggle Fullscreen">
+                        <i data-lucide="expand"></i>
+                    </button>
+                </div>
+            </div>
+            <button id="sidebarToggle" class="btn-icon" title="Collapse Sidebar">
+                <i data-lucide="panel-left-close" style="width: 16px;"></i>
+            </button>
+            <button id="osApkBtn" class="btn-primary hide-on-collapse">
+                <i data-lucide="smartphone" style="width: 12px;"></i> OS
+            </button>
+        </div>
+        <div class="relative group hide-on-collapse input-wrapper">
+            <i data-lucide="search" class="input-icon"></i>
+            <input id="searchInput" placeholder="Search..." class="input-field">
+            <span class="input-kbd">⌘K</span>
+        </div>
+    </div>
 
-<!-- MAIN SCRIPT (Firebase, Search, Rendering) -->
+    <div class="sidebar-content">
+        <div id="pinnedSection" class="hidden">
+            <div class="section-header hide-on-collapse">
+                <i data-lucide="pin" style="width: 10px;"></i> Pinned
+            </div>
+            <div id="pinnedList"></div>
+            <div class="divider hide-on-collapse"></div>
+        </div>
+        
+        <div class="section-header hide-on-collapse">All Projects</div>
+        <div id="projectList">
+            <!-- Loading Skeleton -->
+            <div style="display: flex; flex-direction: column; gap: 8px; padding: 4px;">
+                <div style="height: 36px; background: #1e1e22; border-radius: 8px; width: 100%;"></div>
+                <div style="height: 36px; background: #1e1e22; border-radius: 8px; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-footer center-on-collapse relative">
+        <div class="flex items-center gap-2">
+            <button id="homeBtn" class="btn-icon" title="Go Home">
+                <i data-lucide="home"></i>
+            </button>
+            <div class="flex items-center gap-1.5 hide-on-collapse">
+                <span id="statusDot" style="width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.6);"></span>
+                <span id="pingText" class="text-xs font-mono text-muted" style="font-size: 9px;">ONLINE</span>
+            </div>
+        </div>
+
+        <div class="relative hide-on-collapse">
+            <button id="audioControlBtn" title="Music Controls" class="btn-icon">
+                <i data-lucide="play"></i>
+            </button>
+            <div id="audioDropdown" class="audio-dropdown hidden">
+                <div style="padding: 8px; border-bottom: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between;">
+                    <span class="text-xs font-bold text-muted uppercase" style="font-size: 10px;">Select Track</span>
+                    <button id="playPauseToggle" class="text-xs text-primary hover:text-white">Play</button>
+                </div>
+                <div style="padding: 4px; display: flex; flex-direction: column; gap: 2px;">
+                    <button class="track-option active" data-src="https://blackice-ac.vercel.app/test/2023-03-06_-_Quantum_Leap_-_www.FesliyanStudios.com%20(1).mp3">
+                        <i data-lucide="music" style="width: 12px;"></i> Quantum Leap
+                    </button>
+                    <button class="track-option" data-src="https://blackice-ac.vercel.app/test/2019-10-06_-_Villainous_-_David_Fesliyan.mp3">
+                        <i data-lucide="music" style="width: 12px;"></i> Villainous
+                    </button>
+                    <button class="track-option" data-src="https://blackice-ac.vercel.app/test/2018-10-03_-_Inspirational_Advertising_1_-_David_Fesliyan.mp3">
+                        <i data-lucide="music" style="width: 12px;"></i> Inspirational
+                    </button>
+                    <button class="track-option" data-src="https://blackice-ac.vercel.app/test/Hans_Zimmer_-_Flight_(FeelMP3.com).mp3">
+                        <i data-lucide="music" style="width: 12px;"></i> Flight-Hans Zimmer
+                    </button>
+                    <button class="track-option" data-src="https://blackice-ac.vercel.app/test/02 Cornfield Chase.mp3">
+                        <i data-lucide="music" style="width: 12px;"></i> Cornfield Chase
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main-area">
+    <div id="historyBar" class="history-bar hidden">
+        <div class="flex items-center gap-1.5 text-muted">
+            <i data-lucide="clock" style="width: 12px;"></i>
+        </div>
+        <div id="historyChips" class="history-chips no-scrollbar">
+            <span class="text-xs text-muted italic" style="font-size: 10px;">No recent history</span>
+        </div>
+    </div>
+
+    <div id="frameLoader" class="loader-overlay hidden">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loader-spinner"></div>
+            <span class="text-sm text-muted font-medium tracking-wide">Loading</span>
+        </div>
+    </div>
+
+    <div id="splitContainer" class="split-container">
+        <div id="leftPane" class="split-pane active" style="width: 100%;">
+            <div class="pane-indicator">LEFT</div>
+            <iframe id="portalFrame" src="about:blank"></iframe>
+        </div>
+        <div id="splitResizer" class="split-resizer"></div>
+        <div id="rightPane" class="split-pane inactive hidden" style="width: 0%;">
+            <div class="pane-indicator">RIGHT</div>
+            <iframe id="portalFrame2" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <div id="emptyState" class="empty-state pointer-events-none">
+        <div class="pointer-events-auto w-full flex flex-col items-center" style="max-width: 448px;">
+            <div class="empty-icon">
+                <i data-lucide="layers" class="text-primary" style="width: 40px;"></i>
+            </div>
+            <h2 class="text-3xl font-black mb-2 text-white tracking-tight" style="color: #000; -webkit-text-stroke: 1px rgba(255,255,255,0.2);">Hii Buddy !!</h2>
+            <p class="text-muted mb-8 text-sm">Select a tool from the sidebar.</p>
+        </div>
+    </div>
+</main>
+
+<!-- Placeholder for external local scripts -->
+<script src="/test/some.js"></script>
+
+<!-- MAIN SCRIPT -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -435,7 +756,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Elements needed for rendering
+// Elements
 const els = {
     list: document.getElementById('projectList'),
     pinnedList: document.getElementById('pinnedList'),
@@ -450,7 +771,7 @@ const els = {
     cmdResults: document.getElementById('cmdResults'),
 };
 
-// AUDIO CLICK SOUND (Kept here as general UI sound, not background music)
+// Audio Click
 const clickAudio = new Audio('/test/914-preview.mp3');
 clickAudio.preload = 'auto';
 function playClickSound() {
@@ -462,26 +783,30 @@ if (window.autoAnimate && els.list) window.autoAnimate(els.list);
 if (window.autoAnimate && els.pinnedList) window.autoAnimate(els.pinnedList);
 lucide.createIcons();
 
-// ONLINE/OFFLINE STATUS
+// Status
 function updateStatus() {
     const d = document.getElementById('statusDot');
     const t = document.getElementById('pingText');
     if (!d || !t) return;
     if (navigator.onLine) {
-        d.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]";
+        d.style.background = '#22c55e';
+        d.style.boxShadow = '0 0 6px rgba(34,197,94,0.6)';
         t.innerText = "ONLINE";
-        t.className = "text-[9px] font-mono text-green-500 hide-on-collapse";
+        t.className = "text-xs font-mono hide-on-collapse";
+        t.style.color = "#22c55e";
     } else {
-        d.className = "w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]";
+        d.style.background = '#ef4444';
+        d.style.boxShadow = '0 0 6px rgba(239,68,68,0.6)';
         t.innerText = "OFFLINE";
-        t.className = "text-[9px] font-mono text-red-500 hide-on-collapse";
+        t.className = "text-xs font-mono hide-on-collapse";
+        t.style.color = "#ef4444";
     }
 }
 window.addEventListener('online', updateStatus);
 window.addEventListener('offline', updateStatus);
 updateStatus();
 
-// CARD HOVER EFFECT
+// Mouse Effect
 document.addEventListener('mousemove', (e) => {
     document.querySelectorAll('.project-card').forEach(card => {
         const rect = card.getBoundingClientRect();
@@ -493,18 +818,14 @@ document.addEventListener('mousemove', (e) => {
 let allSites = [];
 let pinnedIds = JSON.parse(localStorage.getItem('pinnedProjects') || '[]');
 
-// Helper to convert URL
 function convertToLocalHostUrl(url) {
     try {
         const u = new URL(url);
         if (window.location.protocol === 'file:') return u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
         return window.location.origin + u.pathname;
-    } catch {
-        return url;
-    }
+    } catch { return url; }
 }
 
-// MAIN LOAD FUNCTION
 window.loadProject = function(url, btnElement) {
     playClickSound();
     els.loader.classList.remove('hidden');
@@ -513,7 +834,6 @@ window.loadProject = function(url, btnElement) {
     document.querySelectorAll('.project-card').forEach(b => b.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
     
-    // Check if Split View is active (variables set by app.js)
     const targetFrame = (window.splitViewEnabled && window.currentActivePane === 'right') ? els.frame2 : els.frame;
     
     targetFrame.src = convertToLocalHostUrl(url);
@@ -521,59 +841,63 @@ window.loadProject = function(url, btnElement) {
     
     const site = allSites.find(s => convertToLocalHostUrl(s.url) === convertToLocalHostUrl(url) || s.url === url);
     if (site) {
-        // Call the history function from app.js
         if (typeof window.addToHistory === 'function') {
             window.addToHistory(site.title, site.url);
         }
-        
         const projectParam = encodeURIComponent(site.title || site.id || site.url);
         const newUrl = `${window.location.pathname}?project=${projectParam}`;
         window.history.pushState({}, '', newUrl);
     }
 }
 
-// CREATE CARD
 function createCard(site, isPinned) {
     const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(site.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
     const btn = document.createElement('button');
-    btn.className = 'project-card w-full text-left p-1.5 rounded-lg mb-1 flex items-center gap-2 border border-transparent select-none group';
+    // Removed Tailwind classes, using standard CSS class 'project-card'
+    btn.className = 'project-card';
+    
     const projectParam = encodeURIComponent(site.title || site.id || site.url);
     const shareableLink = `${window.location.origin}${window.location.pathname}?project=${projectParam}`;
+    
     btn.innerHTML = `
-    <div class="w-7 h-7 rounded bg-[#18181b] border border-[#27272a] overflow-hidden shrink-0 relative">
-    <img src="${screenshot}" class="screenshot-img w-full h-full object-cover" loading="lazy"
+    <div class="card-icon">
+    <img src="${screenshot}" loading="lazy"
     onload="this.classList.add('loaded')" onerror="this.style.display='none'">
-    <div class="absolute inset-0 flex items-center justify-center bg-[#18181b] -z-10">
-    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#a1a1aa]">
+    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #18181b; z-index: -1;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted">
     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 14 22l7-4A2 2 0 0 0 21 16z"></path>
     </svg>
     </div>
     </div>
-    <div class="min-w-0 flex-1 hide-on-collapse">
-    <div class="title-text text-xs font-medium truncate leading-tight group-hover:text-white transition-colors">${site.title || 'Untitled'}</div>
-    <div class="text-[9px] text-[#a1a1aa] truncate mt-0.5 group-hover:text-gray-300">Project</div>
+    <div class="card-info hide-on-collapse">
+    <div class="title-text group-hover:text-white">${site.title || 'Untitled'}</div>
+    <div class="subtitle-text group-hover:text-gray-300">Project</div>
     </div>
-    <div class="flex items-center gap-1 hide-on-collapse">
-    <button onclick="copyProjectLink(event, '${shareableLink}', this)"
-    class="copy-btn p-1 rounded text-[#a1a1aa] hover:text-white transition-colors"
-    title="Copy shareable link">
-    <i data-lucide="link" class="w-3 h-3"></i>
+    <div class="card-actions hide-on-collapse">
+    <button class="copy-btn" title="Copy shareable link">
+    <i data-lucide="link" style="width: 12px;"></i>
     </button>
-    <div onclick="togglePin('${site.id || site.url}', event)"
-    class="pin-toggle-btn p-1 rounded hover:bg-[#3f3f46] text-[#a1a1aa] hover:text-white transition-opacity ${isPinned ? 'is-pinned text-primary' : ''}">
-    <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i>
+    <div class="pin-toggle-btn ${isPinned ? 'is-pinned' : ''}">
+    <i data-lucide="pin" style="width: 12px;" class="${isPinned ? 'fill-current' : ''}"></i>
     </div>
     </div>
     `;
+    
+    // Re-attach event listeners specifically for the new buttons
+    const copyBtn = btn.querySelector('.copy-btn');
+    copyBtn.onclick = (e) => window.copyProjectLink(e, shareableLink, copyBtn);
+    
+    const pinBtn = btn.querySelector('.pin-toggle-btn');
+    pinBtn.onclick = (e) => window.togglePin(site.id || site.url, e);
+
     btn.onclick = (e) => {
-        if (!e.target.closest('.copy-btn') && !e.target.closest('[onclick*="togglePin"]')) {
+        if (!e.target.closest('.copy-btn') && !e.target.closest('.pin-toggle-btn')) {
             loadProject(site.url, btn);
         }
     };
     return btn;
 }
 
-// RENDER PROJECTS
 function renderProjects() {
     els.list.innerHTML = '';
     els.pinnedList.innerHTML = '';
@@ -615,11 +939,10 @@ function loadProjectFromURL() {
     }
 }
 
-// FIREBASE LISTENER
 onValue(ref(db, 'sites'), (snapshot) => {
     const data = snapshot.val();
     if (!data) {
-        els.list.innerHTML = '<div class="p-3 text-center text-[10px] text-[#a1a1aa]">No projects found</div>';
+        els.list.innerHTML = '<div style="padding: 12px; text-align: center; font-size: 10px; color: var(--text-muted);">No projects found</div>';
         return;
     }
     allSites = Object.entries(data)
@@ -629,7 +952,6 @@ onValue(ref(db, 'sites'), (snapshot) => {
     loadProjectFromURL();
 });
 
-// SEARCH
 els.search.oninput = (e) => {
     const q = e.target.value.toLowerCase();
     document.querySelectorAll('.project-card').forEach(btn => {
@@ -638,7 +960,6 @@ els.search.oninput = (e) => {
     });
 };
 
-// PIN TOGGLE
 window.togglePin = function(id, e) {
     e.stopPropagation();
     if (pinnedIds.includes(id)) pinnedIds = pinnedIds.filter(pid => pid !== id);
@@ -647,14 +968,13 @@ window.togglePin = function(id, e) {
     renderProjects();
 }
 
-// COPY LINK
 window.copyProjectLink = function(event, link, buttonElement) {
     event.stopPropagation();
     navigator.clipboard.writeText(link).then(() => {
         const icon = buttonElement.querySelector('i');
         const originalIcon = icon.outerHTML;
         buttonElement.classList.add('copied');
-        icon.outerHTML = '<i data-lucide="check" class="w-3 h-3"></i>';
+        icon.outerHTML = '<i data-lucide="check" style="width: 12px;"></i>';
         lucide.createIcons();
         setTimeout(() => {
             buttonElement.classList.remove('copied');
@@ -663,63 +983,60 @@ window.copyProjectLink = function(event, link, buttonElement) {
         }, 2000);
     }).catch(err => {
         console.error('Failed to copy link:', err);
-        alert(' copied link to clipboard');
+        alert('Link copied to clipboard');
     });
 };
 
-// COMMAND PALETTE
 document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        els.cmdPalette.classList.remove('hidden');
+        els.cmdPalette.classList.add('open');
         els.cmdInput.focus();
-        setTimeout(() => document.getElementById('cmdContent').classList.remove('scale-95', 'opacity-0'), 10);
     }
     if (e.key === 'Escape') closeCmd();
 });
+
 function closeCmd() {
-    document.getElementById('cmdContent').classList.add('scale-95', 'opacity-0');
-    setTimeout(() => els.cmdPalette.classList.add('hidden'), 200);
+    els.cmdPalette.classList.remove('open');
 }
 els.cmdPalette.addEventListener('click', (e) => {
     if (e.target === els.cmdPalette) closeCmd();
 });
+
 els.cmdInput.addEventListener('input', (e) => {
     const q = e.target.value.toLowerCase();
     const results = allSites.filter(s => (s.title || '').toLowerCase().includes(q));
     els.cmdResults.innerHTML = results.slice(0, 5).map(site => `
-    <button onclick="loadProjectFromCmd('${site.url}')" class="w-full text-left p-2 rounded hover:bg-[#27272a] flex items-center justify-between group">
-    <span class="text-sm text-gray-300 group-hover:text-white">${site.title}</span>
-    <span class="text-[10px] text-gray-500">Jump to</span>
+    <button onclick="loadProjectFromCmd('${site.url}')" class="cmd-item">
+    <span style="font-size: 14px;">${site.title}</span>
+    <span style="font-size: 10px; color: #6b7280;">Jump to</span>
     </button>
     `).join('');
 });
 window.loadProjectFromCmd = (url) => { loadProject(url); closeCmd(); };
 
-// STATIC BUTTONS
 document.getElementById('osApkBtn').onclick = () => window.open(window.location.origin + '/scrapsites/osapk.html', '_blank');
+
 document.getElementById('homeBtn').onclick = () => {
     els.loader.classList.remove('hidden');
     els.empty.classList.add('hidden');
-    
-    // Uses variable from app.js if split view is active
     const targetFrame = (window.splitViewEnabled && window.currentActivePane === 'right') ? els.frame2 : els.frame;
-    
     targetFrame.src = '/index.html';
     targetFrame.addEventListener('load', () => els.loader.classList.add('hidden'), { once: true });
-    
     if (typeof window.addToHistory === 'function') window.addToHistory('Home', '/index.html');
     window.history.pushState({}, '', window.location.pathname);
 };
+
 document.getElementById('fullscreenBtn').onclick = () => {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
     else if (document.exitFullscreen) document.exitFullscreen();
 };
 </script>
+
+<!-- Crisp Chat & Others -->
 <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 <script src="/test/darky.js"></script>
- <!-- MOBILE REDIRECTION SCRIPT -->
-   <script src="/test/redirect.js"></script>
-        
+<script src="/test/redirect.js"></script>
+
 </body>
-</html> 
+</html>
