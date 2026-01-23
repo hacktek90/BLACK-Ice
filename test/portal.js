@@ -9,7 +9,7 @@
     
     class BlackICEWidget {
     constructor() {
-    this.dbUrl = "https://blackice-backend.vercel.app/api/projects";
+    this.dbUrl = "https://blackice-ac.vercel.app/test/portalbackend.js";
     this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
     this.homeUrl = "https://blackice-ac.vercel.app/";
     this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";
