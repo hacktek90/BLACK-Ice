@@ -5,88 +5,355 @@
 }</script></head><body>
 
 
-<meta charset="UTF-8">
-<title>TTS Dev Endpoint</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <meta charset="UTF-8">
 
-<!-- Allow iframe embedding -->
-<meta http-equiv="Content-Security-Policy" content="frame-ancestors *;">
+    <link rel="icon" href="/output-onlinepngtools.png" type="image/png">
 
-<script src="https://js.puter.com/v2/"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-  margin: 0;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  font-family: system-ui, sans-serif;
-}
+    <title>BlackICE Portal — AI, Productivity &amp; Web Tools Platform</title>
 
-.loading {
-  text-align: center;
-}
+    <meta name="description" content="BlackICE Portal is a minimal, modern web-based platform offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration — accessible instantly in your browser.">
+    <meta name="author" content="BlackICE">
+    <meta name="robots" content="index, follow">
 
-audio {
-  width: 100%;
-  max-width: 480px;
-}
-</style>
+    <meta name="theme-color" content="#09090b">
+    <meta name="color-scheme" content="dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
+    <meta property="og:title" content="BlackICE Portal">
+    <meta property="og:description" content="A modern, minimal portal for launching AI tools, productivity apps, and web utilities.">
+    <meta property="og:url" content="https://blackice-ac.vercel.app/">
+    <meta property="og:site_name" content="BlackICE">
+    <meta property="og:image" content="/preview-image.png">
 
+    <meta name="twitter:card" content="summary_large_image">
 
-<div id="loading" class="loading">
-  <p>Generating audio…</p>
-</div>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 
-<audio id="audio" controls=""></audio>
+    <style>
+      :root {
+        --bg-dark: #09090b;
+        --glass-bg: rgba(9, 9, 11, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --accent-blue: #3b82f6;
+        --accent-glow: rgba(59, 130, 246, 0.5);
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+      }
 
-<script>
-(async function () {
-  const params = new URLSearchParams(location.search);
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  // REQUIRED
-  const text = params.get("text");
-  if (!text) {
-    document.body.innerHTML = "❌ Missing ?text=";
-    return;
-  }
+      html,
+      body {
+        width: 100%;
+        min-height: 100vh;
+        font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg-dark);
+        color: var(--text-main);
+        overflow-x: hidden;
+      }
 
-  // OPTIONAL
-  const voice = params.get("voice") || "Joanna";
-  const lang = params.get("lang") || "en-US";
-  const autoplay = params.get("autoplay") === "1";
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
 
-  try {
-    // Generate speech (NEURAL forced)
-    const audioEl = await puter.ai.txt2speech(text, {
-      voice,
-      engine: "neural",
-      language: lang
-    });
+      /* --- Background Video & Overlay --- */
+      .video-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        z-index: -2;
+      }
 
-    if (!audioEl?.src) {
-      throw new Error("No audio source returned");
-    }
+      .video-wrapper video {
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        opacity: 0.6; /* Dimmed naturally */
+      }
 
-    // IMPORTANT: Use REAL URL (NO BLOBS)
-    const audio = document.getElementById("audio");
-    audio.src = audioEl.src;
+      /* Noise texture overlay for cyberpunk feel */
+      .video-wrapper::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, transparent 0%, #09090b 120%),
+          linear-gradient(to bottom, rgba(9, 9, 11, 0.4), rgba(9, 9, 11, 0.9));
+        z-index: 1;
+      }
 
-    document.getElementById("loading").remove();
+      .glow {
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(59, 130, 246, 0.15) 0%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: -1;
+      }
 
-    if (autoplay) {
-      audio.play().catch(() => {});
-    }
+      /* --- Layout Container --- */
+      .main-container {
+        width: 100%;
+        max-width: 900px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 60px;
+        animation: fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
-  } catch (err) {
-    document.body.innerHTML = "❌ TTS failed: " + err.message;
-  }
-})();
-</script>
+      /* --- Hero Section --- */
+      .hero-section {
+        text-align: center;
+        position: relative;
+      }
 
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+      }
 
+      h1:hover {
+        opacity: 0.9;
+        transform: scale(1.01);
+        text-shadow: 0 0 60px rgba(59, 130, 246, 0.3);
+      }
+
+      .hero-section p {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+        font-weight: 300;
+      }
+
+      /* --- Glass Card for Features --- */
+      .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 40px;
+        width: 100%;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        text-align: center;
+      }
+
+      .section-title {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent-blue);
+        margin-bottom: 24px;
+        display: block;
+        font-weight: 600;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        text-align: left;
+        margin-top: 20px;
+      }
+
+      .feature-item {
+        padding: 16px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .feature-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-2px);
+      }
+
+      .feature-item h3 {
+        font-size: 0.95rem;
+        color: #fff;
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+
+      .feature-item p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      /* --- Hint/Launcher HUD --- */
+      .hint-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
+        margin-top: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      .hint-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      /* --- Animations --- */
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* SEO hidden content for structure but visual separation */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+    </style>
+  
+
+  
+    <div class="video-wrapper">
+      <video autoplay="" muted="" loop="" playsinline="">
+        <source src="https://blackice-ac.vercel.app/scrapsites/integrated-loop-optimized.webm">
+      </video>
+    </div>
+
+    <div class="glow"></div>
+
+    <div class="main-container">
+      
+      <main class="hero-section">
+        <h1 role="button" tabindex="0" onclick="window.open('/test/dev.html', '_blank')" onkeydown="if(event.key==='Enter'){window.open('/test/dev.html','_blank')}" title="Enter Developer Mode">
+          BlackICE Portal
+        </h1>
+        <p>The operating system for your web productivity.<br>Seamlessly integrated AI, Utilities, and Workspace tools.</p>
+        
+        <div class="hint-wrap">
+          <div class="hint-text">Click the button toggle at right bottom to open projects</div>
+        </div>
+      </main>
+
+      <section class="glass-card">
+        <span class="section-title">System Capabilities</span>
+        
+        <div class="features-grid">
+          <div class="feature-item">
+            <h3>AI Core</h3>
+            <p>Focus enhancement, health tracking, and automated intelligence workflows.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Productivity</h3>
+            <p>Task management, habit tracking, and advanced planning systems.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Creation</h3>
+            <p>Docs, slides, whiteboards, and mind maps in one unified interface.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Dev Tools</h3>
+            <p>HTML viewers, Git utilities, and minimal developer environments.</p>
+          </div>
+        </div>
+
+        <div class="sr-only">
+          <h2>All-in-One Web Tools &amp; AI Utilities Platform</h2>
+          <p>
+            BlackICE Portal is a browser-based platform combining AI-powered tools,
+            productivity apps, developer utilities, document creation systems, media
+            tools, and real-time collaboration in a single minimal interface.
+          </p>
+          <ul>
+            <li>Use AI tools for focus, health tracking, and automation</li>
+            <li>Manage tasks, habits, notes, and planning workflows</li>
+            <li>Create documents, slides, mind maps, and whiteboards</li>
+            <li>Access developer utilities like HTML viewers and Git fetchers</li>
+            <li>Collaborate via chat, calls, shared docs, and drawing boards</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "BlackICE Portal",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Web",
+        "description": "A minimal web-based portal offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration.",
+        "url": "https://blackice-ac.vercel.app/",
+        "creator": {
+          "@type": "Organization",
+          "name": "BlackICE"
+        }
+      }
+    </script>
+
+    <script src="/test/portal.js" defer=""></script>
+    <script src="/test/redirect.js" defer=""></script>
+    <script src="/test/darky.js" defer=""></script>
+  
 
 <script src="./script.js"></script></body></html>
