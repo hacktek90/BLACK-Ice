@@ -1,6 +1,6 @@
 /**
- * BlackICE Portal Widget v4.3 (Updated)
- * Features: Deep Linking (?project=), Relative URL Pathing, Pinned Projects, Copy Link, Immersive Mode, Master Projects Shortcut
+ * BlackICE Portal Widget v4.4 (Improved Search)
+ * Features: Deep Linking (?project=), Relative URL Pathing, Pinned Projects, Copy Link, Immersive Mode, Master Projects Shortcut, SMART SEARCH
  */
 
 (function() {
@@ -398,9 +398,29 @@
                 }, 100);
             };
 
+            // --- IMPROVED SEARCH LOGIC ---
             document.getElementById('bi-search').oninput = (e) => {
-                const term = e.target.value.toLowerCase();
-                const filtered = this.allProjects.filter(p => (p.title || '').toLowerCase().includes(term));
+                const term = e.target.value.toLowerCase().trim();
+
+                // If search is empty, show all
+                if (!term) {
+                    this.renderProjects(this.allProjects);
+                    return;
+                }
+
+                // Split term into keywords (e.g., "black ice" becomes ["black", "ice"])
+                // This allows matching "BlackICE" even with spaces in the search query
+                const keywords = term.split(/\s+/).filter(k => k.length > 0);
+
+                const filtered = this.allProjects.filter(p => {
+                    // Create a searchable string from Title, URL, and ID
+                    // We also check p.desc if it exists in the database
+                    const searchableContent = `${p.title || ''} ${p.url || ''} ${p.id || ''} ${p.desc || ''}`.toLowerCase();
+
+                    // Check if ALL keywords are present in the searchable content
+                    return keywords.every(keyword => searchableContent.includes(keyword));
+                });
+
                 this.renderProjects(filtered);
             };
 
@@ -565,7 +585,14 @@
             localStorage.setItem('bi_pinned', JSON.stringify(this.pinnedIds));
 
             const term = document.getElementById('bi-search').value.toLowerCase();
-            const filtered = this.allProjects.filter(p => (p.title || '').toLowerCase().includes(term));
+            
+            // Re-run the smart search logic instead of simple filter
+            const keywords = term.split(/\s+/).filter(k => k.length > 0);
+            const filtered = this.allProjects.filter(p => {
+                const content = `${p.title || ''} ${p.url || ''} ${p.id || ''} ${p.desc || ''}`.toLowerCase();
+                return keywords.every(keyword => content.includes(keyword));
+            });
+            
             this.renderProjects(filtered);
         }
 
