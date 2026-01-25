@@ -4,15 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monaco Editor Studio (Fixed)</title>
+    <title> Editor Studio + URL Fetcher</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+
+    <script src="https://js.puter.com/v2/"></script>
+
     <style>
         /* --- RESET & VARIABLES --- */
         * {
@@ -37,6 +39,7 @@
             --hover-bg: #27272a;
             --font-ui: 'Inter', sans-serif;
             --font-code: 'JetBrains Mono', 'Menlo', monospace;
+            --modal-bg: #18181b;
         }
 
         body.light {
@@ -49,10 +52,10 @@
             --text-muted: #71717a;
             --primary: #2563eb;
             --hover-bg: #e4e4e7;
+            --modal-bg: #ffffff;
         }
 
-        html,
-        body {
+        html, body {
             height: 100%;
             width: 100%;
             overflow: hidden;
@@ -141,6 +144,7 @@
             color: white;
         }
 
+        /* Tooltip */
         .nav-btn::after {
             content: attr(title);
             position: absolute;
@@ -230,7 +234,6 @@
             gap: 8px;
         }
 
-        /* Device Selector Styling */
         .pane-actions {
             display: flex;
             gap: 8px;
@@ -359,7 +362,6 @@
             width: 4px;
         }
 
-        /* Increase hit area */
         .resizer::after {
             content: '';
             position: absolute;
@@ -378,6 +380,154 @@
             pointer-events: none;
         }
 
+        /* --- MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--modal-bg);
+            border: 1px solid var(--border);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            transform: translateY(10px);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: var(--bg-app);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-family: var(--font-code);
+            font-size: 13px;
+        }
+
+        .modal-input:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease forwards;
+            min-width: 250px;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(10px); }
+        }
+
         /* --- MOBILE UI --- */
         .mobile-nav {
             display: none;
@@ -388,8 +538,7 @@
                 flex-direction: column;
             }
 
-            .sidebar,
-            .resizer {
+            .sidebar, .resizer {
                 display: none;
             }
 
@@ -454,10 +603,11 @@
             <button class="nav-btn" id="sample-btn" title="Load Sample"><i class="ph ph-file-code"></i></button>
             <button class="nav-btn" id="clear-btn" title="Clear Code"><i class="ph ph-trash"></i></button>
             <div style="height: 1px; width: 24px; background: var(--border); margin: 4px 0;"></div>
+            <!-- NEW: FETCH BUTTON -->
+            <button class="nav-btn" id="fetch-modal-btn" title="Fetch from URL"><i class="ph ph-globe"></i></button>
             <button class="nav-btn" id="import-btn" title="Import HTML"><i class="ph ph-upload-simple"></i></button>
             <button class="nav-btn" id="export-btn" title="Export HTML"><i class="ph ph-download-simple"></i></button>
-            <a href="https://livecodes.io/" class="nav-btn" target="_blank"
-                title="Site Builder"><i class="ph ph-hammer"></i></a>
+            <a href="https://livecodes.io/" class="nav-btn" target="_blank" title="Site Builder"><i class="ph ph-hammer"></i></a>
         </nav>
         <div class="sidebar-footer">
             <button class="theme-toggle" id="theme-btn" title="Toggle Theme"><i class="ph ph-moon"></i></button>
@@ -486,16 +636,15 @@
                 <div class="pane-title"><i class="ph ph-eye"></i> Preview</div>
                 <div class="pane-actions">
                     <select id="device-select" class="device-select">
-<option value="375x667">iPhone SE (375x667)</option>
-<option value="390x844" selected>iPhone 14 (390x844)</option>
-<option value="430x932">iPhone 14 Pro Max (430x932)</option>
-<option value="412x915">Pixel 7 (412x915)</option>
-<option value="360x800">Samsung S22 (360x800)</option>
-<option value="768x1024">iPad Mini (768x1024)</option>
-</select>
+                        <option value="375x667">iPhone SE (375x667)</option>
+                        <option value="390x844" selected>iPhone 14 (390x844)</option>
+                        <option value="430x932">iPhone 14 Pro Max (430x932)</option>
+                        <option value="412x915">Pixel 7 (412x915)</option>
+                        <option value="360x800">Samsung S22 (360x800)</option>
+                        <option value="768x1024">iPad Mini (768x1024)</option>
+                    </select>
                     <button class="icon-btn active" id="desktop-btn" title="Desktop View"><i class="ph ph-monitor"></i></button>
                     <button class="icon-btn" id="mobile-btn" title="Mobile View"><i class="ph ph-device-mobile"></i></button>
-                    <!-- NEW TAB BUTTON -->
                     <button class="icon-btn" id="newtab-btn" title="Open in New Tab"><i class="ph ph-arrow-square-out"></i></button>
                 </div>
             </header>
@@ -515,6 +664,22 @@
     </nav>
 
     <input type="file" id="file-input" accept=".html" hidden>
+
+    <!-- FETCH URL MODAL -->
+    <div class="modal-overlay" id="fetch-modal">
+        <div class="modal">
+            <h3><i class="ph ph-globe"></i> Fetch from URL</h3>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Enter a website URL to load its HTML source code into the editor.</p>
+            <input type="text" id="url-input" class="modal-input" placeholder="https://example.com" autocomplete="off">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-fetch">Cancel</button>
+                <button class="btn btn-primary" id="do-fetch">Fetch Code</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
 
     <script>
         // --- DATA ---
@@ -965,6 +1130,116 @@ function formatCode() {
     editor.getAction('editor.action.formatDocument').run();
 }
 
+// --- TOAST NOTIFICATION SYSTEM ---
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let icon = type === 'success' ? '<i class="ph ph-check-circle" style="font-size:16px"></i>' : '<i class="ph ph-warning-circle" style="font-size:16px"></i>';
+    
+    toast.innerHTML = `${icon}<span>${message}</span>`;
+    
+    container.appendChild(toast);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s ease forwards';
+        toast.addEventListener('animationend', () => {
+            toast.remove();
+        });
+    }, 3000);
+}
+
+// --- FETCH URL MODAL LOGIC ---
+function initFetchModal() {
+    const modal = document.getElementById('fetch-modal');
+    const input = document.getElementById('url-input');
+    const openBtn = document.getElementById('fetch-modal-btn');
+    const cancelBtn = document.getElementById('cancel-fetch');
+    const fetchBtn = document.getElementById('do-fetch');
+
+    function openModal() {
+        modal.classList.add('active');
+        input.value = '';
+        input.focus();
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+    }
+
+    openBtn.addEventListener('click', openModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    // Close on outside click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // Handle Fetch
+    fetchBtn.addEventListener('click', async () => {
+        const url = input.value.trim();
+        
+        if (!url) {
+            showToast('Please enter a valid URL', 'error');
+            return;
+        }
+
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            showToast('URL must start with http:// or https://', 'error');
+            return;
+        }
+
+        // Loading state
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = 'Fetching...';
+        input.disabled = true;
+
+        try {
+            // Use Puter.js to fetch
+            if (typeof puter === 'undefined') {
+                throw new Error('Puter.js library not loaded. Check your internet connection.');
+            }
+
+            showToast('Fetching code...', 'success');
+            
+            const request = await puter.net.fetch(url);
+            
+            if (!request.ok) {
+                throw new Error(`Server responded with ${request.status}`);
+            }
+
+            const body = await request.text();
+
+            // Update Editor
+            if (editor) {
+                editor.setValue(body);
+                updatePreview();
+                showToast(`Successfully loaded code from ${new URL(url).hostname}`, 'success');
+            }
+            
+            closeModal();
+
+        } catch (err) {
+            console.error(err);
+            showToast(`Failed to fetch: ${err.message}`, 'error');
+        } finally {
+            // Reset state
+            fetchBtn.disabled = false;
+            fetchBtn.textContent = 'Fetch Code';
+            input.disabled = false;
+        }
+    });
+
+    // Allow "Enter" key to submit
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            fetchBtn.click();
+        }
+    });
+}
+
 // --- THEME HANDLING ---
 function toggleTheme() {
     const isLight = document.body.classList.toggle('light');
@@ -1078,6 +1353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initResizer();
     initMobileTabs();
     initViewModes();
+    initFetchModal(); // Initialize Fetch Feature
 
     // Initial Theme Check
     if (localStorage.getItem('theme') === 'light') toggleTheme();
@@ -1136,14 +1412,12 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
     });
 
-    // NEW TAB LOGIC
     document.getElementById('newtab-btn').addEventListener('click', () => {
         if(!editor) return;
         const code = editor.getValue();
         const blob = new Blob([code], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
-        // Optional: revoke URL after some time or on close, though browser usually handles this fine for simple blobs
     });
 });
     </script>
