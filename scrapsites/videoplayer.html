@@ -1,453 +1,1325 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pro Video Player | Snapshots & Notes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/feather-icons"></script>
-<style>
-    /* --- 2025 MODERN VARIABLES --- */
-    :root {
-        --bg-app: #050505;
-        --bg-panel: rgba(20, 20, 20, 0.65);
-        --bg-glass: rgba(255, 255, 255, 0.03);
-        --accent-1: #06b6d4; /* Cyan */
-        --accent-2: #8b5cf6; /* Violet */
-        --accent-grad: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-        --text-main: #ffffff;
-        --text-muted: rgba(255, 255, 255, 0.5);
-        --border: rgba(255, 255, 255, 0.08);
-        --radius-lg: 16px;
-        --radius-md: 10px;
-        --radius-sm: 6px;
-        --blur: 24px;
-        --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro Dual-Mode Video Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Plyr CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-    body {
-        font-family: 'Inter', sans-serif;
-        background: var(--bg-app);
-        color: var(--text-main);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow-x: hidden;
-    }
+    <style>
+        /* --- GLOBAL VARIABLES & RESET --- */
+        :root {
+            --bg-app: #050505;
+            --bg-panel: rgba(20, 20, 20, 0.65);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --accent-1: #06b6d4;
+            /* Cyan */
+            --accent-2: #8b5cf6;
+            /* Violet */
+            --accent-grad: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --border: rgba(255, 255, 255, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --blur: 24px;
+            --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
 
-    .container { width: 100%; max-width: 1200px; padding: 24px; }
-    .player-wrapper {
-        position: relative;
-        background: #000;
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);
-        border: 1px solid var(--border);
-    }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            margin: 0;
+            padding: 0;
+        }
 
-    .video-stage { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; user-select: none; }
-    video { width: 100%; height: 100%; object-fit: contain; }
-    #ytPlayerRef { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 2; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-app);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
 
-    .click-layer { position: absolute; inset: 0; z-index: 5; cursor: pointer; }
+        /* --- LAYOUT & MODE SWITCHER --- */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    /* CROP LAYER */
-    .crop-layer {
-        position: absolute; inset: 0; z-index: 50;
-        background: rgba(0,0,0,0.6);
-        display: none; opacity: 0; transition: opacity 0.3s var(--ease);
-    }
-    .crop-layer.active { display: block; opacity: 1; }
-    
-    .crop-box {
-        position: absolute;
-        border: 2px solid var(--accent-1);
-        box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-        cursor: move;
-        top: 20%; left: 20%; width: 60%; height: 60%;
-    }
-    /* Grid lines for crop box */
-    .crop-box::after {
-        content: ''; position: absolute; inset: 0;
-        background: linear-gradient(to bottom, transparent 32%, rgba(255,255,255,0.3) 33%, transparent 34%, transparent 65%, rgba(255,255,255,0.3) 66%, transparent 67%);
-        pointer-events: none;
-    }
-    .crop-box::before {
-        content: ''; position: absolute; inset: 0;
-        background: linear-gradient(to right, transparent 32%, rgba(255,255,255,0.3) 33%, transparent 34%, transparent 65%, rgba(255,255,255,0.3) 66%, transparent 67%);
-        pointer-events: none; z-index: 1;
-    }
-    
-    .crop-handle {
-        position: absolute; width: 12px; height: 12px; background: #fff;
-        border-radius: 50%; border: 2px solid var(--accent-1); z-index: 10;
-    }
-    .handle-nw { top: -6px; left: -6px; cursor: nw-resize; }
-    .handle-ne { top: -6px; right: -6px; cursor: ne-resize; }
-    .handle-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
-    .handle-se { bottom: -6px; right: -6px; cursor: se-resize; }
-    
-    .crop-actions {
-        position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%);
-        display: flex; gap: 12px; background: var(--bg-panel); padding: 8px 12px;
-        border-radius: var(--radius-md); border: 1px solid var(--border);
-        white-space: nowrap; pointer-events: auto;
-    }
-    .btn-crop-action {
-        background: transparent; border: none; color: #fff; cursor: pointer;
-        width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        transition: 0.2s;
-    }
-    .btn-crop-action:hover { background: rgba(255,255,255,0.1); }
-    .btn-crop-confirm { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
-    .btn-crop-confirm:hover { background: rgba(74, 222, 128, 0.25); }
-    .btn-crop-cancel { color: #f87171; }
+        .logo {
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    /* CONTROLS */
-    .controls-layer {
-        position: absolute; bottom: 0; left: 0; right: 0; z-index: 30;
-        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
-        padding: 60px 24px 24px;
-        opacity: 1; transform: translateY(0); transition: 0.3s ease;
-    }
-    .controls-layer.hidden { opacity: 0; transform: translateY(10px); pointer-events: none; }
+        .logo i {
+            color: var(--accent-1);
+        }
 
-    .progress-track {
-        position: relative; height: 4px; background: rgba(255,255,255,0.15);
-        border-radius: 4px; cursor: pointer; margin-bottom: 20px;
-        transition: height 0.2s var(--ease);
-    }
-    .progress-track:hover { height: 6px; }
-    .progress-fill { position: absolute; height: 100%; background: var(--accent-grad); width: 0%; border-radius: 4px; }
-    .progress-thumb { position: absolute; top: 50%; left: 0%; width: 14px; height: 14px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%) scale(0); transition: transform 0.2s; }
-    .progress-track:hover .progress-thumb { transform: translate(-50%, -50%) scale(1); }
+        .mode-switcher {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            display: flex;
+            position: relative;
+        }
 
-    .ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .ctrl-group { display: flex; align-items: center; gap: 8px; }
-    .btn {
-        background: transparent; border: none; color: rgba(255,255,255,0.85);
-        width: 40px; height: 40px; border-radius: var(--radius-sm);
-        display: flex; align-items: center; justify-content: center; cursor: pointer;
-        transition: all 0.2s ease; position: relative;
-    }
-    .btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .btn.active { color: var(--accent-1); background: rgba(6, 182, 212, 0.1); }
-    .skip-badge { position: absolute; font-size: 8px; font-weight: 700; top: 50%; left: 50%; transform: translate(-50%, -50%); margin-top: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s;
+        }
 
-    .time-display { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--text-muted); min-width: 90px; text-align: center; }
-    .time-display span { color: #fff; }
+        .mode-btn.active {
+            color: #fff;
+        }
 
-    .volume-group { display: flex; align-items: center; }
-    .volume-slider-wrap { width: 0; overflow: hidden; transition: width 0.3s var(--ease); display: flex; align-items: center; }
-    .volume-group:hover .volume-slider-wrap { width: 80px; margin-left: 12px; }
-    input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.2); height: 4px; border-radius: 2px; width: 100%; outline: none; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #fff; border-radius: 50%; cursor: pointer; }
-    
-    .settings-popover {
-        position: absolute; bottom: 80px; right: 24px; width: 220px;
-        background: var(--bg-panel); backdrop-filter: blur(var(--blur));
-        border: 1px solid var(--border); border-radius: var(--radius-md);
-        padding: 16px; display: none; flex-direction: column; gap: 12px;
-        transform-origin: bottom right; animation: scaleIn 0.2s var(--ease);
-    }
-    .settings-popover.active { display: flex; }
-    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    .setting-header { display: flex; justify-content: space-between; align-items: center; }
-    .setting-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
-    .setting-val { font-size: 13px; font-weight: 700; color: var(--accent-1); }
+        .mode-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: var(--bg-panel);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s var(--ease);
+            z-index: 1;
+        }
 
-    /* NOTIFICATION & BIG PLAY */
-    .snapshot-notification {
-        position: absolute; top: 24px; right: 24px;
-        background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(12px); border: 1px solid var(--border);
-        color: var(--accent-1); padding: 10px 16px; border-radius: var(--radius-md);
-        font-size: 13px; font-weight: 500; z-index: 100;
-        opacity: 0; transform: translateY(-10px); pointer-events: none;
-        transition: all 0.4s var(--ease); display: flex; align-items: center; gap: 8px;
-    }
-    .snapshot-notification.show { opacity: 1; transform: translateY(0); }
-    
-    .big-play-btn {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
-        width: 80px; height: 80px; border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
-        color: white; z-index: 20; opacity: 0; pointer-events: none;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s var(--ease);
-    }
-    .big-play-btn.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+        /* Slider positions based on active class index */
+        .mode-switcher[data-active="1"] .mode-slider {
+            transform: translateX(0);
+        }
 
-    /* SIDEBAR (Drawer) */
-    .drawer {
-        position: absolute; top: 0; right: 0; bottom: 0; width: 340px;
-        background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(40px);
-        border-left: 1px solid var(--border); z-index: 60;
-        transform: translateX(100%); transition: transform 0.4s var(--ease);
-        display: flex; flex-direction: column;
-    }
-    .drawer.open { transform: translateX(0); }
-    .drawer-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .drawer-title { font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
-    .drawer-tabs { display: flex; padding: 0 20px; margin-top: 12px; gap: 16px; border-bottom: 1px solid var(--border); }
-    .drawer-tab { padding-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; }
-    .drawer-tab.active { color: #fff; border-color: var(--accent-1); }
-    
-    .drawer-content { flex: 1; overflow-y: auto; padding: 20px; display: none; }
-    .drawer-content.active { display: block; }
-    
-    /* Notes UI */
-    .note-input-area { background: var(--bg-glass); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; }
-    .note-textarea { width: 100%; background: transparent; border: none; color: #fff; resize: vertical; min-height: 70px; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
-    .note-actions { display: flex; justify-content: flex-end; align-items: center; }
-    .btn-primary {
-        background: var(--accent-grad); color: white; border: none;
-        padding: 8px 16px; border-radius: var(--radius-sm);
-        font-size: 12px; font-weight: 600; cursor: pointer;
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-        transition: transform 0.2s;
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35); }
-    .note-list { display: flex; flex-direction: column; gap: 12px; }
-    .note-card {
-        background: var(--bg-glass); border: 1px solid transparent;
-        padding: 14px; border-radius: var(--radius-md); cursor: pointer;
-        transition: all 0.2s; position: relative;
-    }
-    .note-card:hover { border-color: var(--accent-2); background: rgba(139, 92, 246, 0.05); }
-    .note-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-    .note-time { color: var(--accent-1); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .note-delete-btn { background: transparent; border: none; color: var(--text-muted); padding: 4px; cursor: pointer; border-radius: 4px; margin-top: -4px; margin-right: -4px; }
-    .note-delete-btn:hover { color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+        .mode-switcher[data-active="2"] .mode-slider {
+            transform: translateX(100%);
+        }
 
-    /* Snapshots UI */
-    .snapshot-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .snapshot-card {
-        background: var(--bg-glass); border: 1px solid var(--border);
-        border-radius: var(--radius-md); overflow: hidden; position: relative;
-        transition: all 0.2s;
-    }
-    .snapshot-card:hover { border-color: var(--accent-1); }
-    .snapshot-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
-    .snapshot-meta { padding: 8px; display: flex; justify-content: space-between; align-items: center; background: #111; }
-    .snapshot-time { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-    .snapshot-dl-btn {
-        background: rgba(255,255,255,0.1); border: none; color: #fff;
-        width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s;
-    }
-    .snapshot-dl-btn:hover { background: var(--accent-1); }
+        /* --- MAIN CONTENT AREA --- */
+        .main-stage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    /* UPLOAD */
-    .upload-section { background: #0a0a0a; padding: 20px 24px; border-top: 1px solid var(--border); }
-    .upload-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-    .url-input {
-        flex: 1; min-width: 240px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-        color: white; padding: 12px 16px; border-radius: var(--radius-md); font-size: 14px; transition: 0.2s;
-    }
-    .url-input:focus { border-color: var(--accent-1); background: rgba(255,255,255,0.08); }
-    .upload-btn-group { display: flex; gap: 8px; }
-    .btn-secondary {
-        background: rgba(255,255,255,0.08); color: white; border: none;
-        padding: 0 20px; height: 44px; border-radius: var(--radius-md);
-        font-size: 13px; font-weight: 600; cursor: pointer;
-        display: flex; align-items: center; gap: 8px; transition: 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.15); }
-    .playlist {
-        display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px;
-        mask-image: linear-gradient(to right, black 90%, transparent 100%);
-        -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
-    }
-    .playlist::-webkit-scrollbar { display: none; }
-    .playlist-item {
-        min-width: 180px; max-width: 180px; background: #111; border: 1px solid var(--border);
-        padding: 10px 14px; border-radius: var(--radius-md); cursor: pointer;
-        font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        transition: all 0.2s; color: var(--text-muted);
-    }
-    .playlist-item:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-    .playlist-item.active { border-color: var(--accent-1); background: rgba(6, 182, 212, 0.05); color: var(--accent-1); }
+        .player-container {
+            width: 100%;
+            max-width: 1200px;
+            display: none;
+            animation: fadeIn 0.4s var(--ease);
+        }
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-        .container { padding: 0; }
-        .player-wrapper { border-radius: 0; border: none; min-height: 100vh; display: flex; flex-direction: column; }
-        .video-stage { flex: 1; }
-        .volume-group { display: none; }
-        .drawer { width: 100%; }
-        .upload-row { flex-direction: column; }
-        .btn-secondary { width: 100%; justify-content: center; }
-        .snapshot-list { grid-template-columns: 1fr 1fr 1fr; }
-    }
-</style>
+        .player-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- GLOBAL FOOTER / UPLOAD --- */
+        .global-footer {
+            background: #0a0a0a;
+            border-top: 1px solid var(--border);
+            padding: 20px 24px;
+            z-index: 90;
+        }
+
+        .upload-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto 16px auto;
+        }
+
+        .url-input {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .url-input:focus {
+            border-color: var(--accent-1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-global {
+            background: var(--bg-glass);
+            color: white;
+            border: 1px solid var(--border);
+            padding: 0 20px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-global:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--accent-grad);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .playlist {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            max-width: 1200px;
+            margin: 0 auto;
+            mask-image: linear-gradient(to right, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+        }
+
+        .playlist::-webkit-scrollbar {
+            display: none;
+        }
+
+        .playlist-item {
+            min-width: 180px;
+            max-width: 180px;
+            background: #111;
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .playlist-item:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .playlist-item.active {
+            border-color: var(--accent-1);
+            background: rgba(6, 182, 212, 0.05);
+            color: var(--accent-1);
+        }
+
+        .playlist-item-remove {
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .playlist-item:hover .playlist-item-remove {
+            opacity: 1;
+        }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        .toast-container {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s var(--ease);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success i {
+            color: var(--accent-1);
+        }
+
+        .toast.error i {
+            color: #ef4444;
+        }
+
+        /* ========================================================
+       MODE 1: CUSTOM PLAYER STYLES (From your request)
+       ======================================================== */
+        .player-wrapper {
+            position: relative;
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border);
+        }
+
+        .video-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            user-select: none;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #ytPlayerRef {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 2;
+        }
+
+        .click-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        /* CROP LAYER */
+        .crop-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s var(--ease);
+        }
+
+        .crop-layer.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .crop-box {
+            position: absolute;
+            border: 2px solid var(--accent-1);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            cursor: move;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+        }
+
+        .crop-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 32%, rgba(255, 255, 255, 0.3) 33%, transparent 34%, transparent 65%, rgba(255, 255, 255, 0.3) 66%, transparent 67%);
+            pointer-events: none;
+        }
+
+        .crop-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent 32%, rgba(255, 255, 255, 0.3) 33%, transparent 34%, transparent 65%, rgba(255, 255, 255, 0.3) 66%, transparent 67%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .crop-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid var(--accent-1);
+            z-index: 10;
+        }
+
+        .handle-nw {
+            top: -6px;
+            left: -6px;
+            cursor: nw-resize;
+        }
+
+        .handle-ne {
+            top: -6px;
+            right: -6px;
+            cursor: ne-resize;
+        }
+
+        .handle-sw {
+            bottom: -6px;
+            left: -6px;
+            cursor: sw-resize;
+        }
+
+        .handle-se {
+            bottom: -6px;
+            right: -6px;
+            cursor: se-resize;
+        }
+
+        .crop-actions {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: var(--bg-panel);
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            pointer-events: auto;
+        }
+
+        .btn-crop-action {
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .btn-crop-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-crop-confirm {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .btn-crop-confirm:hover {
+            background: rgba(74, 222, 128, 0.25);
+        }
+
+        .btn-crop-cancel {
+            color: #f87171;
+        }
+
+        /* CONTROLS */
+        .controls-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+            padding: 60px 24px 24px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: 0.3s ease;
+        }
+
+        .controls-layer.hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+
+        .progress-track {
+            position: relative;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: height 0.2s var(--ease);
+        }
+
+        .progress-track:hover {
+            height: 6px;
+        }
+
+        .progress-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--accent-grad);
+            width: 0%;
+            border-radius: 4px;
+        }
+
+        .progress-thumb {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.2s;
+        }
+
+        .progress-track:hover .progress-thumb {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .ctrl-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .ctrl-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.85);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn.active {
+            color: var(--accent-1);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .skip-badge {
+            position: absolute;
+            font-size: 8px;
+            font-weight: 700;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin-top: 1px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .time-display {
+            font-size: 13px;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-muted);
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .time-display span {
+            color: #fff;
+        }
+
+        .volume-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-slider-wrap {
+            width: 0;
+            overflow: hidden;
+            transition: width 0.3s var(--ease);
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-group:hover .volume-slider-wrap {
+            width: 80px;
+            margin-left: 12px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            height: 4px;
+            border-radius: 2px;
+            width: 100%;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .settings-popover {
+            position: absolute;
+            bottom: 80px;
+            right: 24px;
+            width: 220px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            transform-origin: bottom right;
+            animation: scaleIn 0.2s var(--ease);
+        }
+
+        .settings-popover.active {
+            display: flex;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .setting-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-1);
+        }
+
+        .snapshot-notification {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            color: var(--accent-1);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.4s var(--ease);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .snapshot-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .big-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--ease);
+        }
+
+        .big-play-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* SIDEBAR (Drawer) */
+        .drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 340px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(40px);
+            border-left: 1px solid var(--border);
+            z-index: 60;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--ease);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-title {
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .drawer-tabs {
+            display: flex;
+            padding: 0 20px;
+            margin-top: 12px;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .drawer-tab {
+            padding-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .drawer-tab.active {
+            color: #fff;
+            border-color: var(--accent-1);
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+
+        .drawer-content.active {
+            display: block;
+        }
+
+        .note-input-area {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+        }
+
+        .note-textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            resize: vertical;
+            min-height: 70px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-family: inherit;
+        }
+
+        .note-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .btn-drawer-primary {
+            background: var(--accent-grad);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+            transition: transform 0.2s;
+        }
+
+        .btn-drawer-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+        }
+
+        .note-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .note-card {
+            background: var(--bg-glass);
+            border: 1px solid transparent;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .note-card:hover {
+            border-color: var(--accent-2);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .note-time {
+            color: var(--accent-1);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .note-delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: -4px;
+            margin-right: -4px;
+        }
+
+        .note-delete-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .snapshot-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .snapshot-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .snapshot-card:hover {
+            border-color: var(--accent-1);
+        }
+
+        .snapshot-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+        }
+
+        .snapshot-meta {
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #111;
+        }
+
+        .snapshot-time {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .snapshot-dl-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .snapshot-dl-btn:hover {
+            background: var(--accent-1);
+        }
+
+        /* ========================================================
+       MODE 2: PLYR STYLES
+       ======================================================== */
+        #plyr-wrapper {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        /* Dark theme overrides for Plyr to match our app */
+        .plyr {
+            --plyr-color-main: var(--accent-1);
+            --plyr-video-background: #000;
+            --plyr-menu-background: #111;
+            --plyr-menu-color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 12px 16px;
+            }
+
+            .mode-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .main-stage {
+                padding: 0;
+            }
+
+            .player-container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .player-wrapper,
+            #plyr-wrapper {
+                border-radius: 0;
+                border: none;
+            }
+
+            .volume-group {
+                display: none;
+            }
+
+            .upload-row {
+                flex-direction: column;
+            }
+
+            .btn-global {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .snapshot-list {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container">
-    <div class="player-wrapper" id="playerRef">
-        
-        <!-- Video Content -->
-        <div class="video-stage">
-            <video id="mainVideo" playsinline preload="metadata" crossorigin="anonymous">
-                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
-            </video>
-            <div id="ytPlayerRef"></div>
-            
-            <div class="click-layer" id="clickLayer"></div>
-            
-            <button class="big-play-btn" id="bigPlayBtn">
-                <i data-feather="play" style="width: 32px; height: 32px; fill: white;"></i>
-            </button>
+    <!-- Header & Mode Switcher -->
+    <header class="app-header">
+        <div class="logo">
+            <i data-feather="play-circle"></i>
+            <span>VidSuite Pro</span>
+        </div>
+        <div class="mode-switcher" id="modeSwitcher" data-active="1">
+            <div class="mode-slider"></div>
+            <button class="mode-btn active" onclick="appManager.switchMode(1)">Advanced</button>
+            <button class="mode-btn" onclick="appManager.switchMode(2)">Plyr Minimal</button>
+        </div>
+    </header>
 
-            <!-- CROP LAYER -->
-            <div class="crop-layer" id="cropLayer">
-                <div class="crop-box" id="cropBox">
-                    <div class="crop-handle handle-nw" data-handle="nw"></div>
-                    <div class="crop-handle handle-ne" data-handle="ne"></div>
-                    <div class="crop-handle handle-sw" data-handle="sw"></div>
-                    <div class="crop-handle handle-se" data-handle="se"></div>
-                    
-                    <div class="crop-actions">
-                        <button class="btn-crop-action btn-crop-cancel" id="cancelCropBtn" title="Cancel"><i data-feather="x"></i></button>
-                        <button class="btn-crop-action btn-crop-confirm" id="confirmCropBtn" title="Save to Gallery"><i data-feather="check"></i></button>
-                    </div>
-                </div>
-            </div>
+    <!-- Main Stage -->
+    <main class="main-stage">
 
-            <div class="snapshot-notification" id="snapshotNotify">
-                <i data-feather="image" style="width: 16px; height: 16px;"></i>
-                <span>Added to Gallery</span>
-            </div>
+        <!-- MODE 1: Custom Player -->
+        <div id="mode-custom" class="player-container active">
+            <div class="player-wrapper" id="playerRef">
+                <div class="video-stage">
+                    <video id="mainVideo" playsinline preload="metadata" crossorigin="anonymous">
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+                            type="video/mp4">
+                    </video>
+                    <div id="ytPlayerRef"></div>
+                    <div class="click-layer" id="clickLayer"></div>
+                    <button class="big-play-btn" id="bigPlayBtn">
+                    <i data-feather="play" style="width: 32px; height: 32px; fill: white;"></i>
+                </button>
 
-            <!-- Controls -->
-            <div class="controls-layer" id="controlsLayer">
-                <div class="progress-track" id="progressBar">
-                    <div class="progress-fill" id="progressFill"></div>
-                    <div class="progress-thumb" id="progressThumb"></div>
-                </div>
-
-                <div class="ctrl-row">
-                    <div class="ctrl-group">
-                        <button class="btn" id="playPauseBtn"><i data-feather="play"></i></button>
-                        <button class="btn" id="skipBackBtn" title="Rewind 10s">
-                            <i data-feather="rotate-ccw"></i><span class="skip-badge">10</span>
-                        </button>
-                        <button class="btn" id="skipForwardBtn" title="Forward 10s">
-                            <i data-feather="rotate-cw"></i><span class="skip-badge">10</span>
-                        </button>
-                        <div class="volume-group">
-                            <button class="btn" id="muteBtn"><i data-feather="volume-2"></i></button>
-                            <div class="volume-slider-wrap">
-                                <input type="range" id="volSlider" min="0" max="1" step="0.05" value="1">
+                    <!-- CROP LAYER -->
+                    <div class="crop-layer" id="cropLayer">
+                        <div class="crop-box" id="cropBox">
+                            <div class="crop-handle handle-nw" data-handle="nw"></div>
+                            <div class="crop-handle handle-ne" data-handle="ne"></div>
+                            <div class="crop-handle handle-sw" data-handle="sw"></div>
+                            <div class="crop-handle handle-se" data-handle="se"></div>
+                            <div class="crop-actions">
+                                <button class="btn-crop-action btn-crop-cancel" id="cancelCropBtn"><i data-feather="x"></i></button>
+                                <button class="btn-crop-action btn-crop-confirm" id="confirmCropBtn"><i data-feather="check"></i></button>
                             </div>
                         </div>
-                        <div class="time-display">
-                            <span id="currTime">0:00</span> <span style="opacity: 0.5; margin: 0 4px;">/</span> <span id="durTime">0:00</span>
+                    </div>
+
+                    <div class="snapshot-notification" id="snapshotNotify">
+                        <i data-feather="image" style="width: 16px; height: 16px;"></i>
+                        <span>Added to Gallery</span>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="controls-layer" id="controlsLayer">
+                        <div class="progress-track" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-thumb" id="progressThumb"></div>
+                        </div>
+                        <div class="ctrl-row">
+                            <div class="ctrl-group">
+                                <button class="btn" id="playPauseBtn"><i data-feather="play"></i></button>
+                                <button class="btn" id="skipBackBtn" title="Rewind 10s">
+                                <i data-feather="rotate-ccw"></i><span class="skip-badge">10</span>
+                            </button>
+                                <button class="btn" id="skipForwardBtn" title="Forward 10s">
+                                <i data-feather="rotate-cw"></i><span class="skip-badge">10</span>
+                            </button>
+                                <div class="volume-group">
+                                    <button class="btn" id="muteBtn"><i data-feather="volume-2"></i></button>
+                                    <div class="volume-slider-wrap">
+                                        <input type="range" id="volSlider" min="0" max="1" step="0.05" value="1">
+                                    </div>
+                                </div>
+                                <div class="time-display">
+                                    <span id="currTime">0:00</span> <span style="opacity: 0.5; margin: 0 4px;">/</span>
+                                    <span id="durTime">0:00</span>
+                                </div>
+                            </div>
+                            <div class="ctrl-group">
+                                <button class="btn" id="snapshotBtn" title="Crop & Save"><i data-feather="crop"></i></button>
+                                <button class="btn" id="notesToggleBtn" title="Notes & Snaps"><i data-feather="sidebar"></i></button>
+                                <button class="btn" id="settingsToggleBtn" title="Settings"><i data-feather="sliders"></i></button>
+                                <button class="btn" id="fsBtn" title="Fullscreen"><i data-feather="maximize"></i></button>
+                            </div>
+                        </div>
+                        <div class="settings-popover" id="settingsMenu">
+                            <div class="setting-header">
+                                <span class="setting-label">Playback Speed</span>
+                                <span class="setting-val" id="speedValue">1.00x</span>
+                            </div>
+                            <input type="range" id="speedSlider" min="0.25" max="3.0" step="0.25" value="1" style="height: 3px; background: rgba(255,255,255,0.15);">
+                            <div
+                                style="display:flex; justify-content:space-between; font-size:10px; color:rgba(255,255,255,0.3); padding:0 2px;">
+                                <span>0.25x</span><span>1x</span><span>3x</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="ctrl-group">
-                        <button class="btn" id="snapshotBtn" title="Crop & Save"><i data-feather="crop"></i></button>
-                        <button class="btn" id="notesToggleBtn" title="Notes & Snaps"><i data-feather="sidebar"></i></button>
-                        <button class="btn" id="settingsToggleBtn" title="Settings"><i data-feather="sliders"></i></button>
-                        <button class="btn" id="fsBtn" title="Fullscreen"><i data-feather="maximize"></i></button>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div class="settings-popover" id="settingsMenu">
-                    <div class="setting-header">
-                        <span class="setting-label">Playback Speed</span>
-                        <span class="setting-val" id="speedValue">1.00x</span>
-                    </div>
-                    <input type="range" id="speedSlider" min="0.25" max="3.0" step="0.25" value="1" style="height: 3px; background: rgba(255,255,255,0.15);">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:rgba(255,255,255,0.3); padding:0 2px;">
-                        <span>0.25x</span><span>1x</span><span>3x</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SIDEBAR DRAWER -->
-            <div class="drawer" id="notesDrawer">
-                <div class="drawer-header">
-                    <span class="drawer-title">Media & Notes</span>
-                    <button class="btn" id="closeDrawerBtn"><i data-feather="x"></i></button>
-                </div>
-                <div class="drawer-tabs">
-                    <div class="drawer-tab active" data-tab="notes">Notes</div>
-                    <div class="drawer-tab" data-tab="snaps">Snapshots</div>
-                </div>
-                
-                <!-- Notes Content -->
-                <div class="drawer-content active" id="tab-notes">
-                    <div class="note-input-area">
-                        <textarea id="noteText" class="note-textarea" placeholder="Write a note at current timestamp..."></textarea>
-                        <div class="note-actions">
-                            <button class="btn-primary" id="addNoteBtn">Save Note</button>
+                    <!-- SIDEBAR DRAWER -->
+                    <div class="drawer" id="notesDrawer">
+                        <div class="drawer-header">
+                            <span class="drawer-title">Media & Notes</span>
+                            <button class="btn" id="closeDrawerBtn"><i data-feather="x"></i></button>
+                        </div>
+                        <div class="drawer-tabs">
+                            <div class="drawer-tab active" data-tab="notes">Notes</div>
+                            <div class="drawer-tab" data-tab="snaps">Snapshots</div>
+                        </div>
+                        <div class="drawer-content active" id="tab-notes">
+                            <div class="note-input-area">
+                                <textarea id="noteText" class="note-textarea" placeholder="Write a note at current timestamp..."></textarea>
+                                <div class="note-actions">
+                                    <button class="btn-drawer-primary" id="addNoteBtn">Save Note</button>
+                                </div>
+                            </div>
+                            <div class="note-list" id="noteList"></div>
+                        </div>
+                        <div class="drawer-content" id="tab-snaps">
+                            <div class="snapshot-list" id="snapList"></div>
+                            <div style="margin-top:20px; text-align:center; font-size:12px; color:var(--text-muted);">
+                                Images stored in browser cache</div>
                         </div>
                     </div>
-                    <div class="note-list" id="noteList"></div>
-                </div>
-
-                <!-- Snapshots Content -->
-                <div class="drawer-content" id="tab-snaps">
-                    <div class="snapshot-list" id="snapList"></div>
-                    <div style="margin-top:20px; text-align:center; font-size:12px; color:var(--text-muted);">
-                        Images stored in browser cache
-                    </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Upload -->
-        <div class="upload-section">
-            <div class="upload-row">
-                <input type="text" id="urlInput" class="url-input" placeholder="Paste YouTube or Video URL">
-                <div class="upload-btn-group">
-                    <button class="btn-secondary" id="loadUrlBtn">Load</button>
-                    <label class="btn-secondary">
-                        Upload File
-                        <input type="file" id="fileInput" multiple accept="video/*" style="display: none;">
-                    </label>
-                </div>
+        <!-- MODE 2: Plyr CDN -->
+        <div id="mode-plyr" class="player-container">
+            <div id="plyr-wrapper">
+                <!-- Plyr will attach to this element -->
+                <video id="plyr-element" controls playsinline>
+                    <source src="" type="video/mp4" />
+                </video>
             </div>
-            <div class="playlist" id="playlist"></div>
         </div>
-    </div>
-</div>
 
-<script>
-    var ytApiReady = false;
-    var app = null;
-    window.onYouTubeIframeAPIReady = function() {
-        console.log('YouTube API Ready');
-        ytApiReady = true;
-        if (app) app.onYTApiReady();
-    };
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-</script>
+    </main>
 
-<script>
+    <!-- Global Footer / Shared Playlist -->
+    <footer class="global-footer">
+        <div class="upload-row">
+            <input type="text" id="urlInput" class="url-input" placeholder="Paste YouTube or Video URL">
+            <button class="btn-global btn-primary" id="loadUrlBtn"><i data-feather="link"></i> Load</button>
+            <label class="btn-global">
+            <i data-feather="upload"></i> Upload File
+            <input type="file" id="fileInput" multiple accept="video/*" style="display: none;">
+        </label>
+        </div>
+        <div class="playlist" id="playlist"></div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- YouTube Iframe API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- Plyr JS CDN -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <script>
+        /**
+ * GLOBAL APP MANAGER
+ * Handles playlist, mode switching, and cross-player communication.
+ */
+const appManager = {
+    mode: 1, // 1 = Custom, 2 = Plyr
+    playlist: [],
+    players: {},
+
+    init() {
+        // Setup Listeners for Global Upload
+        document.getElementById('loadUrlBtn').onclick = () => this.handleLoadUrl();
+        document.getElementById('fileInput').onchange = (e) => this.handleFileUpload(e);
+
+        // Initialize Custom Player
+        this.players.custom = new AdvancedPlayer();
+        
+        // Initialize Plyr Player
+        this.players.plyr = new PlyrPlayer();
+
+        // Add default video
+        this.addToPlaylist("Demo Video", "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4", false);
+    },
+
+    switchMode(mode) {
+        if (this.mode === mode) return;
+        
+        // Pause current player
+        if (this.mode === 1) this.players.custom.pause();
+        if (this.mode === 2) this.players.plyr.pause();
+
+        // Update UI State
+        this.mode = mode;
+        document.getElementById('modeSwitcher').setAttribute('data-active', mode);
+        document.querySelectorAll('.mode-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', (idx + 1) === mode);
+        });
+
+        // Toggle Containers
+        document.getElementById('mode-custom').classList.toggle('active', mode === 1);
+        document.getElementById('mode-plyr').classList.toggle('active', mode === 2);
+
+        // Sync Video Source
+        const current = this.playlist[this.playlist.length - 1]; // Play last added for simplicity
+        if (current) {
+            if (mode === 1) this.players.custom.loadSource(current);
+            if (mode === 2) this.players.plyr.loadSource(current);
+        }
+    },
+
+    addToPlaylist(name, src, isYT) {
+        const item = { name, src, isYT, id: Date.now() };
+        this.playlist.push(item);
+        this.renderPlaylist();
+        
+        // Load immediately into active player
+        if (this.mode === 1) this.players.custom.loadSource(item);
+        if (this.mode === 2) this.players.plyr.loadSource(item);
+    },
+
+    removeFromPlaylist(index) {
+        this.playlist.splice(index, 1);
+        this.renderPlaylist();
+    },
+
+    playIndex(index) {
+        const item = this.playlist[index];
+        if (this.mode === 1) this.players.custom.loadSource(item);
+        if (this.mode === 2) this.players.plyr.loadSource(item);
+        this.renderPlaylist();
+    },
+
+    handleLoadUrl() {
+        const url = document.getElementById('urlInput').value.trim();
+        if (!url) return showToast('Please enter a URL', 'error');
+        
+        const ytId = this.extractYtId(url);
+        if (ytId) {
+            this.addToPlaylist(`YouTube: ${ytId}`, ytId, true);
+            showToast(`Added YouTube Video`, 'success');
+        } else if (url) {
+            this.addToPlaylist('Web Video', url, false);
+            showToast(`Added Video URL`, 'success');
+        }
+        document.getElementById('urlInput').value = '';
+    },
+
+    handleFileUpload(e) {
+        Array.from(e.target.files).forEach(f => {
+            this.addToPlaylist(f.name, URL.createObjectURL(f), false);
+        });
+        showToast(`${e.target.files.length} file(s) added`, 'success');
+    },
+
+    extractYtId(url) {
+        const patterns = [ /(?:youtube\.com\/watch\?v=)([^&]+)/, /(?:youtu\.be\/)([^?]+)/, /(?:youtube\.com\/embed\/)([^?]+)/, /(?:youtube\.com\/shorts\/)([^?]+)/ ];
+        for (let pattern of patterns) { const match = url.match(pattern); if (match) return match[1]; }
+        return null;
+    },
+
+    renderPlaylist() {
+        const list = document.getElementById('playlist');
+        list.innerHTML = this.playlist.map((item, i) => `
+            <div class="playlist-item ${i === this.playlist.length - 1 ? 'active' : ''}" onclick="appManager.playIndex(${i})">
+                <span>${item.name}</span>
+                <i data-feather="x" class="playlist-item-remove" onclick="event.stopPropagation(); appManager.removeFromPlaylist(${i})"></i>
+            </div>
+        `).join('');
+        feather.replace();
+    }
+};
+
+/* =========================================
+   MODE 1: CUSTOM PLAYER IMPLEMENTATION
+   ========================================= */
 class AdvancedPlayer {
     constructor() {
-        this.state = {
-            playing: false, 
-            isYT: false,
-            volume: 1, 
-            playlist: [], 
-            notes: [], 
-            snaps: [], 
-            ytReady: false,
-            cropping: false
-        };
+        this.state = { playing: false, isYT: false, volume: 1, cropping: false };
         this.dom = {
             video: document.getElementById('mainVideo'),
             playBtn: document.getElementById('playPauseBtn'),
@@ -456,12 +1328,6 @@ class AdvancedPlayer {
             fill: document.getElementById('progressFill'),
             thumb: document.getElementById('progressThumb'),
             controls: document.getElementById('controlsLayer'),
-            drawer: document.getElementById('notesDrawer'),
-            playlist: document.getElementById('playlist'),
-            currTime: document.getElementById('currTime'),
-            durTime: document.getElementById('durTime'),
-            
-            // Crop Elements
             cropLayer: document.getElementById('cropLayer'),
             cropBox: document.getElementById('cropBox')
         };
@@ -470,15 +1336,55 @@ class AdvancedPlayer {
         this.ytUpdateInterval = null;
 
         this.setupListeners();
-        this.loadData(); // Loads both notes and snaps
-        this.setupCrop(); 
+        this.setupCrop();
         feather.replace();
-
-        this.addToPlaylist("Demo Video", this.dom.video.querySelector('source').src, false);
-        if (ytApiReady) this.onYTApiReady();
+        this.loadNotesAndSnaps();
     }
 
-    onYTApiReady() { this.state.ytReady = true; }
+    loadSource(item) {
+        if (this.state.cropping) this.endCrop(false);
+        if (this.ytUpdateInterval) clearInterval(this.ytUpdateInterval);
+
+        if (item.isYT) {
+            this.state.isYT = true;
+            this.dom.video.style.display = 'none';
+            this.dom.video.pause();
+            document.getElementById('ytPlayerRef').style.display = 'block';
+            
+            if (this.ytPlayer) {
+                this.ytPlayer.loadVideoById(item.src);
+            } else {
+                this.ytPlayer = new YT.Player('ytPlayerRef', {
+                    height: '100%', width: '100%', videoId: item.src,
+                    playerVars: { 'playsinline': 1, 'controls': 0, 'modestbranding': 1 },
+                    events: {
+                        'onReady': (e) => { e.target.playVideo(); this.startYTUpdateLoop(); },
+                        'onStateChange': (e) => {
+                            this.state.playing = (e.data === YT.PlayerState.PLAYING);
+                            this.updatePlayBtn();
+                            this.dom.bigPlayBtn.classList.toggle('visible', !this.state.playing);
+                        }
+                    }
+                });
+            }
+        } else {
+            this.state.isYT = false;
+            document.getElementById('ytPlayerRef').style.display = 'none';
+            if (this.ytPlayer) this.ytPlayer.stopVideo();
+            this.dom.video.style.display = 'block';
+            this.dom.video.src = item.src;
+            this.dom.video.load();
+            this.dom.video.play().catch(()=>{}); // Auto-play attempt
+            this.state.playing = true;
+            this.updatePlayBtn();
+        }
+    }
+
+    pause() {
+        if(this.state.isYT && this.ytPlayer) this.ytPlayer.pauseVideo();
+        else this.dom.video.pause();
+        this.state.playing = false;
+    }
 
     setupListeners() {
         const togglePlay = () => this.togglePlay();
@@ -494,8 +1400,6 @@ class AdvancedPlayer {
 
         document.getElementById('skipBackBtn').onclick = () => this.skip(-10);
         document.getElementById('skipForwardBtn').onclick = () => this.skip(10);
-
-        // Snapshot Trigger
         document.getElementById('snapshotBtn').onclick = () => this.startCrop();
         
         const resetIdle = () => {
@@ -507,9 +1411,9 @@ class AdvancedPlayer {
         document.onmousemove = resetIdle;
         document.ontouchstart = resetIdle;
 
-        // Drawer & Tabs
-        document.getElementById('notesToggleBtn').onclick = () => this.dom.drawer.classList.toggle('open');
-        document.getElementById('closeDrawerBtn').onclick = () => this.dom.drawer.classList.remove('open');
+        // Drawer Logic
+        document.getElementById('notesToggleBtn').onclick = () => document.getElementById('notesDrawer').classList.toggle('open');
+        document.getElementById('closeDrawerBtn').onclick = () => document.getElementById('notesDrawer').classList.remove('open');
         
         document.querySelectorAll('.drawer-tab').forEach(t => {
             t.onclick = (e) => {
@@ -521,9 +1425,6 @@ class AdvancedPlayer {
         });
 
         document.getElementById('addNoteBtn').onclick = () => this.addNote();
-        document.getElementById('loadUrlBtn').onclick = () => this.loadUrl();
-        document.getElementById('fileInput').onchange = (e) => this.handleFiles(e);
-
         document.getElementById('muteBtn').onclick = () => this.toggleMute();
         document.getElementById('volSlider').oninput = (e) => this.setVolume(e.target.value);
         document.getElementById('fsBtn').onclick = () => this.toggleFs();
@@ -596,33 +1497,21 @@ class AdvancedPlayer {
 
     captureCrop() {
         if (this.state.isYT) {
+            // Simplified YT Capture
             try {
                 let id = null;
                 if (this.ytPlayer && this.ytPlayer.getVideoData) {
                     const data = this.ytPlayer.getVideoData();
                     if(data) id = data.video_id;
                 }
-                if (!id && this.state.playlist.length > 0) {
-                     id = this.state.playlist[this.state.currentIdx || 0].src;
-                }
-
                 if (id) {
                     const thumbUrl = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
                     this.addSnapshot(thumbUrl);
-                    const notify = document.getElementById('snapshotNotify');
-                    if(notify) {
-                        notify.classList.add('show');
-                        setTimeout(() => notify.classList.remove('show'), 2000);
-                    }
-                    this.dom.drawer.classList.add('open');
-                    setTimeout(() => {
-                        const tab = document.querySelector('[data-tab="snaps"]');
-                        if(tab) tab.click();
-                    }, 100);
+                    this.openDrawerSnaps();
                 } else {
-                    alert('Could not determine YouTube Video ID');
+                    showToast('Could not capture YouTube frame', 'error');
                 }
-            } catch(e) { console.error(e); alert('Snapshot failed'); }
+            } catch(e) { showToast('Snapshot failed', 'error'); }
             return;
         }
         
@@ -658,31 +1547,32 @@ class AdvancedPlayer {
         try {
             const dataUrl = canvas.toDataURL('image/png');
             this.addSnapshot(dataUrl);
-            const notify = document.getElementById('snapshotNotify');
-            notify.classList.add('show');
-            setTimeout(() => notify.classList.remove('show'), 2000);
-            this.dom.drawer.classList.add('open');
-            document.querySelector('[data-tab="snaps"]').click();
+            this.openDrawerSnaps();
         } catch(e) {
-            alert('Storage full or CORS error');
+            showToast('Storage full or CORS error', 'error');
         }
     }
 
-    /* --- SNAPSHOT GALLERY MANAGMENT --- */
+    openDrawerSnaps() {
+        const notify = document.getElementById('snapshotNotify');
+        notify.classList.add('show');
+        setTimeout(() => notify.classList.remove('show'), 2000);
+        document.getElementById('notesDrawer').classList.add('open');
+        setTimeout(() => { const tab = document.querySelector('[data-tab="snaps"]'); if(tab) tab.click(); }, 100);
+    }
+
     addSnapshot(dataUrl) {
-        const snap = {
-            id: Date.now(),
-            time: this.state.isYT ? this.ytPlayer.getCurrentTime() : this.dom.video.currentTime,
-            img: dataUrl
-        };
+        const snap = { id: Date.now(), time: this.state.isYT ? this.ytPlayer.getCurrentTime() : this.dom.video.currentTime, img: dataUrl };
+        this.state.snaps = this.state.snaps || [];
         this.state.snaps.unshift(snap);
         if(this.state.snaps.length > 20) this.state.snaps.pop(); 
         this.renderSnaps();
-        this.saveData();
+        this.saveNotesAndSnaps();
     }
 
     renderSnaps() {
         const list = document.getElementById('snapList');
+        this.state.snaps = this.state.snaps || [];
         if (this.state.snaps.length === 0) { list.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:12px;padding:20px;">No snapshots yet</div>'; return; }
         
         list.innerHTML = this.state.snaps.map(s => `
@@ -691,10 +1581,10 @@ class AdvancedPlayer {
                 <div class="snapshot-meta">
                     <span class="snapshot-time">${this.fmt(s.time)}</span>
                     <div style="display:flex; gap:6px;">
-                        <button class="snapshot-dl-btn" onclick="app.downloadSnap(${s.id})" title="Download">
+                        <button class="snapshot-dl-btn" onclick="appManager.players.custom.downloadSnap(${s.id})" title="Download">
                             <i data-feather="download" style="width:14px;"></i>
                         </button>
-                        <button class="snapshot-dl-btn" onclick="app.deleteSnap(${s.id})" title="Delete" style="color:#ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                        <button class="snapshot-dl-btn" onclick="appManager.players.custom.deleteSnap(${s.id})" title="Delete" style="color:#ef4444; border-color: rgba(239, 68, 68, 0.3);">
                             <i data-feather="trash-2" style="width:14px;"></i>
                         </button>
                     </div>
@@ -708,7 +1598,7 @@ class AdvancedPlayer {
         if(!confirm('Delete this snapshot?')) return;
         this.state.snaps = this.state.snaps.filter(s => s.id !== id);
         this.renderSnaps();
-        this.saveData();
+        this.saveNotesAndSnaps();
     }
 
     downloadSnap(id) {
@@ -720,24 +1610,52 @@ class AdvancedPlayer {
         link.click();
     }
 
-    /* --- STORAGE & NOTES --- */
-    saveData() {
-        localStorage.setItem('videoNotes', JSON.stringify(this.state.notes));
+    /* --- NOTES --- */
+    saveNotesAndSnaps() {
+        localStorage.setItem('customNotes', JSON.stringify(this.state.notes || []));
+        try { localStorage.setItem('customSnaps', JSON.stringify(this.state.snaps || [])); } catch(e) {}
+    }
+    loadNotesAndSnaps() {
         try {
-            localStorage.setItem('videoSnaps', JSON.stringify(this.state.snaps));
-        } catch(e) { console.error("Quota exceeded for images"); }
+            const n = localStorage.getItem('customNotes'); if(n) this.state.notes = JSON.parse(n);
+            const s = localStorage.getItem('customSnaps'); if(s) this.state.snaps = JSON.parse(s);
+            this.renderNotes();
+            this.renderSnaps();
+        } catch(e) {}
     }
-    loadData() {
-        const notes = localStorage.getItem('videoNotes');
-        if(notes) this.state.notes = JSON.parse(notes);
+    addNote() {
+        const text = document.getElementById('noteText').value;
+        if(!text) return;
+        const time = (this.state.isYT) ? this.ytPlayer.getCurrentTime() : this.dom.video.currentTime;
+        this.state.notes = this.state.notes || [];
+        this.state.notes.push({ time, text });
+        this.state.notes.sort((a,b) => a.time - b.time);
         this.renderNotes();
-        
-        const snaps = localStorage.getItem('videoSnaps');
-        if(snaps) this.state.snaps = JSON.parse(snaps);
-        this.renderSnaps();
+        this.saveNotesAndSnaps();
+        document.getElementById('noteText').value = '';
     }
-    
-    /* --- PLAYER METHODS --- */
+    deleteNote(index) { if(confirm('Delete?')) { this.state.notes.splice(index, 1); this.renderNotes(); this.saveNotesAndSnaps(); } }
+    renderNotes() {
+        const list = document.getElementById('noteList');
+        this.state.notes = this.state.notes || [];
+        if (this.state.notes.length === 0) { list.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px;">No notes yet</div>'; return; }
+        list.innerHTML = this.state.notes.map((n, i) => `
+            <div class="note-card" onclick="appManager.players.custom.jumpToNote(${i})">
+                <div class="note-header">
+                    <span class="note-time">${this.fmt(n.time)}</span>
+                    <button class="note-delete-btn" onclick="event.stopPropagation(); appManager.players.custom.deleteNote(${i})"><i data-feather="trash-2"></i></button>
+                </div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.9);">${this.escapeHtml(n.text)}</div>
+            </div>`).join('');
+        feather.replace();
+    }
+    jumpToNote(i) {
+        const n = this.state.notes[i];
+        if(this.state.isYT) this.ytPlayer.seekTo(n.time); else this.dom.video.currentTime = n.time;
+    }
+    escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+    /* --- PLAYER UTILS --- */
     togglePlay() {
         this.state.playing = !this.state.playing;
         if(this.state.isYT) this.state.playing ? this.ytPlayer.playVideo() : this.ytPlayer.pauseVideo();
@@ -755,6 +1673,7 @@ class AdvancedPlayer {
         if(this.state.cropping) return;
         let c = this.state.isYT ? this.ytPlayer.getCurrentTime() : this.dom.video.currentTime;
         let d = this.state.isYT ? this.ytPlayer.getDuration() : this.dom.video.duration;
+        if(!d) return;
         this.dom.fill.style.width = (c/d*100)+'%';
         this.dom.thumb.style.left = (c/d*100)+'%';
         this.dom.currTime.innerText = this.fmt(c);
@@ -762,7 +1681,7 @@ class AdvancedPlayer {
     }
     seek(e) {
         const r = this.dom.progress.getBoundingClientRect();
-        const p = (e.clientX - r.left) / r.width;
+        const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
         if(this.state.isYT) this.ytPlayer.seekTo(p * this.ytPlayer.getDuration());
         else this.dom.video.currentTime = p * this.dom.video.duration;
         this.updateProgress();
@@ -780,105 +1699,73 @@ class AdvancedPlayer {
     setSpeed(v) { this.dom.video.playbackRate = v; if(this.ytPlayer) this.ytPlayer.setPlaybackRate(v); }
     toggleFs() { document.fullscreenElement ? document.exitFullscreen() : document.getElementById('playerRef').requestFullscreen(); }
     fmt(s) { if(!s) return '0:00'; const m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec.toString().padStart(2,'0')}`; }
-    
-    addNote() {
-        const text = document.getElementById('noteText').value;
-        if(!text) return;
-        const time = (this.state.isYT) ? this.ytPlayer.getCurrentTime() : this.dom.video.currentTime;
-        const note = { time, text }; // Simplified note object
-        this.state.notes.push(note);
-        this.state.notes.sort((a,b) => a.time - b.time);
-        this.renderNotes();
-        this.saveData();
-        document.getElementById('noteText').value = '';
-    }
-    deleteNote(index) { if(confirm('Delete?')) { this.state.notes.splice(index, 1); this.renderNotes(); this.saveData(); } }
-    renderNotes() {
-        const list = document.getElementById('noteList');
-        if (this.state.notes.length === 0) { list.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px;">No notes yet</div>'; return; }
-        list.innerHTML = this.state.notes.map((n, i) => `
-            <div class="note-card" onclick="app.jumpToNote(${i})">
-                <div class="note-header">
-                    <span class="note-time">${this.fmt(n.time)}</span>
-                    <button class="note-delete-btn" onclick="event.stopPropagation(); app.deleteNote(${i})"><i data-feather="trash-2"></i></button>
-                </div>
-                <div style="font-size:13px;color:rgba(255,255,255,0.9);">${this.escapeHtml(n.text)}</div>
-            </div>`).join('');
-        feather.replace();
-    }
-    jumpToNote(i) {
-        const n = this.state.notes[i];
-        if(this.state.isYT) this.ytPlayer.seekTo(n.time); else this.dom.video.currentTime = n.time;
-    }
-    escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-    handleFiles(e) { Array.from(e.target.files).forEach(f => this.addToPlaylist(f.name, URL.createObjectURL(f), false)); }
-    loadUrl() {
-        const url = document.getElementById('urlInput').value.trim();
-        if (!url) return;
-        const ytId = this.extractYtId(url);
-        if(ytId) this.addToPlaylist(`YouTube: ${ytId}`, ytId, true);
-        else if(url) this.addToPlaylist('Web Video', url, false);
-        document.getElementById('urlInput').value = '';
-    }
-    extractYtId(url) {
-        const patterns = [ /(?:youtube\.com\/watch\?v=)([^&]+)/, /(?:youtu\.be\/)([^?]+)/, /(?:youtube\.com\/embed\/)([^?]+)/, /(?:youtube\.com\/shorts\/)([^?]+)/ ];
-        for (let pattern of patterns) { const match = url.match(pattern); if (match) return match[1]; }
-        return null;
-    }
-    addToPlaylist(name, src, isYT) { this.state.playlist.push({ name, src, isYT }); this.renderPlaylist(); if(this.state.playlist.length === 1) this.playTrack(0); }
-    renderPlaylist() {
-        this.dom.playlist.innerHTML = this.state.playlist.map((item, i) => `
-            <div class="playlist-item ${i === this.state.playlistIdx ? 'active' : ''}" onclick="app.playTrack(${i})">
-                ${this.escapeHtml(item.name)}
-            </div>`).join('');
-    }
-    playTrack(i) {
-        this.state.playlistIdx = i;
-        const item = this.state.playlist[i];
-        this.state.isYT = item.isYT;
-        this.renderPlaylist();
-        if (this.ytUpdateInterval) clearInterval(this.ytUpdateInterval);
-
-        if (item.isYT) {
-            if (!this.state.ytReady) { alert('YouTube API loading...'); return; }
-            this.dom.video.style.display = 'none';
-            this.dom.video.pause();
-            document.getElementById('ytPlayerRef').style.display = 'block';
-            if (!this.ytPlayer) {
-                this.ytPlayer = new YT.Player('ytPlayerRef', {
-                    height: '100%', width: '100%', videoId: item.src,
-                    playerVars: { 'playsinline': 1, 'controls': 0, 'modestbranding': 1 },
-                    events: {
-                        'onReady': (e) => { e.target.playVideo(); this.state.playing = true; this.updatePlayBtn(); this.startYTUpdateLoop(); },
-                        'onStateChange': (e) => {
-                            this.state.playing = (e.data === YT.PlayerState.PLAYING);
-                            this.updatePlayBtn();
-                            this.dom.bigPlayBtn.classList.toggle('visible', !this.state.playing);
-                        }
-                    }
-                });
-            } else {
-                this.ytPlayer.loadVideoById(item.src);
-                this.ytPlayer.playVideo();
-                this.state.playing = true;
-                this.updatePlayBtn();
-                this.startYTUpdateLoop();
-            }
-        } else {
-            this.state.isYT = false;
-            document.getElementById('ytPlayerRef').style.display = 'none';
-            if (this.ytPlayer) this.ytPlayer.stopVideo();
-            this.dom.video.style.display = 'block';
-            this.dom.video.src = item.src;
-            this.dom.video.load();
-            this.dom.video.play();
-            this.state.playing = true;
-            this.updatePlayBtn();
-        }
-    }
     startYTUpdateLoop() { this.ytUpdateInterval = setInterval(() => { if (this.state.isYT && this.ytPlayer) this.updateProgress(); }, 100); }
 }
-app = new AdvancedPlayer();
-</script>
+
+/* =========================================
+   MODE 2: PLYR PLAYER IMPLEMENTATION
+   ========================================= */
+class PlyrPlayer {
+    constructor() {
+        this.player = new Plyr('#plyr-element', {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']
+        });
+        
+        // Event listeners for UI feedback if needed
+        this.player.on('play', () => console.log('Plyr playing'));
+        this.player.on('pause', () => console.log('Plyr paused'));
+    }
+
+    loadSource(item) {
+        if (item.isYT) {
+            this.player.source = {
+                type: 'video',
+                sources: [{ src: item.src, provider: 'youtube' }],
+            };
+        } else {
+            this.player.source = {
+                type: 'video',
+                sources: [{ src: item.src, type: 'video/mp4' }],
+            };
+        }
+        this.player.play();
+    }
+
+    pause() {
+        this.player.pause();
+    }
+}
+
+/* =========================================
+   UTILITIES
+   ========================================= */
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let icon = type === 'success' ? 'check-circle' : 'alert-circle';
+    
+    toast.innerHTML = `<i data-feather="${icon}"></i> <span>${message}</span>`;
+    container.appendChild(toast);
+    feather.replace();
+
+    // Animate in
+    requestAnimationFrame(() => toast.classList.add('show'));
+
+    // Remove after 3s
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Initialize Everything
+window.onload = () => {
+    feather.replace();
+    appManager.init();
+};
+    </script>
 </body>
+
 </html>
