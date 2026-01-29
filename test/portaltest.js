@@ -11,7 +11,7 @@
                 try {
                     console.log("BlackICE Widget: Initializing...");
                     
-                    this.dbUrl ="https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
+                
                     this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
                     this.homeUrl = "https://blackice-ac.vercel.app/";
                     this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";
@@ -385,7 +385,7 @@
                         </div>
                     </div>
                 `;
-
+                  this.dbUrl ="https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
                 const menuIcon = `<svg class="bi-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
                 const closeIcon = `<svg class="bi-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
