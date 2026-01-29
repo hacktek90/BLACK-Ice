@@ -11,7 +11,7 @@
                 try {
                     console.log("BlackICE Widget: Initializing...");
                     
-                    this.dbUrl = FIREBASE_DB_URL;
+                    this.dbUrl = "FIREBASE_DB_URL";
                     this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
                     this.homeUrl = "https://blackice-ac.vercel.app/";
                     this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";
