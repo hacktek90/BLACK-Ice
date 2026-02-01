@@ -3,8 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MarkEdit - Responsive Markdown Studio</title>
     
+    <!-- SEO & Metadata -->
+    <title>MarkEdit - Free Online Markdown Editor with Live Preview</title>
+    <meta name="description" content="MarkEdit is a free, responsive online Markdown editor featuring live preview, LaTeX math support, Mermaid diagrams, and syntax highlighting. Write, edit, and export Markdown to HTML instantly.">
+    <meta name="keywords" content="markdown editor, online markdown, markdown viewer, latex editor, mermaid diagram, markdown to html, free text editor, responsive markdown, syntax highlighting, markedit, web editor">
+    <meta name="author" content="MarkEdit Studio">
+    <meta name="theme-color" content="#1a73e8">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.example.com/markedit/">
+    <meta property="og:title" content="MarkEdit - Free Online Markdown Editor">
+    <meta property="og:description" content="Write and preview Markdown in real-time. Supports Math, Diagrams, and HTML export.">
+    <meta property="og:image" content="https://picsum.photos/seed/markeditseo/1200/630.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.example.com/markedit/">
+    <meta property="twitter:title" content="MarkEdit - Free Online Markdown Editor">
+    <meta property="twitter:description" content="Write and preview Markdown in real-time. Supports Math, Diagrams, and HTML export.">
+    <meta property="twitter:image" content="https://picsum.photos/seed/markeditseo/1200/630.jpg">
+
+    <!-- Canonical Link -->
+    <link rel="canonical" href="https://www.example.com/markedit/">
+    
+    <!-- Favicon (Inline SVG) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>M</text></svg>">
+
     <!-- Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -13,6 +39,24 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MarkEdit",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A powerful, responsive Markdown editor with live preview, LaTeX support, and Mermaid diagrams.",
+      "featureList": "Live Preview, Syntax Highlighting, Math Support, Export to HTML/MD"
+    }
+    </script>
     
     <style>
         :root {
@@ -72,6 +116,7 @@
             color: var(--text-primary);
             flex-shrink: 0;
             cursor: pointer;
+            user-select: none;
         }
 
         .logo-icon {
@@ -329,7 +374,7 @@
         .preview-content blockquote { border-left: 4px solid var(--accent-color); padding-left: 16px; margin-left: 0; color: var(--text-secondary); background-color: var(--bg-tertiary); padding: 12px 12px 12px 16px; border-radius: 0 6px 6px 0; margin-bottom: 1em; }
         .preview-content ul, .preview-content ol { margin-bottom: 1em; padding-left: 2em; }
         .preview-content li { margin-bottom: 0.4em; }
-        .preview-content li input[type="checkbox"] { margin-right: 8px; transform: scale(1.2); }
+        .preview-content li input[type="checkbox"] { margin-right: 8px; transform: scale(1.2); cursor: pointer; }
         .preview-content table { border-collapse: collapse; width: 100%; margin-bottom: 1em; font-size: 14px; display: block; overflow-x: auto; }
         .preview-content th, .preview-content td { border: 1px solid var(--border-color); padding: 8px 12px; text-align: left; }
         .preview-content th { background-color: var(--bg-tertiary); font-weight: 600; }
@@ -526,47 +571,47 @@
     </div>
 
     <header class="header">
-        <div class="logo" onclick="document.getElementById('editor').focus()">
-            <div class="logo-icon">M</div>
+        <div class="logo" onclick="document.getElementById('editor').focus()" title="Focus Editor">
+            <div class="logo-icon" aria-hidden="true">M</div>
             <span>MarkEdit</span>
         </div>
         
-        <div class="mobile-toggle">
-            <button class="btn active" onclick="setMobileView('editor')" id="btnEditor">Edit</button>
-            <button class="btn" onclick="setMobileView('preview')" id="btnPreview">Preview</button>
+        <div class="mobile-toggle" role="tablist">
+            <button class="btn active" onclick="setMobileView('editor')" id="btnEditor" role="tab" aria-selected="true" aria-controls="paneEditor">Edit</button>
+            <button class="btn" onclick="setMobileView('preview')" id="btnPreview" role="tab" aria-selected="false" aria-controls="panePreview">Preview</button>
         </div>
         
-        <div class="toolbar">
-            <button class="btn btn-icon" onclick="insertText('**', '**')" title="Bold">
+        <div class="toolbar" role="toolbar" aria-label="Text Formatting Toolbar">
+            <button class="btn btn-icon" onclick="insertText('**', '**')" title="Bold (Ctrl+B)" aria-label="Bold">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
             </button>
-            <button class="btn btn-icon" onclick="insertText('*', '*')" title="Italic">
+            <button class="btn btn-icon" onclick="insertText('*', '*')" title="Italic (Ctrl+I)" aria-label="Italic">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
             </button>
-            <button class="btn btn-icon" onclick="insertText('# ', '')" title="Heading">
+            <button class="btn btn-icon" onclick="insertText('# ', '')" title="Heading" aria-label="Heading">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12h8"/><path d="M4 18V6"/><path d="M12 18V6"/><path d="M17 12h3"/><path d="M17 6v12"/></svg>
             </button>
-            <button class="btn btn-icon desktop-only" onclick="insertText('> ', '')" title="Quote">
+            <button class="btn btn-icon desktop-only" onclick="insertText('> ', '')" title="Quote" aria-label="Blockquote">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
             </button>
-            <button class="btn btn-icon" onclick="insertText('```\n', '\n```')" title="Code">
+            <button class="btn btn-icon" onclick="insertText('```\n', '\n```')" title="Code" aria-label="Code Block">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </button>
-            <button class="btn btn-icon" onclick="openTableModal()" title="Table">
+            <button class="btn btn-icon" onclick="openTableModal()" title="Table" aria-label="Insert Table">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
             </button>
-            <button class="btn btn-icon desktop-only" onclick="insertText('$', '$')" title="Math">
+            <button class="btn btn-icon desktop-only" onclick="insertText('$', '$')" title="Math" aria-label="Inline Math">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><text x="6" y="16" font-family="serif" font-size="12" font-style="italic" stroke="none" fill="currentColor">x</text><text x="12" y="10" font-family="serif" font-size="8" stroke="none" fill="currentColor">2</text></svg>
             </button>
             <div class="separator desktop-only"></div>
-            <button class="btn btn-icon" onclick="insertText('- [ ] ', '')" title="Task">
+            <button class="btn btn-icon" onclick="insertText('- [ ] ', '')" title="Task" aria-label="Task List">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="18" x2="21" y2="18"/><polyline points="3 12 5 14 9 10"/></svg>
             </button>
             <div class="separator"></div>
             
             <!-- Fixed Export Dropdown -->
             <div class="export-container" id="exportContainer">
-                <button class="btn btn-primary" onclick="toggleExportMenu(event)" id="exportBtn" style="display: flex; align-items: center; gap: 6px;">
+                <button class="btn btn-primary" onclick="toggleExportMenu(event)" id="exportBtn" aria-expanded="false" aria-haspopup="true" style="display: flex; align-items: center; gap: 6px;">
                     <span class="btn-text">Export</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -574,17 +619,17 @@
         </div>
     </header>
 
-    <!-- Export Menu - MOVED OUTSIDE TOOLBAR to avoid overflow clipping -->
-    <div class="export-menu" id="exportMenu" style="top: 60px; right: 16px;">
-        <button class="export-item" onclick="handleExportAction('downloadMD')">
+    <!-- Export Menu - FIXED POSITIONING -->
+    <div class="export-menu" id="exportMenu" role="menu" aria-label="Export Options" style="top: 60px; right: 16px;">
+        <button class="export-item" onclick="handleExportAction('downloadMD')" role="menuitem">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Download Markdown</span>
         </button>
-        <button class="export-item" onclick="handleExportAction('downloadHTML')">
+        <button class="export-item" onclick="handleExportAction('downloadHTML')" role="menuitem">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Download HTML</span>
         </button>
-        <button class="export-item" onclick="handleExportAction('copy')">
+        <button class="export-item" onclick="handleExportAction('copy')" role="menuitem">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             <span>Copy to Clipboard</span>
         </button>
@@ -593,15 +638,15 @@
     <div class="container" id="mainContainer">
         <div class="pane pane-editor" id="paneEditor">
             <div class="editor-wrapper">
-                <textarea id="editor" placeholder="Start writing..." spellcheck="false"></textarea>
+                <textarea id="editor" placeholder="Start writing..." spellcheck="false" aria-label="Markdown Editor"></textarea>
             </div>
         </div>
         
-        <div class="resizer desktop-only" id="resizer">
+        <div class="resizer desktop-only" id="resizer" title="Drag to resize">
             <div class="resizer-grip"></div>
         </div>
         
-        <div class="pane pane-preview" id="panePreview">
+        <div class="pane pane-preview" id="panePreview" aria-label="Preview Pane">
             <div class="preview-content" id="preview"></div>
         </div>
     </div>
@@ -618,21 +663,21 @@
     </footer>
 
     <!-- Table Modal -->
-    <div class="modal-overlay" id="tableModal" onclick="if(event.target === this) closeModal('tableModal')">
-        <div class="modal">
+    <div class="modal-overlay" id="tableModal" onclick="if(event.target === this) closeModal('tableModal')" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <div class="modal-header">
-                <span class="modal-title">Insert Table</span>
-                <button class="modal-close" onclick="closeModal('tableModal')">
+                <span class="modal-title" id="modalTitle">Insert Table</span>
+                <button class="modal-close" onclick="closeModal('tableModal')" aria-label="Close Modal">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Rows</label>
+                    <label class="form-label" for="tableRows">Rows</label>
                     <input type="number" class="form-input" id="tableRows" value="3" min="1" max="20">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Columns</label>
+                    <label class="form-label" for="tableCols">Columns</label>
                     <input type="number" class="form-input" id="tableCols" value="3" min="1" max="10">
                 </div>
             </div>
@@ -643,7 +688,7 @@
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
+    <div class="notification" id="notification" role="status" aria-live="polite"></div>
 
     <script>
         // Elements
@@ -663,20 +708,31 @@ The **Export button** now works perfectly! Click it ↑↑↑
 ## Fixed Issues
 - Menu no longer hides behind toolbar
 - Fixed position breaks out of overflow
-- Works on all screen sizes`;
+- Works on all screen sizes
+
+## Features
+- LaTeX Math: $E = mc^2$ - Code Highlighting:
+\`\`\`javascript
+console.log("Hello World");
+\`\`\`
+`;
         
         editor.value = localStorage.getItem('markdown-content') || defaultContent;
         
         const savedSplit = localStorage.getItem('editor-split');
         if (savedSplit && !isMobile) paneEditor.style.width = savedSplit + '%';
         
-        marked.setOptions({
+        // CONFIGURE MARKED.JS (v11 Compatibility Fix)
+        // marked.setOptions was removed in v5, we use marked.use() instead
+        marked.use({
+            gfm: true,
+            breaks: true,
             highlight: function(code, lang) {
                 if (lang && hljs.getLanguage(lang)) return hljs.highlight(code, { language: lang }).value;
                 return hljs.highlightAuto(code).value;
-            },
-            breaks: true, gfm: true
+            }
         });
+
         mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
         // FIXED EXPORT MENU
@@ -686,6 +742,7 @@ The **Export button** now works perfectly! Click it ↑↑↑
             
             if (isOpen) {
                 exportMenu.classList.remove('show');
+                exportBtn.setAttribute('aria-expanded', 'false');
             } else {
                 // Calculate position relative to button
                 const rect = exportBtn.getBoundingClientRect();
@@ -713,11 +770,13 @@ The **Export button** now works perfectly! Click it ↑↑↑
                 }
                 
                 exportMenu.classList.add('show');
+                exportBtn.setAttribute('aria-expanded', 'true');
             }
         }
 
         function handleExportAction(action) {
             exportMenu.classList.remove('show');
+            exportBtn.setAttribute('aria-expanded', 'false');
             switch(action) {
                 case 'downloadMD': downloadMarkdown(); break;
                 case 'downloadHTML': downloadHTML(); break;
@@ -729,12 +788,16 @@ The **Export button** now works perfectly! Click it ↑↑↑
         document.addEventListener('click', (e) => {
             if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target)) {
                 exportMenu.classList.remove('show');
+                exportBtn.setAttribute('aria-expanded', 'false');
             }
         });
 
         // Close on escape
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') exportMenu.classList.remove('show');
+            if (e.key === 'Escape') {
+                exportMenu.classList.remove('show');
+                exportBtn.setAttribute('aria-expanded', 'false');
+            }
         });
 
         // Update position on resize
@@ -746,15 +809,22 @@ The **Export button** now works perfectly! Click it ↑↑↑
         // Mobile View Toggle
         function setMobileView(view) {
             const container = document.getElementById('mainContainer');
+            const btnEditor = document.getElementById('btnEditor');
+            const btnPreview = document.getElementById('btnPreview');
+
             if (view === 'preview') {
                 container.classList.add('show-preview');
-                document.getElementById('btnEditor').classList.remove('active');
-                document.getElementById('btnPreview').classList.add('active');
+                btnEditor.classList.remove('active');
+                btnEditor.setAttribute('aria-selected', 'false');
+                btnPreview.classList.add('active');
+                btnPreview.setAttribute('aria-selected', 'true');
                 updatePreview();
             } else {
                 container.classList.remove('show-preview');
-                document.getElementById('btnEditor').classList.add('active');
-                document.getElementById('btnPreview').classList.remove('active');
+                btnEditor.classList.add('active');
+                btnEditor.setAttribute('aria-selected', 'true');
+                btnPreview.classList.remove('active');
+                btnPreview.setAttribute('aria-selected', 'false');
                 editor.focus();
             }
         }
@@ -796,11 +866,23 @@ The **Export button** now works perfectly! Click it ↑↑↑
         function updatePreview() {
             const html = marked.parse(editor.value);
             preview.innerHTML = html;
-            mermaid.init(undefined, preview.querySelectorAll('.language-mermaid'));
+            
+            // Process Mermaid
+            preview.querySelectorAll('.language-mermaid').forEach((el, index) => {
+                // Remove code block styling for mermaid
+                el.parentElement.classList.add('mermaid-wrapper');
+                mermaid.render('mermaid-' + index, el.textContent).then(result => {
+                    el.parentElement.innerHTML = result.svg;
+                });
+            });
+
+            // Process Math
             renderMathInElement(preview, {
                 delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
                 throwOnError: false
             });
+            
+            // Handle Checkboxes
             preview.querySelectorAll('input[type="checkbox"]').forEach((cb, idx) => {
                 cb.disabled = false;
                 cb.onclick = () => toggleCheckbox(idx, cb.checked);
@@ -848,6 +930,8 @@ The **Export button** now works perfectly! Click it ↑↑↑
 
         function openTableModal() {
             document.getElementById('tableModal').classList.add('active');
+            document.getElementById('tableModal').setAttribute('aria-hidden', 'false');
+            document.getElementById('tableRows').focus();
         }
 
         function insertTable() {
@@ -862,6 +946,7 @@ The **Export button** now works perfectly! Click it ↑↑↑
 
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
+            document.getElementById(id).setAttribute('aria-hidden', 'true');
         }
 
         function downloadMarkdown() {
@@ -875,26 +960,29 @@ The **Export button** now works perfectly! Click it ↑↑↑
 
         function downloadHTML() {
             const html = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>MarkEdit Export</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"><\/script>
     <style>
-        body { max-width: 800px; margin: 40px auto; padding: 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; }
+        body { max-width: 800px; margin: 40px auto; padding: 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; }
         pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; }
+        code { background: #f6f8fa; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
         blockquote { border-left: 4px solid #1a73e8; margin: 0; padding-left: 16px; color: #5f6368; }
-        table { border-collapse: collapse; width: 100%; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
         th, td { border: 1px solid #ddd; padding: 8px; }
         img { max-width: 100%; }
     </style>
 </head>
 <body>
     ${preview.innerHTML}
-    <script>renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });<\/script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"><\/script>
+    <script>
+        renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
+    <\/script>
 </body>
 </html>`;
             const blob = new Blob([html], { type: 'text/html' });
@@ -923,8 +1011,13 @@ The **Export button** now works perfectly! Click it ↑↑↑
             dragCounter++;
             document.getElementById('dragOverlay').classList.add('active');
         });
-        document.addEventListener('dragleave', () => {
-            dragCounter--;
+        document.addEventListener('dragleave', (e) => {
+            // Check if we are actually leaving the window
+            if (e.clientX === 0 && e.clientY === 0) {
+                dragCounter = 0;
+            } else {
+                dragCounter--;
+            }
             if (dragCounter === 0) document.getElementById('dragOverlay').classList.remove('active');
         });
         document.addEventListener('dragover', (e) => e.preventDefault());
@@ -935,9 +1028,11 @@ The **Export button** now works perfectly! Click it ↑↑↑
             for (let file of e.dataTransfer.files) {
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
-                    reader.onload = (ev) => insertText(`\n![${file.name}](${ev.target.result})\n`, '');
+                    reader.onload = (ev) => insertText(`\n
+![${file.name}](${ev.target.result})
+`, '');
                     reader.readAsDataURL(file);
-                } else if (file.name.endsWith('.md')) {
+                } else if (file.name.endsWith('.md') || file.type === 'text/markdown') {
                     const reader = new FileReader();
                     reader.onload = (ev) => { editor.value = ev.target.result; updatePreview(); };
                     reader.readAsText(file);
