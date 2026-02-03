@@ -1693,30 +1693,9 @@ btn.addEventListener('keydown', (e) => {
 
     const CANONICAL_DOMAIN = "blackice-ac.vercel.app";
     const CANONICAL_ORIGIN = "https://" + CANONICAL_DOMAIN;
-    const VISIT_KEY = "__blackice_visited__";
 
-    /* ===============================
-       👁️ VISIT-ONCE LOGIC (TOP ONLY)
-       =============================== */
-    if (window === window.top) {
-        try {
-            const hasVisited = localStorage.getItem(VISIT_KEY);
-            const path = location.pathname.toLowerCase();
 
-            if (hasVisited && path !== "/home.html") {
-                location.replace("/Home.html");
-                return;
-            }
-
-            if (!hasVisited) {
-                localStorage.setItem(VISIT_KEY, "1");
-            }
-        } catch (e) {
-            // localStorage blocked → ignore
-        }
-
-        return; // ⛔ STOP here for normal visits
-    }
+    
 
     /* ===============================
        🔒 IFRAME-ONLY LOGIC BELOW
@@ -1761,7 +1740,8 @@ btn.addEventListener('keydown', (e) => {
 })();
     </script>
 
-
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9029531054632994"
+     crossorigin="anonymous"></script>
 
 </body>
 
