@@ -146,8 +146,5 @@ console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: m
     return; // stop further execution
   }
 
-  // 2️⃣ Mobile redirect (only on Vercel)
-  if (isMobile && currentPath !== "/mobile.html") {
-    window.location.replace("/mobile.html");
-  }
+  
 })();
