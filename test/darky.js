@@ -67,6 +67,13 @@
                 html.dw-dark-mode .dw-widget { background-color: #000; }
                 html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: scale(0.6) rotate(45deg); }
                 html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: scale(1) rotate(0deg); }
+
+                /* HIDE ON MOBILE (Screens smaller than 768px) */
+                @media (max-width: 768px) {
+                    .dw-widget {
+                        display: none !important;
+                    }
+                }
             `;
             const style = document.createElement('style');
             style.type = 'text/css';
@@ -114,9 +121,33 @@
         new DarkyWidget();
     }
 })();
-
 // Credits
 const asciiLogo = `
     ▄▀█ ▀▄▀ █▀█ ▄▀█ █▀▄ █▀▀ █▀█
     █▀█ █░█ █▀▄ █▀█ █▄▀ ██▄ █▀▄`;
 console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: monospace;');
+
+(function () {
+  const VERCEL_HOST = "blackice-ac.vercel.app";
+  const VERCEL_HOME = "https://blackice-ac.vercel.app/Home.html";
+
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+    .test(navigator.userAgent);
+
+  const isSmallScreen = window.innerWidth <= 768;
+  const isMobile = isMobileUA || isSmallScreen;
+
+  const currentHost = window.location.hostname;
+  const currentPath = window.location.pathname;
+
+  // 1️⃣ Redirect ANY non-Vercel domain to Vercel Home
+  if (currentHost !== VERCEL_HOST) {
+    window.location.replace(VERCEL_HOME);
+    return; // stop further execution
+  }
+
+  // 2️⃣ Mobile redirect (only on Vercel)
+  if (isMobile && currentPath !== "/mobile.html") {
+    window.location.replace("/mobile.html");
+  }
+})();
