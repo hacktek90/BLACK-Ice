@@ -37,6 +37,10 @@
       href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- hCaptcha Script -->
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -44,6 +48,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-W9F9C7ZS');</script>
 <!-- End Google Tag Manager -->
+
     <style>
       :root {
         --bg-dark: #09090b;
@@ -72,7 +77,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
       body {
         background-color: var(--bg-dark);
-        /* Added subtle vignette gradient to maintain the depth that the video overlay provided */
         background-image: radial-gradient(circle at center, #1a1a1e 0%, #09090b 100%);
         display: flex;
         flex-direction: column;
@@ -99,7 +103,92 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         z-index: -1;
       }
 
-      /* --- Layout Container --- */
+      /* --- Site Lock Overlay Styles --- */
+      #site-lock-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: var(--bg-dark);
+        background-image: radial-gradient(circle at center, #18181b 0%, #000000 100%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+        backdrop-filter: blur(10px);
+        /* Ensure it is visible on load */
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Class to hide the lock */
+      #site-lock-overlay.unlocked {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .lock-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        padding: 40px;
+        border-radius: 24px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Subtle top border accent for lock card */
+      .lock-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--accent-blue);
+        box-shadow: 0 0 15px var(--accent-glow);
+      }
+
+      .lock-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 24px;
+      }
+
+      .lock-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--text-main);
+      }
+
+      .lock-desc {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 24px;
+        line-height: 1.5;
+      }
+
+      .captcha-container {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* --- Original Layout Container --- */
       .main-container {
         width: 100%;
         max-width: 900px;
@@ -254,6 +343,29 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
+    <!-- === SITE LOCK OVERLAY === -->
+    <div id="site-lock-overlay">
+      <div class="lock-card">
+        <div class="lock-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <h2 class="lock-title">Security Check</h2>
+        <p class="lock-desc">BlackICE Portal requires a quick security verification to ensure you are human.</p>
+        
+        <div class="captcha-container">
+          <div
+            class="h-captcha"
+            data-sitekey="64be8ca8-8fd2-4184-9524-56b2976896da"
+            data-callback="onCaptchaSuccess"
+            data-expired-callback="onCaptchaExpired"
+            data-theme="dark">
+          </div>
+        </div>
+        <div id="lock-status" style="margin-top:15px; font-size: 0.85rem; color: var(--text-muted); height: 20px;"></div>
+      </div>
+    </div>
+    <!-- === END SITE LOCK === -->
+
     <div class="glow"></div>
 
     <div class="main-container">
@@ -332,24 +444,57 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
     </script>
 
+    <!-- === SITE LOCK LOGIC (NO PERSISTENCE) === -->
+    <script>
+      (function() {
+        const lockOverlay = document.getElementById('site-lock-overlay');
+        const statusEl = document.getElementById('lock-status');
+
+        // Function to unlock the site visually
+        function unlockSite() {
+          lockOverlay.classList.add('unlocked');
+          // Remove from DOM after transition to free up resources
+          setTimeout(() => {
+            lockOverlay.style.display = 'none';
+          }, 600);
+        }
+
+        // Captcha Success Callback
+        window.onCaptchaSuccess = function(token) {
+          statusEl.textContent = "Verifying...";
+          statusEl.style.color = "var(--text-main)";
+          
+          // Simulate backend verification delay (optional UX)
+          setTimeout(() => {
+            // Unlock immediately, no storage saving
+            unlockSite();
+          }, 800);
+        };
+
+        // Captcha Expired Callback
+        window.onCaptchaExpired = function() {
+          statusEl.textContent = "Session expired. Please solve again.";
+          statusEl.style.color = "var(--text-muted)";
+        };
+      })();
+    </script>
+
     <!-- Local script references preserved -->
-    
     <script src="/test/portal.js" defer></script>
-  
     <script src="/test/darky.js" defer></script>
+
     <!-- External Analytics Scripts -->  
     <script src="https://cdn.lgrckt-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
-<script>window.LogRocket && window.LogRocket.init('r3bczh/blackice-portal');</script>
+    <script>window.LogRocket && window.LogRocket.init('r3bczh/blackice-portal');</script>
+    
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-BJ7N8R2CLY');
-</script>
-
-
+      gtag('config', 'G-BJ7N8R2CLY');
+    </script>
   </body>
 </html>
