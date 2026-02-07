@@ -38,8 +38,8 @@
       rel="stylesheet"
     />
 
-    <!-- hCaptcha Script -->
-    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+    <!-- Cloudflare Turnstile Script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -353,12 +353,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p class="lock-desc">BlackICE Portal requires a quick security verification to ensure you are human.</p>
         
         <div class="captcha-container">
+          <!-- Cloudflare Turnstile Widget -->
           <div
-            class="h-captcha"
-            data-sitekey="64be8ca8-8fd2-4184-9524-56b2976896da"
-            data-callback="onCaptchaSuccess"
-            data-expired-callback="onCaptchaExpired"
-            data-theme="dark">
+            class="cf-turnstile"
+            data-sitekey="0x4AAAAAACY8_UNceG8ZswXS"
+            data-theme="dark"
+            data-callback="turnstileSuccess"
+            data-error-callback="turnstileError">
           </div>
         </div>
         <div id="lock-status" style="margin-top:15px; font-size: 0.85rem; color: var(--text-muted); height: 20px;"></div>
@@ -444,7 +445,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
     </script>
 
-    <!-- === SITE LOCK LOGIC (NO PERSISTENCE) === -->
+    <!-- === SITE LOCK LOGIC (TURSTILE) === -->
     <script>
       (function() {
         const lockOverlay = document.getElementById('site-lock-overlay');
@@ -459,8 +460,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           }, 600);
         }
 
-        // Captcha Success Callback
-        window.onCaptchaSuccess = function(token) {
+        // Turnstile Success Callback
+        window.turnstileSuccess = function(token) {
           statusEl.textContent = "Verifying...";
           statusEl.style.color = "var(--text-main)";
           
@@ -471,9 +472,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           }, 800);
         };
 
-        // Captcha Expired Callback
-        window.onCaptchaExpired = function() {
-          statusEl.textContent = "Session expired. Please solve again.";
+        // Turnstile Error Callback
+        window.turnstileError = function() {
+          statusEl.textContent = "Challenge failed. Please try again.";
           statusEl.style.color = "var(--text-muted)";
         };
       })();
