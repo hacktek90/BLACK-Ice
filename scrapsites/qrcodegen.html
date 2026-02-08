@@ -48,7 +48,6 @@ body {
 section {
     display: flex;
     flex-direction: column;
-    /* On mobile, we want natural scrolling, not overflow containers */
     height: auto; 
 }
 
@@ -88,22 +87,12 @@ label {
     color: var(--text-color);
 }
 
-.instruction {
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 1.1;
-    padding: 24px;
-    border-bottom: var(--thin-line);
-    letter-spacing: -0.03em;
-}
-
 /* --- FORMS & INPUTS --- */
 .input-group {
     padding: 20px;
     border-bottom: var(--thin-line);
 }
 
-/* Large, touch-friendly inputs */
 input[type=text], input[type=number], select {
     width: 100%;
     padding: 0;
@@ -111,12 +100,12 @@ input[type=text], input[type=number], select {
     border-bottom: 2px solid transparent;
     background: transparent;
     font-family: var(--font-main);
-    font-size: 16px; /* Prevent IOS zoom */
+    font-size: 16px;
     color: var(--text-color);
-    height: 48px; /* Touch target min height */
+    height: 48px;
     border-radius: 0;
     outline: none;
-    appearance: none; /* Remove native dropdown arrows */
+    appearance: none;
     transition: border 0.2s;
 }
 
@@ -136,11 +125,11 @@ select {
     display: flex;
     gap: 0;
     border-bottom: var(--thin-line);
-    flex-wrap: wrap; /* Safe wrap for very small screens */
+    flex-wrap: wrap;
 }
 .color-item {
     flex: 1;
-    min-width: 100px; /* Don't squash too small */
+    min-width: 100px;
     padding: 20px;
     border-right: var(--thin-line);
     display: flex;
@@ -164,7 +153,6 @@ input[type=color] {
     padding: 20px;
     border-bottom: var(--thin-line);
 }
-/* Mask ugly file input */
 .file-upload-wrapper input[type=file] {
     font-size: 14px;
     padding-top: 10px;
@@ -176,7 +164,7 @@ button {
     color: var(--text-color);
     border: 1px solid var(--text-color);
     padding: 0 24px;
-    height: 56px; /* Fat finger friendly */
+    height: 56px;
     font-family: var(--font-main);
     font-weight: 800;
     text-transform: uppercase;
@@ -213,14 +201,14 @@ button:active {
 .actions-row {
     display: flex;
     border-bottom: var(--thin-line);
-    flex-wrap: wrap; /* allow wrap on tiny screens */
+    flex-wrap: wrap;
 }
 .actions-row button {
     flex: 1;
     border: none;
     border-right: var(--thin-line);
     border-bottom: var(--thin-line);
-    min-width: 80px; /* Ensure clickable */
+    min-width: 80px;
 }
 .actions-row button:last-child { border-right: none; }
 
@@ -232,6 +220,12 @@ button:active {
     background: #fff;
     border-bottom: var(--thin-line);
 }
+.canvas-wrapper img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 canvas {
     max-width: 100%;
     height: auto;
@@ -244,7 +238,7 @@ canvas {
     width: 100%;
     border-bottom: var(--thin-line);
     background: #000;
-    min-height: 60vh; /* Taller on mobile for scanning */
+    min-height: 60vh; 
     overflow: hidden;
 }
 video {
@@ -262,7 +256,7 @@ video {
     border: 2px solid var(--accent-color);
     z-index: 5;
     pointer-events: none;
-    box-shadow: 0 0 0 2000px rgba(0,0,0,0.5); /* Dim surrounding area */
+    box-shadow: 0 0 0 2000px rgba(0,0,0,0.5); 
 }
 .scan-overlay::before { content: "TARGET"; position: absolute; top: -25px; left: 0; color: var(--accent-color); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; }
 
@@ -282,25 +276,66 @@ video {
     font-size: 10px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8;
 }
 
+/* --- IMAGE UPLOAD SECTION (Scanner) --- */
+.scan-file-row {
+    display: flex;
+    background: white;
+    border-bottom: var(--thin-line);
+}
+.scan-file-btn {
+    flex: 1;
+    border: none;
+    border-right: var(--thin-line);
+    background: white;
+    font-size: 11px;
+    justify-content: center;
+    text-transform: uppercase;
+}
+.scan-file-btn:last-child { border-right: none; }
+.scan-file-btn:hover { background: #f0f0f0; }
+
+/* Hide actual file input */
+#scanFileInput {
+    position: absolute;
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+}
+
+/* Image Preview Container */
+#imagePreviewContainer {
+    background: #fff;
+    padding: 20px;
+    display: none; /* Hidden by default */
+    border-bottom: var(--thin-line);
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+}
+#imagePreviewContainer img {
+    max-width: 100%;
+    max-height: 300px;
+    border: 1px solid #000;
+}
+
 /* --- MOBILE RESPONSIVE LOGIC --- */
 @media (max-width: 900px) {
     .main-grid { 
-        grid-template-columns: 1fr; /* Stack vertically */
+        grid-template-columns: 1fr; 
         grid-template-rows: auto;
         border-top: none; 
     }
     
     .panel-gen { 
         border-right: none; 
-        border-bottom: 4px solid black; /* Heavy separation between modules */
-        order: 2; /* Move generator below scanner on mobile? Or keep top. Let's keep top. */
+        border-bottom: 4px solid black;
+        order: 2; 
     }
     
     .panel-scan {
-        order: 1; /* Actually, scanner is often primary on mobile. Let's make it easy to reach. */
+        order: 1; 
     }
     
-    /* Make buttons bigger on mobile */
     .actions-row button {
         padding: 0 16px;
         font-size: 11px;
@@ -308,7 +343,6 @@ video {
     
     h2 { font-size: 12px; padding: 16px; }
 }
-
 </style>
 </head>
 <body>
@@ -331,6 +365,24 @@ video {
             </div>
         </div>
 
+        <!-- NEW: Image Upload Section -->
+        <div class="scan-file-row">
+            <button class="scan-file-btn" onclick="document.getElementById('scanFileInput').click()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Upload Image
+            </button>
+            <input type="file" id="scanFileInput" accept="image/*" />
+            <button class="scan-file-btn" id="pasteBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                Paste Image
+            </button>
+        </div>
+
+        <!-- Image Preview Area -->
+        <div id="imagePreviewContainer">
+            <img id="uploadedImagePreview" alt="Uploaded preview" />
+        </div>
+
         <!-- Result Area -->
         <div id="scanResult" class="result-box">
             <div class="result-label">Decoded Content</div>
@@ -341,7 +393,7 @@ video {
         <div class="actions-row" id="resultActions" style="display:none; background:white;">
             <button id="copyResult">Copy</button>
             <button id="openResult">Open URL</button>
-            <button id="shareResult" style="display:none">Share</button> <!-- Mobile Share API -->
+            <button id="shareResult" style="display:none">Share</button>
             <button id="clearResult">Clear</button>
         </div>
 
@@ -357,7 +409,6 @@ video {
             <select id="cameraSelect"><option value="">Default (Rear)</option></select>
         </div>
         
-        <!-- Only show on Desktop/Support check -->
         <div class="actions-row" style="background:white; border-top:var(--thin-line)">
              <button id="startScreen">Scan Screen (Desktop)</button>
         </div>
@@ -447,7 +498,6 @@ const canvas = document.getElementById('qrCanvas');
 const ctx = canvas.getContext('2d');
 let logoImage = null;
 
-// Handle Logo Upload
 logoFileEl.addEventListener('change', (e) => {
     const f = e.target.files?.[0];
     if (!f) { logoImage = null; return; }
@@ -467,7 +517,6 @@ async function renderQR() {
     const fg = fgEl.value;
     const bg = bgEl.value;
     
-    // Set high resolution for canvas
     canvas.width = size;
     canvas.height = size;
     
@@ -490,9 +539,7 @@ async function renderQR() {
         if (logoImage) {
             const s = Math.max(10, Math.min(50, Number(logoSizeEl.value)||20)) / 100;
             const w = size * s, h = size * s, x = (size - w) / 2, y = (size - h) / 2;
-            // Draw logo background for readability
             ctx.fillStyle = bg;
-            // ctx.fillRect(x-5, y-5, w+10, h+10); // Optional border around logo
             ctx.drawImage(logoImage, x, y, w, h);
         }
     } catch(e) {
@@ -502,7 +549,6 @@ async function renderQR() {
 
 genBtn.addEventListener('click', renderQR);
 
-// Live update debounce
 let debounceTimer;
 ['input','change'].forEach(ev =>
     [textEl,sizeEl,ecEl,fgEl,bgEl,logoSizeEl].forEach(el =>
@@ -513,7 +559,6 @@ let debounceTimer;
     )
 );
 
-// Downloads
 document.getElementById('downloadPng').addEventListener('click', () => {
     const link = document.createElement('a');
     link.download = `qr_${Date.now()}.png`;
@@ -543,8 +588,7 @@ document.getElementById('copyData').addEventListener('click', async () => {
     }
 });
 
-renderQR(); // Init
-
+renderQR();
 
 /* =========================================
    2. MOBILE SCANNER LOGIC
@@ -564,6 +608,12 @@ const resultBox = document.getElementById('scanResult');
 const resText = document.getElementById('resText');
 const actionsEl = document.getElementById('resultActions');
 const shareBtn = document.getElementById('shareResult');
+
+/* New Elements for Image Upload */
+const scanFileInput = document.getElementById('scanFileInput');
+const pasteBtn = document.getElementById('pasteBtn');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const uploadedImagePreview = document.getElementById('uploadedImagePreview');
 
 let scanStream = null;
 let rafId = 0;
@@ -589,19 +639,17 @@ function updateStatus(msg) {
 
 function showResult(text){
     if(text) {
-        // Vibrate on success (Mobile feature)
         if(navigator.vibrate) navigator.vibrate(200);
-        
         resText.textContent = text;
         resultBox.style.display = 'block';
         actionsEl.style.display = 'flex';
         updateStatus("SCAN COMPLETE");
-        // Scroll to result on mobile
         resultBox.scrollIntoView({behavior: "smooth", block: "center"});
     } else {
         resText.textContent = '';
         resultBox.style.display = 'none';
         actionsEl.style.display = 'none';
+        imagePreviewContainer.style.display = 'none';
     }
 }
 
@@ -616,7 +664,6 @@ function stopScan(){
     updateStatus("CAMERA INACTIVE");
 }
 
-// Feature Detection for Barcode API
 async function ensureDetector(){
     if ('BarcodeDetector' in window) {
         try {
@@ -631,13 +678,123 @@ async function ensureDetector(){
     useNativeDetector = false;
 }
 
+/* =========================================
+   3. IMAGE UPLOAD & DECODING LOGIC (UPDATED)
+   ========================================= */
+
+function decodeImage(imgElement) {
+    uploadedImagePreview.src = imgElement.src;
+    imagePreviewContainer.style.display = 'flex';
+    stopScan();
+    updateStatus("ANALYZING IMAGE...");
+
+    scanCanvas.width = imgElement.naturalWidth || imgElement.width;
+    scanCanvas.height = imgElement.naturalHeight || imgElement.height;
+    
+    scanCtx.drawImage(imgElement, 0, 0, scanCanvas.width, scanCanvas.height);
+    
+    const imageData = scanCtx.getImageData(0, 0, scanCanvas.width, scanCanvas.height);
+    
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: "dontInvert",
+    });
+    
+    if (code) {
+        showResult(code.data);
+    } else {
+        updateStatus("NO QR CODE FOUND");
+        uploadedImagePreview.style.opacity = "0.5";
+        setTimeout(() => uploadedImagePreview.style.opacity = "1", 1000);
+    }
+}
+
+// Handle File Selection
+scanFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => decodeImage(img);
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+});
+
+// Handle Paste Button Click (Mobile API)
+pasteBtn.addEventListener('click', async () => {
+    if (!navigator.clipboard) {
+        alert("Clipboard API not supported in this browser.");
+        return;
+    }
+
+    try {
+        updateStatus("Reading clipboard...");
+        const clipboardItems = await navigator.clipboard.read();
+        
+        for (const item of clipboardItems) {
+            // Look for image types
+            for (const type of item.types) {
+                if (type.startsWith('image/')) {
+                    const blob = await item.getType(type);
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => decodeImage(img);
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(blob);
+                    return; // Stop after finding first image
+                }
+            }
+        }
+        updateStatus("No image found in clipboard.");
+    } catch (err) {
+        console.error(err);
+        // Handle permission denial or empty clipboard
+        if(err.name === 'NotAllowedError') {
+            alert("Clipboard permission denied. Please allow access to paste images.");
+        } else {
+            alert("Failed to read clipboard. Make sure you copied an image.");
+        }
+        updateStatus("READY");
+    }
+});
+
+// Handle Keyboard Paste (Desktop/Physical Keyboard)
+window.addEventListener('paste', (e) => {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    let blob = null;
+    
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            blob = items[i].getAsFile();
+            break;
+        }
+    }
+
+    if (blob !== null) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => decodeImage(img);
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(blob);
+    }
+});
+
+/* =========================================
+   4. CAMERA SCANNING LOGIC
+   ========================================= */
+
 async function scanLoop(){
     if (!videoEl.videoWidth || !videoEl.videoHeight) {
         rafId = requestAnimationFrame(scanLoop);
         return;
     }
     
-    // Safety check: is stream active?
     if(!scanStream || !scanStream.active) {
         stopScan();
         return;
@@ -652,7 +809,6 @@ async function scanLoop(){
                 return;
             }
         } else {
-            // Fallback: jsQR
             scanCanvas.width = videoEl.videoWidth; 
             scanCanvas.height = videoEl.videoHeight;
             scanCtx.drawImage(videoEl, 0, 0, scanCanvas.width, scanCanvas.height);
@@ -672,11 +828,9 @@ async function scanLoop(){
     rafId = requestAnimationFrame(scanLoop);
 }
 
-// Enumerate Cameras - Handling Mobile Permissions
 async function populateCameras(){
     camSelect.innerHTML = '<option value="">Default (Rear)</option>';
     try {
-        // Only works if permission already granted
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(d => d.kind === 'videoinput');
         
@@ -685,7 +839,6 @@ async function populateCameras(){
             videoDevices.forEach(d => {
                 const opt = document.createElement('option');
                 opt.value = d.deviceId;
-                // If label is missing, it means no permission yet
                 opt.text = d.label || `Camera ${videoDevices.indexOf(d) + 1}`;
                 camSelect.appendChild(opt);
             });
@@ -696,7 +849,8 @@ async function populateCameras(){
 }
 
 async function startCameraScan(){
-    showResult(''); // Clear previous
+    showResult('');
+    imagePreviewContainer.style.display = 'none';
     stopScan();
     updateStatus("INITIALIZING...");
     
@@ -707,25 +861,20 @@ async function startCameraScan(){
         const constraints = {
             video: {
                 deviceId: selectedId ? { exact: selectedId } : undefined,
-                facingMode: selectedId ? undefined : { ideal: 'environment' }, // Prefer back cam
+                facingMode: selectedId ? undefined : { ideal: 'environment' },
                 width: { ideal: 1280 },
                 height: { ideal: 720 },
-                focusMode: 'continuous' // Try to force focus
+                focusMode: 'continuous'
             }
         };
 
         scanStream = await navigator.mediaDevices.getUserMedia(constraints);
         videoEl.srcObject = scanStream;
-        
-        // Wait for video to actually play
         await videoEl.play();
         
         currentVideoTrack = scanStream.getVideoTracks()[0];
         updateStatus("SCANNING...");
-        
-        // Now that we have permission, update the list with real labels
         populateCameras(); 
-        
         rafId = requestAnimationFrame(scanLoop);
         
     } catch (err) {
@@ -737,8 +886,8 @@ async function startCameraScan(){
 }
 
 async function startScreenScan(){
-    // Desktop only usually
     showResult('');
+    imagePreviewContainer.style.display = 'none';
     stopScan();
     try {
         await ensureDetector();
@@ -791,7 +940,6 @@ document.getElementById('clearResult').addEventListener('click', () => {
     updateStatus("READY");
 });
 
-// Initial load
 populateCameras();
 
 </script>
