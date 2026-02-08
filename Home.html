@@ -445,48 +445,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
     </script>
 
-    <!-- === SITE LOCK LOGIC (TURSTILE) === -->
-    <script>
-      (function() {
-        const lockOverlay = document.getElementById('site-lock-overlay');
-        const statusEl = document.getElementById('lock-status');
-
-        // Function to unlock the site visually
-        function unlockSite() {
-          lockOverlay.classList.add('unlocked');
-          // Remove from DOM after transition to free up resources
-          setTimeout(() => {
-            lockOverlay.style.display = 'none';
-          }, 600);
-        }
-
-        // Turnstile Success Callback
-        window.turnstileSuccess = function(token) {
-          statusEl.textContent = "Verifying...";
-          statusEl.style.color = "var(--text-main)";
-          
-          // Simulate backend verification delay (optional UX)
-          setTimeout(() => {
-            // Unlock immediately, no storage saving
-            unlockSite();
-          }, 800);
-        };
-
-        // Turnstile Error Callback
-        window.turnstileError = function() {
-          statusEl.textContent = "Challenge failed. Please try again.";
-          statusEl.style.color = "var(--text-muted)";
-        };
-      })();
-    </script>
-
-    <!-- Local script references preserved -->
    
     <script src="/test/darky.js" defer></script>
-
-    <!-- External Analytics Scripts -->  
-    <script src="https://cdn.lgrckt-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
-    <script>window.LogRocket && window.LogRocket.init('r3bczh/blackice-portal');</script>
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
