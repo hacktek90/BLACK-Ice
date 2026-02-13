@@ -38,9 +38,6 @@
       rel="stylesheet"
     />
 
-    <!-- Cloudflare Turnstile Script -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -103,91 +100,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         z-index: -1;
       }
 
-      /* --- Site Lock Overlay Styles --- */
-      #site-lock-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: var(--bg-dark);
-        background-image: radial-gradient(circle at center, #18181b 0%, #000000 100%);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: opacity 0.6s ease, visibility 0.6s ease;
-        backdrop-filter: blur(10px);
-        /* Ensure it is visible on load */
-        opacity: 1;
-        visibility: visible;
-      }
-
-      /* Class to hide the lock */
-      #site-lock-overlay.unlocked {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-
-      .lock-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--glass-border);
-        padding: 40px;
-        border-radius: 24px;
-        text-align: center;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* Subtle top border accent for lock card */
-      .lock-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: var(--accent-blue);
-        box-shadow: 0 0 15px var(--accent-glow);
-      }
-
-      .lock-icon {
-        width: 50px;
-        height: 50px;
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--accent-blue);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 24px;
-      }
-
-      .lock-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-        color: var(--text-main);
-      }
-
-      .lock-desc {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        margin-bottom: 24px;
-        line-height: 1.5;
-      }
-
-      .captcha-container {
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: center;
-      }
-
       /* --- Original Layout Container --- */
       .main-container {
         width: 100%;
@@ -206,6 +118,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       .hero-section {
         text-align: center;
         position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       h1 {
@@ -235,6 +151,113 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         margin: 0 auto;
         line-height: 1.6;
         font-weight: 300;
+      }
+
+      /* --- Search Bar Styles --- */
+      .search-wrapper {
+        width: 100%;
+        max-width: 560px;
+        margin-top: 35px;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        padding: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+      }
+
+      .search-bar:focus-within {
+        border-color: var(--accent-blue);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      }
+
+      .engine-selector {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 14px;
+        height: 40px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+      }
+
+      .engine-selector select {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+      }
+
+      .engine-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        pointer-events: none;
+        transition: transform 0.2s ease;
+      }
+
+      .engine-selector:hover .engine-icon {
+        transform: scale(1.1);
+      }
+
+      .selector-arrow {
+        margin-left: 8px;
+        width: 12px;
+        height: 12px;
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+
+      .search-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        font-family: inherit;
+        padding: 0 16px;
+        font-weight: 400;
+      }
+
+      .search-input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+      }
+
+      .search-btn {
+        background: var(--accent-blue);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        flex-shrink: 0;
+      }
+
+      .search-btn:hover {
+        background: #2563eb;
+        transform: scale(1.05);
+      }
+      
+      .search-btn:active {
+          transform: scale(0.95);
       }
 
       /* --- Glass Card for Features --- */
@@ -343,30 +366,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
-    <!-- === SITE LOCK OVERLAY === -->
-    <div id="site-lock-overlay">
-      <div class="lock-card">
-        <div class="lock-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        </div>
-        <h2 class="lock-title">Security Check</h2>
-        <p class="lock-desc">BlackICE Portal requires a quick security verification to ensure you are human.</p>
-        
-        <div class="captcha-container">
-          <!-- Cloudflare Turnstile Widget -->
-          <div
-            class="cf-turnstile"
-            data-sitekey="0x4AAAAAACY8_UNceG8ZswXS"
-            data-theme="dark"
-            data-callback="turnstileSuccess"
-            data-error-callback="turnstileError">
-          </div>
-        </div>
-        <div id="lock-status" style="margin-top:15px; font-size: 0.85rem; color: var(--text-muted); height: 20px;"></div>
-      </div>
-    </div>
-    <!-- === END SITE LOCK === -->
-
     <div class="glow"></div>
 
     <div class="main-container">
@@ -383,6 +382,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </h1>
         <p>The operating system for your web productivity.<br>Seamlessly integrated AI, Utilities, and Workspace tools.</p>
         
+        <!-- === SEARCH BAR === -->
+        <div class="search-wrapper">
+          <form class="search-bar" onsubmit="handleSearch(event)">
+            <div class="engine-selector">
+              <select id="engine-select" onchange="updateEngineIcon()">
+                <option value="https://search.brave.com/search?q=%s" data-domain="search.brave.com">Brave</option>
+                <option value="https://www.perplexity.ai/?q=%s" data-domain="perplexity.ai">Perplexity</option>
+                <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com">DuckDuckGo</option>
+              </select>
+              <!-- Default Icon set via JS on load, but providing a fallback src -->
+              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=search.brave.com&sz=32" alt="Search Engine">
+              <svg class="selector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <input type="text" id="search-query" class="search-input" placeholder="Search the web..." required autocomplete="off">
+            <button type="submit" class="search-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+          </form>
+        </div>
+        <!-- === END SEARCH BAR === -->
+
         <div class="hint-wrap">
           <div class="hint-text">Click the button toggle at right bottom to open projects</div>
         </div>
@@ -444,39 +464,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
       }
     </script>
-     <script>
-      (function() {
-        const lockOverlay = document.getElementById('site-lock-overlay');
-        const statusEl = document.getElementById('lock-status');
+     
+    <script>
+      // --- Search Functionality ---
+      function updateEngineIcon() {
+        const select = document.getElementById('engine-select');
+        const icon = document.getElementById('engine-favicon');
+        const selectedOption = select.options[select.selectedIndex];
+        const domain = selectedOption.getAttribute('data-domain');
+        
+        // Use Google's S2 favicon service with specific size
+        icon.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      }
 
-        // Function to unlock the site visually
-        function unlockSite() {
-          lockOverlay.classList.add('unlocked');
-          // Remove from DOM after transition to free up resources
-          setTimeout(() => {
-            lockOverlay.style.display = 'none';
-          }, 600);
-        }
+      function handleSearch(e) {
+        e.preventDefault();
+        const select = document.getElementById('engine-select');
+        const input = document.getElementById('search-query');
+        const query = encodeURIComponent(input.value);
+        
+        if (!query) return;
 
-        // Turnstile Success Callback
-        window.turnstileSuccess = function(token) {
-          statusEl.textContent = "Verifying...";
-          statusEl.style.color = "var(--text-main)";
-          
-          // Simulate backend verification delay (optional UX)
-          setTimeout(() => {
-            // Unlock immediately, no storage saving
-            unlockSite();
-          }, 800);
-        };
+        // Get URL template (e.g., https://search.brave.com/search?q=%s)
+        const urlTemplate = select.value;
+        
+        // Replace %s with the encoded query
+        const finalUrl = urlTemplate.replace('%s', query);
+        
+        window.open(finalUrl, '_blank');
+      }
 
-        // Turnstile Error Callback
-        window.turnstileError = function() {
-          statusEl.textContent = "Challenge failed. Please try again.";
-          statusEl.style.color = "var(--text-muted)";
-        };
-      })();
-    </script> 
+      // Initialize icon on page load
+      document.addEventListener('DOMContentLoaded', updateEngineIcon);
+    </script>
+
    <script src="/test/portal.js" defer></script>
 
     <script src="/test/darky.js" defer></script>
