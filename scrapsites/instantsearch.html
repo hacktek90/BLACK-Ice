@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Search</title>
+
+    <style>
+        body {
+            font-family: "Inter Tight", system-ui, sans-serif;
+            background: #fff;
+            color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 80px;
+            margin: 0;
+        }
+
+        .box {
+            width: 650px;
+            max-width: 90%;
+            position: relative;
+            overflow: visible;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            margin-top: 12px;
+            padding: 12px 18px;
+            border: none;
+            background: #000;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .suggestions {
+            margin-top: 6px;
+            border: 1px solid #eee;
+            background: #fff;
+            width: 100%;
+            max-height: 220px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .suggestions div {
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+
+        .suggestions div:hover {
+            background: #f5f5f5;
+        }
+
+        .history-title {
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .history div {
+            padding: 8px 0;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .history div:hover {
+            font-weight: 500;
+        }
+
+        .result-card {
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            opacity: .8;
+        }
+
+        a {
+            color: #000;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <h2>Search</h2>
+        <input id="query" placeholder="Search anything..." autocomplete="off">
+        <div id="suggestions" class="suggestions"></div>
+
+        <button onclick="search()">Search</button>
+
+        <div class="history-title">Recent Searches</div>
+        <div id="history" class="history"></div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const input=document.getElementById("query");
+const suggestionsDiv=document.getElementById("suggestions");
+const historyDiv=document.getElementById("history");
+const resultDiv=document.getElementById("result");
+
+// SEARCH
+async function search(qOverride){
+  const q=qOverride||input.value.trim();
+  if(!q)return;
+  input.value=q;
+
+  saveHistory(q);
+  renderHistory();
+  suggestionsDiv.innerHTML="";
+  resultDiv.innerHTML="Loading...";
+
+  const url=`https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_redirect=1&no_html=1`;
+  const res=await fetch(url);
+  const data=await res.json();
+
+  // CASE 1: Instant Answer
+  if(data.AbstractText){
+    resultDiv.innerHTML=`
+      <h3>${data.Heading}</h3>
+      <p>${data.AbstractText}</p>
+      <a href="${data.AbstractURL}" target="_blank">Read more</a>
+    `;
+  } 
+  // CASE 2: Always show related topics (even if empty)
+  else {
+    let topics=(data.RelatedTopics||[])
+      .filter(t=>t.Text)
+      .slice(0,8)
+      .map(t=>`
+        <div class="result-card" onclick="search('${t.Text.replace(/'/g,"")}')">
+          ${t.Text}
+        </div>
+      `).join("");
+
+    resultDiv.innerHTML=`
+      <h3>Related Results</h3>
+      ${topics || "<p>No related topics found.</p>"}
+    `;
+  }
+}
+
+// AUTOCOMPLETE
+input.addEventListener("input",async()=>{
+  const q=input.value.trim();
+  if(!q){suggestionsDiv.innerHTML="";return;}
+
+  const url=`https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_redirect=1&no_html=1`;
+  const res=await fetch(url);
+  const data=await res.json();
+
+  suggestionsDiv.innerHTML=(data.RelatedTopics||[])
+    .filter(t=>t.Text)
+    .slice(0,6)
+    .map(t=>`<div onclick="search('${t.Text.replace(/'/g,"")}')">${t.Text}</div>`)
+    .join("");
+});
+
+// HISTORY
+function saveHistory(q){
+  let h=JSON.parse(localStorage.getItem("searchHistory")||"[]");
+  h=h.filter(i=>i!==q);
+  h.unshift(q);
+  localStorage.setItem("searchHistory",JSON.stringify(h.slice(0,6)));
+}
+function renderHistory(){
+  let h=JSON.parse(localStorage.getItem("searchHistory")||"[]");
+  historyDiv.innerHTML=h.map(i=>`<div onclick="search('${i.replace(/'/g,"")}')">${i}</div>`).join("");
+}
+renderHistory();
+
+// ENTER KEY
+input.addEventListener("keydown",e=>{if(e.key==="Enter")search();});
+    </script>
+
+</body>
+
+</html>
