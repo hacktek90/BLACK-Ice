@@ -236,6 +236,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         opacity: 0.7;
       }
 
+      /* Buttons Container */
+      .search-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 4px;
+      }
+
       .search-btn {
         background: var(--accent-blue);
         border: none;
@@ -258,6 +266,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       
       .search-btn:active {
           transform: scale(0.95);
+      }
+
+      /* AI Button Specific Styles */
+      .search-btn.ai-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        width: 40px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        opacity: 1;
+        margin-left: 0;
+      }
+
+      .search-btn.ai-btn:hover {
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        transform: scale(1.05);
+      }
+
+      /* Class to hide AI button smoothly */
+      .search-btn.ai-btn.hidden {
+        width: 0;
+        opacity: 0;
+        padding: 0;
+        margin: 0;
+        pointer-events: none;
       }
 
       /* --- Glass Card for Features --- */
@@ -384,27 +416,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         
         <!-- === SEARCH BAR === -->
         <div class="search-wrapper">
-          <form class="search-bar" onsubmit="handleSearch(event)">
+          <form class="search-bar" onsubmit="handleSearch(event, 'standard')">
             <div class="engine-selector">
-              <select id="engine-select" onchange="updateEngineIcon()">
-                <option value="https://search.brave.com/search?q=%s" data-domain="search.brave.com">Brave</option>
-                <option value="https://www.perplexity.ai/?q=%s" data-domain="perplexity.ai">Perplexity</option>
-                <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com">DuckDuckGo</option>
+              <select id="engine-select" onchange="updateUI()">
+                <option value="https://search.brave.com/search?q=%s" data-domain="search.brave.com" data-ai-url="https://search.brave.com/ask?q=%s">Brave</option>
+                <option value="https://www.perplexity.ai/?q=%s" data-domain="perplexity.ai" data-ai-url="">Perplexity</option>
+                <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com" data-ai-url="https://duck.ai/chat?q=%s">DuckDuckGo</option>
               </select>
-              <!-- Default Icon set via JS on load, but providing a fallback src -->
               <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=search.brave.com&sz=32" alt="Search Engine">
               <svg class="selector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <input type="text" id="search-query" class="search-input" placeholder="Search the web..." required autocomplete="off">
-            <button type="submit" class="search-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </button>
+            
+            <div class="search-actions">
+              <button type="submit" class="search-btn" title="Standard Search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </button>
+              <button type="button" id="ai-search-btn" class="search-btn ai-btn hidden" title="AI Search / Chat" onclick="handleSearch(event, 'ai')">
+                 <!-- Sparkles Icon for AI -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"></path></svg>
+              </button>
+            </div>
           </form>
         </div>
         <!-- === END SEARCH BAR === -->
 
         <div class="hint-wrap">
-          <div class="hint-text">Click the button toggle at left bottom to open projects</div>
+          <div class="hint-text">Click the button toggle at right bottom to open projects</div>
         </div>
       </main>
 
@@ -467,17 +505,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      
     <script>
       // --- Search Functionality ---
-      function updateEngineIcon() {
+      const aiButton = document.getElementById('ai-search-btn');
+
+      function updateUI() {
         const select = document.getElementById('engine-select');
         const icon = document.getElementById('engine-favicon');
         const selectedOption = select.options[select.selectedIndex];
         const domain = selectedOption.getAttribute('data-domain');
+        const aiUrl = selectedOption.getAttribute('data-ai-url');
         
-        // Use Google's S2 favicon service with specific size
+        // Update Favicon
         icon.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+        
+        // Toggle AI Button Visibility
+        if (aiUrl && aiUrl !== "") {
+          aiButton.classList.remove('hidden');
+        } else {
+          aiButton.classList.add('hidden');
+        }
       }
 
-      function handleSearch(e) {
+      function handleSearch(e, type) {
         e.preventDefault();
         const select = document.getElementById('engine-select');
         const input = document.getElementById('search-query');
@@ -485,8 +533,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         
         if (!query) return;
 
-        // Get URL template (e.g., https://search.brave.com/search?q=%s)
-        const urlTemplate = select.value;
+        const selectedOption = select.options[select.selectedIndex];
+        let urlTemplate = "";
+
+        if (type === 'ai') {
+            urlTemplate = selectedOption.getAttribute('data-ai-url');
+            // Fallback if AI url is somehow missing
+            if(!urlTemplate) urlTemplate = selectedOption.value; 
+        } else {
+            urlTemplate = selectedOption.value;
+        }
         
         // Replace %s with the encoded query
         const finalUrl = urlTemplate.replace('%s', query);
@@ -494,8 +550,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         window.open(finalUrl, '_blank');
       }
 
-      // Initialize icon on page load
-      document.addEventListener('DOMContentLoaded', updateEngineIcon);
+      // Initialize state on page load
+      document.addEventListener('DOMContentLoaded', updateUI);
     </script>
 
    <script src="/test/portal.js" defer></script>
