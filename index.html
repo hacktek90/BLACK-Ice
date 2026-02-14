@@ -5,571 +5,1092 @@
 }</script></head><body>
 
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site Store</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&amp;display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      /* Deep Space Theme */
-      --bg: #050507;
-      --glass-panel: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-highlight: rgba(255, 255, 255, 0.15);
-      
-      --text-main: #ededed;
-      --text-muted: #888899;
-      
-      --accent: #3b82f6;
-      --accent-glow: rgba(59, 130, 246, 0.4);
-      --danger: #ef4444;
-      
-      --radius: 16px;
-      --font-family: 'Inter', sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: var(--font-family);
-      background-color: var(--bg);
-      color: var(--text-main);
-      /* Ambient spotlight effect */
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1), transparent 50%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Floating Navbar */
-    header {
-      position: sticky;
-      top: 16px;
-      z-index: 50;
-      margin-bottom: 40px;
-    }
-    
-    .nav-island {
-      background: rgba(10, 10, 12, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      border-radius: 99px; /* Pill shape */
-      padding: 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      background: linear-gradient(to right, #fff, #a1a1aa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Modern Glass Buttons */
-    .btn {
-      appearance: none;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-panel);
-      color: var(--text-main);
-      padding: 10px 20px;
-      border-radius: 99px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn:hover {
-      background: var(--glass-highlight);
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,0.2);
-    }
-    
-    .btn.primary {
-      background: var(--text-main);
-      color: #000;
-      border: none;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    }
-    .btn.primary:hover {
-      background: #fff;
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
-    }
-
-    /* Search Area */
-    .controls {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-
-    .search-wrap {
-      flex: 1;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--glass-border);
-      padding: 16px 20px;
-      border-radius: 16px;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-      transition: all 0.2s;
-    }
-    .search-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
-      background: rgba(0,0,0,0.5);
-    }
-
-    /* Grid */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
-      padding-bottom: 60px;
-    }
-
-    /* Glass Cards */
-    .card {
-      background: var(--glass-panel);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                  box-shadow 0.3s ease, 
-                  border-color 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Hover State: Subtle Lift + Glow */
-    .card:hover {
-      transform: translateY(-4px) scale(1.01);
-      border-color: rgba(255,255,255,0.15);
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-      background: rgba(255,255,255,0.04);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .icon-box {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #1a1a20, #000);
-      border: 1px solid var(--glass-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    
-    .icon-img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-
-    .meta h3 {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: #fff;
-    }
-    .meta p {
-      margin: 4px 0 0;
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .actions {
-      margin-top: auto;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .visit-btn {
-      flex: 1;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid transparent;
-      padding: 12px;
-      border-radius: 12px;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .visit-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255,255,255,0.1);
-    }
-
-    /* Admin Chips */
-    .chip {
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-    }
-    .delete-chip {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-      border-color: rgba(239, 68, 68, 0.2);
-    }
-    .delete-chip:hover { background: rgba(239, 68, 68, 0.2); }
-
-    .edit-chip {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent);
-      border-color: rgba(59, 130, 246, 0.2);
-    }
-    .edit-chip:hover { background: rgba(59, 130, 246, 0.2); }
-
-    /* Modal / Drawer */
-    .drawer {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .drawer.open {
-      display: flex;
-      opacity: 1;
-    }
-
-    .drawer-content {
-      background: #0f0f11;
-      border: 1px solid var(--glass-border);
-      width: 100%;
-      max-width: 420px;
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-      transform: scale(0.95);
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .drawer.open .drawer-content { transform: scale(1); }
-
-    .form-stack { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
-    label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
-    
-    .input-field {
-      width: 100%;
-      background: #18181b;
-      border: 1px solid #27272a;
-      padding: 12px;
-      border-radius: 10px;
-      color: white;
-      font-family: inherit;
-      outline: none;
-    }
-    .input-field:focus { border-color: var(--accent); }
-
-    @media (max-width: 600px) {
-      header { top: 0; margin-bottom: 24px; }
-      .nav-island { border-radius: 0; border-top: none; border-left: none; border-right: none; }
-      .grid { grid-template-columns: 1fr; }
-    }
-  </style>
-
-
-
-  <header>
-    <div class="nav-island">
-      <h1>Site Store</h1>
-      <div style="display:flex; gap:8px;">
-        <button id="open-submit" class="btn primary">
-          <span>+</span> Submit
-        </button>
-        <a href="https://black-ice-3dbk.onrender.com/projects.html" class="btn">Back</a>
-      </div>
-    </div>
-  </header>
-
-  <div class="container">
-    
-    <div class="controls">
-      <div class="search-wrap">
-        <input id="q" type="search" class="search-input" placeholder="Search for inspiration..." autocomplete="off">
-      </div>
-    </div>
-
-    <main id="grid" class="grid" aria-live="polite">
-      <!-- Loading Skeleton -->
-      <article class="card">
-        <div class="card-header">
-          <div class="icon-box"></div>
-          <div class="meta">
-            <h3 style="background:var(--glass-border); color:transparent; border-radius:4px; width:120px">Loading</h3>
-            <p style="background:var(--glass-border); color:transparent; border-radius:4px; margin-top:6px; width:180px">Loading description content.</p>
-          </div>
-        </div>
-      </article>
-    </main>
-  </div>
-
-  <!-- Submit Modal -->
-  <div id="drawer" class="drawer">
-    <div class="drawer-content">
-      <h2 style="margin:0 0 8px; font-size:20px;">Submit Site</h2>
-      <p style="margin:0; color:var(--text-muted); font-size:14px;">Share your creation with the world.</p>
-      
-      <div class="form-stack">
-        <div>
-          <label>Project Name</label>
-          <input id="f-title" class="input-field" placeholder="e.g. Portfolio v2">
-        </div>
-        <div>
-          <label>Live URL</label>
-          <input id="f-url" type="url" class="input-field" placeholder="https://...">
-        </div>
-        <div>
-          <label>Icon URL</label>
-          <input id="f-img" type="url" class="input-field" placeholder="https://... (square png/jpg)">
-        </div>
-        <div>
-          <label>Description</label>
-          <textarea id="f-desc" class="input-field" rows="3" placeholder="Briefly describe functionality..."></textarea>
-        </div>
-        
-        <!-- Hosting Hint -->
-        <div style="font-size:12px; color:var(--text-muted); background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;">
-          No URL? <a href="https://black-ice-3dbk.onrender.com/Htmlsub.html" target="_blank" style="color:var(--accent); text-decoration:none;">Request hosting here</a>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:8px;">
-          <button id="do-submit" class="btn primary" style="flex:1; justify-content:center;">Publish</button>
-          <button id="close-drawer" class="btn" style="flex:1; justify-content:center;">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Title Modal (Admin Only) -->
-  <div id="edit-drawer" class="drawer">
-    <div class="drawer-content">
-      <h2 style="margin:0 0 8px; font-size:20px;">Edit Project Name</h2>
-      <p style="margin:0; color:var(--text-muted); font-size:14px;">Update the title for this site.</p>
-      
-      <div class="form-stack">
-        <input id="edit-id" type="hidden">
-        <div>
-          <label>Project Name</label>
-          <input id="edit-title-input" class="input-field" placeholder="Enter new project name">
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:8px;">
-          <button id="do-edit" class="btn primary" style="flex:1; justify-content:center;">Save Change</button>
-          <button id="close-edit-drawer" class="btn" style="flex:1; justify-content:center;">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    // Added 'update' to imports
-    import { getDatabase, ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-      authDomain: "h-90-8a7c5.firebaseapp.com",
-      databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-      projectId: "h-90-8a7c5",
-      storageBucket: "h-90-8a7c5.firebasestorage.app",
-      messagingSenderId: "367196609301",
-      appId: "1:367196609301:web:156e24c1b4532c26af671c"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const $ = id => document.getElementById(id);
-
-    // Drawer Logic (Submit)
-    const drawer = $('drawer');
-    $('open-submit').onclick = () => drawer.classList.add('open');
-    $('close-drawer').onclick = () => drawer.classList.remove('open');
-    drawer.onclick = (e) => { if(e.target === drawer) drawer.classList.remove('open'); }
-
-    // Submit Logic
-    $('do-submit').onclick = async () => {
-      const title = $('f-title').value.trim();
-      const url = $('f-url').value.trim();
-      const image = $('f-img').value.trim();
-      const description = $('f-desc').value.trim();
-
-      if(!title || !url || !description) return alert('Please fill in required fields.');
-
-      try {
-        await push(ref(db, 'sites'), { title, url, image, description, timestamp: Date.now() });
-        drawer.classList.remove('open');
-        ['f-title','f-url','f-img','f-desc'].forEach(id => $(id).value = '');
-      } catch(e) {
-        alert(e.message);
-      }
-    };
-
-    // Edit Drawer Logic
-    const editDrawer = $('edit-drawer');
-    const editInput = $('edit-title-input');
-    const editIdField = $('edit-id');
-
-    // Expose to window so inline HTML can call it
-    window.openEditModal = (id) => {
-      const site = sitesCache.find(s => s.id === id);
-      if(site) {
-        editIdField.value = site.id;
-        editInput.value = site.title || '';
-        editDrawer.classList.add('open');
-        setTimeout(() => editInput.focus(), 100); // Focus after transition
-      }
-    };
-
-    $('close-edit-drawer').onclick = () => editDrawer.classList.remove('open');
-    editDrawer.onclick = (e) => { if(e.target === editDrawer) editDrawer.classList.remove('open'); }
-
-    // Save Edit Logic
-    $('do-edit').onclick = async () => {
-      const newTitle = editInput.value.trim();
-      const id = editIdField.value;
-
-      if(!newTitle) return alert('Title cannot be empty.');
-      if(!id) return;
-
-      try {
-        await update(ref(db, `sites/${id}`), { title: newTitle });
-        editDrawer.classList.remove('open');
-      } catch(e) {
-        alert(e.message);
-      }
-    };
-
-    // Render Logic
-    let sitesCache = [];
-    const grid = $('grid');
-    const params = new URLSearchParams(location.search);
-    const isAdmin = params.get('admin') === 'elite';
-
-    onValue(ref(db, 'sites'), (snap) => {
-      const data = snap.val();
-      if(!data) {
-        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted)">No sites found.</div>`;
-        return;
-      }
-      sitesCache = Object.entries(data).map(([k,v]) => ({id:k, ...v})).sort((a,b) => b.timestamp - a.timestamp);
-      render(sitesCache);
-    });
-
-    const esc = t => { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
-
-    function render(list) {
-      const q = $('q').value.toLowerCase();
-      const filtered = q ? list.filter(s => (s.title||'').toLowerCase().includes(q)) : list;
-      
-      grid.innerHTML = filtered.map(s => {
-        const title = esc(s.title);
-        const desc = esc(s.description);
-        const url = esc(s.url);
-        const img = esc(s.image);
-        const letter = title.charAt(0).toUpperCase();
-
-        const iconHTML = img 
-          ? `<img src="${img}" class="icon-img" onerror="this.style.display='none';this.parentNode.innerText='${letter}'">`
-          : letter;
-
-        // Admin Buttons
-        let adminHTML = '';
-        if(isAdmin) {
-          adminHTML = `
-            <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
-               <button class="chip edit-chip" onclick="openEditModal('${s.id}')">Edit Name</button>
-               <button class="chip delete-chip" onclick="delSite('${s.id}')">Delete</button>
-            </div>
-          `;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuPDF.js PDF Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        return `
-          <article class="card">
-            <div class="card-header">
-              <div class="icon-box">${iconHTML}</div>
-              <div class="meta">
-                <h3>${title}</h3>
-                <p>${desc}</p>
-              </div>
-              ${adminHTML}
-            </div>
-            <div class="actions">
-              <a href="${url}" target="_blank" class="visit-btn">Visit Site &rarr;</a>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-    $('q').oninput = () => render(sitesCache);
-    
-    window.delSite = async (id) => {
-      if(confirm('Delete this site permanently?')) await remove(ref(db, `sites/${id}`));
-    }
-  </script>
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+            border-bottom: 1px solid #2a2a2a;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 15px;
+            border-right: 1px solid #2a2a2a;
+        }
+
+        .toolbar-section:last-child {
+            border-right: none;
+            margin-left: auto;
+        }
+
+        .btn {
+            background: #252525;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #333;
+            border-color: #444;
+            transform: translateY(-1px);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background: #0066cc;
+            border-color: #0066cc;
+            color: white;
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            background: #0052a3;
+            border-color: #0052a3;
+        }
+
+        .page-info {
+            background: #1a1a1a;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            font-size: 13px;
+            font-variant-numeric: tabular-nums;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .zoom-select {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .zoom-select:focus {
+            border-color: #0066cc;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background: #141414;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            width: 0;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #2a2a2a;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .thumbnail-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 0.707;
+            background: #1a1a1a;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumbnail:hover {
+            border-color: #444;
+        }
+
+        .thumbnail.active {
+            border-color: #0066cc;
+        }
+
+        .thumbnail canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .thumbnail-number {
+            position: absolute;
+            bottom: 2px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        /* Viewer */
+        .viewer-container {
+            flex: 1;
+            background: #0a0a0a;
+            overflow: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .viewer-content {
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            background: white;
+            margin: 0 auto;
+        }
+
+        #pdfCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .text-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .text-layer span {
+            position: absolute;
+            color: transparent;
+            pointer-events: auto;
+            cursor: text;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%);
+            z-index: 50;
+        }
+
+        .welcome-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.3);
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .drop-zone {
+            border: 2px dashed #333;
+            border-radius: 12px;
+            padding: 60px 40px;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #0066cc;
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .drop-zone-text {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone-hint {
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top-color: #0066cc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Error Message */
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #ff4444;
+            display: none;
+            text-align: center;
+            max-width: 400px;
+            z-index: 300;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #141414;
+            border-top: 1px solid #2a2a2a;
+            padding: 8px 20px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-section {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 150;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-width: 250px;
+        }
+
+        .search-box.active {
+            display: flex;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: #0f0f0f;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #0066cc;
+        }
+
+        .search-results {
+            font-size: 12px;
+            color: #888;
+            padding: 5px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toolbar {
+                padding: 10px;
+            }
+            
+            .toolbar-section {
+                padding: 0 8px;
+            }
+            
+            .sidebar {
+                position: absolute;
+                z-index: 90;
+                height: 100%;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+    </style>
+
+
+    <div class="app-container">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-section">
+                <button class="btn primary" onclick="document.getElementById('fileInput').click()">
+                    <span>📂</span> Open PDF
+                </button>
+                <input type="file" id="fileInput" accept=".pdf,application/pdf" style="display: none;" onchange="handleFileSelect(event)">
+            </div>
+
+            <div class="toolbar-section" id="navControls" style="opacity: 0.4; pointer-events: none;">
+                <button class="btn" onclick="prevPage()" title="Previous Page">
+                    <span>◀</span>
+                </button>
+                <div class="page-info">
+                    <span id="currentPage">0</span> / <span id="totalPages">0</span>
+                </div>
+                <button class="btn" onclick="nextPage()" title="Next Page">
+                    <span>▶</span>
+                </button>
+            </div>
+
+            <div class="toolbar-section" id="zoomControls" style="opacity: 0.4; pointer-events: none;">
+                <button class="btn" onclick="zoomOut()" title="Zoom Out">
+                    <span>🔍-</span>
+                </button>
+                <select class="zoom-select" id="zoomSelect" onchange="setZoom(this.value)">
+                    <option value="0.5">50%</option>
+                    <option value="0.75">75%</option>
+                    <option value="1" selected="">100%</option>
+                    <option value="1.25">125%</option>
+                    <option value="1.5">150%</option>
+                    <option value="2">200%</option>
+                    <option value="3">300%</option>
+                    <option value="4">400%</option>
+                </select>
+                <button class="btn" onclick="zoomIn()" title="Zoom In">
+                    <span>🔍+</span>
+                </button>
+                <button class="btn" onclick="rotatePage()" title="Rotate">
+                    <span>🔄</span>
+                </button>
+            </div>
+
+            <div class="toolbar-section" id="actionControls" style="opacity: 0.4; pointer-events: none;">
+                <button class="btn" onclick="toggleSearch()" title="Search">
+                    <span>🔍</span> Find
+                </button>
+                <button class="btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <span>📑</span>
+                </button>
+                <button class="btn" onclick="downloadPDF()" title="Download">
+                    <span>💾</span>
+                </button>
+            </div>
+
+            <div class="toolbar-section">
+                <button class="btn" onclick="clearViewer()" title="Close">
+                    <span>❌</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">Pages</div>
+                <div class="thumbnail-container" id="thumbnailContainer">
+                    <!-- Thumbnails will be generated here -->
+                </div>
+            </div>
+
+            <!-- Viewer -->
+            <div class="viewer-container" id="dropZone">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-content">
+                        <div class="logo">📄</div>
+                        <h1 class="welcome-title">MuPDF PDF Viewer</h1>
+                        <p class="welcome-subtitle">
+                            High-performance PDF viewing using MuPDF WebAssembly engine.<br>
+                            No PDF.js required - pure C compiled to WASM.
+                        </p>
+                        <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+                            <p class="drop-zone-text">Drop PDF file here</p>
+                            <p class="drop-zone-hint">or click to browse</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viewer-content" id="viewerContent" style="display: none;">
+                    <canvas id="pdfCanvas"></canvas>
+                    <div class="text-layer" id="textLayer"></div>
+                </div>
+
+                <!-- Search Box -->
+                <div class="search-box" id="searchBox">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search text..." onkeypress="if(event.key==='Enter')searchText()">
+                        <button class="btn" onclick="searchText()">Find</button>
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Loading PDF...</div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage">
+            <div class="error-icon">⚠️</div>
+            <h3>Error Loading PDF</h3>
+            <p id="errorText" style="margin: 10px 0; color: #888; font-size: 14px;"></p>
+            <button class="btn primary" onclick="clearViewer()" style="margin-top: 15px;">OK</button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-section">
+                <span id="fileName">No file loaded</span>
+                <span id="fileSize"></span>
+            </div>
+            <div class="status-section">
+                <span id="renderStatus">Ready</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MuPDF.js from CDN -->
+    <script type="module">
+        import * as mupdf from 'https://cdn.jsdelivr.net/npm/mupdf@0.3.0/dist/mupdf.module.js';
+        
+        // Global state
+        let pdfDocument = null;
+        let currentPageNum = 1;
+        let totalPages = 0;
+        let currentZoom = 1;
+        let currentRotation = 0;
+        let pdfBuffer = null;
+        let fileName = '';
+        
+        // Make functions available globally for onclick handlers
+        window.handleFileSelect = handleFileSelect;
+        window.prevPage = prevPage;
+        window.nextPage = nextPage;
+        window.zoomIn = zoomIn;
+        window.zoomOut = zoomOut;
+        window.setZoom = setZoom;
+        window.rotatePage = rotatePage;
+        window.toggleSearch = toggleSearch;
+        window.toggleSidebar = toggleSidebar;
+        window.searchText = searchText;
+        window.downloadPDF = downloadPDF;
+        window.clearViewer = clearViewer;
+        window.goToPage = goToPage;
+
+        // Initialize MuPDF
+        async function initMuPDF() {
+            try {
+                updateLoadingText('Initializing MuPDF engine...');
+                showLoading();
+                
+                // MuPDF initialization happens automatically when imported
+                // The wasm binary is loaded from the CDN
+                
+                hideLoading();
+                console.log('MuPDF initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize MuPDF:', error);
+                showError('Failed to initialize PDF engine. Please check your browser supports WebAssembly.');
+            }
+        }
+
+        // File handling
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'application/pdf') {
+                showError('Please select a valid PDF file.');
+                return;
+            }
+            
+            fileName = file.name;
+            const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+            
+            updateLoadingText('Reading file...');
+            showLoading();
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdfBuffer = new Uint8Array(arrayBuffer);
+                await loadPDF(pdfBuffer, fileName, fileSize);
+            } catch (error) {
+                console.error('Error reading file:', error);
+                showError('Failed to read PDF file: ' + error.message);
+            }
+        }
+
+        // Load PDF into MuPDF
+        async function loadPDF(buffer, name, size) {
+            try {
+                updateLoadingText('Opening PDF document...');
+                
+                // Open document using MuPDF
+                pdfDocument = mupdf.Document.openDocument(buffer, "application/pdf");
+                totalPages = pdfDocument.countPages();
+                currentPageNum = 1;
+                currentRotation = 0;
+                
+                // Update UI
+                document.getElementById('fileName').textContent = name;
+                document.getElementById('fileSize').textContent = size;
+                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('currentPage').textContent = currentPageNum;
+                
+                // Enable controls
+                enableControls();
+                
+                // Hide welcome screen
+                document.getElementById('welcomeScreen').style.display = 'none';
+                document.getElementById('viewerContent').style.display = 'block';
+                
+                // Render first page
+                await renderPage(currentPageNum);
+                
+                // Generate thumbnails
+                await generateThumbnails();
+                
+                hideLoading();
+                updateStatus('PDF loaded successfully');
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                showError('Failed to load PDF: ' + error.message);
+            }
+        }
+
+        // Render page using MuPDF
+        async function renderPage(pageNum) {
+            if (!pdfDocument || pageNum < 1 || pageNum > totalPages) return;
+            
+            try {
+                updateLoadingText(`Rendering page ${pageNum}...`);
+                
+                const page = pdfDocument.loadPage(pageNum - 1); // MuPDF uses 0-based indexing
+                
+                // Calculate transform based on zoom and rotation
+                let transform = mupdf.Matrix.identity;
+                transform = mupdf.Matrix.concat(transform, mupdf.Matrix.scale(currentZoom, currentZoom));
+                
+                if (currentRotation !== 0) {
+                    transform = mupdf.Matrix.concat(transform, mupdf.Matrix.rotate(currentRotation));
+                }
+                
+                // Get page bounds
+                const bounds = page.getBounds();
+                
+                // Render to pixmap
+                const pixmap = page.toPixmap(transform, mupdf.ColorSpace.DeviceRGB, false);
+                const imageData = pixmap.getPixels();
+                const width = pixmap.getWidth();
+                const height = pixmap.getHeight();
+                
+                // Draw to canvas
+                const canvas = document.getElementById('pdfCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Create ImageData and put on canvas
+                const imgData = new ImageData(new Uint8ClampedArray(imageData), width, height);
+                ctx.putImageData(imgData, 0, 0);
+                
+                // Update page info
+                document.getElementById('currentPage').textContent = pageNum;
+                currentPageNum = pageNum;
+                
+                // Update thumbnail selection
+                updateThumbnailSelection(pageNum);
+                
+                // Extract and render text layer
+                await renderTextLayer(page);
+                
+                updateStatus(`Page ${pageNum} of ${totalPages}`);
+                
+                // Cleanup
+                page.destroy();
+                pixmap.destroy();
+                
+            } catch (error) {
+                console.error('Error rendering page:', error);
+                updateStatus('Error rendering page');
+            }
+        }
+
+        // Render text layer for selection
+        async function renderTextLayer(page) {
+            const textLayer = document.getElementById('textLayer');
+            textLayer.innerHTML = '';
+            
+            try {
+                const textPage = page.toTextPage();
+                const blocks = textPage.getBlocks();
+                
+                // This is a simplified text layer - in production you'd want to
+                // create selectable text spans positioned correctly
+                textPage.destroy();
+            } catch (error) {
+                console.log('Text extraction not available');
+            }
+        }
+
+        // Generate thumbnails
+        async function generateThumbnails() {
+            const container = document.getElementById('thumbnailContainer');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const thumbDiv = document.createElement('div');
+                thumbDiv.className = 'thumbnail';
+                thumbDiv.dataset.page = i;
+                thumbDiv.onclick = () => goToPage(i);
+                
+                const pageNum = document.createElement('div');
+                pageNum.className = 'thumbnail-number';
+                pageNum.textContent = i;
+                thumbDiv.appendChild(pageNum);
+                
+                container.appendChild(thumbDiv);
+                
+                // Render thumbnail
+                try {
+                    const page = pdfDocument.loadPage(i - 1);
+                    const bounds = page.getBounds();
+                    const scale = 150 / bounds[2]; // Fit to 150px width
+                    const transform = mupdf.Matrix.scale(scale, scale);
+                    const pixmap = page.toPixmap(transform, mupdf.ColorSpace.DeviceRGB, false);
+                    
+                    const thumbCanvas = document.createElement('canvas');
+                    thumbCanvas.width = pixmap.getWidth();
+                    thumbCanvas.height = pixmap.getHeight();
+                    const ctx = thumbCanvas.getContext('2d');
+                    
+                    const imageData = pixmap.getPixels();
+                    const imgData = new ImageData(new Uint8ClampedArray(imageData), pixmap.getWidth(), pixmap.getHeight());
+                    ctx.putImageData(imgData, 0, 0);
+                    
+                    thumbDiv.innerHTML = '';
+                    thumbDiv.appendChild(thumbCanvas);
+                    thumbDiv.appendChild(pageNum);
+                    
+                    page.destroy();
+                    pixmap.destroy();
+                } catch (e) {
+                    console.error('Error generating thumbnail:', e);
+                }
+            }
+        }
+
+        // Navigation
+        function prevPage() {
+            if (currentPageNum > 1) {
+                renderPage(currentPageNum - 1);
+            }
+        }
+
+        function nextPage() {
+            if (currentPageNum < totalPages) {
+                renderPage(currentPageNum + 1);
+            }
+        }
+
+        function goToPage(num) {
+            if (num >= 1 && num <= totalPages) {
+                renderPage(num);
+            }
+        }
+
+        // Zoom
+        function zoomIn() {
+            const zoomSelect = document.getElementById('zoomSelect');
+            const currentIndex = zoomSelect.selectedIndex;
+            if (currentIndex < zoomSelect.options.length - 1) {
+                zoomSelect.selectedIndex = currentIndex + 1;
+                setZoom(zoomSelect.value);
+            }
+        }
+
+        function zoomOut() {
+            const zoomSelect = document.getElementById('zoomSelect');
+            const currentIndex = zoomSelect.selectedIndex;
+            if (currentIndex > 0) {
+                zoomSelect.selectedIndex = currentIndex - 1;
+                setZoom(zoomSelect.value);
+            }
+        }
+
+        function setZoom(value) {
+            currentZoom = parseFloat(value);
+            renderPage(currentPageNum);
+        }
+
+        // Rotation
+        function rotatePage() {
+            currentRotation = (currentRotation + 90) % 360;
+            renderPage(currentPageNum);
+        }
+
+        // Search functionality
+        function toggleSearch() {
+            const searchBox = document.getElementById('searchBox');
+            searchBox.classList.toggle('active');
+            if (searchBox.classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
+        function searchText() {
+            if (!pdfDocument) return;
+            
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+            
+            // MuPDF search implementation would go here
+            // This requires iterating through pages and using text extraction
+            document.getElementById('searchResults').textContent = 'Search: ' + query;
+        }
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('hidden');
+        }
+
+        // Download
+        function downloadPDF() {
+            if (!pdfBuffer) return;
+            
+            const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName || 'document.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Clear/Reset
+        function clearViewer() {
+            pdfDocument = null;
+            pdfBuffer = null;
+            currentPageNum = 1;
+            totalPages = 0;
+            currentZoom = 1;
+            currentRotation = 0;
+            fileName = '';
+            
+            document.getElementById('pdfCanvas').getContext('2d').clearRect(0, 0, 
+                document.getElementById('pdfCanvas').width, 
+                document.getElementById('pdfCanvas').height
+            );
+            document.getElementById('viewerContent').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'flex';
+            document.getElementById('thumbnailContainer').innerHTML = '';
+            document.getElementById('fileName').textContent = 'No file loaded';
+            document.getElementById('fileSize').textContent = '';
+            document.getElementById('currentPage').textContent = '0';
+            document.getElementById('totalPages').textContent = '0';
+            document.getElementById('searchBox').classList.remove('active');
+            document.getElementById('textLayer').innerHTML = '';
+            
+            disableControls();
+            hideError();
+        }
+
+        // UI Helpers
+        function enableControls() {
+            document.getElementById('navControls').style.opacity = '1';
+            document.getElementById('navControls').style.pointerEvents = 'auto';
+            document.getElementById('zoomControls').style.opacity = '1';
+            document.getElementById('zoomControls').style.pointerEvents = 'auto';
+            document.getElementById('actionControls').style.opacity = '1';
+            document.getElementById('actionControls').style.pointerEvents = 'auto';
+        }
+
+        function disableControls() {
+            document.getElementById('navControls').style.opacity = '0.4';
+            document.getElementById('navControls').style.pointerEvents = 'none';
+            document.getElementById('zoomControls').style.opacity = '0.4';
+            document.getElementById('zoomControls').style.pointerEvents = 'none';
+            document.getElementById('actionControls').style.opacity = '0.4';
+            document.getElementById('actionControls').style.pointerEvents = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function updateLoadingText(text) {
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function showError(text) {
+            hideLoading();
+            document.getElementById('errorText').textContent = text;
+            document.getElementById('errorMessage').classList.add('active');
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.remove('active');
+        }
+
+        function updateStatus(text) {
+            document.getElementById('renderStatus').textContent = text;
+        }
+
+        function updateThumbnailSelection(pageNum) {
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.toggle('active', parseInt(thumb.dataset.page) === pageNum);
+            });
+        }
+
+        // Drag and drop
+        const dropZone = document.getElementById('dropZone');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            document.querySelector('.drop-zone').classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            document.querySelector('.drop-zone').classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            document.querySelector('.drop-zone').classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                const file = files[0];
+                fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    pdfBuffer = new Uint8Array(arrayBuffer);
+                    await loadPDF(pdfBuffer, fileName, fileSize);
+                } catch (error) {
+                    showError('Failed to load dropped file: ' + error.message);
+                }
+            } else {
+                showError('Please drop a valid PDF file.');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (!pdfDocument) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'PageUp':
+                    if (e.ctrlKey) return;
+                    e.preventDefault();
+                    prevPage();
+                    break;
+                case 'ArrowRight':
+                case 'PageDown':
+                    if (e.ctrlKey) return;
+                    e.preventDefault();
+                    nextPage();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    goToPage(1);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToPage(totalPages);
+                    break;
+                case 'f':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        toggleSearch();
+                    }
+                    break;
+                case 'Escape':
+                    document.getElementById('searchBox').classList.remove('active');
+                    break;
+            }
+        });
+
+        // Initialize
+        initMuPDF();
+    </script>
 
 <script src="./script.js"></script></body></html>
