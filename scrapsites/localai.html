@@ -21,6 +21,8 @@
             --font-family: 'Google Sans', Roboto, Arial, sans-serif;
             --code-bg: #0d1117;
             --code-header-bg: #161b22;
+            --success-color: #81c995;
+            --danger-color: #ff6b6b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -438,7 +440,7 @@
         }
         .send-icon.active { opacity: 1; pointer-events: auto; }
 
-        /* --- Modal --- */
+        /* --- Modal & Profiles --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center;
@@ -446,15 +448,45 @@
         }
         .modal {
             background-color: var(--surface-color); padding: 25px; border-radius: 12px; width: 90%;
-            max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;
+            max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 15px;
         }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-muted); }
+        .modal h3 { margin-bottom: 10px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.9rem; color: var(--text-muted); }
         .form-control {
             width: 100%; padding: 10px; background-color: var(--bg-color); border: 1px solid var(--border-color);
             border-radius: 6px; color: var(--text-main);
         }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+        .profiles-section {
+            border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 10px;
+        }
+        .profiles-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .btn-small {
+            padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border-color);
+            background: var(--surface-hover); color: var(--text-main); cursor: pointer;
+        }
+        .btn-small:hover { background: var(--accent-color); color: #202124; border-color: var(--accent-color); }
+
+        .profile-list {
+            display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto;
+        }
+        .profile-card {
+            background: var(--bg-color); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .profile-card:hover { border-color: var(--accent-color); }
+        .profile-card.active { border-color: var(--accent-color); background: rgba(138, 180, 248, 0.1); }
+        .profile-info h4 { font-size: 0.9rem; margin-bottom: 2px; }
+        .profile-info p { font-size: 0.75rem; color: var(--text-muted); }
+        .profile-actions { display: flex; gap: 5px; }
+        .btn-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; }
+        .btn-icon:hover { color: var(--danger-color); background: rgba(255,255,255,0.1); }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
 
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -539,27 +571,44 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <h3>Connection Settings</h3>
+            
             <div class="form-group">
                 <label>Provider</label>
                 <select id="settingProvider" class="form-control" onchange="updateSettingsDefaults()">
                     <option value="ollama">Ollama (localhost:11434)</option>
                     <option value="lmstudio">LM Studio (localhost:1234)</option>
                     <option value="custom">Custom (OpenAI Compatible)</option>
+                    <option value="gemini">Gemini (Google Cloud)</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label>Base URL</label>
                 <input type="text" id="settingUrl" class="form-control" placeholder="http://localhost:11434">
             </div>
-            <!-- API Key Field: Visible only for Custom Provider -->
-            <div class="form-group" id="keyGroup" style="display:none;">
-                <label>API Key (Optional)</label>
-                <input type="password" id="settingKey" class="form-control" placeholder="sk-...">
+            
+            <div class="form-group" id="keyGroup">
+                <label>API Key</label>
+                <input type="password" id="settingKey" class="form-control" placeholder="Required for Gemini/Custom">
             </div>
+
             <div class="form-group">
                 <label>System Prompt</label>
                 <textarea id="settingSysPrompt" class="form-control" rows="3">You are a helpful, efficient AI assistant running locally.</textarea>
             </div>
+
+            <!-- Saved Profiles Section -->
+            <div class="profiles-section">
+                <div class="profiles-header">
+                    <label style="font-weight:600; color:var(--text-main)">Saved Profiles</label>
+                    <button class="btn-small" onclick="saveCurrentAsProfile()">+ Save Current</button>
+                </div>
+                <div class="profile-list" id="profileList">
+                    <!-- Profiles injected here -->
+                    <div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding:10px;">No saved profiles</div>
+                </div>
+            </div>
+
             <div class="modal-actions">
                 <button class="btn-text" onclick="closeSettings()">Cancel</button>
                 <button class="btn-text" style="background-color: var(--accent-color); color: #202124;" onclick="saveSettings()">Save & Refresh</button>
@@ -577,14 +626,16 @@
             config: {
                 provider: 'ollama',
                 baseUrl: 'http://localhost:11434',
-                apiKey: '', // Saved to localStorage
+                apiKey: '',
                 modelsPath: '/v1/models',
+                chatPath: '/v1/chat/completions',
                 model: '',
                 systemPrompt: 'You are a helpful, efficient AI assistant running locally.'
             },
             messages: [],
             controller: null,
-            isDropdownOpen: false
+            isDropdownOpen: false,
+            profiles: []
         };
 
         const els = {
@@ -608,12 +659,14 @@
                 key: document.getElementById('settingKey'),
                 sysPrompt: document.getElementById('settingSysPrompt'),
                 keyGroup: document.getElementById('keyGroup')
-            }
+            },
+            profileList: document.getElementById('profileList')
         };
 
         // --- Init ---
         window.onload = () => { 
             loadConfig(); 
+            loadProfiles();
             fetchModels(); 
         };
 
@@ -623,9 +676,7 @@
             if (saved) {
                 try {
                     state.config = { ...state.config, ...JSON.parse(saved) };
-                } catch (e) {
-                    console.error("Error loading config", e);
-                }
+                } catch (e) { console.error("Error loading config", e); }
             }
             updateSettingsUI();
         }
@@ -635,32 +686,43 @@
             els.settings.url.value = state.config.baseUrl || '';
             els.settings.key.value = state.config.apiKey || '';
             els.settings.sysPrompt.value = state.config.systemPrompt || '';
-            updateSettingsDefaults(); // This handles visibility of API Key field
+            updateSettingsDefaults(); 
         }
 
         function updateSettingsDefaults() {
             const p = els.settings.provider.value;
             
             if (p === 'ollama') {
-                // Only overwrite URL if it's currently the default or empty, to avoid wiping manual custom overrides
-                if (!state.config.baseUrl || state.config.baseUrl === '' || state.config.baseUrl === 'http://localhost:1234') {
+                if (!state.config.baseUrl || state.config.baseUrl === '' || state.config.baseUrl.includes('1234')) {
                     state.config.baseUrl = 'http://localhost:11434';
                 }
                 state.config.modelsPath = '/v1/models';
+                state.config.chatPath = '/v1/chat/completions';
                 els.settings.keyGroup.style.display = 'none'; 
+                els.settings.url.disabled = false;
             } else if (p === 'lmstudio') {
-                if (!state.config.baseUrl || state.config.baseUrl === '' || state.config.baseUrl === 'http://localhost:11434') {
+                if (!state.config.baseUrl || state.config.baseUrl === '' || state.config.baseUrl.includes('11434')) {
                     state.config.baseUrl = 'http://localhost:1234';
                 }
-                state.config.modelsPath = '/api/v1/models';
+                state.config.modelsPath = '/api/v1/models'; // LM Studio specific
+                state.config.chatPath = '/v1/chat/completions';
                 els.settings.keyGroup.style.display = 'none'; 
+                els.settings.url.disabled = false;
             } else if (p === 'custom') {
-                // For custom, we don't overwrite the URL to preserve user input
-                els.settings.keyGroup.style.display = 'block'; // Show API Key field
+                els.settings.keyGroup.style.display = 'block'; 
+                state.config.chatPath = '/v1/chat/completions'; // Default OpenAI path
+                els.settings.url.disabled = false;
+            } else if (p === 'gemini') {
+                // Native Google API
+                state.config.baseUrl = 'https://generativelanguage.googleapis.com';
+                state.config.modelsPath = '/v1beta/models';
+                state.config.chatPath = ''; // Dynamic per model
+                els.settings.keyGroup.style.display = 'block'; 
+                els.settings.url.disabled = true; // Fixed URL for Google
+                els.settings.url.value = state.config.baseUrl;
             }
             
-            // Update the input field value if we changed it in logic
-            if (p !== 'custom') {
+            if (p !== 'custom' && p !== 'gemini') {
                 els.settings.url.value = state.config.baseUrl;
             }
         }
@@ -668,16 +730,99 @@
         function saveSettings() {
             state.config.provider = els.settings.provider.value;
             state.config.baseUrl = els.settings.url.value.replace(/\/$/, '');
-            state.config.apiKey = els.settings.key.value; // Save API Key
+            state.config.apiKey = els.settings.key.value;
             state.config.systemPrompt = els.settings.sysPrompt.value;
             
-            // Persist to Local Storage
             localStorage.setItem('localAiConfig', JSON.stringify(state.config));
             
             updateSettingsDefaults(); 
             closeSettings();
             fetchModels();
-            showToast('Settings Saved (Key & URL Stored)');
+            showToast('Settings Saved');
+        }
+
+        // --- Profile Management ---
+        function loadProfiles() {
+            const saved = localStorage.getItem('ai_profiles');
+            state.profiles = saved ? JSON.parse(saved) : [];
+            renderProfiles();
+        }
+
+        function renderProfiles() {
+            els.profileList.innerHTML = '';
+            if (state.profiles.length === 0) {
+                els.profileList.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding:10px;">No saved profiles</div>';
+                return;
+            }
+
+            state.profiles.forEach((profile, index) => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                // Highlight if matches current config
+                const isCurrent = (state.config.provider === profile.provider && 
+                                  state.config.baseUrl === profile.url && 
+                                  state.config.apiKey === profile.key);
+                if(isCurrent) card.classList.add('active');
+
+                card.innerHTML = `
+                    <div class="profile-info" onclick="loadProfile(${index})">
+                        <h4>${escapeHtml(profile.name)}</h4>
+                        <p>${profile.provider} | ${profile.url}</p>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="btn-icon" onclick="deleteProfile(event, ${index})" title="Delete">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                `;
+                els.profileList.appendChild(card);
+            });
+        }
+
+        function saveCurrentAsProfile() {
+            const name = prompt("Profile Name (e.g., My OpenAI Key, Home Ollama):", `${state.config.provider} Profile`);
+            if (!name) return;
+
+            const newProfile = {
+                name: name,
+                provider: els.settings.provider.value,
+                url: els.settings.url.value.replace(/\/$/, ''),
+                key: els.settings.key.value,
+                systemPrompt: els.settings.sysPrompt.value
+            };
+
+            // Check for duplicates (exact match)
+            const existsIndex = state.profiles.findIndex(p => p.url === newProfile.url && p.key === newProfile.key && p.provider === newProfile.provider);
+            if (existsIndex >= 0) {
+                state.profiles[existsIndex] = newProfile; // Update
+                showToast('Profile Updated');
+            } else {
+                state.profiles.push(newProfile);
+                showToast('Profile Saved');
+            }
+
+            localStorage.setItem('ai_profiles', JSON.stringify(state.profiles));
+            renderProfiles();
+        }
+
+        function loadProfile(index) {
+            const p = state.profiles[index];
+            els.settings.provider.value = p.provider;
+            els.settings.url.value = p.url;
+            els.settings.key.value = p.key;
+            els.settings.sysPrompt.value = p.systemPrompt || '';
+            updateSettingsDefaults();
+            showToast(`Loaded: ${p.name}`);
+            renderProfiles(); // Update active state visual
+        }
+
+        function deleteProfile(e, index) {
+            e.stopPropagation();
+            if(confirm("Delete this profile?")) {
+                state.profiles.splice(index, 1);
+                localStorage.setItem('ai_profiles', JSON.stringify(state.profiles));
+                renderProfiles();
+            }
         }
 
         // --- Dropdown Logic ---
@@ -728,13 +873,20 @@
         }
 
         async function fetchModels() {
-            const url = `${state.config.baseUrl}${state.config.modelsPath}`;
+            let url = `${state.config.baseUrl}${state.config.modelsPath}`;
+            
+            // For Gemini, append key as query param
+            if (state.config.provider === 'gemini') {
+                url += `?key=${state.config.apiKey}`;
+            }
+
             els.modelSelectValue.textContent = "Fetching...";
             els.modelOptionsContainer.innerHTML = '<div class="custom-option" style="cursor:default; color:var(--text-muted)">Loading...</div>';
             
-            // Headers with API Key support
             const headers = { 'Content-Type': 'application/json' };
-            if(state.config.apiKey) headers['Authorization'] = `Bearer ${state.config.apiKey}`;
+            if (state.config.provider !== 'gemini' && state.config.apiKey) {
+                headers['Authorization'] = `Bearer ${state.config.apiKey}`;
+            }
 
             try {
                 const res = await fetch(url, { headers });
@@ -746,18 +898,37 @@
                 const addOpt = (id, name, loaded) => {
                     const div = document.createElement('div');
                     div.className = `custom-option ${loaded?'status-loaded':''}`;
-                    div.dataset.value = id; div.textContent = name;
+                    div.dataset.value = id; 
+                    div.textContent = name;
                     div.onclick = () => selectModel(id, name);
                     els.modelOptionsContainer.appendChild(div);
-                    if (state.config.model === id) { div.classList.add('selected'); els.modelSelectValue.textContent = name; found = true; }
+                    if (state.config.model === id) { 
+                        div.classList.add('selected'); 
+                        els.modelSelectValue.textContent = name; 
+                        found = true; 
+                    }
                 };
 
-                if (state.config.provider === 'lmstudio' && Array.isArray(data.models)) {
+                if (state.config.provider === 'gemini') {
+                    // Google API returns models array
+                    if (data.models) {
+                        data.models.forEach(m => {
+                            // Filter for generative models only
+                            if (m.name.includes('generateContent')) {
+                                const id = m.name.split('/').pop();
+                                addOpt(id, m.displayName || id, false);
+                            }
+                        });
+                    }
+                } else if (state.config.provider === 'lmstudio' && Array.isArray(data.models)) {
                     data.models.forEach(m => addOpt(m.key || m.id, m.display_name || m.key, m.loaded_instances?.length > 0));
                 } else if (data.object === 'list' && Array.isArray(data.data)) {
                     data.data.forEach(m => addOpt(m.id, m.id));
                 }
-                if (!found && els.modelOptionsContainer.firstChild) selectModel(els.modelOptionsContainer.firstChild.dataset.value, els.modelOptionsContainer.firstChild.textContent);
+
+                if (!found && els.modelOptionsContainer.firstChild) {
+                    selectModel(els.modelOptionsContainer.firstChild.dataset.value, els.modelOptionsContainer.firstChild.textContent);
+                }
                 updateSidebarModel();
             } catch (e) {
                 els.modelSelectValue.textContent = "Error";
@@ -801,8 +972,6 @@
         function preProcessMath(text) {
             let processed = text;
             for (const [unicode, latex] of Object.entries(unicodeToLatex)) processed = processed.split(unicode).join(latex);
-            processed = processed.replace(/\|_{([^}]+)}\^{([^}]+)}/g, '\\Big|_{$1}^{$2}');
-            processed = processed.replace(/\|_([a-zA-Z0-9]+)\^([a-zA-Z0-9]+)/g, '\\Big|_{$1}^{$2}');
             return processed;
         }
         mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'strict' });
@@ -885,48 +1054,115 @@
 
             const aiDiv = appendMessage('ai', 'Thinking...');
             let fullResponse = "", lastRender = 0;
-
-            const payload = { model: state.config.model, messages: [{ role: 'system', content: state.config.systemPrompt }, ...state.messages], stream: true };
             state.controller = new AbortController();
 
-            // Headers with API Key support
             const headers = { 'Content-Type': 'application/json' };
-            if(state.config.apiKey) headers['Authorization'] = `Bearer ${state.config.apiKey}`;
+            if (state.config.provider !== 'gemini' && state.config.apiKey) headers['Authorization'] = `Bearer ${state.config.apiKey}`;
+
+            let url = "";
+            let body = {};
 
             try {
-                const res = await fetch(`${state.config.baseUrl}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(payload),
-                    signal: state.controller.signal
-                });
-                if (!res.ok) throw new Error(`Server Error: ${res.status}`);
-
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder();
-                let isFirstChunk = true;
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
+                if (state.config.provider === 'gemini') {
+                    // --- Gemini Native Logic ---
+                    // Map messages to Gemini format
+                    const contents = state.messages.map(m => ({
+                        role: m.role === 'assistant' ? 'model' : 'user',
+                        parts: [{ text: m.content }]
+                    }));
                     
-                    for (const line of lines) {
-                        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                    // Prepend system prompt
+                    if(state.config.systemPrompt) {
+                        contents.unshift({
+                            role: "user",
+                            parts: [{ text: `System Instructions: ${state.config.systemPrompt}` }]
+                        });
+                    }
+
+                    url = `https://generativelanguage.googleapis.com/v1beta/models/${state.config.model}:streamGenerateContent?key=${state.config.apiKey}`;
+                    body = { contents: contents };
+
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(body),
+                        signal: state.controller.signal
+                    });
+
+                    if (!res.ok) throw new Error(`Gemini Error: ${res.status}`);
+
+                    const reader = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    let isFirstChunk = true;
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value);
+                        // Gemini sometimes sends multiple JSON objects in one chunk separated by commas
+                        const lines = chunk.split('\n').filter(line => line.trim().length > 0);
+                        
+                        for (const line of lines) {
                             try {
-                                const content = JSON.parse(line.slice(6)).choices[0]?.delta?.content || "";
-                                fullResponse += content;
+                                // Remove "data: " prefix if exists (rare in native Gemini, but good for safety)
+                                const jsonStr = line.replace(/^data:\s*/, '').trim();
+                                const data = JSON.parse(jsonStr);
+                                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                                fullResponse += text;
                                 if (isFirstChunk) { aiDiv.textContent = ''; isFirstChunk = false; }
-                                if (Date.now() - lastRender > 100 || /[.!?\n]$/.test(content)) {
+                                if (Date.now() - lastRender > 100) {
                                     renderMarkdown(aiDiv, fullResponse);
                                     lastRender = Date.now();
                                     els.chatStream.scrollTop = els.chatStream.scrollHeight;
                                 }
-                            } catch(e){}
+                            } catch(e) { /* ignore parsing errors on partial chunks */ }
+                        }
+                    }
+
+                } else {
+                    // --- OpenAI Compatible Logic (Ollama, LM Studio, Custom) ---
+                    url = `${state.config.baseUrl}/v1/chat/completions`;
+                    body = { 
+                        model: state.config.model, 
+                        messages: [{ role: 'system', content: state.config.systemPrompt }, ...state.messages], 
+                        stream: true 
+                    };
+
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(body),
+                        signal: state.controller.signal
+                    });
+                    if (!res.ok) throw new Error(`Server Error: ${res.status}`);
+
+                    const reader = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    let isFirstChunk = true;
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                try {
+                                    const content = JSON.parse(line.slice(6)).choices[0]?.delta?.content || "";
+                                    fullResponse += content;
+                                    if (isFirstChunk) { aiDiv.textContent = ''; isFirstChunk = false; }
+                                    if (Date.now() - lastRender > 100 || /[.!?\n]$/.test(content)) {
+                                        renderMarkdown(aiDiv, fullResponse);
+                                        lastRender = Date.now();
+                                        els.chatStream.scrollTop = els.chatStream.scrollHeight;
+                                    }
+                                } catch(e){}
+                            }
                         }
                     }
                 }
+
                 state.messages.push({ role: 'assistant', content: fullResponse });
                 renderMarkdown(aiDiv, fullResponse);
             } catch (err) {
@@ -934,11 +1170,17 @@
             }
         }
 
-        function openSettings() { els.settings.modal.style.display = 'flex'; }
+        function openSettings() { els.settings.modal.style.display = 'flex'; renderProfiles(); }
         function closeSettings() { els.settings.modal.style.display = 'none'; }
         function showToast(msg) {
             const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
+        }
+        
+        // Utility to prevent XSS in profile names
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
     </script>
 </body>
