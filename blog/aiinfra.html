@@ -34,45 +34,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        bg: '#07080c',
-                        bgCard: '#0d0f14',
-                        bgElevated: '#13151c',
-                        fg: '#e4e6ea',
-                        fgMuted: '#8a8d95',
-                        accent: '#00e5c7',
-                        accentDim: '#00a894',
-                        border: '#1e2028',
-                        borderLight: '#2a2d36'
-                    },
-                    fontFamily: {
-                        display: ['Space Grotesk', 'sans-serif'],
-                        body: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    
     <style>
         :root {
             --bg: #07080c;
             --bg-card: #0d0f14;
+            --bg-elevated: #13151c;
             --fg: #e4e6ea;
             --fg-muted: #8a8d95;
             --accent: #00e5c7;
             --accent-dim: #00a894;
             --border: #1e2028;
+            --border-light: #2a2d36;
+            
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --container-max: 1280px;
+            --nav-height: 72px;
         }
         
-        * {
+        /* Reset */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -83,14 +65,36 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-body);
             background-color: var(--bg);
             color: var(--fg);
+            line-height: 1.6;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
         
-        .font-display {
-            font-family: 'Space Grotesk', sans-serif;
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+        
+        /* Container */
+        .container {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 24px;
         }
         
         /* Grid Background */
@@ -203,7 +207,8 @@
         .reveal {
             opacity: 0;
             transform: translateY(40px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         .reveal.visible {
@@ -215,57 +220,44 @@
         .stagger-children > * {
             opacity: 0;
             transform: translateY(30px);
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        .stagger-children.visible > *:nth-child(1) { transition-delay: 0ms; }
-        .stagger-children.visible > *:nth-child(2) { transition-delay: 100ms; }
-        .stagger-children.visible > *:nth-child(3) { transition-delay: 200ms; }
-        .stagger-children.visible > *:nth-child(4) { transition-delay: 300ms; }
-        .stagger-children.visible > *:nth-child(5) { transition-delay: 400ms; }
-        .stagger-children.visible > *:nth-child(6) { transition-delay: 500ms; }
+        .stagger-children.visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(6) { transition-delay: 500ms; opacity: 1; transform: translateY(0); }
         
-        .stagger-children.visible > * {
-            opacity: 1;
-            transform: translateY(0);
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(7, 8, 12, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
         }
         
-        /* AI Model Cards */
-        .ai-card {
-            position: relative;
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden;
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            max-width: var(--container-max);
+            margin: 0 auto;
         }
         
-        .ai-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 0%, rgba(0, 229, 199, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
-        .ai-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(0, 229, 199, 0.3);
-            box-shadow: 0 20px 40px -20px rgba(0, 229, 199, 0.2);
-        }
-        
-        .ai-card:hover::before {
-            opacity: 1;
-        }
-        
-        .ai-card:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 4px;
-        }
-        
-        /* Logo Icon */
         .logo-icon {
             width: 40px;
             height: 40px;
@@ -276,18 +268,75 @@
             justify-content: center;
         }
         
-        /* Button Styles */
+        .logo-icon svg {
+            color: var(--bg);
+        }
+        
+        .logo-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-links {
+            display: none;
+            align-items: center;
+            gap: 32px;
+        }
+        
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex;
+            }
+        }
+        
+        .nav-link {
+            position: relative;
+            color: var(--fg-muted);
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--fg);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-family: var(--font-display);
+        }
+        
         .btn-primary {
             position: relative;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
             color: var(--bg);
-            font-weight: 600;
-            padding: 1rem 2rem;
-            border-radius: 8px;
+            padding: 12px 24px;
             border: none;
-            cursor: pointer;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
         
         .btn-primary::after {
@@ -316,12 +365,8 @@
         .btn-secondary {
             background: transparent;
             color: var(--fg);
-            font-weight: 500;
-            padding: 1rem 2rem;
-            border-radius: 8px;
+            padding: 12px 24px;
             border: 1px solid var(--border-light);
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
         
         .btn-secondary:hover {
@@ -334,22 +379,284 @@
             outline-offset: 4px;
         }
         
-        /* Stat Counter Animation */
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: var(--nav-height);
+            position: relative;
+        }
+        
+        .hero-content {
+            padding: 80px 0;
+            max-width: 900px;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            margin-bottom: 32px;
+        }
+        
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .badge-text {
+            font-size: 14px;
+            color: var(--fg-muted);
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            margin-bottom: 24px;
+        }
+        
+        .hero-description {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--fg-muted);
+            max-width: 650px;
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        /* Stats Section */
+        .stats {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+        }
+        
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
         .stat-value {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 8px;
             font-variant-numeric: tabular-nums;
         }
         
-        /* Feature Item */
+        .stat-value.accent {
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--fg-muted);
+        }
+        
+        /* AI Models Section */
+        .models {
+            padding: 96px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+        
+        .section-header h2 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            margin-bottom: 16px;
+        }
+        
+        .section-header p {
+            color: var(--fg-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .models-grid {
+            display: grid;
+            gap: 24px;
+        }
+        
+        @media (min-width: 768px) {
+            .models-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .models-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .ai-card {
+            position: relative;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+        
+        .ai-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 229, 199, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .ai-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 229, 199, 0.3);
+            box-shadow: 0 20px 40px -20px rgba(0, 229, 199, 0.2);
+        }
+        
+        .ai-card:hover::before {
+            opacity: 1;
+        }
+        
+        .ai-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+        }
+        
+        .ai-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ai-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .ai-icon.claude {
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+        }
+        
+        .ai-icon.chatgpt {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        
+        .ai-icon.gemini {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        
+        .ai-icon.grok {
+            background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        
+        .ai-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .ai-card p {
+            color: var(--fg-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .ai-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Platform Section */
+        .platform {
+            padding: 96px 0;
+            background: rgba(13, 15, 20, 0.5);
+        }
+        
+        .platform-grid {
+            display: grid;
+            gap: 64px;
+            align-items: center;
+        }
+        
+        @media (min-width: 1024px) {
+            .platform-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .platform-content h2 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            margin-bottom: 24px;
+        }
+        
+        .platform-content > p {
+            color: var(--fg-muted);
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
         .feature-item {
             position: relative;
-            padding-left: 1.5rem;
+            padding-left: 24px;
         }
         
         .feature-item::before {
             content: '';
             position: absolute;
             left: 0;
-            top: 0.5rem;
+            top: 8px;
             width: 8px;
             height: 8px;
             background: var(--accent);
@@ -357,30 +664,344 @@
             transform: rotate(45deg);
         }
         
-        /* Navigation */
-        .nav-link {
-            position: relative;
+        .feature-item h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .feature-item p {
             color: var(--fg-muted);
-            transition: color 0.3s ease;
+            font-size: 14px;
         }
         
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
+        /* Visualization */
+        .visualization-wrapper {
+            position: relative;
         }
         
-        .nav-link:hover {
-            color: var(--fg);
+        .visualization {
+            aspect-ratio: 1;
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
         }
         
-        .nav-link:hover::after {
+        .visualization canvas {
             width: 100%;
+            height: 100%;
+        }
+        
+        .viz-overlay {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .viz-badge {
+            background: rgba(7, 8, 12, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .viz-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .viz-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(7, 8, 12, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--fg-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .viz-btn:hover {
+            color: var(--fg);
+            border-color: var(--border-light);
+        }
+        
+        .viz-stats {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .viz-stat {
+            background: rgba(7, 8, 12, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .viz-stat-label {
+            color: var(--accent);
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .viz-stat-value {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        /* Capabilities Section */
+        .capabilities {
+            padding: 96px 0;
+        }
+        
+        .capabilities-grid {
+            display: grid;
+            gap: 24px;
+        }
+        
+        @media (min-width: 768px) {
+            .capabilities-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .cap-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .cap-card:hover {
+            border-color: rgba(0, 229, 199, 0.3);
+        }
+        
+        .cap-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 229, 199, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        
+        .cap-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .cap-card p {
+            color: var(--fg-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* About Section */
+        .about {
+            padding: 96px 0;
+            background: rgba(13, 15, 20, 0.5);
+        }
+        
+        .about-content {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .about-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(0, 229, 199, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            color: var(--accent);
+        }
+        
+        .about h2 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            margin-bottom: 24px;
+        }
+        
+        .about p {
+            color: var(--fg-muted);
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+        
+        .about-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+        }
+        
+        .about-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--fg-muted);
+            font-size: 14px;
+        }
+        
+        .about-tag svg {
+            color: var(--accent);
+        }
+        
+        /* CTA Section */
+        .cta {
+            padding: 96px 0;
+        }
+        
+        .cta-box {
+            background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 32px;
+            text-align: center;
+        }
+        
+        @media (min-width: 640px) {
+            .cta-box {
+                padding: 64px 48px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .cta-box {
+                padding: 80px 64px;
+            }
+        }
+        
+        .cta-box h2 {
+            font-size: clamp(1.75rem, 5vw, 3rem);
+            margin-bottom: 24px;
+        }
+        
+        .cta-box p {
+            color: var(--fg-muted);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .cta-btn {
+            font-size: 16px;
+            padding: 16px 32px;
+        }
+        
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 0;
+        }
+        
+        .footer-grid {
+            display: grid;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+        
+        @media (min-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 2fr 1fr 1fr 1fr;
+                gap: 48px;
+            }
+        }
+        
+        .footer-brand p {
+            color: var(--fg-muted);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        
+        .footer-col h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .footer-links a {
+            color: var(--fg-muted);
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        @media (min-width: 640px) {
+            .footer-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+        
+        .footer-copyright {
+            color: var(--fg-muted);
+            font-size: 14px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .footer-social a {
+            color: var(--fg-muted);
+            transition: color 0.2s ease;
+        }
+        
+        .footer-social a:hover {
+            color: var(--accent);
         }
         
         /* Scrollbar */
@@ -416,7 +1037,7 @@
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
     <!-- Grid Background -->
     <div class="grid-bg"></div>
     
@@ -432,119 +1053,113 @@
     </div>
     
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-lg border-b border-border">
-        <div class="max-w-7xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="https://blackice-ac.vercel.app/Home.html" class="flex items-center gap-3" aria-label="BLACKICE AI Home">
-                    <div class="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-bg">
-                            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-                            <line x1="12" y1="22" x2="12" y2="15.5"></line>
-                            <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
-                        </svg>
-                    </div>
-                    <span class="font-display font-bold text-xl tracking-tight">BLACKICE</span>
-                </a>
-                
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#platform" class="nav-link font-medium text-sm">Platform</a>
-                    <a href="#models" class="nav-link font-medium text-sm">AI Models</a>
-                    <a href="#capabilities" class="nav-link font-medium text-sm">Capabilities</a>
-                    <a href="#about" class="nav-link font-medium text-sm">About</a>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="https://blackice-ac.vercel.app/Home.html" class="logo" aria-label="BLACKICE AI Home">
+                <div class="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
+                        <line x1="12" y1="22" x2="12" y2="15.5"></line>
+                        <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
+                    </svg>
                 </div>
-                
-                <div class="flex items-center gap-4">
-                    <a href="https://blackice-ac.vercel.app/Home.html" class="btn-primary font-display text-sm">
-                        Get Started
-                    </a>
-                </div>
+                <span class="logo-text">BLACKICE</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#platform" class="nav-link">Platform</a>
+                <a href="#models" class="nav-link">AI Models</a>
+                <a href="#capabilities" class="nav-link">Capabilities</a>
+                <a href="#about" class="nav-link">About</a>
             </div>
+            
+            <a href="https://blackice-ac.vercel.app/Home.html" class="btn btn-primary">
+                Get Started
+            </a>
         </div>
     </nav>
     
-    <main class="relative z-10">
+    <main style="position: relative; z-index: 10;">
         <!-- Hero Section -->
-        <section class="min-h-screen flex items-center pt-20">
-            <div class="max-w-7xl mx-auto px-6 py-20">
-                <div class="max-w-4xl">
-                    <div class="stagger-children visible">
-                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-bgCard border border-border rounded-full mb-8">
-                            <span class="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
-                            <span class="text-sm text-fgMuted">Backed by Elon Musk</span>
-                        </div>
-                        
-                        <h1 class="font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[1.1] mb-6">
-                            <span class="hero-title">Architecture</span>
-                            <br>
-                            <span class="text-fg">Reimagined by AI</span>
-                        </h1>
-                        
-                        <p class="text-lg sm:text-xl text-fgMuted max-w-2xl mb-10 leading-relaxed">
-                            The most advanced AI architecture platform, powered by the collective intelligence of Claude, ChatGPT, Gemini, and Grok. Design, visualize, and build the structures of tomorrow.
-                        </p>
-                        
-                        <div class="flex flex-wrap gap-4">
-                            <a href="https://blackice-ac.vercel.app/Home.html" class="btn-primary font-display inline-flex items-center gap-2">
-                                Start Building
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                                </svg>
-                            </a>
-                            <button class="btn-secondary font-display" onclick="document.getElementById('platform').scrollIntoView({behavior: 'smooth'})">
-                                Learn More
-                            </button>
-                        </div>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content stagger-children visible">
+                    <div class="badge">
+                        <span class="badge-dot"></span>
+                        <span class="badge-text">Backed by Elon Musk</span>
+                    </div>
+                    
+                    <h1>
+                        <span class="hero-title">Architecture</span>
+                        <br>
+                        <span>Reimagined by AI</span>
+                    </h1>
+                    
+                    <p class="hero-description">
+                        The most advanced AI architecture platform, powered by the collective intelligence of Claude, ChatGPT, Gemini, and Grok. Design, visualize, and build the structures of tomorrow.
+                    </p>
+                    
+                    <div class="hero-buttons">
+                        <a href="https://blackice-ac.vercel.app/Home.html" class="btn btn-primary">
+                            Start Building
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <button class="btn btn-secondary" onclick="document.getElementById('platform').scrollIntoView({behavior: 'smooth'})">
+                            Learn More
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
         
         <!-- Stats Section -->
-        <section class="py-20 border-y border-border">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 stagger-children">
-                    <div class="text-center">
-                        <div class="font-display font-bold text-4xl sm:text-5xl text-accent mb-2 stat-value" data-target="4">0</div>
-                        <div class="text-fgMuted text-sm">AI Models Integrated</div>
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid stagger-children" id="stats-section">
+                    <div class="stat-item">
+                        <div class="stat-value accent" data-target="4">0</div>
+                        <div class="stat-label">AI Models Integrated</div>
                     </div>
-                    <div class="text-center">
-                        <div class="font-display font-bold text-4xl sm:text-5xl text-fg mb-2 stat-value" data-target="2.5">0</div>
-                        <div class="text-fgMuted text-sm">Billion Parameters</div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-target="2.5">0</div>
+                        <div class="stat-label">Billion Parameters</div>
                     </div>
-                    <div class="text-center">
-                        <div class="font-display font-bold text-4xl sm:text-5xl text-fg mb-2 stat-value" data-target="150">0</div>
-                        <div class="text-fgMuted text-sm">Countries Served</div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-target="150">0</div>
+                        <div class="stat-label">Countries Served</div>
                     </div>
-                    <div class="text-center">
-                        <div class="font-display font-bold text-4xl sm:text-5xl text-fg mb-2 stat-value" data-target="99.9">0</div>
-                        <div class="text-fgMuted text-sm">% Uptime</div>
+                    <div class="stat-item">
+                        <div class="stat-value" data-target="99.9">0</div>
+                        <div class="stat-label">% Uptime</div>
                     </div>
                 </div>
             </div>
         </section>
         
         <!-- AI Models Section -->
-        <section id="models" class="py-24">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="font-display font-bold text-3xl sm:text-4xl mb-4">Powered by Industry Leaders</h2>
-                    <p class="text-fgMuted max-w-2xl mx-auto">Four cutting-edge AI models working in harmony to deliver unprecedented architectural intelligence.</p>
+        <section class="models" id="models">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Powered by Industry Leaders</h2>
+                    <p>Four cutting-edge AI models working in harmony to deliver unprecedented architectural intelligence.</p>
                 </div>
                 
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children" id="ai-cards">
+                <div class="models-grid stagger-children" id="ai-cards">
                     <!-- Claude -->
                     <article class="ai-card" tabindex="0" role="article" aria-label="Claude AI Integration">
-                        <div class="relative z-10">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center mb-4 border border-orange-500/30">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-orange-400">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <div class="ai-card-content">
+                            <div class="ai-icon claude">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke-linejoin="round"/>
                                 </svg>
                             </div>
-                            <h3 class="font-display font-semibold text-xl mb-2">Claude</h3>
-                            <p class="text-fgMuted text-sm leading-relaxed mb-4">Anthropic's reasoning powerhouse. Excels at complex architectural analysis, code generation, and ethical design considerations.</p>
-                            <div class="flex items-center gap-2 text-accent text-sm font-medium">
+                            <h3>Claude</h3>
+                            <p>Anthropic's reasoning powerhouse. Excels at complex architectural analysis, code generation, and ethical design considerations.</p>
+                            <div class="ai-tag">
                                 <span>Deep Reasoning</span>
                             </div>
                         </div>
@@ -552,16 +1167,16 @@
                     
                     <!-- ChatGPT -->
                     <article class="ai-card" tabindex="0" role="article" aria-label="ChatGPT Integration">
-                        <div class="relative z-10">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 flex items-center justify-center mb-4 border border-emerald-500/30">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-emerald-400">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <div class="ai-card-content">
+                            <div class="ai-icon chatgpt">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6l4 2" stroke-linecap="round"/>
                                 </svg>
                             </div>
-                            <h3 class="font-display font-semibold text-xl mb-2">ChatGPT</h3>
-                            <p class="text-fgMuted text-sm leading-relaxed mb-4">OpenAI's versatile assistant. Masters natural language design briefs, client communication, and iterative refinement.</p>
-                            <div class="flex items-center gap-2 text-accent text-sm font-medium">
+                            <h3>ChatGPT</h3>
+                            <p>OpenAI's versatile assistant. Masters natural language design briefs, client communication, and iterative refinement.</p>
+                            <div class="ai-tag">
                                 <span>Versatile Design</span>
                             </div>
                         </div>
@@ -569,15 +1184,15 @@
                     
                     <!-- Gemini -->
                     <article class="ai-card" tabindex="0" role="article" aria-label="Gemini Integration">
-                        <div class="relative z-10">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center mb-4 border border-blue-500/30">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-blue-400">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <div class="ai-card-content">
+                            <div class="ai-icon gemini">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke-linejoin="round"/>
                                 </svg>
                             </div>
-                            <h3 class="font-display font-semibold text-xl mb-2">Gemini</h3>
-                            <p class="text-fgMuted text-sm leading-relaxed mb-4">Google's multimodal intelligence. Processes images, blueprints, and spatial data with remarkable precision.</p>
-                            <div class="flex items-center gap-2 text-accent text-sm font-medium">
+                            <h3>Gemini</h3>
+                            <p>Google's multimodal intelligence. Processes images, blueprints, and spatial data with remarkable precision.</p>
+                            <div class="ai-tag">
                                 <span>Multimodal</span>
                             </div>
                         </div>
@@ -585,15 +1200,15 @@
                     
                     <!-- Grok -->
                     <article class="ai-card" tabindex="0" role="article" aria-label="Grok Integration">
-                        <div class="relative z-10">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center mb-4 border border-red-500/30">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-red-400">
-                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <div class="ai-card-content">
+                            <div class="ai-icon grok">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linejoin="round"/>
                                 </svg>
                             </div>
-                            <h3 class="font-display font-semibold text-xl mb-2">Grok</h3>
-                            <p class="text-fgMuted text-sm leading-relaxed mb-4">xAI's rebellious genius. Real-time data synthesis, unconventional solutions, and boundary-pushing creativity.</p>
-                            <div class="flex items-center gap-2 text-accent text-sm font-medium">
+                            <h3>Grok</h3>
+                            <p>xAI's rebellious genius. Real-time data synthesis, unconventional solutions, and boundary-pushing creativity.</p>
+                            <div class="ai-tag">
                                 <span>Real-time</span>
                             </div>
                         </div>
@@ -603,74 +1218,66 @@
         </section>
         
         <!-- Platform Section -->
-        <section id="platform" class="py-24 bg-bgCard/50">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="grid lg:grid-cols-2 gap-16 items-center">
-                    <div class="reveal">
-                        <h2 class="font-display font-bold text-3xl sm:text-4xl mb-6">Architecture Intelligence Platform</h2>
-                        <p class="text-fgMuted text-lg leading-relaxed mb-8">
-                            BLACKICE synthesizes the unique strengths of four leading AI models into a unified architecture platform. From conceptual sketches to detailed blueprints, our AI ensemble collaborates to bring your vision to life.
-                        </p>
+        <section class="platform" id="platform">
+            <div class="container">
+                <div class="platform-grid">
+                    <div class="platform-content reveal">
+                        <h2>Architecture Intelligence Platform</h2>
+                        <p>BLACKICE synthesizes the unique strengths of four leading AI models into a unified architecture platform. From conceptual sketches to detailed blueprints, our AI ensemble collaborates to bring your vision to life.</p>
                         
-                        <div class="space-y-4">
-                            <div class="feature-item">
-                                <h4 class="font-semibold mb-1">Generative Design Engine</h4>
-                                <p class="text-fgMuted text-sm">AI-powered parametric design with infinite variations</p>
-                            </div>
-                            <div class="feature-item">
-                                <h4 class="font-semibold mb-1">Real-time Collaboration</h4>
-                                <p class="text-fgMuted text-sm">Multi-agent AI discussion for complex problem solving</p>
-                            </div>
-                            <div class="feature-item">
-                                <h4 class="font-semibold mb-1">Sustainability Analysis</h4>
-                                <p class="text-fgMuted text-sm">Environmental impact assessment built into every design</p>
-                            </div>
-                            <div class="feature-item">
-                                <h4 class="font-semibold mb-1">Code Compliance</h4>
-                                <p class="text-fgMuted text-sm">Automatic building code verification across jurisdictions</p>
-                            </div>
-                        </div>
+                        <ul class="feature-list">
+                            <li class="feature-item">
+                                <h4>Generative Design Engine</h4>
+                                <p>AI-powered parametric design with infinite variations</p>
+                            </li>
+                            <li class="feature-item">
+                                <h4>Real-time Collaboration</h4>
+                                <p>Multi-agent AI discussion for complex problem solving</p>
+                            </li>
+                            <li class="feature-item">
+                                <h4>Sustainability Analysis</h4>
+                                <p>Environmental impact assessment built into every design</p>
+                            </li>
+                            <li class="feature-item">
+                                <h4>Code Compliance</h4>
+                                <p>Automatic building code verification across jurisdictions</p>
+                            </li>
+                        </ul>
                     </div>
                     
-                    <div class="reveal">
-                        <div class="relative">
-                            <!-- Architecture Visualization Mock -->
-                            <div class="aspect-square bg-bgElevated rounded-2xl border border-border overflow-hidden relative">
-                                <canvas id="architecture-canvas" class="w-full h-full"></canvas>
-                                
-                                <!-- Overlay UI Elements -->
-                                <div class="absolute top-4 left-4 right-4 flex justify-between">
-                                    <div class="bg-bg/80 backdrop-blur px-3 py-1.5 rounded-lg border border-border text-xs font-medium">
-                                        Live Preview
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <div class="w-8 h-8 bg-bg/80 backdrop-blur rounded-lg border border-border flex items-center justify-center">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-fgMuted">
-                                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
-                                            </svg>
-                                        </div>
-                                        <div class="w-8 h-8 bg-bg/80 backdrop-blur rounded-lg border border-border flex items-center justify-center">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-fgMuted">
-                                                <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                                            </svg>
-                                        </div>
-                                    </div>
+                    <div class="visualization-wrapper reveal">
+                        <div class="visualization">
+                            <canvas id="architecture-canvas"></canvas>
+                            
+                            <div class="viz-overlay">
+                                <div class="viz-badge">Live Preview</div>
+                                <div class="viz-controls">
+                                    <button class="viz-btn" aria-label="Zoom in">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"/>
+                                            <path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/>
+                                        </svg>
+                                    </button>
+                                    <button class="viz-btn" aria-label="Fullscreen">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
+                                        </svg>
+                                    </button>
                                 </div>
-                                
-                                <!-- Bottom Stats -->
-                                <div class="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2">
-                                    <div class="bg-bg/80 backdrop-blur px-3 py-2 rounded-lg border border-border text-center">
-                                        <div class="text-accent text-xs font-medium">Efficiency</div>
-                                        <div class="text-fg font-bold">94%</div>
-                                    </div>
-                                    <div class="bg-bg/80 backdrop-blur px-3 py-2 rounded-lg border border-border text-center">
-                                        <div class="text-accent text-xs font-medium">Load</div>
-                                        <div class="text-fg font-bold">Optimal</div>
-                                    </div>
-                                    <div class="bg-bg/80 backdrop-blur px-3 py-2 rounded-lg border border-border text-center">
-                                        <div class="text-accent text-xs font-medium">Cost</div>
-                                        <div class="text-fg font-bold">-23%</div>
-                                    </div>
+                            </div>
+                            
+                            <div class="viz-stats">
+                                <div class="viz-stat">
+                                    <div class="viz-stat-label">Efficiency</div>
+                                    <div class="viz-stat-value">94%</div>
+                                </div>
+                                <div class="viz-stat">
+                                    <div class="viz-stat-label">Load</div>
+                                    <div class="viz-stat-value">Optimal</div>
+                                </div>
+                                <div class="viz-stat">
+                                    <div class="viz-stat-label">Cost</div>
+                                    <div class="viz-stat-value">-23%</div>
                                 </div>
                             </div>
                         </div>
@@ -680,85 +1287,83 @@
         </section>
         
         <!-- Capabilities Section -->
-        <section id="capabilities" class="py-24">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="font-display font-bold text-3xl sm:text-4xl mb-4">Capabilities That Scale</h2>
-                    <p class="text-fgMuted max-w-2xl mx-auto">From residential homes to urban masterplans, BLACKICE adapts to projects of any scale.</p>
+        <section class="capabilities" id="capabilities">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Capabilities That Scale</h2>
+                    <p>From residential homes to urban masterplans, BLACKICE adapts to projects of any scale.</p>
                 </div>
                 
-                <div class="grid md:grid-cols-3 gap-6 stagger-children">
-                    <div class="bg-bgCard border border-border rounded-xl p-6 hover:border-accent/30 transition-colors">
-                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                <div class="capabilities-grid stagger-children">
+                    <div class="cap-card">
+                        <div class="cap-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                                 <polyline points="9 22 9 12 15 12 15 22"/>
                             </svg>
                         </div>
-                        <h3 class="font-display font-semibold text-lg mb-2">Residential Design</h3>
-                        <p class="text-fgMuted text-sm leading-relaxed">Single-family homes, apartments, and mixed-use developments with personalized living spaces.</p>
+                        <h3>Residential Design</h3>
+                        <p>Single-family homes, apartments, and mixed-use developments with personalized living spaces.</p>
                     </div>
                     
-                    <div class="bg-bgCard border border-border rounded-xl p-6 hover:border-accent/30 transition-colors">
-                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                    <div class="cap-card">
+                        <div class="cap-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
                                 <path d="M9 22v-4h6v4"/>
                                 <path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/>
                             </svg>
                         </div>
-                        <h3 class="font-display font-semibold text-lg mb-2">Commercial Projects</h3>
-                        <p class="text-fgMuted text-sm leading-relaxed">Office towers, retail spaces, and hospitality venues optimized for foot traffic and revenue.</p>
+                        <h3>Commercial Projects</h3>
+                        <p>Office towers, retail spaces, and hospitality venues optimized for foot traffic and revenue.</p>
                     </div>
                     
-                    <div class="bg-bgCard border border-border rounded-xl p-6 hover:border-accent/30 transition-colors">
-                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                    <div class="cap-card">
+                        <div class="cap-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="12 2 2 7 12 12 22 7 12 2"/>
                                 <polyline points="2 17 12 22 22 17"/>
                                 <polyline points="2 12 12 17 22 12"/>
                             </svg>
                         </div>
-                        <h3 class="font-display font-semibold text-lg mb-2">Urban Planning</h3>
-                        <p class="text-fgMuted text-sm leading-relaxed">City-scale developments, transportation networks, and sustainable community masterplans.</p>
+                        <h3>Urban Planning</h3>
+                        <p>City-scale developments, transportation networks, and sustainable community masterplans.</p>
                     </div>
                 </div>
             </div>
         </section>
         
-        <!-- About/Funding Section -->
-        <section id="about" class="py-24 bg-bgCard/50">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="max-w-3xl mx-auto text-center reveal">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-2xl mb-8">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-accent">
+        <!-- About Section -->
+        <section class="about" id="about">
+            <div class="container">
+                <div class="about-content reveal">
+                    <div class="about-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                         </svg>
                     </div>
                     
-                    <h2 class="font-display font-bold text-3xl sm:text-4xl mb-6">Visionary Backing</h2>
+                    <h2>Visionary Backing</h2>
                     
-                    <p class="text-fgMuted text-lg leading-relaxed mb-8">
-                        BLACKICE is funded by Elon Musk, aligning with his vision of accelerating humanity's transition to sustainable, intelligent infrastructure. Our mission is to democratize world-class architectural design through artificial intelligence.
-                    </p>
+                    <p>BLACKICE is funded by Elon Musk, aligning with his vision of accelerating humanity's transition to sustainable, intelligent infrastructure. Our mission is to democratize world-class architectural design through artificial intelligence.</p>
                     
-                    <div class="flex flex-wrap justify-center gap-6 text-sm">
-                        <div class="flex items-center gap-2 text-fgMuted">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                    <div class="about-tags">
+                        <div class="about-tag">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>
                             <span>Series A Funded</span>
                         </div>
-                        <div class="flex items-center gap-2 text-fgMuted">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                        <div class="about-tag">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>
                             <span>Global Team</span>
                         </div>
-                        <div class="flex items-center gap-2 text-fgMuted">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+                        <div class="about-tag">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>
@@ -770,89 +1375,83 @@
         </section>
         
         <!-- CTA Section -->
-        <section class="py-24">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="bg-gradient-to-br from-bgElevated to-bgCard border border-border rounded-3xl p-8 sm:p-12 lg:p-16 text-center reveal">
-                    <h2 class="font-display font-bold text-3xl sm:text-4xl lg:text-5xl mb-6">
-                        Ready to Build the Future?
-                    </h2>
-                    <p class="text-fgMuted text-lg max-w-2xl mx-auto mb-10">
-                        Join thousands of architects, developers, and visionaries using BLACKICE to create tomorrow's landmarks today.
-                    </p>
+        <section class="cta">
+            <div class="container">
+                <div class="cta-box reveal">
+                    <h2>Ready to Build the Future?</h2>
+                    <p>Join thousands of architects, developers, and visionaries using BLACKICE to create tomorrow's landmarks today.</p>
                     
-                    <div class="flex flex-wrap justify-center gap-4">
-                        <a href="https://blackice-ac.vercel.app/Home.html" class="btn-primary font-display inline-flex items-center gap-2 text-lg px-8 py-4">
-                            Launch Platform
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                    </div>
+                    <a href="https://blackice-ac.vercel.app/Home.html" class="btn btn-primary cta-btn">
+                        Launch Platform
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
     </main>
     
     <!-- Footer -->
-    <footer class="border-t border-border py-12">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid md:grid-cols-4 gap-8 mb-12">
-                <div>
-                    <div class="flex items-center gap-3 mb-4">
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="https://blackice-ac.vercel.app/Home.html" class="logo">
                         <div class="logo-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-bg">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
                                 <line x1="12" y1="22" x2="12" y2="15.5"></line>
                                 <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
                             </svg>
                         </div>
-                        <span class="font-display font-bold text-lg">BLACKICE</span>
-                    </div>
-                    <p class="text-fgMuted text-sm">Architecture intelligence for the modern era.</p>
+                        <span class="logo-text">BLACKICE</span>
+                    </a>
+                    <p>Architecture intelligence for the modern era.</p>
                 </div>
                 
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm">Platform</h4>
-                    <ul class="space-y-2">
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Features</a></li>
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Pricing</a></li>
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">API</a></li>
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Features</a></li>
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Pricing</a></li>
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">API</a></li>
                     </ul>
                 </div>
                 
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm">Company</h4>
-                    <ul class="space-y-2">
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">About</a></li>
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Careers</a></li>
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Press</a></li>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">About</a></li>
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Careers</a></li>
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Press</a></li>
                     </ul>
                 </div>
                 
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm">Legal</h4>
-                    <ul class="space-y-2">
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Privacy</a></li>
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Terms</a></li>
-                        <li><a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent text-sm transition-colors">Security</a></li>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Privacy</a></li>
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Terms</a></li>
+                        <li><a href="https://blackice-ac.vercel.app/Home.html">Security</a></li>
                     </ul>
                 </div>
             </div>
             
-            <div class="border-t border-border pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p class="text-fgMuted text-sm">2025 BLACKICE AI. All rights reserved.</p>
-                <div class="flex items-center gap-4">
-                    <a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent transition-colors" aria-label="Twitter">
+            <div class="footer-bottom">
+                <p class="footer-copyright">2025 BLACKICE AI. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="https://blackice-ac.vercel.app/Home.html" aria-label="Twitter">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                         </svg>
                     </a>
-                    <a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent transition-colors" aria-label="LinkedIn">
+                    <a href="https://blackice-ac.vercel.app/Home.html" aria-label="LinkedIn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                         </svg>
                     </a>
-                    <a href="https://blackice-ac.vercel.app/Home.html" class="text-fgMuted hover:text-accent transition-colors" aria-label="GitHub">
+                    <a href="https://blackice-ac.vercel.app/Home.html" aria-label="GitHub">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
@@ -869,7 +1468,6 @@
         
         // Architecture visualization variables
         let particles = [];
-        let lines = [];
         let animationFrameId = null;
         
         // Set canvas size
@@ -965,6 +1563,10 @@
                 if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                 if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
                 
+                // Clamp positions
+                p.x = Math.max(0, Math.min(canvas.width, p.x));
+                p.y = Math.max(0, Math.min(canvas.height, p.y));
+                
                 // Draw particle
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, Math.max(0.5, p.radius), 0, Math.PI * 2);
@@ -978,7 +1580,7 @@
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         
                         if (dist < 80) {
-                            ctx.strokeStyle = `rgba(0, 229, 199, ${0.15 * (1 - dist/80)})`;
+                            ctx.strokeStyle = 'rgba(0, 229, 199, ' + (0.15 * (1 - dist/80)) + ')';
                             ctx.lineWidth = 0.5;
                             ctx.beginPath();
                             ctx.moveTo(p.x, p.y);
@@ -1005,12 +1607,10 @@
                     entry.target.classList.add('visible');
                     
                     // Animate stat counters
-                    if (entry.target.classList.contains('stagger-children')) {
-                        const statValues = entry.target.querySelectorAll('.stat-value');
-                        statValues.forEach(stat => {
-                            animateCounter(stat);
-                        });
-                    }
+                    const statValues = entry.target.querySelectorAll('.stat-value[data-target]');
+                    statValues.forEach(stat => {
+                        animateCounter(stat);
+                    });
                 }
             });
         }, observerOptions);
@@ -1022,6 +1622,9 @@
         
         // Counter animation
         function animateCounter(element) {
+            if (element.dataset.animated) return;
+            element.dataset.animated = 'true';
+            
             const target = parseFloat(element.dataset.target);
             const duration = 2000;
             const startTime = performance.now();
@@ -1039,8 +1642,6 @@
                     requestAnimationFrame(update);
                 } else {
                     element.textContent = isDecimal ? target.toFixed(1) : target;
-                    if (target === 99.9) element.textContent = target;
-                    if (target === 2.5) element.textContent = target;
                 }
             }
             
@@ -1073,7 +1674,7 @@
         
         // Initial stagger animation for hero
         document.addEventListener('DOMContentLoaded', () => {
-            const heroStagger = document.querySelector('.stagger-children');
+            const heroStagger = document.querySelector('.hero .stagger-children');
             if (heroStagger) {
                 setTimeout(() => {
                     heroStagger.classList.add('visible');
