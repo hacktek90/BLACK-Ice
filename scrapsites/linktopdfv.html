@@ -240,6 +240,16 @@
             color: #4338ca;
         }
 
+        /* --- NATIVE TOGGLE BUTTON STYLE --- */
+        .btn-native-toggle.active {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .btn-native-toggle.active:hover {
+            background: #bfdbfe;
+        }
+
         /* --- FLOATING SHOW BUTTON --- */
         #show-header-btn {
             position: fixed;
@@ -378,6 +388,14 @@
             text-align: center;
         }
 
+        /* --- NATIVE PDF IFRAME --- */
+        .native-pdf-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
             .btn-label { display: none; }
@@ -438,9 +456,15 @@
                 </button>
             </div>
 
-            <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
-                <i data-lucide="expand"></i>
-            </button>
+            <!-- Header Right Actions -->
+            <div style="display:flex; gap: 4px;">
+                <button class="icon-btn btn-native-toggle" id="native-toggle-btn" title="Toggle Native PDF Viewer (Browser Default)">
+                    <i data-lucide="file-check"></i>
+                </button>
+                <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
+                    <i data-lucide="expand"></i>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -476,6 +500,7 @@
             tabs: [],
             activeTabId: null,
             isFocusMode: false,
+            nativePdfMode: false, // <-- New state for Native PDF
             // Dragging State
             isDragging: false,
             startX: 0,
@@ -495,6 +520,7 @@
         const newTabBtn = document.getElementById('new-tab-btn');
         const pdfInput = document.getElementById('pdf-input');
         const imgInput = document.getElementById('img-input');
+        const nativeToggleBtn = document.getElementById('native-toggle-btn');
         
         const zoomToolbar = document.getElementById('global-zoom-toolbar');
         const zoomLevelText = document.getElementById('zoom-level-text');
@@ -622,15 +648,24 @@
             }
 
             if (type === 'pdf') {
-                try {
-                    EmbedPDF.init({
-                        type: 'container',
-                        target: container,
-                        src: source,
-                        openLinksInNewWindow: true
-                    });
-                } catch (e) {
-                    container.innerHTML = `<div class="image-error"><p>Failed to load PDF.</p></div>`;
+                // Check for Native Mode Toggle
+                if (state.nativePdfMode) {
+                    const iframe = document.createElement('iframe');
+                    iframe.className = 'native-pdf-frame';
+                    iframe.src = source;
+                    container.appendChild(iframe);
+                } else {
+                    // Use EmbedPDF (Custom Viewer)
+                    try {
+                        EmbedPDF.init({
+                            type: 'container',
+                            target: container,
+                            src: source,
+                            openLinksInNewWindow: true
+                        });
+                    } catch (e) {
+                        container.innerHTML = `<div class="image-error"><p>Failed to load PDF.</p></div>`;
+                    }
                 }
             } 
             else if (type === 'image') {
@@ -813,6 +848,22 @@
                 toggleFocusMode(false);
             }
         });
+
+        // --- NATIVE PDF TOGGLE LOGIC ---
+        nativeToggleBtn.addEventListener('click', () => {
+            state.nativePdfMode = !state.nativePdfMode;
+            nativeToggleBtn.classList.toggle('active', state.nativePdfMode);
+
+            // Re-render active tab if it's a PDF
+            if(state.activeTabId) {
+                const activeTabData = state.tabs.find(t => t.id === state.activeTabId);
+                if(activeTabData && activeTabData.type === 'pdf') {
+                    const container = document.getElementById(`viewer-${activeTabData.id}`);
+                    renderContent(activeTabData.source, 'pdf', container);
+                }
+            }
+        });
+
 
         // --- GENERAL EVENTS ---
         newTabBtn.addEventListener('click', () => createTab(`Tab ${state.tabs.length + 1}`));
