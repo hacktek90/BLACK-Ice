@@ -140,11 +140,15 @@ console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: m
   const currentHost = window.location.hostname;
   const currentPath = window.location.pathname;
 
+  // 🔑 Check for ?admin=elite
+  const params = new URLSearchParams(window.location.search);
+  const isEliteAdmin = params.get("admin") === "elite";
+
   // 1️⃣ Redirect ANY non-Vercel domain to Vercel Home
-  if (currentHost !== VERCEL_HOST) {
+  // BUT skip redirect if ?admin=elite is present
+  if (currentHost !== VERCEL_HOST && !isEliteAdmin) {
     window.location.replace(VERCEL_HOME);
     return; // stop further execution
   }
 
-  
 })();
