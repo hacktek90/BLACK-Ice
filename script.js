@@ -5,7 +5,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 import { c as _c } from "react/compiler-runtime";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // --- Types & Interfaces ---
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
@@ -30,7 +30,7 @@ var ENGINES = [{
 // --- Components ---
 
 var App = function App() {
-  var $ = _c(45);
+  var $ = _c(46);
   var _useState = useState(0),
     _useState2 = _slicedToArray(_useState, 2),
     engineIndex = _useState2[0],
@@ -42,17 +42,25 @@ var App = function App() {
   var currentEngine = ENGINES[engineIndex];
   var t0;
   if ($[0] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t0 = function t0(e) {
-      setEngineIndex(Number(e.target.value));
-    };
+    t0 = [];
     $[0] = t0;
   } else {
     t0 = $[0];
   }
-  var handleEngineChange = t0;
+  useEffect(_temp2, t0);
   var t1;
-  if ($[1] !== currentEngine.aiUrl || $[2] !== currentEngine.url || $[3] !== query) {
-    t1 = function t1(e_0, type) {
+  if ($[1] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t1 = function t1(e) {
+      setEngineIndex(Number(e.target.value));
+    };
+    $[1] = t1;
+  } else {
+    t1 = $[1];
+  }
+  var handleEngineChange = t1;
+  var t2;
+  if ($[2] !== currentEngine.aiUrl || $[3] !== currentEngine.url || $[4] !== query) {
+    t2 = function t2(e_0, type) {
       e_0.preventDefault();
       if (!query) {
         return;
@@ -69,28 +77,28 @@ var App = function App() {
       var finalUrl = urlTemplate.replace("%s", encodeURIComponent(query));
       window.open(finalUrl, "_blank");
     };
-    $[1] = currentEngine.aiUrl;
-    $[2] = currentEngine.url;
-    $[3] = query;
-    $[4] = t1;
-  } else {
-    t1 = $[4];
-  }
-  var handleSearch = t1;
-  var handleTitleClick = _temp;
-  var getFaviconSrc = _temp2;
-  var t2;
-  if ($[5] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t2 = /*#__PURE__*/_jsx("div", {
-      className: "glow"
-    });
+    $[2] = currentEngine.aiUrl;
+    $[3] = currentEngine.url;
+    $[4] = query;
     $[5] = t2;
   } else {
     t2 = $[5];
   }
+  var handleSearch = t2;
+  var handleTitleClick = _temp3;
+  var getFaviconSrc = _temp4;
   var t3;
   if ($[6] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t3 = /*#__PURE__*/_jsx("h1", {
+    t3 = /*#__PURE__*/_jsx("div", {
+      className: "glow"
+    });
+    $[6] = t3;
+  } else {
+    t3 = $[6];
+  }
+  var t4;
+  if ($[7] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t4 = /*#__PURE__*/_jsx("h1", {
       className: "hero-title",
       onClick: handleTitleClick,
       onKeyDown: function onKeyDown(e_1) {
@@ -103,66 +111,66 @@ var App = function App() {
       title: "Enter Developer Mode",
       children: "BlackICE Portal"
     });
-    $[6] = t3;
-  } else {
-    t3 = $[6];
-  }
-  var t4;
-  if ($[7] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t4 = /*#__PURE__*/_jsxs("p", {
-      children: ["The operating system for your web productivity.", /*#__PURE__*/_jsx("br", {}), "Seamlessly integrated AI, Utilities, and Workspace tools."]
-    });
     $[7] = t4;
   } else {
     t4 = $[7];
   }
   var t5;
-  if ($[8] !== handleSearch) {
-    t5 = function t5(e_2) {
-      return handleSearch(e_2, "standard");
-    };
-    $[8] = handleSearch;
-    $[9] = t5;
+  if ($[8] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t5 = /*#__PURE__*/_jsxs("p", {
+      children: ["The operating system for your web productivity.", /*#__PURE__*/_jsx("br", {}), "Seamlessly integrated AI, Utilities, and Workspace tools."]
+    });
+    $[8] = t5;
   } else {
-    t5 = $[9];
+    t5 = $[8];
   }
   var t6;
-  if ($[10] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t6 = ENGINES.map(_temp3);
+  if ($[9] !== handleSearch) {
+    t6 = function t6(e_2) {
+      return handleSearch(e_2, "standard");
+    };
+    $[9] = handleSearch;
     $[10] = t6;
   } else {
     t6 = $[10];
   }
   var t7;
-  if ($[11] !== engineIndex) {
-    t7 = /*#__PURE__*/_jsx("select", {
+  if ($[11] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t7 = ENGINES.map(_temp5);
+    $[11] = t7;
+  } else {
+    t7 = $[11];
+  }
+  var t8;
+  if ($[12] !== engineIndex) {
+    t8 = /*#__PURE__*/_jsx("select", {
       className: "engine-select",
       value: engineIndex,
       onChange: handleEngineChange,
-      children: t6
+      children: t7
     });
-    $[11] = engineIndex;
-    $[12] = t7;
+    $[12] = engineIndex;
+    $[13] = t8;
   } else {
-    t7 = $[12];
+    t8 = $[13];
   }
-  var t8 = getFaviconSrc(currentEngine.domain);
-  var t9;
-  if ($[13] !== currentEngine.name || $[14] !== t8) {
-    t9 = /*#__PURE__*/_jsx("img", {
+  var t9 = getFaviconSrc(currentEngine.domain);
+  var t10;
+  if ($[14] !== currentEngine.name || $[15] !== t9) {
+    t10 = /*#__PURE__*/_jsx("img", {
       className: "engine-icon",
-      src: t8,
+      src: t9,
       alt: currentEngine.name
     });
-    $[13] = currentEngine.name;
-    $[14] = t8;
+    $[14] = currentEngine.name;
     $[15] = t9;
+    $[16] = t10;
   } else {
-    t9 = $[15];
+    t10 = $[16];
   }
-  var t10;
-  if ($[16] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t10 = /*#__PURE__*/_jsx("svg", {
+  var t11;
+  if ($[17] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t11 = /*#__PURE__*/_jsx("svg", {
       className: "selector-arrow",
       viewBox: "0 0 24 24",
       fill: "none",
@@ -174,50 +182,50 @@ var App = function App() {
         points: "6 9 12 15 18 9"
       })
     });
-    $[16] = t10;
+    $[17] = t11;
   } else {
-    t10 = $[16];
-  }
-  var t11;
-  if ($[17] !== t7 || $[18] !== t9) {
-    t11 = /*#__PURE__*/_jsxs("div", {
-      className: "engine-selector",
-      children: [t7, t9, t10]
-    });
-    $[17] = t7;
-    $[18] = t9;
-    $[19] = t11;
-  } else {
-    t11 = $[19];
+    t11 = $[17];
   }
   var t12;
-  if ($[20] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t12 = function t12(e_3) {
-      return setQuery(e_3.target.value);
-    };
+  if ($[18] !== t10 || $[19] !== t8) {
+    t12 = /*#__PURE__*/_jsxs("div", {
+      className: "engine-selector",
+      children: [t8, t10, t11]
+    });
+    $[18] = t10;
+    $[19] = t8;
     $[20] = t12;
   } else {
     t12 = $[20];
   }
   var t13;
-  if ($[21] !== query) {
-    t13 = /*#__PURE__*/_jsx("input", {
+  if ($[21] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t13 = function t13(e_3) {
+      return setQuery(e_3.target.value);
+    };
+    $[21] = t13;
+  } else {
+    t13 = $[21];
+  }
+  var t14;
+  if ($[22] !== query) {
+    t14 = /*#__PURE__*/_jsx("input", {
       type: "text",
       className: "search-input",
       placeholder: "Search the web...",
       value: query,
-      onChange: t12,
+      onChange: t13,
       autoComplete: "off",
       required: true
     });
-    $[21] = query;
-    $[22] = t13;
+    $[22] = query;
+    $[23] = t14;
   } else {
-    t13 = $[22];
+    t14 = $[23];
   }
-  var t14;
-  if ($[23] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t14 = /*#__PURE__*/_jsx("button", {
+  var t15;
+  if ($[24] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t15 = /*#__PURE__*/_jsx("button", {
       type: "submit",
       className: "search-btn",
       title: "Standard Search",
@@ -242,13 +250,13 @@ var App = function App() {
         })]
       })
     });
-    $[23] = t14;
+    $[24] = t15;
   } else {
-    t14 = $[23];
+    t15 = $[24];
   }
-  var t15;
-  if ($[24] !== currentEngine.aiUrl || $[25] !== handleSearch) {
-    t15 = currentEngine.aiUrl && /*#__PURE__*/_jsx("button", {
+  var t16;
+  if ($[25] !== currentEngine.aiUrl || $[26] !== handleSearch) {
+    t16 = currentEngine.aiUrl && /*#__PURE__*/_jsx("button", {
       type: "button",
       className: "search-btn ai-btn",
       title: "AI Search / Chat",
@@ -269,84 +277,70 @@ var App = function App() {
         })
       })
     });
-    $[24] = currentEngine.aiUrl;
-    $[25] = handleSearch;
-    $[26] = t15;
+    $[25] = currentEngine.aiUrl;
+    $[26] = handleSearch;
+    $[27] = t16;
   } else {
-    t15 = $[26];
-  }
-  var t16;
-  if ($[27] !== t15) {
-    t16 = /*#__PURE__*/_jsxs("div", {
-      className: "search-actions",
-      children: [t14, t15]
-    });
-    $[27] = t15;
-    $[28] = t16;
-  } else {
-    t16 = $[28];
+    t16 = $[27];
   }
   var t17;
-  if ($[29] !== t11 || $[30] !== t13 || $[31] !== t16 || $[32] !== t5) {
-    t17 = /*#__PURE__*/_jsx("div", {
+  if ($[28] !== t16) {
+    t17 = /*#__PURE__*/_jsxs("div", {
+      className: "search-actions",
+      children: [t15, t16]
+    });
+    $[28] = t16;
+    $[29] = t17;
+  } else {
+    t17 = $[29];
+  }
+  var t18;
+  if ($[30] !== t12 || $[31] !== t14 || $[32] !== t17 || $[33] !== t6) {
+    t18 = /*#__PURE__*/_jsx("div", {
       className: "search-wrapper",
       children: /*#__PURE__*/_jsxs("form", {
         className: "search-bar",
-        onSubmit: t5,
-        children: [t11, t13, t16]
+        onSubmit: t6,
+        children: [t12, t14, t17]
       })
     });
-    $[29] = t11;
-    $[30] = t13;
-    $[31] = t16;
-    $[32] = t5;
-    $[33] = t17;
+    $[30] = t12;
+    $[31] = t14;
+    $[32] = t17;
+    $[33] = t6;
+    $[34] = t18;
   } else {
-    t17 = $[33];
+    t18 = $[34];
   }
-  var t18;
-  if ($[34] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t18 = /*#__PURE__*/_jsx("div", {
+  var t19;
+  if ($[35] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t19 = /*#__PURE__*/_jsx("div", {
       className: "hint-wrap",
       children: /*#__PURE__*/_jsx("div", {
         className: "hint-text",
         children: "Click the button toggle at left bottom to open projects"
       })
     });
-    $[34] = t18;
+    $[35] = t19;
   } else {
-    t18 = $[34];
-  }
-  var t19;
-  if ($[35] !== t17) {
-    t19 = /*#__PURE__*/_jsxs("main", {
-      className: "hero-section",
-      children: [t3, t4, t17, t18]
-    });
-    $[35] = t17;
-    $[36] = t19;
-  } else {
-    t19 = $[36];
+    t19 = $[35];
   }
   var t20;
-  if ($[37] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t20 = /*#__PURE__*/_jsx("span", {
-      className: "section-title",
-      children: "System Capabilities"
+  if ($[36] !== t18) {
+    t20 = /*#__PURE__*/_jsxs("main", {
+      className: "hero-section",
+      children: [t4, t5, t18, t19]
     });
+    $[36] = t18;
     $[37] = t20;
   } else {
     t20 = $[37];
   }
   var t21;
   if ($[38] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t21 = /*#__PURE__*/_jsxs("div", {
-      className: "feature-item",
-      children: [/*#__PURE__*/_jsx("h3", {
-        children: "AI Core"
-      }), /*#__PURE__*/_jsx("p", {
-        children: "Focus enhancement, health tracking, and automated intelligence workflows."
-      })]
+    t21 = /*#__PURE__*/_jsx("span", {
+      className: "section-title",
+      children: "System Capabilities"
     });
     $[38] = t21;
   } else {
@@ -357,9 +351,9 @@ var App = function App() {
     t22 = /*#__PURE__*/_jsxs("div", {
       className: "feature-item",
       children: [/*#__PURE__*/_jsx("h3", {
-        children: "Productivity"
+        children: "AI Core"
       }), /*#__PURE__*/_jsx("p", {
-        children: "Task management, habit tracking, and advanced planning systems."
+        children: "Focus enhancement, health tracking, and automated intelligence workflows."
       })]
     });
     $[39] = t22;
@@ -371,9 +365,9 @@ var App = function App() {
     t23 = /*#__PURE__*/_jsxs("div", {
       className: "feature-item",
       children: [/*#__PURE__*/_jsx("h3", {
-        children: "Creation"
+        children: "Productivity"
       }), /*#__PURE__*/_jsx("p", {
-        children: "Docs, slides, whiteboards, and mind maps in one unified interface."
+        children: "Task management, habit tracking, and advanced planning systems."
       })]
     });
     $[40] = t23;
@@ -383,14 +377,11 @@ var App = function App() {
   var t24;
   if ($[41] === Symbol["for"]("react.memo_cache_sentinel")) {
     t24 = /*#__PURE__*/_jsxs("div", {
-      className: "features-grid",
-      children: [t21, t22, t23, /*#__PURE__*/_jsxs("div", {
-        className: "feature-item",
-        children: [/*#__PURE__*/_jsx("h3", {
-          children: "Dev Tools"
-        }), /*#__PURE__*/_jsx("p", {
-          children: "HTML viewers, Git utilities, and minimal developer environments."
-        })]
+      className: "feature-item",
+      children: [/*#__PURE__*/_jsx("h3", {
+        children: "Creation"
+      }), /*#__PURE__*/_jsx("p", {
+        children: "Docs, slides, whiteboards, and mind maps in one unified interface."
       })]
     });
     $[41] = t24;
@@ -399,14 +390,14 @@ var App = function App() {
   }
   var t25;
   if ($[42] === Symbol["for"]("react.memo_cache_sentinel")) {
-    t25 = /*#__PURE__*/_jsxs("section", {
-      className: "glass-card",
-      children: [t20, t24, /*#__PURE__*/_jsxs("div", {
-        className: "sr-only",
-        children: [/*#__PURE__*/_jsx("h2", {
-          children: "All-in-One Web Tools & AI Utilities Platform"
+    t25 = /*#__PURE__*/_jsxs("div", {
+      className: "features-grid",
+      children: [t22, t23, t24, /*#__PURE__*/_jsxs("div", {
+        className: "feature-item",
+        children: [/*#__PURE__*/_jsx("h3", {
+          children: "Dev Tools"
         }), /*#__PURE__*/_jsx("p", {
-          children: "BlackICE Portal is a browser-based platform combining AI-powered tools, productivity apps, developer utilities, document creation systems, media tools, and real-time collaboration in a single minimal interface."
+          children: "HTML viewers, Git utilities, and minimal developer environments."
         })]
       })]
     });
@@ -415,29 +406,61 @@ var App = function App() {
     t25 = $[42];
   }
   var t26;
-  if ($[43] !== t19) {
-    t26 = /*#__PURE__*/_jsxs("div", {
-      className: "app",
-      children: [t2, /*#__PURE__*/_jsxs("div", {
-        className: "main-container",
-        children: [t19, t25]
+  if ($[43] === Symbol["for"]("react.memo_cache_sentinel")) {
+    t26 = /*#__PURE__*/_jsxs("section", {
+      className: "glass-card",
+      children: [t21, t25, /*#__PURE__*/_jsxs("div", {
+        className: "sr-only",
+        children: [/*#__PURE__*/_jsx("h2", {
+          children: "All-in-One Web Tools & AI Utilities Platform"
+        }), /*#__PURE__*/_jsx("p", {
+          children: "BlackICE Portal is a browser-based platform combining AI-powered tools, productivity apps, developer utilities, document creation systems, media tools, and real-time collaboration in a single minimal interface."
+        })]
       })]
     });
-    $[43] = t19;
-    $[44] = t26;
+    $[43] = t26;
   } else {
-    t26 = $[44];
+    t26 = $[43];
   }
-  return t26;
+  var t27;
+  if ($[44] !== t20) {
+    t27 = /*#__PURE__*/_jsxs("div", {
+      className: "app",
+      children: [t3, /*#__PURE__*/_jsxs("div", {
+        className: "main-container",
+        children: [t20, t26]
+      })]
+    });
+    $[44] = t20;
+    $[45] = t27;
+  } else {
+    t27 = $[45];
+  }
+  return t27;
 };
 export default App;
-function _temp() {
+function _temp(src, id) {
+  if (document.getElementById(id)) {
+    return;
+  }
+  var script = document.createElement("script");
+  script.src = src;
+  script.id = id;
+  script.async = true;
+  document.body.appendChild(script);
+}
+function _temp2() {
+  var loadScript = _temp;
+  loadScript("https://blackice-ac.vercel.app/test/portal.js", "portal-js");
+  loadScript("https://blackice-ac.vercel.app/test/darky.js", "darky-js");
+}
+function _temp3() {
   window.open("/test/dev.html", "_blank");
 }
-function _temp2(domain) {
+function _temp4(domain) {
   return "https://www.google.com/s2/favicons?domain=".concat(domain, "&sz=32");
 }
-function _temp3(eng, idx) {
+function _temp5(eng, idx) {
   return /*#__PURE__*/_jsx("option", {
     value: idx,
     children: eng.name
