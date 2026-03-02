@@ -1,100 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Untitled Project</title><meta name="title" content="Untitled Project"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./style.css"><script src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" async=""></script><script type="importmap">{
-  "imports": {}
+  "imports": {
+    "react/compiler-runtime": "https://esm.sh/react/compiler-runtime?external=react,react-dom",
+    "react": "https://esm.sh/react",
+    "react-dom/client": "https://esm.sh/react-dom/client?external=react,react-dom",
+    "react/jsx-runtime": "https://esm.sh/react/jsx-runtime?external=react,react-dom",
+    "react/": "https://esm.sh/react/",
+    "react-dom": "https://esm.sh/react-dom",
+    "react-dom/": "https://esm.sh/react-dom/"
+  }
 }</script></head><body>
 
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tailwind JS Page</title>
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Optional: Custom Tailwind Config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            accent: "#111111"
-          }
-        }
-      }
-    }
-  </script>
-
-
-
-  <!-- Navbar -->
-  <header class="border-b border-gray-200">
-    <nav class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold tracking-tight">MySite</h1>
-      <div class="space-x-6 text-sm font-medium">
-        <a href="#" class="hover:underline">Home</a>
-        <a href="#" class="hover:underline">About</a>
-        <a href="#" class="hover:underline">Contact</a>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="max-w-6xl mx-auto px-6 py-20 text-center">
-    <h2 class="text-4xl font-bold tracking-tight mb-6">
-      Build Fast Websites with Tailwind
-    </h2>
-    <p class="text-gray-600 max-w-xl mx-auto mb-8">
-      A minimal starter template using Tailwind CDN + Vanilla JavaScript.
-      No frameworks. No build tools. Just pure speed.
-    </p>
-
-    <button id="actionBtn" class="px-6 py-3 bg-black text-white rounded-lg hover:opacity-80 transition">
-      Click Me
-    </button>
-
-    <p id="message" class="mt-6 text-lg font-medium"></p>
-  </section>
-
-  <!-- Features -->
-  <section class="bg-gray-50 py-16">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10">
-      <div class="p-6 border rounded-xl bg-white">
-        <h3 class="font-semibold mb-2">Fast</h3>
-        <p class="text-sm text-gray-600">
-          Loads instantly using CDN without any build step.
-        </p>
-      </div>
-      <div class="p-6 border rounded-xl bg-white">
-        <h3 class="font-semibold mb-2">Simple</h3>
-        <p class="text-sm text-gray-600">
-          Clean structure using pure HTML + Tailwind utility classes.
-        </p>
-      </div>
-      <div class="p-6 border rounded-xl bg-white">
-        <h3 class="font-semibold mb-2">Flexible</h3>
-        <p class="text-sm text-gray-600">
-          Easily add JavaScript for interactivity without frameworks.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="text-center py-10 text-sm text-gray-500">
-    © 2026 MySite. Built with Tailwind + JS.
-  </footer>
-
-  <!-- Vanilla JavaScript -->
-  <script>
-    const btn = document.getElementById("actionBtn");
-    const message = document.getElementById("message");
-
-    btn.addEventListener("click", () => {
-      message.textContent = "🚀 Tailwind + JavaScript is working!";
-      message.classList.add("text-green-600");
-    });
-  </script>
-
-
-<script src="./script.js"></script></body></html>
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Landing Page</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  
+  
+    <div id="root"></div>
+  
+<script src="./script.js" type="module"></script></body></html>
