@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<title>MediaPipe Face & Hand Detection | Real-Time AI Vision Demo</title>
+<meta name="title" content="MediaPipe Face & Hand Detection | Real-Time AI Vision Demo">
+<meta name="description" content="Real-time face mesh and hand landmark detection using MediaPipe Tasks Vision. Optimized for low-power devices with GPU/CPU support. Runs fully in the browser.">
+<meta name="keywords" content="MediaPipe, Face Detection, Hand Tracking, Face Mesh, AI Vision, Computer Vision, JavaScript AI, Web AI, Real Time Detection">
+<meta name="author" content="Subhankar Das">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0f14">
+
+<!-- Viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Open Graph / Facebook -->
+<meta property="og:description" content="Real-time browser-based face mesh & hand tracking powered by MediaPipe. No backend required.">
+<!-- Twitter -->
+<meta name="twitter:title" content="MediaPipe Face & Hand Detection">
+<meta name="twitter:description" content="Real-time face and hand landmark detection using MediaPipe Tasks Vision. Fully client-side AI.">
+<!-- Performance & SEO hints -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://storage.googleapis.com">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="https://storage.googleapis.com">
+
+<style>
+    :root { font-family: system-ui, Arial, sans-serif; }
+    body { margin: 16px; background:#0b0f14; color:#e8eef6; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    button, select, input { font: inherit; }
+    button { padding:10px 12px; border-radius:10px; border:1px solid #2a3645; background:#111a24; color:#e8eef6; cursor:pointer; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    label { display:flex; gap:8px; align-items:center; }
+    .card { border:1px solid #243245; border-radius:14px; padding:12px; background:#0f1620; }
+    .stage { position:relative; width:min(900px, 100%); aspect-ratio: 16/9; background:#05070a; border-radius:14px; overflow:hidden; }
+    video, canvas { position:absolute; inset:0; width:100%; height:100%; }
+    .meta { opacity:.9; font-size:14px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, monospace; }
+    .error { background:#3d1212; border:1px solid #8b2e2e; color:#ffb3b3; padding:12px; border-radius:10px; margin-top:12px; display:none; }
+    .stats { display:flex; gap:12px; flex-wrap:wrap; margin-top:10px; }
+    .pill { padding:8px 10px; background:#111a24; border:1px solid #2a3645; border-radius:999px; }
+  </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MediaPipe Face & Hand Detection",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "description": "Real-time face mesh and hand landmark detection using MediaPipe Tasks Vision.",
+  "author": {
+    "@type": "Person",
+    "name": "Subhankar Das"
+  }
+}
+</script>
+
+</head>
+<body><h1 style="display:none;">MediaPipe Face and Hand Detection Demo</h1>
+
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div class="row">
+        <button id="startBtn">Start</button>
+        <button id="stopBtn" disabled>Stop</button>
+
+        <label>
+          Mode:
+          <select id="modeSel">
+            <option value="face" selected>Face</option>
+            <option value="hand">Hand</option>
+            <option value="both">Both</option>
+          </select>
+        </label>
+
+        <label title="Low-end devices: lower resolution + skip frames">
+          <input id="lowPower" type="checkbox" />
+          Low-power
+        </label>
+
+        <label>
+          Delegate:
+          <select id="delegateSel">
+            <option value="GPU" selected>GPU</option>
+            <option value="CPU">CPU</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="meta">
+        <span class="mono">Status:</span> <span id="statusOut">Idle</span>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <label>
+        Face mesh
+        <input id="drawFaceMesh" type="checkbox" checked />
+      </label>
+      <label>
+        Hand landmarks
+        <input id="drawHands" type="checkbox" checked />
+      </label>
+    </div>
+
+    <div class="stats">
+      <div class="pill"><span class="mono">Faces:</span> <span id="facesOut">0</span></div>
+      <div class="pill"><span class="mono">Hands:</span> <span id="handsOut">0</span></div>
+      <div class="pill"><span class="mono">FPS:</span> <span id="fpsOut">0</span></div>
+    </div>
+  </div>
+
+  <div class="stage card" style="margin-top:12px;">
+    <video id="video" playsinline autoplay muted></video>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div id="errorBox" class="error"></div>
+
+  <script type="module">
+    import { FaceLandmarker, HandLandmarker, FilesetResolver, DrawingUtils } from
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+    // Float16 models (smaller/faster than float32 generally)
+    const FACE_MODEL_URL =
+      "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+    const HAND_MODEL_URL =
+      "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+
+    const WASM_ROOT =
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const modeSel = document.getElementById("modeSel");
+    const lowPower = document.getElementById("lowPower");
+    const delegateSel = document.getElementById("delegateSel");
+
+    const drawFaceMesh = document.getElementById("drawFaceMesh");
+    const drawHands = document.getElementById("drawHands");
+
+    const facesOut = document.getElementById("facesOut");
+    const handsOut = document.getElementById("handsOut");
+    const fpsOut = document.getElementById("fpsOut");
+    const statusOut = document.getElementById("statusOut");
+    const errorBox = document.getElementById("errorBox");
+
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let stream = null;
+    let rafId = null;
+
+    // Lazy-loaded MP objects
+    let visionFileset = null;
+    let drawingUtils = null;
+    let faceLandmarker = null;
+    let handLandmarker = null;
+
+    // FPS
+    let lastFpsTime = performance.now();
+    let frames = 0;
+
+    function setStatus(t) { statusOut.textContent = t; }
+    function showError(msg) { errorBox.textContent = msg; errorBox.style.display = "block"; console.error(msg); }
+    function hideError() { errorBox.style.display = "none"; }
+
+    function resizeCanvasToVideo() {
+      const w = video.videoWidth || 1280;
+      const h = video.videoHeight || 720;
+      if (canvas.width !== w) canvas.width = w;
+      if (canvas.height !== h) canvas.height = h;
+    }
+
+    function updateFps() {
+      frames++;
+      const now = performance.now();
+      const dt = now - lastFpsTime;
+      if (dt >= 500) {
+        fpsOut.textContent = String(Math.round((frames * 1000) / dt));
+        frames = 0;
+        lastFpsTime = now;
+      }
+    }
+
+    async function ensureVision() {
+      if (visionFileset) return;
+      visionFileset = await FilesetResolver.forVisionTasks(WASM_ROOT);
+    }
+
+    async function ensureFaceLandmarker() {
+      if (faceLandmarker) return;
+      await ensureVision();
+      faceLandmarker = await FaceLandmarker.createFromOptions(visionFileset, {
+        baseOptions: { modelAssetPath: FACE_MODEL_URL, delegate: delegateSel.value },
+        runningMode: "VIDEO",
+        numFaces: 1,
+        // Keep these OFF for low devices (they are optional per docs)
+        outputFaceBlendshapes: false,
+        outputFacialTransformationMatrixes: false,
+        minFaceDetectionConfidence: 0.5,
+        minFacePresenceConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+    }
+
+    async function ensureHandLandmarker() {
+      if (handLandmarker) return;
+      await ensureVision();
+      handLandmarker = await HandLandmarker.createFromOptions(visionFileset, {
+        baseOptions: { modelAssetPath: HAND_MODEL_URL, delegate: delegateSel.value },
+        runningMode: "VIDEO",
+        numHands: 2,
+        minHandDetectionConfidence: 0.5,
+        minHandPresenceConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+    }
+
+    function drawFace(result) {
+      const faces = result?.faceLandmarks || [];
+      facesOut.textContent = String(faces.length);
+
+      if (!drawFaceMesh.checked) return;
+
+      for (const face of faces) {
+        // Full mesh is heavier; in low-power, draw only outline
+        if (!lowPower.checked) {
+          drawingUtils.drawConnectors(
+            face,
+            FaceLandmarker.FACE_LANDMARKS_TESSELATION,
+            { color: "#69b7ff40", lineWidth: 1 }
+          );
+        }
+        drawingUtils.drawConnectors(
+          face,
+          FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
+          { color: "#7dffb2", lineWidth: 2 }
+        );
+      }
+    }
+
+    function drawHand(result) {
+      const hands = result?.landmarks || [];
+      handsOut.textContent = String(hands.length);
+
+      if (!drawHands.checked) return;
+
+      for (let i = 0; i < hands.length; i++) {
+        const hand = hands[i];
+        drawingUtils.drawConnectors(hand, HandLandmarker.HAND_CONNECTIONS, { color: "#ff8800", lineWidth: 3 });
+        drawingUtils.drawLandmarks(hand, { color: "#ff8800", radius: 3 });
+      }
+    }
+
+    let tick = 0;
+    function loop() {
+      resizeCanvasToVideo();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Low-power: run inference every N frames
+      const skip = lowPower.checked ? 2 : 1; // increase if still slow (e.g., 3 or 4)
+      const doInfer = (tick++ % skip) === 0;
+
+      if (doInfer) {
+        const nowMs = performance.now();
+        if (modeSel.value === "face" || modeSel.value === "both") {
+          const faceRes = faceLandmarker.detectForVideo(video, nowMs);
+          drawFace(faceRes);
+        } else {
+          facesOut.textContent = "0";
+        }
+
+        if (modeSel.value === "hand" || modeSel.value === "both") {
+          const handRes = handLandmarker.detectForVideo(video, nowMs);
+          drawHand(handRes);
+        } else {
+          handsOut.textContent = "0";
+        }
+      }
+
+      updateFps();
+      rafId = requestAnimationFrame(loop);
+    }
+
+    async function start() {
+      hideError();
+      try {
+        setStatus("Requesting camera…");
+
+        // Low-power camera constraints
+        const constraints = lowPower.checked
+          ? { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 360 } }, audio: false }
+          : { video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
+
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        await video.play();
+
+        resizeCanvasToVideo();
+        drawingUtils = new DrawingUtils(ctx);
+
+        // In low-power, CPU can be more compatible; keep user choice though
+        setStatus("Loading selected model(s)…");
+
+        // Lazy-load ONLY what user picked
+        if (modeSel.value === "face" || modeSel.value === "both") await ensureFaceLandmarker();
+        if (modeSel.value === "hand" || modeSel.value === "both") await ensureHandLandmarker();
+
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        modeSel.disabled = true;
+        lowPower.disabled = true;
+        delegateSel.disabled = true;
+
+        setStatus("Running");
+        loop();
+      } catch (e) {
+        showError("Error: " + (e?.message || e));
+        setStatus("Failed");
+        stop();
+      }
+    }
+
+    function stop() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      stream = null;
+      video.srcObject = null;
+
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      modeSel.disabled = false;
+      lowPower.disabled = false;
+      delegateSel.disabled = false;
+
+      facesOut.textContent = "0";
+      handsOut.textContent = "0";
+      fpsOut.textContent = "0";
+      setStatus("Stopped");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // If user changes mode/settings, we keep already-downloaded models (browser cache helps),
+    // but you can force re-init by clearing the objects:
+    function resetModels() {
+      faceLandmarker = null;
+      handLandmarker = null;
+    }
+    modeSel.addEventListener("change", resetModels);
+    delegateSel.addEventListener("change", resetModels);
+
+    startBtn.addEventListener("click", start);
+    stopBtn.addEventListener("click", stop);
+  </script>
+</body>
+</html>
