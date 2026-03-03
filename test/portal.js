@@ -553,8 +553,9 @@
                         (site.title || '').toLowerCase() === decodedParam.toLowerCase()
                     );
                     if (project) {
-                        // UPDATED LOGIC: Use the raw URL from the database directly
-                        this.openProject(project.url, project.title);
+                        let finalUrl = project.url;
+                        try { const u = new URL(project.url); finalUrl = window.location.origin + u.pathname; } catch(e) {}
+                        this.openProject(finalUrl, project.title);
                     }
                 }
             }
@@ -588,9 +589,8 @@
 
                 const createCard = (p, isPinned) => {
                     const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(p.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
-                    
-                    // UPDATED LOGIC: Use the raw URL from the database directly
                     let finalUrl = p.url;
+                    try { const u = new URL(p.url); finalUrl = window.location.origin + u.pathname; } catch(e) {}
 
                     const el = document.createElement('div');
                     el.className = `bi-card ${isPinned ? 'pinned' : ''}`;
@@ -803,4 +803,4 @@
   s.src = "https://blackice-ac.vercel.app/test/tracking.js";
   s.defer = true;
   document.head.appendChild(s);
-})();
+})();  
