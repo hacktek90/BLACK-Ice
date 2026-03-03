@@ -1,61 +1,91 @@
 /* Analyzed bindings: {
-  "h": "setup-const",
-  "Fragment": "setup-const",
   "ref": "setup-const",
-  "props": "setup-reactive-const",
-  "count": "setup-ref",
-  "align": "literal-const",
-  "Greeting": "setup-const",
-  "name": "props"
+  "isMobileMenuOpen": "setup-ref",
+  "toggleMobileMenu": "setup-const"
 } */
-import { useCssVars as _useCssVars, defineComponent as _defineComponent } from 'vue';
-import { createVNode as _createVNode, createElementVNode as _createElementVNode, toDisplayString as _toDisplayString, openBlock as _openBlock, createElementBlock as _createElementBlock } from "vue";
-const _hoisted_1 = { class: "container" };
-import { h } from "vue";
-import { ref } from 'vue';
-const align = 'center';
-// define inline component
-const __sfc__ = /*@__PURE__*/ _defineComponent({
-    __name: 'Component',
-    props: {
-        name: { type: String, required: false }
-    },
-    setup(__props) {
-        _useCssVars(_ctx => ({
-            "e3c34c9c-align": (align)
-        }));
-        const props = __props;
-        const count = ref(0);
-        function Greeting(props) {
-            return h("h1", null,
-                "Hello, ",
-                props.name || 'World',
-                "!");
-        }
-        return (_ctx, _cache) => {
-            return (_openBlock(), _createElementBlock("div", _hoisted_1, [
-                _createVNode(Greeting, {
-                    name: props.name
-                }, null, 8 /* PROPS */, ["name"]),
-                _cache[1] || (_cache[1] = _createElementVNode("img", {
-                    class: "logo",
-                    alt: "logo",
-                    src: "https://livecodes.io/livecodes/assets/templates/vue.svg"
-                }, null, -1 /* CACHED */)),
-                _createElementVNode("p", null, "You clicked " + _toDisplayString(count.value) + " times.", 1 /* TEXT */),
-                _createElementVNode("button", {
-                    onClick: _cache[0] || (_cache[0] = ($event) => (count.value++))
-                }, "Click me")
-            ]));
-        };
-    }
-});
+import { createCommentVNode as _createCommentVNode, createElementVNode as _createElementVNode, createTextVNode as _createTextVNode, normalizeClass as _normalizeClass, openBlock as _openBlock, createElementBlock as _createElementBlock, createStaticVNode as _createStaticVNode } from "vue"
 
-__sfc__.__scopeId = "data-v-e3c34c9c";
+const _hoisted_1 = { class: "app-container" }
+const _hoisted_2 = { class: "navbar" }
+const _hoisted_3 = { class: "container nav-content" }
+const _hoisted_4 = { class: "nav-actions" }
+const _hoisted_5 = { key: 0 }
+const _hoisted_6 = { key: 1 }
+
+import { ref } from 'vue';
+
+
+const __sfc__ = {
+  __name: 'Component',
+  setup(__props) {
+
+const isMobileMenuOpen = ref(false);
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+return (_ctx, _cache) => {
+  return (_openBlock(), _createElementBlock("div", _hoisted_1, [
+    _createCommentVNode(" Navigation "),
+    _createElementVNode("nav", _hoisted_2, [
+      _createElementVNode("div", _hoisted_3, [
+        _cache[3] || (_cache[3] = _createElementVNode("div", { class: "logo" }, [
+          _createElementVNode("span", { class: "logo-icon" }, "❖"),
+          _createTextVNode(" NeuralFlow ")
+        ], -1 /* CACHED */)),
+        _createElementVNode("div", {
+          class: _normalizeClass(["nav-links", { active: isMobileMenuOpen.value }])
+        }, [...(_cache[0] || (_cache[0] = [
+          _createElementVNode("a", { href: "#features" }, "Features", -1 /* CACHED */),
+          _createElementVNode("a", { href: "#solutions" }, "Solutions", -1 /* CACHED */),
+          _createElementVNode("a", { href: "#pricing" }, "Pricing", -1 /* CACHED */),
+          _createElementVNode("a", { href: "#about" }, "About", -1 /* CACHED */)
+        ]))], 2 /* CLASS */),
+        _createElementVNode("div", _hoisted_4, [
+          _cache[1] || (_cache[1] = _createElementVNode("button", { class: "btn-login" }, "Log In", -1 /* CACHED */)),
+          _cache[2] || (_cache[2] = _createElementVNode("button", { class: "btn-primary" }, "Get Started", -1 /* CACHED */)),
+          _createElementVNode("button", {
+            class: "mobile-menu-btn",
+            onClick: toggleMobileMenu
+          }, [
+            (!isMobileMenuOpen.value)
+              ? (_openBlock(), _createElementBlock("span", _hoisted_5, "☰"))
+              : (_openBlock(), _createElementBlock("span", _hoisted_6, "✕"))
+          ])
+        ])
+      ])
+    ]),
+    _createCommentVNode(" Hero Section "),
+    _cache[4] || (_cache[4] = _createStaticVNode("<header class=\"hero\"><div class=\"container hero-content\"><div class=\"hero-text\"><div class=\"badge\">AI-Powered Revolution</div><h1>Scale Your Intelligence with <span class=\"gradient-text\">Neural Networks</span></h1><p>Unlock the potential of your data with our next-generation generative AI models. Automate workflows, generate insights, and build the future today.</p><div class=\"hero-buttons\"><button class=\"btn-primary btn-large\">Start Free Trial</button><button class=\"btn-secondary btn-large\">Watch Demo</button></div><div class=\"stats\"><div><strong>10k+</strong> <span>Developers</span></div><div><strong>99.9%</strong> <span>Uptime</span></div><div><strong>500M+</strong> <span>Predictions</span></div></div></div><div class=\"hero-visual\"><div class=\"orb orb-1\"></div><div class=\"orb orb-2\"></div><div class=\"card glass-panel\"><div class=\"code-block\"><span class=\"keyword\">const</span> response = <span class=\"keyword\">await</span> neuralFlow.<span class=\"function\">generate</span>({<br>   model: <span class=\"string\">&#39;nf-v4-turbo&#39;</span>,<br>   prompt: <span class=\"string\">&quot;Analyze market trends...&quot;</span><br> });<br><br><span class=\"comment\">// Output: High precision insights</span></div></div></div></div></header>", 1)),
+    _createCommentVNode(" Trusted By "),
+    _cache[5] || (_cache[5] = _createElementVNode("section", { class: "trusted-by" }, [
+      _createElementVNode("div", { class: "container" }, [
+        _createElementVNode("p", null, "Trusted by innovative teams at"),
+        _createElementVNode("div", { class: "logos" }, [
+          _createElementVNode("span", null, "ACME Corp"),
+          _createElementVNode("span", null, "GlobalTech"),
+          _createElementVNode("span", null, "Nebula"),
+          _createElementVNode("span", null, "Vertex"),
+          _createElementVNode("span", null, "QuantumSoft")
+        ])
+      ])
+    ], -1 /* CACHED */)),
+    _createCommentVNode(" Features "),
+    _cache[6] || (_cache[6] = _createStaticVNode("<section id=\"features\" class=\"features\"><div class=\"container\"><div class=\"section-header\"><h2>Why Choose NeuralFlow?</h2><p>Designed for developers, optimized for performance.</p></div><div class=\"grid\"><div class=\"feature-card\"><div class=\"icon-box\">⚡</div><h3>Lightning Fast</h3><p>Sub-second latency with our globally distributed edge network optimized for inference.</p></div><div class=\"feature-card\"><div class=\"icon-box\">🧠</div><h3>Deep Learning</h3><p>Pre-trained models that understand context, nuance, and complex patterns in your data.</p></div><div class=\"feature-card\"><div class=\"icon-box\">🔒</div><h3>Enterprise Security</h3><p>SOC2 compliant with end-to-end encryption. Your data stays yours.</p></div><div class=\"feature-card\"><div class=\"icon-box\">🛠</div><h3>Easy Integration</h3><p>Simple REST APIs and SDKs for Python, Node.js, and Go. Get running in minutes.</p></div><div class=\"feature-card\"><div class=\"icon-box\">📊</div><h3>Real-time Analytics</h3><p>Monitor token usage, costs, and performance through our unified dashboard.</p></div><div class=\"feature-card\"><div class=\"icon-box\">🌐</div><h3>Scalable</h3><p>From prototype to millions of users. Our infrastructure scales automatically with you.</p></div></div></div></section>", 1)),
+    _createCommentVNode(" Pricing "),
+    _cache[7] || (_cache[7] = _createStaticVNode("<section id=\"pricing\" class=\"pricing\"><div class=\"container\"><div class=\"section-header\"><h2>Simple, Transparent Pricing</h2><p>Start small and scale as you grow.</p></div><div class=\"pricing-grid\"><div class=\"pricing-card\"><h3>Starter</h3><div class=\"price\">$0<span>/mo</span></div><ul><li>5,000 tokens/mo</li><li>1 API Key</li><li>Community Support</li><li>Basic Models</li></ul><button class=\"btn-outline\">Get Started</button></div><div class=\"pricing-card featured\"><div class=\"popular-badge\">Most Popular</div><h3>Pro</h3><div class=\"price\">$49<span>/mo</span></div><ul><li>2M tokens/mo</li><li>Unlimited API Keys</li><li>Priority Email Support</li><li>Advanced Models (GPT-4 Level)</li><li>Fine-tuning access</li></ul><button class=\"btn-primary\">Start Free Trial</button></div><div class=\"pricing-card\"><h3>Enterprise</h3><div class=\"price\">Custom</div><ul><li>Unlimited tokens</li><li>Dedicated Instance</li><li>24/7 Phone Support</li><li>Custom Model Training</li><li>SLA Guarantee</li></ul><button class=\"btn-outline\">Contact Sales</button></div></div></div></section>", 1)),
+    _createCommentVNode(" Footer "),
+    _cache[8] || (_cache[8] = _createStaticVNode("<footer class=\"footer\"><div class=\"container footer-content\"><div class=\"footer-brand\"><div class=\"logo\"><span class=\"logo-icon\">❖</span> NeuralFlow</div><p>Building the brain for the next generation of applications.</p></div><div class=\"footer-links\"><div><h4>Product</h4><a href=\"#\">Features</a><a href=\"#\">Integrations</a><a href=\"#\">Documentation</a><a href=\"#\">Pricing</a></div><div><h4>Company</h4><a href=\"#\">About Us</a><a href=\"#\">Careers</a><a href=\"#\">Blog</a><a href=\"#\">Contact</a></div><div><h4>Legal</h4><a href=\"#\">Privacy Policy</a><a href=\"#\">Terms of Service</a><a href=\"#\">Security</a></div></div></div><div class=\"copyright\"><div class=\"container\"> © 2023 NeuralFlow AI Inc. All rights reserved. </div></div></footer>", 1))
+  ]))
+}
+}
+
+}
 __sfc__.__file = "Component.vue";
 export default __sfc__;
 
 document.head.insertBefore(
-  Object.assign(document.createElement('style'), { textContent: ".container[data-v-e3c34c9c],\n  .container button[data-v-e3c34c9c] {\n    text-align: var(--e3c34c9c-align);\n    font: 1em sans-serif;\n}\n.logo[data-v-e3c34c9c] {\n    width: 150px;\n}" }),
+  Object.assign(document.createElement('style'), { textContent: "/* CSS Variables & Reset */\n[data-v-e3c34c9c]:root {\n  --bg-color: #0a0a0f;\n  --card-bg: #13131f;\n  --primary: #6366f1;\n  --primary-hover: #4f46e5;\n  --accent: #a855f7;\n  --text-main: #ffffff;\n  --text-muted: #94a3b8;\n  --border: #27273a;\n  --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);\n}\n[data-v-e3c34c9c] {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n}\nbody[data-v-e3c34c9c] {\n  font-family: 'Inter', -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n  background-color: var(--bg-color);\n  color: var(--text-main);\n  line-height: 1.6;\n}\na[data-v-e3c34c9c] {\n  text-decoration: none;\n  color: inherit;\n  transition: color 0.3s ease;\n}\nul[data-v-e3c34c9c] {\n  list-style: none;\n}\n\n/* Utility Classes */\n.container[data-v-e3c34c9c] {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 0 20px;\n}\n.btn-primary[data-v-e3c34c9c] {\n  background: var(--gradient);\n  border: none;\n  color: white;\n  padding: 10px 24px;\n  border-radius: 8px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.btn-primary[data-v-e3c34c9c]:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);\n}\n.btn-secondary[data-v-e3c34c9c] {\n  background: rgba(255, 255, 255, 0.1);\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  color: white;\n  padding: 10px 24px;\n  border-radius: 8px;\n  font-weight: 600;\n  cursor: pointer;\n  backdrop-filter: blur(10px);\n  transition: background 0.3s;\n}\n.btn-secondary[data-v-e3c34c9c]:hover {\n  background: rgba(255, 255, 255, 0.2);\n}\n.btn-outline[data-v-e3c34c9c] {\n  background: transparent;\n  border: 1px solid var(--border);\n  color: var(--text-main);\n  padding: 10px 24px;\n  border-radius: 8px;\n  font-weight: 600;\n  cursor: pointer;\n  width: 100%;\n  transition: all 0.3s;\n}\n.btn-outline[data-v-e3c34c9c]:hover {\n  border-color: var(--primary);\n  color: var(--primary);\n}\n.btn-login[data-v-e3c34c9c] {\n  background: none;\n  border: none;\n  color: var(--text-muted);\n  font-weight: 500;\n  cursor: pointer;\n  margin-right: 15px;\n}\n.btn-login[data-v-e3c34c9c]:hover {\n  color: var(--text-main);\n}\n\n/* Navigation */\n.navbar[data-v-e3c34c9c] {\n  position: fixed;\n  top: 0;\n  width: 100%;\n  background: rgba(10, 10, 15, 0.8);\n  backdrop-filter: blur(12px);\n  z-index: 1000;\n  border-bottom: 1px solid rgba(255, 255, 255, 0.05);\n}\n.nav-content[data-v-e3c34c9c] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  height: 70px;\n}\n.logo[data-v-e3c34c9c] {\n  font-size: 1.25rem;\n  font-weight: 700;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n.logo-icon[data-v-e3c34c9c] {\n  color: var(--primary);\n  font-size: 1.5rem;\n}\n.nav-links[data-v-e3c34c9c] {\n  display: flex;\n  gap: 32px;\n}\n.nav-links a[data-v-e3c34c9c] {\n  color: var(--text-muted);\n  font-size: 0.95rem;\n}\n.nav-links a[data-v-e3c34c9c]:hover {\n  color: var(--text-main);\n}\n.nav-actions[data-v-e3c34c9c] {\n  display: flex;\n  align-items: center;\n}\n.mobile-menu-btn[data-v-e3c34c9c] {\n  display: none;\n  background: none;\n  border: none;\n  color: white;\n  font-size: 1.5rem;\n  cursor: pointer;\n}\n\n/* Hero Section */\n.hero[data-v-e3c34c9c] {\n  padding-top: 140px;\n  padding-bottom: 80px;\n  position: relative;\n  overflow: hidden;\n}\n.hero-content[data-v-e3c34c9c] {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 60px;\n  align-items: center;\n}\n.badge[data-v-e3c34c9c] {\n  display: inline-block;\n  background: rgba(99, 102, 241, 0.1);\n  color: var(--primary);\n  padding: 6px 12px;\n  border-radius: 20px;\n  font-size: 0.85rem;\n  font-weight: 600;\n  margin-bottom: 24px;\n  border: 1px solid rgba(99, 102, 241, 0.2);\n}\n.hero h1[data-v-e3c34c9c] {\n  font-size: 3.5rem;\n  line-height: 1.1;\n  margin-bottom: 24px;\n  font-weight: 800;\n}\n.gradient-text[data-v-e3c34c9c] {\n  background: var(--gradient);\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n}\n.hero p[data-v-e3c34c9c] {\n  color: var(--text-muted);\n  font-size: 1.125rem;\n  margin-bottom: 32px;\n  max-width: 500px;\n}\n.hero-buttons[data-v-e3c34c9c] {\n  display: flex;\n  gap: 16px;\n  margin-bottom: 40px;\n}\n.stats[data-v-e3c34c9c] {\n  display: flex;\n  gap: 40px;\n  border-top: 1px solid var(--border);\n  padding-top: 24px;\n}\n.stats strong[data-v-e3c34c9c] {\n  display: block;\n  font-size: 1.5rem;\n  color: var(--text-main);\n}\n.stats span[data-v-e3c34c9c] {\n  font-size: 0.875rem;\n  color: var(--text-muted);\n}\n\n/* Hero Visual */\n.hero-visual[data-v-e3c34c9c] {\n  position: relative;\n  height: 400px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.orb[data-v-e3c34c9c] {\n  position: absolute;\n  border-radius: 50%;\n  filter: blur(80px);\n  z-index: 0;\n  opacity: 0.6;\n}\n.orb-1[data-v-e3c34c9c] {\n  width: 300px;\n  height: 300px;\n  background: var(--primary);\n  top: 0;\n  right: 0;\n}\n.orb-2[data-v-e3c34c9c] {\n  width: 250px;\n  height: 250px;\n  background: var(--accent);\n  bottom: 0;\n  left: 0;\n}\n.glass-panel[data-v-e3c34c9c] {\n  background: rgba(255, 255, 255, 0.03);\n  backdrop-filter: blur(16px);\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  border-radius: 16px;\n  padding: 24px;\n  width: 100%;\n  max-width: 450px;\n  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);\n  position: relative;\n  z-index: 1;\n}\n.code-block[data-v-e3c34c9c] {\n  font-family: 'Fira Code', monospace;\n  font-size: 0.9rem;\n  color: #e2e8f0;\n}\n.keyword[data-v-e3c34c9c] { color: #c084fc;\n}\n.function[data-v-e3c34c9c] { color: #60a5fa;\n}\n.string[data-v-e3c34c9c] { color: #4ade80;\n}\n.comment[data-v-e3c34c9c] { color: #64748b;\n}\n\n/* Trusted By */\n.trusted-by[data-v-e3c34c9c] {\n  border-top: 1px solid var(--border);\n  border-bottom: 1px solid var(--border);\n  padding: 40px 0;\n  background: rgba(255, 255, 255, 0.02);\n  text-align: center;\n}\n.trusted-by p[data-v-e3c34c9c] {\n  color: var(--text-muted);\n  font-size: 0.875rem;\n  margin-bottom: 20px;\n  text-transform: uppercase;\n  letter-spacing: 1px;\n}\n.logos[data-v-e3c34c9c] {\n  display: flex;\n  justify-content: center;\n  gap: 40px;\n  flex-wrap: wrap;\n  opacity: 0.5;\n  font-weight: 700;\n  font-size: 1.25rem;\n}\n\n/* Features */\n.features[data-v-e3c34c9c] {\n  padding: 100px 0;\n}\n.section-header[data-v-e3c34c9c] {\n  text-align: center;\n  margin-bottom: 60px;\n}\n.section-header h2[data-v-e3c34c9c] {\n  font-size: 2.5rem;\n  margin-bottom: 16px;\n}\n.section-header p[data-v-e3c34c9c] {\n  color: var(--text-muted);\n  font-size: 1.125rem;\n}\n.grid[data-v-e3c34c9c] {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n  gap: 24px;\n}\n.feature-card[data-v-e3c34c9c] {\n  background: var(--card-bg);\n  padding: 32px;\n  border-radius: 12px;\n  border: 1px solid var(--border);\n  transition: transform 0.3s, border-color 0.3s;\n}\n.feature-card[data-v-e3c34c9c]:hover {\n  transform: translateY(-5px);\n  border-color: var(--primary);\n}\n.icon-box[data-v-e3c34c9c] {\n  width: 48px;\n  height: 48px;\n  background: rgba(99, 102, 241, 0.1);\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 1.5rem;\n  margin-bottom: 20px;\n}\n.feature-card h3[data-v-e3c34c9c] {\n  margin-bottom: 12px;\n  font-size: 1.25rem;\n}\n.feature-card p[data-v-e3c34c9c] {\n  color: var(--text-muted);\n  font-size: 0.95rem;\n}\n\n/* Pricing */\n.pricing[data-v-e3c34c9c] {\n  padding: 100px 0;\n  background: rgba(255, 255, 255, 0.02);\n}\n.pricing-grid[data-v-e3c34c9c] {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n  gap: 30px;\n  align-items: start;\n}\n.pricing-card[data-v-e3c34c9c] {\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: 16px;\n  padding: 40px;\n  position: relative;\n}\n.pricing-card.featured[data-v-e3c34c9c] {\n  border-color: var(--primary);\n  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);\n}\n.popular-badge[data-v-e3c34c9c] {\n  position: absolute;\n  top: -12px;\n  left: 50%;\n  transform: translateX(-50%);\n  background: var(--gradient);\n  padding: 4px 12px;\n  border-radius: 12px;\n  font-size: 0.75rem;\n  font-weight: 700;\n  text-transform: uppercase;\n}\n.pricing-card h3[data-v-e3c34c9c] {\n  font-size: 1.25rem;\n  margin-bottom: 10px;\n}\n.price[data-v-e3c34c9c] {\n  font-size: 3rem;\n  font-weight: 800;\n  margin-bottom: 30px;\n}\n.price span[data-v-e3c34c9c] {\n  font-size: 1rem;\n  color: var(--text-muted);\n  font-weight: 400;\n}\n.pricing-card ul[data-v-e3c34c9c] {\n  margin-bottom: 30px;\n}\n.pricing-card li[data-v-e3c34c9c] {\n  margin-bottom: 12px;\n  color: var(--text-muted);\n  display: flex;\n  align-items: center;\n}\n.pricing-card li[data-v-e3c34c9c]::before {\n  content: \"✓\";\n  color: var(--primary);\n  margin-right: 10px;\n  font-weight: bold;\n}\n\n/* Footer */\n.footer[data-v-e3c34c9c] {\n  padding: 80px 0 30px 0;\n  border-top: 1px solid var(--border);\n}\n.footer-content[data-v-e3c34c9c] {\n  display: grid;\n  grid-template-columns: 2fr 3fr;\n  gap: 60px;\n  margin-bottom: 60px;\n}\n.footer-brand p[data-v-e3c34c9c] {\n  color: var(--text-muted);\n  margin-top: 16px;\n  max-width: 300px;\n}\n.footer-links[data-v-e3c34c9c] {\n  display: flex;\n  justify-content: space-between;\n}\n.footer-links h4[data-v-e3c34c9c] {\n  margin-bottom: 20px;\n  color: var(--text-main);\n}\n.footer-links a[data-v-e3c34c9c] {\n  display: block;\n  color: var(--text-muted);\n  margin-bottom: 12px;\n  font-size: 0.9rem;\n}\n.footer-links a[data-v-e3c34c9c]:hover {\n  color: var(--primary);\n}\n.copyright[data-v-e3c34c9c] {\n  text-align: center;\n  color: var(--text-muted);\n  font-size: 0.875rem;\n  padding-top: 30px;\n  border-top: 1px solid var(--border);\n}\n\n/* Responsive Design */\n@media (max-width: 900px) {\n.hero-content[data-v-e3c34c9c] {\n    grid-template-columns: 1fr;\n    text-align: center;\n}\n.hero h1[data-v-e3c34c9c] {\n    font-size: 2.5rem;\n}\n.hero p[data-v-e3c34c9c] {\n    margin: 0 auto 32px auto;\n}\n.hero-buttons[data-v-e3c34c9c] {\n    justify-content: center;\n}\n.stats[data-v-e3c34c9c] {\n    justify-content: center;\n}\n.hero-visual[data-v-e3c34c9c] {\n    display: none;\n}\n.footer-content[data-v-e3c34c9c] {\n    grid-template-columns: 1fr;\n    gap: 40px;\n}\n}\n@media (max-width: 768px) {\n.nav-links[data-v-e3c34c9c], .nav-actions .btn-login[data-v-e3c34c9c], .nav-actions .btn-primary[data-v-e3c34c9c] {\n    display: none;\n}\n.mobile-menu-btn[data-v-e3c34c9c] {\n    display: block;\n}\n.nav-links.active[data-v-e3c34c9c] {\n    display: flex;\n    flex-direction: column;\n    position: absolute;\n    top: 70px;\n    left: 0;\n    width: 100%;\n    background: var(--card-bg);\n    padding: 20px;\n    border-bottom: 1px solid var(--border);\n    gap: 20px;\n}\n}" }),
   document.head.getElementsByTagName('style')[0]
 );
