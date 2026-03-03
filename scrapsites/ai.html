@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects Showcase </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Brand-core and SpaceX-adjacent accents */
+  --bg: #0F1112;            /* Chinese Black (SpaceX site) */
+  --bg-elev: #181C1F;       /* Eerie Black (panel base) */
+  --fg: #FFFFFF;            /* White (primary) */
+  --muted: #A7A9AC;         /* Metallic Silver (subtle trims) */
+  --accent: #005288;        /* SpaceX Midnight Blue */
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.14);
+  --shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  padding:0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body{
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Starfield + orbital grid + Earth limb glow */
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-2;
+}
+
+/* Earth limb glow at bottom for space vibe */
+body::before{
+  background:
+    radial-gradient(1200px 400px at 50% 115%, rgba(0,82,136,0.55), rgba(0,82,136,0.00) 60%),
+    radial-gradient(900px 300px at 50% 120%, rgba(167,169,172,0.25), rgba(167,169,172,0.00) 55%);
+  filter: saturate(105%);
+}
+
+/* Sparse orbital grid and star speckle */
+body::after{
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.25) 50%, transparent 51%),
+    radial-gradient(1px 1px at 35% 80%, rgba(255,255,255,0.20) 50%, transparent 51%),
+    linear-gradient(transparent 97%, rgba(255,255,255,0.04) 97%) 0 0/100% 28px,
+    linear-gradient(90deg, transparent 97%, rgba(255,255,255,0.04) 97%) 0 0/28px 100%;
+  opacity:0.35;
+  mix-blend-mode:screen;
+}
+
+.container{
+  width:100%;
+  max-width:920px;
+  padding: clamp(16px, 3.5vw, 40px);
+}
+
+/* Header */
+header{
+  text-align:center;
+  margin: 0 0 clamp(28px, 6vw, 56px);
+}
+
+header h1{
+  font-family:'Archivo Black', system-ui, sans-serif;
+  margin:0 0 10px;
+  font-size: clamp(28px, 6vw, 56px);
+  line-height:1.05;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+header p{
+  margin:0 auto;
+  max-width: 720px;
+  color: rgba(255,255,255,0.72);
+  font-size: clamp(14px, 2.5vw, 18px);
+  line-height:1.7;
+}
+
+/* Grid */
+main{
+  display:grid;
+  gap: clamp(16px, 3vw, 28px);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 880px){
+  main{ grid-template-columns: 1fr 1fr; }
+}
+
+/* Card — glass/metal plate */
+.card{
+  position:relative;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: clamp(18px, 3.2vw, 28px);
+  box-shadow: var(--shadow);
+  backdrop-filter: saturate(120%) blur(6px);
+  -webkit-backdrop-filter: saturate(120%) blur(6px);
+  overflow:hidden;
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* Subtle metallic top trim */
+.card::before{
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0; height:2px;
+  background: linear-gradient(90deg, transparent, var(--muted), transparent);
+  opacity:.45;
+}
+
+/* Hover lift with accent rim */
+.card:hover{
+  transform: translateY(-6px);
+  border-color: var(--border-strong);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+}
+
+/* Titles */
+.card h2{
+  font-family:'Archivo Black', system-ui, sans-serif;
+  margin:0 0 10px;
+  font-size: clamp(18px, 3.6vw, 24px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+/* Copy */
+.card p{
+  margin: 0 0 18px;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.75;
+  font-size: clamp(14px, 2.5vw, 17px);
+}
+
+/* Button — minimalist, high-contrast */
+.button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.6);
+  color: var(--fg);
+  text-decoration:none;
+  font-weight:700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: transparent;
+  transition: transform .15s ease, background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+  will-change: transform;
+}
+
+.button:hover{
+  background: var(--fg);
+  color: #000;
+  border-color: var(--fg);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255,255,255,0.10);
+}
+
+.button:active{
+  transform: translateY(0);
+}
+
+/* Full-bleed single column on narrow devices */
+@media (max-width: 767px){
+  .container{ padding: 16px; }
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Our Creations</h1>
+      <p>High-performance tools with orbital-grade clarity and speed.</p>
+    </header>
+
+    <main>
+      <div class="card">
+        <h2>Vision Drawing</h2>
+        <p>An intuitive canvas for ideas, engineered for precision and flow in a distraction-free environment.</p>
+        <a href="https://black-ice-3dbk.onrender.com/drawfolder/draw.html" class="button"  rel="noopener">Open Canvas</a>
+      </div>
+
+      <div class="card">
+        <h2>Bicochat AI</h2>
+        <p>A bilingual, context-aware assistant focused on signal over noise, across any device.</p>
+        <a href="https://incandescent-gnome-e84ac4.netlify.app/" class="button" rel="noopener">Launch Assistant</a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

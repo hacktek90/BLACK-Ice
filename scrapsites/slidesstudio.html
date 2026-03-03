@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slide Maker Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  
+  <!-- External Libraries for Export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- Using a specific bundle version that exposes the global variable correctly -->
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <style>
+    :root {
+      --bg: #111827;
+      --bg-elevated: #1f2937;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --accent-strong: #2563eb;
+      --border: #374151;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* --- Toolbar --- */
+    header.toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, #020617, #111827);
+      z-index: 10;
+      height: 60px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    header.toolbar::-webkit-scrollbar { display: none; }
+
+    .brand {
+      font-weight: 600; margin-right: 1rem; display: flex; align-items: center; gap: 0.4rem; color: var(--muted);
+    }
+    .brand span.logo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #facc15, #ef4444);
+    }
+
+    .toolbar-group {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding-right: 0.8rem; border-right: 1px solid rgba(55, 65, 81, 0.8);
+      margin-right: 0.8rem;
+    }
+    .toolbar-group:last-of-type { border: none; margin: 0; padding: 0; }
+
+    button.btn {
+      border-radius: 0.4rem; border: 1px solid var(--border);
+      background: rgba(17, 24, 39, 0.9); color: var(--text);
+      padding: 0.4rem 0.7rem; font-size: 0.85rem;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      cursor: pointer; transition: 0.2s;
+    }
+    button.btn:active { transform: scale(0.96); }
+    button.btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      border-color: rgba(191, 219, 254, 0.5); color: #fff;
+    }
+    button.btn-danger { color: #fecaca; border-color: rgba(239,68,68,0.5); }
+    button.btn-success { color: #bbf7d0; border-color: rgba(74, 222, 128, 0.5); }
+    button.btn-success:hover { background: rgba(22, 101, 52, 0.5); }
+
+    /* --- Workspace --- */
+    main.workspace {
+      flex: 1; display: grid; grid-template-columns: 220px 1fr;
+      height: calc(100vh - 60px); overflow: hidden;
+    }
+
+    /* Sidebar */
+    aside.sidebar {
+      border-right: 1px solid var(--border);
+      background: #0f172a;
+      display: flex; flex-direction: column;
+      padding: 0.5rem; gap: 0.5rem; overflow-y: auto;
+    }
+    .slide-thumb {
+      padding: 4px; border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent; transition: 0.2s;
+      background: rgba(255,255,255,0.02);
+    }
+    .slide-thumb.active { border-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
+    .slide-thumb-preview {
+      pointer-events: none; background: #111827;
+      aspect-ratio: 16/9; position: relative; overflow: hidden;
+      border-radius: 4px;
+    }
+    .thumb-scaler {
+      width: 960px; height: 540px;
+      transform-origin: top left;
+      transform: scale(0.2);
+      background: inherit;
+      padding: 2rem;
+      position: absolute; top: 0; left: 0;
+      color: #f9fafb;
+    }
+
+    /* Editor */
+    section.editor-area {
+      background: #020617; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    
+    #editorScaler {
+      width: 960px; height: 540px;
+      transform-origin: center;
+      box-shadow: 0 0 60px rgba(0,0,0,0.5);
+    }
+
+    .slide-frame {
+      width: 100%; height: 100%;
+      background: #111827;
+      position: relative; overflow: hidden;
+    }
+
+    .slide-content {
+      width: 100%; height: 100%;
+      padding: 3rem 4rem; outline: none;
+      overflow-y: auto;
+      color: #f9fafb;
+    }
+    
+    /* --- Content Styles --- */
+    .slide-content img { max-width: 80%; max-height: 70%; display: block; margin: 1rem auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    
+    .slide-content table {
+      width: 100%; border-collapse: collapse; margin: 1rem 0;
+      font-size: 0.9em; color: #e2e8f0;
+    }
+    .slide-content th, .slide-content td {
+      border: 1px solid #475569; padding: 12px; text-align: left;
+    }
+    .slide-content th { background-color: rgba(59, 130, 246, 0.2); font-weight: 600; }
+    .slide-content tr:nth-child(even) { background-color: rgba(255,255,255,0.03); }
+
+    .slide-title { font-size: 2.8em; font-weight: 800; margin-bottom: 0.2em; line-height: 1.1; }
+    .slide-subtitle { font-size: 1.5em; color: #94a3b8; font-weight: 300; }
+    
+    /* --- Presenter --- */
+    .presenter-overlay {
+      position: fixed; inset: 0; background: #000; z-index: 100;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .presenter-overlay.active { display: flex; }
+
+    #presenterContainer {
+      position: relative;
+      width: 960px; height: 540px;
+      background: #111827;
+      overflow: hidden;
+      transform-origin: center;
+    }
+    
+    canvas#markerCanvas {
+      position: absolute; inset: 0; z-index: 50; pointer-events: none; touch-action: none;
+    }
+
+    .presenter-controls {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 10px; padding: 8px 16px;
+      background: rgba(30,30,30,0.8); border-radius: 50px;
+      backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+      z-index: 60;
+    }
+
+    /* Export UI */
+    #exportOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      color: white; gap: 1rem;
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid #3b82f6; border-top-color: transparent;
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .brand span:last-child { display: none; }
+      main.workspace { grid-template-columns: 1fr; grid-template-rows: 120px 1fr; }
+      aside.sidebar { flex-direction: row; border-right: none; border-bottom: 1px solid var(--border); }
+      .slide-thumb-preview { width: 140px; } 
+      .thumb-scaler { transform: scale(0.145); }
+      .slide-content { padding: 1.5rem; }
+      .slide-title { font-size: 2em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <header class="toolbar">
+    <div class="brand"><span class="logo-dot"></span><span>SlidePro</span></div>
+    
+    <div class="toolbar-group">
+      <button class="btn" onclick="addSlide()">＋ Slide</button>
+      <button class="btn btn-danger" onclick="deleteSlide()">🗑</button>
+    </div>
+    
+    <div class="toolbar-group">
+      <button class="btn" onclick="document.getElementById('imgInput').click()">🖼 Img</button>
+      <input type="file" id="imgInput" hidden accept="image/*" onchange="insertImage(this)">
+      <button class="btn" onclick="insertTable()">⊞ Table</button>
+    </div>
+
+    <div class="toolbar-group">
+      <button class="btn" onclick="formatDoc('bold')"><b>B</b></button>
+      <button class="btn" onclick="formatDoc('italic')"><i>I</i></button>
+      <input type="color" id="bgColor" value="#111827" onchange="updateBg(this.value)" style="width:30px; height:30px; border:none; background:none;">
+    </div>
+
+    <div style="flex:1"></div>
+    
+    <div class="toolbar-group">
+      <button class="btn btn-success" onclick="exportToPPTX()">⬇ Export PPT</button>
+    </div>
+    <button class="btn btn-primary" onclick="startPresentation()">▶ Play</button>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar"></aside>
+    <section class="editor-area" id="editorArea">
+      <div id="editorScaler">
+        <div class="slide-frame" id="editorFrame">
+          <div id="slideEditor" class="slide-content" contenteditable="true" spellcheck="false"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Presentation Overlay -->
+<div id="presenterOverlay" class="presenter-overlay">
+  <div id="presenterContainer">
+    <div id="presenterContent" class="slide-content" style="overflow:hidden;"></div>
+    <canvas id="markerCanvas" width="960" height="540"></canvas>
+  </div>
+
+  <div class="presenter-controls">
+    <button class="btn btn-icon" onclick="navSlide(-1)">◀</button>
+    <button class="btn btn-icon" onclick="navSlide(1)">▶</button>
+    <button class="btn btn-icon" id="markerBtn" onclick="toggleMarker()">✏</button>
+    <button class="btn btn-icon" onclick="clearMarker()">⌫</button>
+    <button class="btn btn-icon" onclick="stopPresentation()">✕</button>
+  </div>
+</div>
+
+<!-- Export Loading UI -->
+<div id="exportOverlay">
+  <div class="spinner"></div>
+  <div id="exportStatus">Generating PowerPoint...</div>
+</div>
+
+<div id="exportRenderContainer" style="position:absolute; left:-9999px; top:0; width:960px; height:540px; overflow:hidden;"></div>
+
+<script>
+  // --- Data & State ---
+  let slides = [{ html: '<div class="slide-title">Tap to Edit</div><div class="slide-subtitle">Add tables, images, and more.</div>', bg: '#111827' }];
+  let currentIndex = 0;
+  let isPresenting = false;
+
+  // --- Editor Logic ---
+  const editor = document.getElementById('slideEditor');
+  const sidebar = document.getElementById('sidebar');
+  const frame = document.getElementById('editorFrame');
+  const pContainer = document.getElementById('presenterContainer');
+  const pContent = document.getElementById('presenterContent');
+
+  function init() {
+    renderSidebar();
+    loadSlide(0);
+    setupAutoSave();
+    setupResponsiveEditor();
+  }
+
+  function renderSidebar() {
+    sidebar.innerHTML = '';
+    slides.forEach((slide, i) => {
+      const div = document.createElement('div');
+      div.className = `slide-thumb ${i === currentIndex ? 'active' : ''}`;
+      div.onclick = () => { saveCurrent(); loadSlide(i); };
+      div.innerHTML = `
+        <div class="slide-thumb-preview">
+          <div class="thumb-scaler" style="background:${slide.bg}">${slide.html}</div>
+        </div>
+      `;
+      sidebar.appendChild(div);
+    });
+  }
+
+  function loadSlide(index) {
+    currentIndex = index;
+    editor.innerHTML = slides[index].html;
+    frame.style.background = slides[index].bg;
+    document.getElementById('bgColor').value = slides[index].bg;
+    renderSidebar();
+  }
+
+  function saveCurrent() {
+    slides[currentIndex].html = editor.innerHTML;
+    slides[currentIndex].bg = frame.style.background;
+    const thumbs = document.querySelectorAll('.thumb-scaler');
+    if(thumbs[currentIndex]) thumbs[currentIndex].innerHTML = editor.innerHTML;
+  }
+
+  function addSlide() {
+    saveCurrent();
+    slides.splice(currentIndex + 1, 0, { html: '<div class="slide-title">New Slide</div>', bg: '#111827' });
+    loadSlide(currentIndex + 1);
+  }
+
+  function deleteSlide() {
+    if (slides.length > 1) {
+      slides.splice(currentIndex, 1);
+      if (currentIndex >= slides.length) currentIndex = slides.length - 1;
+      loadSlide(currentIndex);
+    }
+  }
+
+  function setupAutoSave() {
+    editor.addEventListener('input', () => {
+      clearTimeout(window.saveTimer);
+      window.saveTimer = setTimeout(saveCurrent, 500);
+    });
+  }
+
+  // --- Formatting ---
+  function formatDoc(cmd) { document.execCommand(cmd, false, null); editor.focus(); }
+  function updateBg(color) { frame.style.background = color; saveCurrent(); }
+  
+  function insertImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = `<img src="${e.target.result}">`;
+      editor.focus();
+      document.execCommand('insertHTML', false, img);
+      saveCurrent();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function insertTable() {
+    const html = `
+      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <thead>
+          <tr><th>Header 1</th><th>Header 2</th><th>Header 3</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Data 1</td><td>Data 2</td><td>Data 3</td></tr>
+          <tr><td>Data 4</td><td>Data 5</td><td>Data 6</td></tr>
+        </tbody>
+      </table><p><br></p>`;
+    editor.focus();
+    document.execCommand('insertHTML', false, html);
+    saveCurrent();
+  }
+
+  // --- Responsive Editor ---
+  function setupResponsiveEditor() {
+    const container = document.getElementById('editorArea');
+    const scaler = document.getElementById('editorScaler');
+    const resize = () => {
+      const margin = 40;
+      const scale = Math.min(
+        (container.clientWidth - margin) / 960,
+        (container.clientHeight - margin) / 540
+      );
+      scaler.style.transform = `scale(${Math.max(scale, 0.1)})`;
+    };
+    new ResizeObserver(resize).observe(container);
+  }
+
+  // --- Presentation ---
+  function startPresentation() {
+    saveCurrent();
+    isPresenting = true;
+    document.getElementById('presenterOverlay').classList.add('active');
+    loadPresenterSlide();
+    fitPresenterToScreen();
+    window.addEventListener('resize', fitPresenterToScreen);
+    if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  }
+
+  function stopPresentation() {
+    isPresenting = false;
+    document.getElementById('presenterOverlay').classList.remove('active');
+    window.removeEventListener('resize', fitPresenterToScreen);
+    if(document.fullscreenElement) document.exitFullscreen();
+    markerMode = false;
+    updateMarkerState();
+  }
+
+  function loadPresenterSlide() {
+    const slide = slides[currentIndex];
+    pContent.innerHTML = slide.html;
+    pContainer.style.background = slide.bg;
+    clearMarker();
+  }
+
+  function fitPresenterToScreen() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const scale = Math.min(w / 960, h / 540);
+    pContainer.style.transform = `scale(${scale})`;
+  }
+
+  function navSlide(dir) {
+    const next = currentIndex + dir;
+    if (next >= 0 && next < slides.length) {
+      currentIndex = next;
+      loadPresenterSlide();
+    }
+  }
+
+  // --- Marker ---
+  const canvas = document.getElementById('markerCanvas');
+  const ctx = canvas.getContext('2d');
+  let markerMode = false;
+  let isDrawing = false;
+
+  function toggleMarker() {
+    markerMode = !markerMode;
+    updateMarkerState();
+  }
+
+  function updateMarkerState() {
+    canvas.style.pointerEvents = markerMode ? 'auto' : 'none';
+    document.getElementById('markerBtn').style.color = markerMode ? '#f87171' : 'white';
+  }
+
+  function clearMarker() { ctx.clearRect(0,0,960,540); }
+
+  function getCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = 960 / rect.width;
+    const scaleY = 540 / rect.height;
+    let clientX = e.clientX, clientY = e.clientY;
+    if(e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+  }
+
+  function startDraw(e) {
+    if(!markerMode) return;
+    isDrawing = true;
+    ctx.beginPath();
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#ef4444';
+    const {x, y} = getCoords(e);
+    ctx.moveTo(x, y);
+  }
+
+  function moveDraw(e) {
+    if(!isDrawing || !markerMode) return;
+    e.preventDefault();
+    const {x, y} = getCoords(e);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+
+  function endDraw() { isDrawing = false; }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', moveDraw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('touchstart', startDraw, {passive: false});
+  canvas.addEventListener('touchmove', moveDraw, {passive: false});
+  canvas.addEventListener('touchend', endDraw);
+
+  // --- FIXED EXPORT LOGIC ---
+  async function exportToPPTX() {
+    saveCurrent();
+    const overlay = document.getElementById('exportOverlay');
+    const status = document.getElementById('exportStatus');
+    const renderContainer = document.getElementById('exportRenderContainer');
+    
+    overlay.style.display = 'flex';
+    status.innerText = 'Initializing...';
+
+    try {
+      // Fix for constructor error:
+      // Some CDN bundles export 'PptxGenJS' as a property of 'window' or 'window.PptxGenJS'
+      // If the class isn't directly available, try finding it.
+      let PptxClass = window.PptxGenJS;
+      if (typeof PptxClass !== 'function' && window.pptxgen) {
+          // Sometimes it's under window.pptxgen in some bundles
+          PptxClass = window.pptxgen;
+      }
+
+      if (typeof PptxClass !== 'function') {
+          throw new Error("PptxGenJS library not loaded correctly.");
+      }
+
+      let pptx = new PptxClass();
+      pptx.layout = 'LAYOUT_16x9';
+
+      for (let i = 0; i < slides.length; i++) {
+        status.innerText = `Processing slide ${i + 1} of ${slides.length}...`;
+        
+        // Stage slide in hidden container
+        renderContainer.innerHTML = `<div class="slide-content" style="width:100%;height:100%;background:${slides[i].bg};padding:3rem 4rem;">${slides[i].html}</div>`;
+        
+        // Wait for layout
+        await new Promise(r => setTimeout(r, 100));
+
+        // Capture screenshot
+        const canvas = await html2canvas(renderContainer, {
+          useCORS: true,
+          scale: 2,
+          backgroundColor: slides[i].bg
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        let slide = pptx.addSlide();
+        // Add image covering the whole slide
+        slide.background = { data: imgData };
+      }
+
+      status.innerText = 'Saving...';
+      await pptx.writeFile({ fileName: 'SlidePro-Presentation.pptx' });
+      
+      overlay.style.display = 'none';
+      renderContainer.innerHTML = '';
+      
+    } catch (error) {
+      console.error(error);
+      alert('Export failed: ' + error.message);
+      overlay.style.display = 'none';
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

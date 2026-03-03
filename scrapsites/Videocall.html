@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secure Link // Minimal Video Bridge</title>
+    <meta name="theme-color" content="#111111">
+    
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- PEERJS -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+    <style>
+        /* === CSS VARIABLES & RESET === */
+        :root {
+            --bg-body: #F2F2F2;
+            --bg-surface: #FFFFFF;
+            --bg-panel: #111111;
+            
+            --text-main: #111111;
+            --text-muted: #888888;
+            --text-inverse: #FFFFFF;
+            
+            --accent: #FF3333; /* Swiss Red */
+            --accent-hover: #CC0000;
+            
+            --border-light: #E5E5E5;
+            --border-focus: #111111;
+            
+            --radius-sm: 4px;
+            --radius-md: 12px;
+            
+            --shadow-float: 0 20px 40px -10px rgba(0,0,0,0.15);
+            
+            --font-main: 'Inter', sans-serif;
+            --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === LAYOUT === */
+        .app-container {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR (Controls) */
+        .sidebar {
+            width: 360px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .brand h1 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .control-group {
+            margin-bottom: 32px;
+        }
+
+        .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: block;
+        }
+
+        /* === COMPONENTS === */
+        
+        /* ID Card */
+        .id-card {
+            background: var(--bg-body);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .id-card:hover { border-color: var(--border-light); }
+        
+        .my-id {
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--text-muted);
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover { color: var(--text-main); }
+
+        /* Input */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            background: var(--bg-body);
+            border: 1px solid transparent;
+            padding: 16px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-main);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus {
+            background: #fff;
+            border-color: var(--border-focus);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        /* Primary Button */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--bg-panel);
+            color: var(--text-inverse);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #333;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            background: var(--border-light);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #fff;
+            color: var(--accent);
+            border: 1px solid var(--border-light);
+        }
+        .btn-danger:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: #fff0f0;
+        }
+
+        /* Toggle Switches */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .toggle-row:last-child { border-bottom: none; }
+        
+        .toggle-label {
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-light);
+            transition: .3s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input:checked + .slider { background-color: var(--bg-panel); }
+        input:checked + .slider:before { transform: translateX(18px); }
+        input:checked:disabled + .slider { background-color: #ccc; }
+
+        /* === VIDEO STAGE === */
+        .stage {
+            flex: 1;
+            position: relative;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Video Elements */
+        video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Remote Video (Full Screen) */
+        #remoteVideo {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        /* Placeholder State */
+        .placeholder-state {
+            position: absolute;
+            z-index: 2;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .placeholder-state svg { width: 64px; height: 64px; opacity: 0.5; }
+        .placeholder-text {
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Local Video (PiP) */
+        .local-pip {
+            position: absolute;
+            bottom: 32px;
+            right: 32px;
+            width: 240px;
+            aspect-ratio: 16/9;
+            background: #222;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-float);
+            z-index: 10;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .local-pip:hover {
+            transform: scale(1.02);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .local-pip video {
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        
+        /* Audio visualizer or Mute badge on PIP */
+        .pip-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            display: none; /* Shown via JS */
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        /* Screen Share Indicator */
+        .share-indicator {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .share-indicator.active { opacity: 1; }
+        .share-dot {
+            width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* === TOAST NOTIFICATIONS === */
+        .toast-container {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: var(--shadow-float);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { border-left: 3px solid var(--accent); }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+                align-items: center;
+                gap: 16px;
+            }
+            .brand { margin-bottom: 0; margin-right: auto; }
+            .control-group { margin-bottom: 0; display: flex; align-items: center; gap: 12px; }
+            .label { display: none; }
+            .id-card { display: none; } /* Hide ID card on mobile to save space */
+            .local-pip { width: 120px; bottom: 16px; right: 16px; }
+            .btn span { display: none; } /* Hide button text, keep icons */
+            .btn { padding: 12px; width: auto; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOAST NOTIFICATION AREA -->
+    <div class="toast-container" id="toastArea"></div>
+
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-dot" id="statusDot"></div>
+                <h1>Bridge v1</h1>
+            </div>
+
+            <!-- Connection Controls -->
+            <div class="control-group" style="flex: 1;">
+                <span class="label">My Identity</span>
+                <div class="id-card" title="Click to copy">
+                    <span class="my-id" id="myIdDisplay">Generating...</span>
+                    <button class="icon-btn" id="copyBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+
+                <div class="input-wrapper" style="margin-top: 24px;">
+                    <input type="text" id="remoteIdInput" placeholder="Enter Remote ID to connect..." autocomplete="off">
+                </div>
+
+                <button id="callBtn" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span>Connect</span>
+                </button>
+                
+                <button id="hangupBtn" class="btn btn-danger" style="margin-top: 12px;" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
+                    <span>End Call</span>
+                </button>
+            </div>
+
+            <!-- Media Toggles -->
+            <div class="control-group">
+                <span class="label">Media Controls</span>
+                
+                <div class="toggle-row">
+                    <span class="toggle-label">Microphone</span>
+                    <label class="switch">
+                        <input type="checkbox" id="audioToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <span class="toggle-label">Camera</span>
+                    <label class="switch">
+                        <input type="checkbox" id="videoToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <span class="toggle-label">Share Screen</span>
+                    <label class="switch">
+                        <input type="checkbox" id="screenToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- VIDEO STAGE -->
+        <section class="stage">
+            
+            <!-- Remote Video -->
+            <video id="remoteVideo" autoplay playsinline></video>
+            
+            <!-- Placeholder when no call -->
+            <div id="placeholder" class="placeholder-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <div class="placeholder-text">Awaiting connection</div>
+            </div>
+
+            <!-- Screen Share Notification -->
+            <div id="shareIndicator" class="share-indicator">
+                <div class="share-dot"></div>
+                You are sharing your screen
+            </div>
+
+            <!-- Local Video PiP -->
+            <div class="local-pip" id="localPipContainer">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div id="pipMuteIcon" class="pip-status">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- CONFIGURATION ---
+        const words1 = ["alpha","beta","gamma","delta","neon","cyber","flux","zero","core","nova"];
+        const words2 = ["link","node","grid","mesh","wave","pulse","sync","data","flow","base"];
+        
+        function generateId() {
+            const w1 = words1[Math.floor(Math.random() * words1.length)];
+            const w2 = words2[Math.floor(Math.random() * words2.length)];
+            const num = Math.floor(Math.random() * 999);
+            return `${w1}-${w2}-${num}`;
+        }
+
+        const myPeerId = generateId();
+        
+        // --- DOM ELEMENTS ---
+        const myIdDisplay = document.getElementById('myIdDisplay');
+        const copyBtn = document.getElementById('copyBtn');
+        const remoteIdInput = document.getElementById('remoteIdInput');
+        const callBtn = document.getElementById('callBtn');
+        const hangupBtn = document.getElementById('hangupBtn');
+        
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const placeholder = document.getElementById('placeholder');
+        const shareIndicator = document.getElementById('shareIndicator');
+        const pipMuteIcon = document.getElementById('pipMuteIcon');
+        const statusDot = document.getElementById('statusDot');
+        
+        const audioToggle = document.getElementById('audioToggle');
+        const videoToggle = document.getElementById('videoToggle');
+        const screenToggle = document.getElementById('screenToggle');
+
+        // --- STATE VARIABLES ---
+        let peer;
+        let currentCall;
+        let localStream;
+        let isScreenSharing = false;
+
+        // --- INITIALIZATION ---
+        myIdDisplay.textContent = myPeerId;
+
+        // Initialize PeerJS
+        peer = new Peer(myPeerId, {
+            debug: 2
+        });
+
+        peer.on('open', (id) => {
+            console.log('Connected with ID:', id);
+            statusDot.style.background = '#4CAF50'; // Green
+            initLocalMedia();
+        });
+
+        peer.on('error', (err) => {
+            console.error(err);
+            showToast('Connection Error: ' + err.type, true);
+        });
+
+        // Handle Incoming Calls
+        peer.on('call', async (call) => {
+            if (currentCall) {
+                call.close(); // Busy signal
+                showToast('Line Busy', true);
+                return;
+            }
+            updateCallUI(true);
+            call.answer(localStream);
+            setupCall(call);
+        });
+
+        // --- MEDIA FUNCTIONS ---
+        async function initLocalMedia() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localVideo.srcObject = localStream;
+            } catch (err) {
+                showToast('Camera/Mic access denied', true);
+            }
+        }
+
+        async function setupCall(call) {
+            currentCall = call;
+            
+            // Handle Remote Stream
+            call.on('stream', (remoteStream) => {
+                remoteVideo.srcObject = remoteStream;
+                placeholder.style.display = 'none';
+            });
+
+            call.on('close', () => {
+                endCall();
+            });
+
+            call.on('error', () => {
+                showToast('Call Disconnected Unexpectedly', true);
+                endCall();
+            });
+            
+            showToast('Connection Established');
+        }
+
+        // --- ACTIONS ---
+
+        // Copy ID
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(myPeerId).then(() => {
+                showToast('ID Copied to Clipboard');
+            }).catch(() => {
+                showToast('Failed to copy', true);
+            });
+        });
+
+        // Start Call
+        callBtn.addEventListener('click', () => {
+            const remoteId = remoteIdInput.value.trim();
+            if (!remoteId) {
+                showToast('Please enter a Remote ID', true);
+                remoteIdInput.focus();
+                return;
+            }
+
+            if (!localStream) {
+                showToast('Waiting for camera permission...', true);
+                return;
+            }
+
+            updateCallUI(true);
+            const call = peer.call(remoteId, localStream);
+            setupCall(call);
+        });
+
+        // End Call
+        hangupBtn.addEventListener('click', endCall);
+
+        function endCall() {
+            if (currentCall) currentCall.close();
+            currentCall = null;
+            
+            remoteVideo.srcObject = null;
+            placeholder.style.display = 'flex';
+            
+            updateCallUI(false);
+            
+            // Reset Screen Share if active
+            if (isScreenSharing) {
+                stopScreenShare();
+            }
+            
+            showToast('Call Ended');
+        }
+
+        function updateCallUI(isInCall) {
+            if (isInCall) {
+                callBtn.disabled = true;
+                callBtn.innerHTML = `<span>Connecting...</span>`;
+                hangupBtn.disabled = false;
+            } else {
+                callBtn.disabled = false;
+                callBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><span>Connect</span>`;
+                hangupBtn.disabled = true;
+            }
+        }
+
+        // --- TOGGLES ---
+
+        // Audio
+        audioToggle.addEventListener('change', () => {
+            if (!localStream) return;
+            const enabled = audioToggle.checked;
+            localStream.getAudioTracks().forEach(track => track.enabled = enabled);
+            pipMuteIcon.style.display = enabled ? 'none' : 'flex';
+        });
+
+        // Video
+        videoToggle.addEventListener('change', async () => {
+            if (!localStream) return;
+            const enabled = videoToggle.checked;
+            
+            if (isScreenSharing && enabled) {
+                // If turning camera back on while sharing screen, stop sharing
+                stopScreenShare();
+            }
+
+            localStream.getVideoTracks().forEach(track => track.enabled = enabled);
+            
+            // Optional: Stop track completely to turn off light, but keeping it simple with enabled=true/false
+        });
+
+        // Screen Share
+        screenToggle.addEventListener('change', async () => {
+            if (screenToggle.checked) {
+                startScreenShare();
+            } else {
+                stopScreenShare();
+            }
+        });
+
+        async function startScreenShare() {
+            if (!currentCall) {
+                showToast('Connect to a peer first', true);
+                screenToggle.checked = false;
+                return;
+            }
+
+            try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                const screenTrack = screenStream.getVideoTracks()[0];
+                
+                const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+                
+                if (sender) {
+                    sender.replaceTrack(screenTrack);
+                    localVideo.srcObject = screenStream;
+                    isScreenSharing = true;
+                    shareIndicator.classList.add('active');
+                    videoToggle.disabled = true; // Disable camera toggle while sharing
+
+                    screenTrack.onended = () => {
+                        stopScreenShare();
+                    };
+                }
+            } catch (err) {
+                showToast('Screen share cancelled', true);
+                screenToggle.checked = false;
+            }
+        }
+
+        async function stopScreenShare() {
+            if (!isScreenSharing) return;
+            
+            // Revert to camera track
+            const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const cameraTrack = cameraStream.getVideoTracks()[0];
+            
+            const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+            
+            if (sender) {
+                sender.replaceTrack(cameraTrack);
+                localVideo.srcObject = cameraStream;
+                
+                // Update localStream reference to include new camera track
+                // We keep audio tracks from original stream ideally, but for simplicity replacing video track
+                
+                isScreenSharing = false;
+                screenToggle.checked = false;
+                shareIndicator.classList.remove('active');
+                videoToggle.disabled = false;
+            }
+        }
+
+        // --- UTILITIES ---
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toastArea');
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'error' : ''}`;
+            
+            let icon = '';
+            if (isError) icon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+            else icon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => {
+                    toast.remove();
+                });
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
