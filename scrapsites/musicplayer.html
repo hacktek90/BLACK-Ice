@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freefy - Minimal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: #0f0f11;
+            --header-bg: rgba(20, 20, 23, 0.85);
+            --header-border: rgba(255, 255, 255, 0.06);
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --accent: #10b981;
+            --btn-bg: rgba(255, 255, 255, 0.05);
+            --btn-hover: rgba(255, 255, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- COMPACT HEADER --- */
+        header {
+            height: 50px; /* Reduced from 70px */
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--header-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px; /* Reduced padding */
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        /* Horizontal Brand Layout */
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Compact spacing */
+        }
+
+        /* Pill Badge for "Powered by" */
+        .powered-by-label {
+            font-size: 0.6rem; /* Very small text */
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: nowrap;
+        }
+
+        .brand-name {
+            font-size: 0.95rem; /* Smaller font size */
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        /* Icon-Only Controls */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* Tight gap between buttons */
+        }
+
+        .btn {
+            width: 32px; /* Square buttons */
+            height: 32px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Hover effects for compact buttons */
+        .btn:hover {
+            background: var(--btn-bg);
+            color: var(--text-main);
+        }
+
+        /* Primary button accent (Fullscreen) */
+        .btn.primary:hover {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent);
+        }
+
+        /* --- MAIN CONTENT --- */
+        main {
+            flex-grow: 1;
+            position: relative;
+            background-color: #000;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Simple Loader */
+        .loader-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: #0a0a0c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.4s ease;
+        }
+
+        .spinner {
+            width: 24px; /* Smaller spinner */
+            height: 24px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--text-main);
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Compact Header -->
+        <header>
+            <div class="brand-wrapper">
+                <span class="powered-by-label">Powered by</span>
+                <span class="brand-name">Freefy</span>
+            </div>
+
+            <div class="controls">
+                <button class="btn primary" onclick="toggleFullscreen()" title="Fullscreen">
+                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+                <button class="btn" onclick="reloadFrame()" title="Reload">
+                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="loader-overlay" id="loader">
+                <div class="spinner"></div>
+            </div>
+
+            <iframe 
+                id="freefyFrame"
+                src="https://freefy.app/" 
+                title="Freefy Web Player"
+                allow="encrypted-media; fullscreen; clipboard-read; clipboard-write"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+                onload="hideLoader()">
+            </iframe>
+        </main>
+    </div>
+
+    <script>
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 400);
+        }
+
+        function reloadFrame() {
+            const frame = document.getElementById('freefyFrame');
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            setTimeout(() => { loader.style.opacity = '1'; }, 10);
+            frame.src = frame.src;
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>

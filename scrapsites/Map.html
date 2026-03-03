@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff">
+  <title>Ultimate Minimal Map</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Leaflet Core -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Leaflet Routing Machine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  
+  <!-- Turf.js (Analysis) -->
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+
+  <style>
+    :root {
+      --bg-surface: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.95);
+      --text-main: #111111;
+      --text-sub: #666666;
+      --border: #e5e5e5;
+      --accent: #000000;
+      --accent-text: #ffffff;
+      --traffic-green: #22c55e;
+      --traffic-red: #ef4444;
+      --shadow-float: 0 12px 32px rgba(0,0,0,0.08);
+      --radius: 16px;
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    [data-theme="dark"] {
+      --bg-surface: #121212;
+      --bg-glass: rgba(18, 18, 18, 0.95);
+      --text-main: #ffffff;
+      --text-sub: #a0a0a0;
+      --border: #2a2a2a;
+      --accent: #ffffff;
+      --accent-text: #000000;
+      --shadow-float: 0 12px 32px rgba(0,0,0,0.6);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body { margin: 0; padding: 0; font-family: 'Inter Tight', sans-serif; background: var(--bg-surface); color: var(--text-main); overflow: hidden; height: 100vh; }
+
+    /* MAP & LAYERS */
+    #map { position: absolute; inset: 0; z-index: 0; transition: filter 0.3s ease; }
+    
+    /* UI SHELL */
+    .app-shell {
+      position: absolute; inset: 0; pointer-events: none; z-index: 100;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: calc(var(--safe-top) + 12px) 16px calc(var(--safe-bottom) + 12px);
+    }
+
+    /* TOP BAR */
+    .search-pill {
+      pointer-events: auto;
+      background: var(--bg-glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      height: 56px;
+      display: flex; align-items: center;
+      padding: 0 6px 0 20px;
+      box-shadow: var(--shadow-float);
+      max-width: 480px; width: 100%;
+      margin: 0 auto;
+      transition: transform 0.2s;
+    }
+    .search-pill:active { transform: scale(0.98); }
+    
+    .search-input {
+      flex: 1; border: none; background: transparent;
+      font-family: inherit; font-size: 16px; color: var(--text-main);
+      outline: none; margin-right: 12px;
+    }
+    
+    .avatar-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--border);
+      overflow: hidden; cursor: pointer;
+    }
+    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* FLOATING TOOLS (Right) */
+    .tools-stack {
+      position: absolute; right: 16px; top: 100px;
+      display: flex; flex-direction: column; gap: 12px;
+      pointer-events: auto;
+    }
+    
+    .fab-mini {
+      width: 48px; height: 48px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-main);
+      box-shadow: var(--shadow-float);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .fab-mini:active { transform: scale(0.9); }
+    .fab-mini.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+
+    /* BOTTOM SHEET (Draggable) */
+    .sheet-wrapper {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      pointer-events: auto;
+      z-index: 200;
+      transform: translateY(calc(100% - 80px)); /* Peeking state */
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sheet-wrapper.expanded { transform: translateY(0); }
+    
+    .sheet-card {
+      background: var(--bg-surface);
+      border-radius: 24px 24px 0 0;
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+      padding: 8px 0 var(--safe-bottom);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .sheet-handle {
+      width: 100%; padding: 12px 0;
+      display: flex; justify-content: center; cursor: grab;
+    }
+    .handle-bar { width: 40px; height: 5px; background: var(--border); border-radius: 10px; }
+
+    /* LAYERS GRID */
+    .layers-scroller {
+      display: flex; gap: 12px; padding: 0 20px 20px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .layer-item {
+      min-width: 80px; height: 80px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      background-size: cover; background-position: center;
+      position: relative; cursor: pointer;
+      transition: 0.2s;
+      overflow: hidden;
+    }
+    .layer-item span {
+      position: absolute; bottom: 6px; left: 6px;
+      font-size: 11px; font-weight: 700; color: white;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      z-index: 2;
+    }
+    .layer-item::after { content:''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.6)); }
+    .layer-item.active { border-color: var(--accent); transform: scale(1.05); }
+
+    /* ROUTING CONTROLS (Hidden by default) */
+    .route-panel {
+      padding: 0 20px; display: none;
+    }
+    .route-panel.visible { display: block; }
+    
+    .route-btn {
+      width: 100%; background: var(--accent); color: var(--accent-text);
+      border: none; padding: 16px; border-radius: 16px;
+      font-weight: 600; font-size: 16px; margin-top: 10px;
+    }
+
+    /* LEAFLET OVERRIDES */
+    .leaflet-routing-container { display: none !important; } /* Hide default ugly box */
+    .leaflet-control-container .leaflet-routing-container-hide { display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <div class="app-shell">
+    
+    <!-- SEARCH -->
+    <div class="search-pill">
+      <i data-lucide="search" style="color:var(--text-sub); width:20px;"></i>
+      <input type="text" class="search-input" id="search" placeholder="Search location...">
+      <div class="avatar-btn" onclick="toggleTheme()">
+        <!-- Placeholder for user or theme toggle -->
+        <div style="width:100%; height:100%; background:var(--text-main); display:flex; align-items:center; justify-content:center; color:var(--bg-surface)">
+          <i data-lucide="moon" style="width:20px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT TOOLS -->
+    <div class="tools-stack">
+      <div class="fab-mini" id="btnLocate" onclick="toggleLocation()">
+        <i data-lucide="navigation"></i>
+      </div>
+      <div class="fab-mini" id="btnTraffic" onclick="toggleTraffic()">
+        <i data-lucide="car-front"></i>
+      </div>
+      <div class="fab-mini" id="btn3D" onclick="toggle3D()">
+        <i data-lucide="box"></i>
+      </div>
+      <div class="fab-mini" id="btnRoute" onclick="startRoutingMode()">
+        <i data-lucide="signpost"></i>
+      </div>
+    </div>
+
+    <!-- BOTTOM SHEET -->
+    <div class="sheet-wrapper" id="sheet">
+      <div class="sheet-card">
+        <div class="sheet-handle" onclick="toggleSheet()">
+          <div class="handle-bar"></div>
+        </div>
+        
+        <div class="sheet-content">
+          <div style="padding: 0 20px 10px;">
+            <h3 style="margin: 0 0 12px; font-size: 18px;">Map Style</h3>
+          </div>
+          
+          <!-- HORIZONTAL LAYER SCROLL -->
+          <div class="layers-scroller">
+            <div class="layer-item active" id="layerStandard" onclick="setLayer('standard')" style="background-image: url('https://a.tile.openstreetmap.org/12/2048/1365.png')">
+              <span>Standard</span>
+            </div>
+            <div class="layer-item" id="layerSat" onclick="setLayer('satellite')" style="background-image: url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/12/1365/2048')">
+              <span>Satellite</span>
+            </div>
+            <div class="layer-item" id="layerDark" onclick="setLayer('dark')" style="background-color: #222;">
+              <span>Dark</span>
+            </div>
+            <div class="layer-item" id="layerTerrain" onclick="setLayer('terrain')" style="background-image: url('https://c.tile.opentopomap.org/12/2048/1365.png')">
+              <span>Terrain</span>
+            </div>
+          </div>
+
+          <!-- ROUTING UI (Dynamic) -->
+          <div class="route-panel" id="routePanel">
+            <h3 style="margin: 20px 0 10px; font-size: 18px;">Navigation</h3>
+            <div style="color: var(--text-sub); font-size: 14px; margin-bottom: 12px;">Tap anywhere on map to set destination from current location.</div>
+            <div id="routeInfo" style="font-weight: 700; font-size: 24px;">0 min <span style="font-size:16px; color:var(--text-sub); font-weight:400">(0 km)</span></div>
+            <button class="route-btn" onclick="clearRoute()">End Navigation</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- STATE ---
+    const state = {
+      theme: 'light',
+      layer: 'standard',
+      traffic: false,
+      mode3d: false,
+      routing: false,
+      userPos: null
+    };
+
+    // --- SETUP MAP ---
+    const map = L.map('map', { 
+      zoomControl: false, attributionControl: false 
+    }).setView([51.505, -0.09], 13); // London default
+
+    // --- TILE LAYERS ---
+    const layers = {
+      standard: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
+      dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
+      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }),
+      terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 }),
+      // Traffic Overlay (Google Traffic layer usually requires API, using a free approximation or placeholder for demo)
+      traffic: L.tileLayer('https://mt0.google.com/vt/lyrs=m,traffic&x={x}&y={y}&z={z}', { maxZoom: 20, opacity: 0.7 }) 
+    };
+    
+    // 3D Buildings (OSM Buildings Vector-like) - Simplified via a specific tile provider for demo
+    // Note: True 3D requires Mapbox GL JS or Cesium. In Leaflet, we use 2.5D building overlays.
+    // We will use a "simulated" 3D feel by using Esri World Topo for building footprints + shadows
+    const buildingsLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { opacity: 0.8 });
+
+    layers.standard.addTo(map);
+
+    // --- ROUTING MACHINE ---
+    let routingControl = null;
+
+    // --- UTILS ---
+    const $ = (id) => document.getElementById(id);
+    lucide.createIcons();
+
+    function haptic() { if(navigator.vibrate) navigator.vibrate(15); }
+
+    // --- FUNCTIONS ---
+    
+    // 1. Layer Switching
+    function setLayer(name) {
+      haptic();
+      state.layer = name;
+      
+      // Remove all base layers
+      Object.keys(layers).forEach(k => {
+        if(k !== 'traffic') map.removeLayer(layers[k]);
+      });
+
+      // Add selected
+      layers[name].addTo(map);
+
+      // Re-add overlay if active
+      if(state.traffic) layers.traffic.addTo(map);
+
+      // UI Update
+      document.querySelectorAll('.layer-item').forEach(el => el.classList.remove('active'));
+      if(name === 'standard') $('layerStandard').classList.add('active');
+      if(name === 'satellite') $('layerSat').classList.add('active');
+      if(name === 'dark') $('layerDark').classList.add('active');
+      if(name === 'terrain') $('layerTerrain').classList.add('active');
+    }
+
+    // 2. Traffic Toggle
+    function toggleTraffic() {
+      haptic();
+      state.traffic = !state.traffic;
+      $('btnTraffic').classList.toggle('active', state.traffic);
+      
+      if(state.traffic) {
+        layers.traffic.addTo(map);
+      } else {
+        map.removeLayer(layers.traffic);
+      }
+    }
+
+    // 3. 3D Buildings (Simulated)
+    function toggle3D() {
+      haptic();
+      state.mode3d = !state.mode3d;
+      $('btn3D').classList.toggle('active', state.mode3d);
+      
+      // In Leaflet, true 3D is hard. We simulate "Building View" by zooming in and switching to a detailed map
+      if(state.mode3d) {
+        map.setZoom(17);
+        // Tilt is not supported natively in Leaflet 2D, but we can simulate focus
+      }
+    }
+
+    // 4. Location
+    function toggleLocation() {
+      haptic();
+      if(!navigator.geolocation) return;
+      
+      $('btnLocate').classList.add('active');
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        state.userPos = L.latLng(latitude, longitude);
+        
+        map.setView(state.userPos, 16);
+        
+        L.circleMarker(state.userPos, {
+          radius: 8,
+          color: '#ffffff',
+          fillColor: '#2563eb',
+          fillOpacity: 1,
+          weight: 3
+        }).addTo(map).bindPopup("You are here").openPopup();
+        
+      }, err => {
+        alert("Location access denied");
+        $('btnLocate').classList.remove('active');
+      });
+    }
+
+    // 5. Routing
+    function startRoutingMode() {
+      haptic();
+      state.routing = true;
+      $('sheet').classList.add('expanded');
+      $('routePanel').classList.add('visible');
+      $('btnRoute').classList.add('active');
+      
+      if(!state.userPos) toggleLocation(); // Get start point
+    }
+
+    map.on('click', function(e) {
+      if(state.routing && state.userPos) {
+        if(routingControl) map.removeControl(routingControl);
+        
+        routingControl = L.Routing.control({
+          waypoints: [
+            state.userPos,
+            e.latlng
+          ],
+          router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1'
+          }),
+          lineOptions: {
+            styles: [{color: 'var(--text-main)', opacity: 0.8, weight: 6}]
+          },
+          createMarker: function(i, wp) {
+            return L.marker(wp.latLng, {
+              draggable: true
+            });
+          }
+        }).addTo(map);
+
+        routingControl.on('routesfound', function(e) {
+          const routes = e.routes;
+          const summary = routes[0].summary;
+          const time = Math.round(summary.totalTime / 60);
+          const dist = (summary.totalDistance / 1000).toFixed(1);
+          
+          $('routeInfo').innerHTML = `${time} min <span style="font-size:16px; color:var(--text-sub); font-weight:400">(${dist} km)</span>`;
+          $('sheet').classList.add('expanded');
+        });
+      }
+    });
+
+    function clearRoute() {
+      if(routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      state.routing = false;
+      $('routePanel').classList.remove('visible');
+      $('btnRoute').classList.remove('active');
+      $('routeInfo').innerHTML = '0 min';
+      $('sheet').classList.remove('expanded');
+    }
+
+    // 6. Bottom Sheet
+    function toggleSheet() {
+      $('sheet').classList.toggle('expanded');
+    }
+
+    // 7. Theme
+    function toggleTheme() {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      
+      // Auto-switch map layer to match theme if on standard/dark
+      if(state.theme === 'dark' && state.layer === 'standard') setLayer('dark');
+      if(state.theme === 'light' && state.layer === 'dark') setLayer('standard');
+    }
+
+  </script>
+</body>
+</html>

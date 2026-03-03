@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bruxism | TMJ Biofeedback</title>
+<!-- MediaPipe -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #0b0c10;
+        --panel: #1f2833;
+        --cyan: #66fcf1;
+        --cyan-dim: rgba(102, 252, 241, 0.1);
+        --alert: #ff3860;
+        --text: #c5c6c7;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: 60px 1fr 200px;
+    }
+
+    /* HEADER */
+    header {
+        background: var(--panel);
+        border-bottom: 1px solid #45a29e;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 30px;
+    }
+    .brand { font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-weight: 700; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+    .status { font-size: 0.8rem; display: flex; gap: 10px; align-items: center; }
+    .status-light { width: 8px; height: 8px; background: #333; border-radius: 50%; }
+    .status-light.active { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+
+    /* MAIN CONTENT */
+    main {
+        position: relative;
+        display: flex; justify-content: center; align-items: center;
+        background: radial-gradient(circle at center, #1f2833 0%, #0b0c10 70%);
+    }
+    
+    video { opacity: 0.4; position: absolute; height: 80%; border-radius: 10px; filter: grayscale(100%) contrast(1.2); }
+    canvas#mesh { position: absolute; height: 80%; }
+
+    .calib-overlay {
+        position: absolute; z-index: 10;
+        background: rgba(11, 12, 16, 0.9);
+        backdrop-filter: blur(5px);
+        padding: 40px; border-radius: 4px; border: 1px solid var(--cyan);
+        text-align: center;
+        max-width: 400px;
+    }
+    
+    .btn {
+        background: var(--cyan); color: #0b0c10;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700; border: none; padding: 15px 30px;
+        margin-top: 20px; cursor: pointer;
+        text-transform: uppercase;
+        transition: all 0.2s;
+    }
+    .btn:hover { box-shadow: 0 0 20px var(--cyan); transform: translateY(-2px); }
+
+    /* ALERT HUD */
+    .hud-alert {
+        position: absolute; top: 20px;
+        background: rgba(255, 56, 96, 0.2);
+        border: 1px solid var(--alert);
+        color: var(--alert);
+        padding: 10px 30px;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        display: none;
+        animation: flash 1s infinite;
+    }
+    @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+    /* BOTTOM DASHBOARD */
+    .dashboard {
+        background: var(--panel);
+        border-top: 1px solid #45a29e;
+        display: grid;
+        grid-template-columns: 250px 1fr 250px;
+        padding: 20px; gap: 20px;
+    }
+
+    .metric-box {
+        display: flex; flex-direction: column; justify-content: center;
+    }
+    .metric-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 5px; }
+    .metric-val { font-family: 'JetBrains Mono', monospace; font-size: 2rem; color: var(--cyan); }
+    .metric-unit { font-size: 0.8rem; color: #666; }
+
+    /* EKG GRAPH */
+    .graph-container {
+        background: #000;
+        border: 1px solid #333;
+        position: relative;
+        overflow: hidden;
+    }
+    canvas#graph { width: 100%; height: 100%; display: block; }
+    .grid-lines {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(#1a1a1a 1px, transparent 1px),
+        linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
+    }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            TMJ-GUARD
+        </div>
+        <div class="status">
+            SENSOR STATUS <div class="status-light" id="statusLight"></div>
+        </div>
+    </header>
+
+    <main>
+        <video id="input_video" playsinline></video>
+        <canvas id="mesh"></canvas>
+        
+        <div class="hud-alert" id="clenchAlert">⚠️ HIGH TENSION DETECTED</div>
+
+        <div class="calib-overlay" id="calibModal">
+            <h2 style="color:var(--cyan); margin-bottom:10px;">Calibration Required</h2>
+            <p style="font-size:0.9rem; line-height:1.6; color:#aaa;">
+                1. Relax your jaw completely (teeth apart).<br>
+                2. Keep lips lightly touching.<br>
+                3. Face forward.
+            </p>
+            <button class="btn" onclick="startCalibration()">Calibrate Resting State</button>
+        </div>
+    </main>
+
+    <div class="dashboard">
+        <!-- Left Stats -->
+        <div class="metric-box">
+            <div>
+                <div class="metric-label">V-COMPRESSION</div>
+                <div class="metric-val" id="tensionVal">0<span class="metric-unit">%</span></div>
+            </div>
+            <div style="margin-top:20px;">
+                <div class="metric-label">CLENCH COUNT</div>
+                <div class="metric-val" id="clenchCount">0</div>
+            </div>
+        </div>
+
+        <!-- Center Graph -->
+        <div class="graph-container">
+            <div class="grid-lines"></div>
+            <canvas id="graph"></canvas>
+        </div>
+
+        <!-- Right Stats -->
+        <div class="metric-box" style="text-align: right;">
+            <div>
+                <div class="metric-label">JAW STATE</div>
+                <div class="metric-val" id="jawState" style="color: #fff;">IDLE</div>
+            </div>
+            <div style="margin-top:20px;">
+                <button class="btn" style="padding: 10px 20px; font-size: 0.8rem;" onclick="reset()">RE-CALIBRATE</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /* --- CONFIGURATION --- */
+    const CONFIG = {
+        calibrationFrames: 50,
+        tensionThreshold: 0.04, // 4% reduction in vertical height = clench
+        sustainTrigger: 10,     // Frames to sustain before alerting (filters noise)
+        graphSpeed: 2
+    };
+
+    const STATE = {
+        calibrating: false,
+        calibData: [],
+        baseHeight: 0,      // Resting distance (Nose to Chin)
+        
+        // Runtime
+        currentTension: 0,  // % deviation
+        isClenching: false,
+        clenchFrames: 0,
+        totalClenches: 0,
+        
+        graphData: new Array(300).fill(0)
+    };
+
+    /* --- DOM ELEMENTS --- */
+    const el = {
+        video: document.getElementById('input_video'),
+        meshCanvas: document.getElementById('mesh'),
+        meshCtx: document.getElementById('mesh').getContext('2d'),
+        graphCanvas: document.getElementById('graph'),
+        graphCtx: document.getElementById('graph').getContext('2d'),
+        alert: document.getElementById('clenchAlert'),
+        modal: document.getElementById('calibModal'),
+        tension: document.getElementById('tensionVal'),
+        count: document.getElementById('clenchCount'),
+        state: document.getElementById('jawState'),
+        light: document.getElementById('statusLight')
+    };
+
+    /* --- AUDIO ENGINE (Biofeedback) --- */
+    const AudioEngine = {
+        ctx: new (window.AudioContext || window.webkitAudioContext)(),
+        playPing() {
+            if(this.ctx.state === 'suspended') this.ctx.resume();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            
+            osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.2);
+            
+            gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+            
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.2);
+        }
+    };
+
+    /* --- MATH HELPERS --- */
+    const distance = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+    /* --- MAIN LOOP --- */
+    function onResults(results) {
+        // Draw Video & Mesh
+        el.meshCanvas.width = el.video.videoWidth;
+        el.meshCanvas.height = el.video.videoHeight;
+        el.meshCtx.clearRect(0, 0, el.meshCanvas.width, el.meshCanvas.height);
+        
+        if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+            el.light.classList.remove('active');
+            return;
+        }
+        
+        el.light.classList.add('active');
+        const landmarks = results.multiFaceLandmarks[0];
+
+        // 1. Calculate Vertical Jaw Height (Nose Tip [1] to Chin [152])
+        const nose = landmarks[1];
+        const chin = landmarks[152];
+        const currentHeight = distance(nose, chin);
+
+        // 2. Check Mouth Openness (Lips Inner) to filter out talking
+        const topLip = landmarks[13];
+        const botLip = landmarks[14];
+        const lipDist = distance(topLip, botLip);
+        const isTalking = lipDist > 0.05; // Approximate threshold
+
+        // DRAW JAWLINE
+        drawJawViz(landmarks);
+
+        // === CALIBRATION PHASE ===
+        if (STATE.calibrating) {
+            STATE.calibData.push(currentHeight);
+            el.state.innerText = "CALIBRATING...";
+            el.state.style.color = "var(--cyan)";
+            
+            if (STATE.calibData.length > CONFIG.calibrationFrames) {
+                // Finish Calibration
+                const sum = STATE.calibData.reduce((a, b) => a + b, 0);
+                STATE.baseHeight = sum / STATE.calibData.length;
+                STATE.calibrating = false;
+                el.modal.style.display = 'none';
+                el.state.innerText = "ACTIVE";
+            }
+            return;
+        }
+
+        if (STATE.baseHeight === 0) return;
+
+        // === DETECTION PHASE ===
+        
+        // Calculate Deviation (Compression)
+        // If currentHeight < baseHeight, jaw is moving UP (clenching)
+        // We track percentage decrease.
+        const diff = STATE.baseHeight - currentHeight;
+        let compression = diff / STATE.baseHeight; 
+
+        // Ignore negative compression (jaw opening/dropping)
+        if (compression < 0) compression = 0;
+        
+        // If mouth is open (talking), force compression to 0 to avoid false positives
+        if (isTalking) compression = 0;
+
+        // Update UI
+        STATE.currentTension = compression;
+        el.tension.innerText = (compression * 100).toFixed(1) + "%";
+        updateGraph(compression);
+
+        // Logic
+        if (compression > CONFIG.tensionThreshold) {
+            STATE.clenchFrames++;
+            if (STATE.clenchFrames > CONFIG.sustainTrigger) {
+                if (!STATE.isClenching) {
+                    // Trigger Start
+                    STATE.isClenching = true;
+                    STATE.totalClenches++;
+                    el.count.innerText = STATE.totalClenches;
+                    el.alert.style.display = 'block';
+                    el.state.innerText = "CLENCHING";
+                    el.state.style.color = "var(--alert)";
+                    AudioEngine.playPing();
+                }
+            }
+        } else {
+            STATE.clenchFrames = 0;
+            if (STATE.isClenching) {
+                // Trigger End
+                STATE.isClenching = false;
+                el.alert.style.display = 'none';
+                el.state.innerText = "RELAXED";
+                el.state.style.color = "#fff";
+            }
+        }
+    }
+
+    /* --- VISUALIZATION --- */
+    function drawJawViz(landmarks) {
+        const ctx = el.meshCtx;
+        const w = el.meshCanvas.width;
+        const h = el.meshCanvas.height;
+
+        ctx.strokeStyle = STATE.isClenching ? 'var(--alert)' : 'var(--cyan)';
+        ctx.lineWidth = 2;
+
+        // Draw Line from Nose to Chin (The Virtual Sensor)
+        const n = landmarks[1];
+        const c = landmarks[152];
+
+        ctx.beginPath();
+        ctx.moveTo(n.x * w, n.y * h);
+        ctx.lineTo(c.x * w, c.y * h);
+        ctx.stroke();
+
+        // Draw Anchor Points
+        ctx.fillStyle = STATE.isClenching ? 'var(--alert)' : 'var(--cyan)';
+        [1, 152, 365, 136].forEach(idx => {
+            const p = landmarks[idx];
+            ctx.beginPath();
+            ctx.arc(p.x * w, p.y * h, 3, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
+
+    function updateGraph(val) {
+        // Shift Array
+        STATE.graphData.shift();
+        
+        // Amplify val for visibility (max expected 0.1)
+        let displayVal = val * 10; 
+        if (displayVal > 1) displayVal = 1;
+        STATE.graphData.push(displayVal);
+
+        // Draw
+        const ctx = el.graphCtx;
+        const w = el.graphCanvas.width = el.graphCanvas.offsetWidth;
+        const h = el.graphCanvas.height = el.graphCanvas.offsetHeight;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.beginPath();
+        ctx.strokeStyle = STATE.isClenching ? 'var(--alert)' : 'var(--cyan)';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+
+        const step = w / STATE.graphData.length;
+
+        STATE.graphData.forEach((v, i) => {
+            const x = i * step;
+            // Invert Y (1 = top)
+            const y = h - (v * h); 
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+
+        ctx.stroke();
+        
+        // Fill
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.fillStyle = STATE.isClenching ? 'rgba(255, 56, 96, 0.1)' : 'rgba(102, 252, 241, 0.1)';
+        ctx.fill();
+    }
+
+    /* --- CONTROLS --- */
+    function startCalibration() {
+        STATE.calibrating = true;
+        STATE.calibData = [];
+    }
+
+    function reset() {
+        STATE.baseHeight = 0;
+        STATE.totalClenches = 0;
+        el.count.innerText = "0";
+        el.modal.style.display = 'block';
+    }
+
+    /* --- INIT --- */
+    const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+    faceMesh.setOptions({maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5});
+    faceMesh.onResults(onResults);
+
+    const camera = new Camera(el.video, {
+        onFrame: async () => { await faceMesh.send({image: el.video}); },
+        width: 640, height: 480
+    });
+    camera.start();
+
+</script>
+</body>
+</html>

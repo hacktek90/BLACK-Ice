@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instant Search</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-color: #111827; /* Monochrome accent */
+    --hover-bg: #f9fafb;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Allow scrolling */
+    padding: 60px 20px;
+  }
+
+  /* Container */
+  .box {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    color: #000;
+  }
+
+  p.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  /* Search Card */
+  .search-card {
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    margin-bottom: 24px;
+  }
+
+  /* Input Wrapper for Icon/Autocomplete positioning */
+  .autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  input:focus {
+    border-color: var(--text-secondary);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  }
+
+  input::placeholder {
+    color: #9ca3af;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.2s ease;
+  }
+
+  button:hover {
+    background: #000;
+  }
+
+  button:active {
+    transform: scale(0.99);
+  }
+
+  /* Autocomplete Dropdown */
+  .autocomplete-items {
+    position: absolute;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #fff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .autocomplete-items div {
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-primary);
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .autocomplete-items div:last-child {
+    border-bottom: none;
+  }
+
+  .autocomplete-items div:hover {
+    background-color: var(--hover-bg);
+  }
+
+  .autocomplete-active {
+    background-color: var(--hover-bg) !important;
+    color: #000;
+    font-weight: 500;
+  }
+
+  /* Results Area */
+  .result-container {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+
+  .result-container.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .result-card {
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    line-height: 1.6;
+  }
+
+  .result-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  .result-card p {
+    color: #374151;
+    margin-bottom: 16px;
+  }
+
+  .result-card a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid #ccc;
+    transition: border-color 0.2s;
+  }
+
+  .result-card a:hover {
+    border-color: #000;
+  }
+
+  /* Related Topics List */
+  ul.related-topics {
+    list-style: none;
+  }
+
+  ul.related-topics li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  ul.related-topics li:last-child {
+    border-bottom: none;
+  }
+
+  /* Loading State (Simple) */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="box">
+  <header>
+    <h1>Instant Search</h1>
+    <p class="subtitle">Fast, private, and minimal.</p>
+  </header>
+
+  <div class="search-card">
+    <div class="autocomplete-wrapper">
+      <input id="query" placeholder="Search anything..." autocomplete="off" />
+      <div id="suggestions" class="autocomplete-items"></div>
+    </div>
+    <button onclick="search()">Search</button>
+  </div>
+
+  <div id="result-container" class="result-container">
+    <div id="result" class="result-card"></div>
+  </div>
+</div>
+
+<script>
+// --- Variables for Autocomplete ---
+let currentFocus = -1;
+const inputField = document.getElementById("query");
+const suggestionsBox = document.getElementById("suggestions");
+const resultContainer = document.getElementById("result-container");
+let debounceTimer;
+
+// --- 1. Event Listeners for Input ---
+inputField.addEventListener("input", function(e) {
+  clearTimeout(debounceTimer);
+  const val = this.value;
+  
+  if (!val) {
+    closeAllLists();
+    return;
+  }
+  
+  debounceTimer = setTimeout(() => {
+    fetchSuggestions(val);
+  }, 300);
+});
+
+// Handle Keyboard Navigation
+inputField.addEventListener("keydown", function(e) {
+  let items = suggestionsBox.getElementsByTagName("div");
+  if (e.keyCode === 40) { // DOWN
+    currentFocus++;
+    addActive(items);
+  } else if (e.keyCode === 38) { // UP
+    currentFocus--;
+    addActive(items);
+  } else if (e.keyCode === 13) { // ENTER
+    e.preventDefault();
+    if (currentFocus > -1 && items[currentFocus]) {
+      items[currentFocus].click();
+    } else {
+      search();
+    }
+  }
+});
+
+// --- 2. Fetch Suggestions (Wikipedia CORS Proxy) ---
+// Using Wikipedia for suggestions as DuckDuckGo blocks browser fetch
+async function fetchSuggestions(query) {
+  const url = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=6&namespace=0&format=json&origin=*`;
+  
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    renderSuggestions(data[1]); // data[1] contains the list of titles
+  } catch (err) {
+    console.error("Error fetching suggestions:", err);
+  }
+}
+
+// --- 3. Render Suggestions ---
+function renderSuggestions(items) {
+  closeAllLists();
+  currentFocus = -1;
+  
+  if (!items || items.length === 0) return;
+
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.textContent = item;
+    div.addEventListener("click", function() {
+      inputField.value = this.textContent;
+      closeAllLists();
+      search();
+    });
+    suggestionsBox.appendChild(div);
+  });
+}
+
+// --- UI Helpers ---
+function addActive(items) {
+  if (!items) return false;
+  removeActive(items);
+  if (currentFocus >= items.length) currentFocus = 0;
+  if (currentFocus < 0) currentFocus = items.length - 1;
+  items[currentFocus].classList.add("autocomplete-active");
+  // Scroll into view if needed
+  items[currentFocus].scrollIntoView({ block: 'nearest' });
+}
+
+function removeActive(items) {
+  for (let item of items) {
+    item.classList.remove("autocomplete-active");
+  }
+}
+
+function closeAllLists() {
+  suggestionsBox.innerHTML = "";
+}
+
+document.addEventListener("click", function(e) {
+  if (e.target !== inputField) {
+    closeAllLists();
+  }
+});
+
+// --- Main Search Function ---
+async function search() {
+  closeAllLists();
+  const q = document.getElementById("query").value.trim();
+  if (!q) return;
+
+  // Show loading state
+  const resultDiv = document.getElementById("result");
+  resultContainer.classList.add("active");
+  resultDiv.innerHTML = '<div class="loading">Searching...</div>';
+
+  // DuckDuckGo Instant Answer API
+  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_redirect=1&no_html=1`;
+  
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    // Case 1: Instant Answer
+    if (data.AbstractText) {
+      resultDiv.innerHTML = `
+        <h3>${data.Heading}</h3>
+        <p>${data.AbstractText}</p>
+        <a href="${data.AbstractURL}" target="_blank">Read more on ${data.AbstractSource || 'Wikipedia'}</a>
+      `;
+      return;
+    }
+
+    // Case 2: Related Topics
+    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+      let topics = data.RelatedTopics
+        .filter(t => t.Text && t.FirstURL)
+        .slice(0, 6)
+        .map(t => `<li><a href="${t.FirstURL}" target="_blank">${t.Text}</a></li>`)
+        .join("");
+
+      resultDiv.innerHTML = `
+        <h3>Related Topics</h3>
+        <ul class="related-topics">${topics}</ul>
+      `;
+      return;
+    }
+
+    // Case 3: Fallback
+    resultDiv.innerHTML = `
+      <p style="text-align:center; color:var(--text-secondary);">No instant answer found.</p>
+      <div style="text-align:center; margin-top:10px;">
+        <a target="_blank" href="https://duckduckgo.com/?q=${encodeURIComponent(q)}">
+          Search "${q}" on DuckDuckGo
+        </a>
+      </div>
+    `;
+
+  } catch (error) {
+    resultDiv.innerHTML = `<p style="color:red;">Error fetching results. Please try again.</p>`;
+    console.error(error);
+  }
+}
+</script>
+</body>
+</html>

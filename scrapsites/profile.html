@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ComicLink! 💥 POW! Your Link-in-Bio Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bowlby+One&family=Righteous&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* === COMIC BOOK VARIABLES === */
+:root {
+--font-comic: 'Bangers', cursive;
+--font-bold: 'Bowlby One', cursive;
+--font-title: 'Righteous', cursive;
+--comic-red: #ff0000;
+--comic-blue: #0066ff;
+--comic-yellow: #ffdd00;
+--comic-black: #000000;
+--comic-white: #ffffff;
+--comic-bg: #fef6e4;
+--panel-border: 4px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: var(--font-title);
+background: var(--comic-bg);
+background-image: 
+radial-gradient(circle at 25% 25%, rgba(255, 0, 0, 0.05) 2%, transparent 2%),
+radial-gradient(circle at 75% 75%, rgba(0, 102, 255, 0.05) 2%, transparent 2%);
+background-size: 30px 30px;
+color: var(--comic-black);
+min-height: 100vh;
+position: relative;
+overflow-x: hidden;
+}
+
+/* Halftone Pattern Overlay */
+body::before {
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image: radial-gradient(circle, var(--comic-black) 1px, transparent 1px);
+background-size: 8px 8px;
+opacity: 0.03;
+pointer-events: none;
+z-index: 1;
+}
+
+/* Comic Sound Effects Background */
+.comic-effects {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 0;
+overflow: hidden;
+}
+
+.effect-text {
+position: absolute;
+font-family: var(--font-comic);
+font-size: 4rem;
+color: var(--comic-yellow);
+text-shadow: 
+4px 4px 0 var(--comic-black),
+-2px -2px 0 var(--comic-black),
+2px -2px 0 var(--comic-black),
+-2px 2px 0 var(--comic-black);
+opacity: 0.08;
+transform: rotate(-15deg);
+animation: float 20s infinite ease-in-out;
+}
+
+@keyframes float {
+0%, 100% { transform: translateY(0) rotate(-15deg); }
+50% { transform: translateY(-30px) rotate(-12deg); }
+}
+
+.hidden { display: none !important; }
+
+/* === CREATOR MODE === */
+#creator-app {
+width: 100%;
+max-width: 1100px;
+margin: 0 auto;
+min-height: 100vh;
+position: relative;
+z-index: 2;
+}
+
+.creator-nav {
+padding: 1.5rem 2rem;
+background: var(--comic-yellow);
+border-bottom: var(--panel-border) solid var(--comic-black);
+display: flex;
+justify-content: space-between;
+align-items: center;
+position: sticky;
+top: 0;
+z-index: 100;
+box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.brand {
+font-family: var(--font-comic);
+font-size: 2.5rem;
+color: var(--comic-red);
+text-shadow: 
+3px 3px 0 var(--comic-black),
+-2px -2px 0 var(--comic-black),
+2px -2px 0 var(--comic-black),
+-2px 2px 0 var(--comic-black);
+letter-spacing: 2px;
+transform: rotate(-2deg);
+animation: wiggle 3s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+0%, 100% { transform: rotate(-2deg); }
+50% { transform: rotate(2deg); }
+}
+
+/* Hero Section */
+.hero-section {
+background: var(--comic-red);
+background-image: 
+repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px);
+padding: 4rem 2rem;
+text-align: center;
+border-bottom: var(--panel-border) solid var(--comic-black);
+position: relative;
+box-shadow: inset 0 -10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.hero-title {
+font-family: var(--font-comic);
+font-size: 3.5rem;
+color: var(--comic-yellow);
+text-shadow: 
+5px 5px 0 var(--comic-black),
+-3px -3px 0 var(--comic-black),
+3px -3px 0 var(--comic-black),
+-3px 3px 0 var(--comic-black);
+margin-bottom: 1rem;
+transform: rotate(-1deg);
+animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+0%, 100% { transform: rotate(-1deg) translateY(0); }
+50% { transform: rotate(1deg) translateY(-10px); }
+}
+
+.hero-sub {
+color: var(--comic-white);
+max-width: 700px;
+margin: 0 auto;
+line-height: 1.8;
+font-size: 1.1rem;
+font-weight: bold;
+text-shadow: 2px 2px 0 var(--comic-black);
+}
+
+.hero-features {
+display: flex;
+justify-content: center;
+gap: 1.5rem;
+margin-top: 2rem;
+flex-wrap: wrap;
+}
+
+.feat-badge {
+display: inline-block;
+font-family: var(--font-comic);
+font-size: 1.1rem;
+font-weight: bold;
+color: var(--comic-black);
+background: var(--comic-white);
+padding: 0.7rem 1.5rem;
+border: 3px solid var(--comic-black);
+border-radius: 0;
+box-shadow: 5px 5px 0 var(--comic-black);
+transform: rotate(-2deg);
+transition: all 0.2s;
+}
+
+.feat-badge:hover {
+transform: rotate(2deg) translateY(-3px);
+box-shadow: 7px 7px 0 var(--comic-black);
+}
+
+.creator-body {
+padding: 3rem 2rem;
+display: grid;
+grid-template-columns: 1.2fr 0.8fr;
+gap: 2rem;
+max-width: 1200px;
+margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+.creator-body { grid-template-columns: 1fr; padding: 1.5rem; }
+.hero-title { font-size: 2.5rem; }
+.brand { font-size: 1.8rem; }
+}
+
+/* Comic Panel Style */
+.panel {
+background: var(--comic-white);
+padding: 2.5rem;
+border: var(--panel-border) solid var(--comic-black);
+box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+position: relative;
+}
+
+.panel::before {
+content: '';
+position: absolute;
+top: 10px;
+left: 10px;
+right: 10px;
+bottom: 10px;
+border: 2px solid var(--comic-black);
+pointer-events: none;
+}
+
+.panel h3 {
+margin-bottom: 2rem;
+font-family: var(--font-comic);
+color: var(--comic-red);
+display: flex;
+align-items: center;
+gap: 0.7rem;
+font-size: 1.8rem;
+text-transform: uppercase;
+letter-spacing: 2px;
+text-shadow: 2px 2px 0 var(--comic-yellow);
+}
+
+.form-group { margin-bottom: 1.5rem; }
+
+.label {
+display: block;
+font-family: var(--font-bold);
+font-size: 0.9rem;
+font-weight: 700;
+color: var(--comic-black);
+margin-bottom: 0.6rem;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+.input {
+width: 100%;
+padding: 1rem;
+border: 3px solid var(--comic-black);
+font-family: var(--font-title);
+background: var(--comic-bg);
+color: var(--comic-black);
+transition: all 0.2s;
+font-size: 1rem;
+box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.input:focus {
+outline: none;
+background: var(--comic-white);
+box-shadow: 5px 5px 0 var(--comic-yellow);
+transform: translateY(-2px);
+}
+
+/* Speech Bubble Link Row */
+.link-row {
+display: flex;
+gap: 0.75rem;
+margin-bottom: 1rem;
+align-items: center;
+background: var(--comic-bg);
+padding: 1rem;
+border: 3px solid var(--comic-black);
+position: relative;
+}
+
+.link-row::before {
+content: '';
+position: absolute;
+left: 15px;
+bottom: -10px;
+width: 0;
+height: 0;
+border-left: 10px solid transparent;
+border-right: 10px solid transparent;
+border-top: 10px solid var(--comic-black);
+}
+
+.link-row::after {
+content: '';
+position: absolute;
+left: 17px;
+bottom: -7px;
+width: 0;
+height: 0;
+border-left: 8px solid transparent;
+border-right: 8px solid transparent;
+border-top: 8px solid var(--comic-bg);
+}
+
+.btn-icon {
+background: var(--comic-red);
+color: var(--comic-white);
+border: 3px solid var(--comic-black);
+width: 45px;
+height: 45px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.2s;
+box-shadow: 3px 3px 0 var(--comic-black);
+font-size: 1.1rem;
+font-weight: bold;
+}
+
+.btn-icon:hover {
+transform: translateY(-2px);
+box-shadow: 5px 5px 0 var(--comic-black);
+background: #cc0000;
+}
+
+.btn-add {
+width: 100%;
+padding: 1.2rem;
+background: var(--comic-blue);
+border: 3px dashed var(--comic-black);
+color: var(--comic-white);
+cursor: pointer;
+font-family: var(--font-comic);
+font-size: 1.2rem;
+font-weight: 600;
+margin-top: 1rem;
+transition: all 0.2s;
+text-transform: uppercase;
+letter-spacing: 2px;
+text-shadow: 2px 2px 0 var(--comic-black);
+box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-add:hover {
+background: #0052cc;
+transform: translateY(-3px);
+box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* POW! Button */
+.btn-generate {
+background: var(--comic-yellow);
+color: var(--comic-black);
+border: 4px solid var(--comic-black);
+padding: 1.5rem 2.5rem;
+font-family: var(--font-comic);
+font-weight: 700;
+font-size: 1.5rem;
+cursor: pointer;
+width: 100%;
+box-shadow: 8px 8px 0 var(--comic-red);
+transition: all 0.2s;
+text-transform: uppercase;
+letter-spacing: 3px;
+position: relative;
+overflow: hidden;
+}
+
+.btn-generate::before {
+content: '★';
+position: absolute;
+top: 50%;
+left: -30px;
+font-size: 2rem;
+color: var(--comic-red);
+animation: star-fly 3s infinite;
+}
+
+@keyframes star-fly {
+0% { left: -30px; transform: translateY(-50%) rotate(0deg); }
+100% { left: 110%; transform: translateY(-50%) rotate(360deg); }
+}
+
+.btn-generate:hover {
+transform: translateY(-3px);
+box-shadow: 12px 12px 0 var(--comic-red);
+}
+
+.btn-generate:active {
+transform: translateY(0);
+box-shadow: 4px 4px 0 var(--comic-red);
+}
+
+/* Result Modal - Comic Panel Style */
+.result-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.8);
+background-image: radial-gradient(circle, transparent 1px, rgba(0, 0, 0, 0.8) 1px);
+background-size: 4px 4px;
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 1000;
+animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+background: var(--comic-white);
+padding: 3rem;
+border: 6px solid var(--comic-black);
+text-align: center;
+width: 90%;
+max-width: 550px;
+box-shadow: 
+12px 12px 0 var(--comic-yellow),
+12px 12px 0 6px var(--comic-black);
+position: relative;
+}
+
+.modal-content::before {
+content: 'SUCCESS!';
+position: absolute;
+top: -30px;
+left: 50%;
+transform: translateX(-50%) rotate(-3deg);
+font-family: var(--font-comic);
+font-size: 1.5rem;
+color: var(--comic-yellow);
+background: var(--comic-red);
+padding: 0.5rem 2rem;
+border: 4px solid var(--comic-black);
+text-shadow: 2px 2px 0 var(--comic-black);
+}
+
+.modal-content h2 {
+font-family: var(--font-comic);
+font-size: 2rem;
+color: var(--comic-red);
+margin-bottom: 1rem;
+text-shadow: 2px 2px 0 var(--comic-yellow);
+}
+
+.bitly-btn {
+background: #ee6123;
+color: var(--comic-white);
+border: 3px solid var(--comic-black);
+padding: 1rem 1.5rem;
+font-family: var(--font-bold);
+font-weight: 600;
+cursor: pointer;
+margin-top: 1rem;
+display: inline-flex;
+align-items: center;
+gap: 0.5rem;
+width: 100%;
+justify-content: center;
+transition: all 0.2s;
+box-shadow: 4px 4px 0 var(--comic-black);
+font-size: 1rem;
+}
+
+.bitly-btn:hover {
+transform: translateY(-2px);
+box-shadow: 6px 6px 0 var(--comic-black);
+}
+
+/* === VIEWER MODE === */
+#viewer-app {
+width: 100%;
+min-height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 3rem 1rem;
+position: relative;
+z-index: 2;
+}
+
+/* Comic Book Panel Card */
+.glass-card {
+background: var(--comic-white);
+border: 6px solid var(--comic-black);
+padding: 3rem 2.5rem;
+width: 100%;
+max-width: 520px;
+text-align: center;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 1.5rem;
+position: relative;
+box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Inner Panel Border */
+.glass-card::before {
+content: '';
+position: absolute;
+top: 15px;
+left: 15px;
+right: 15px;
+bottom: 15px;
+border: 3px solid var(--comic-black);
+pointer-events: none;
+}
+
+/* Thought Bubble Style */
+.glass-card::after {
+content: '●';
+position: absolute;
+top: -25px;
+left: 50px;
+font-size: 2rem;
+color: var(--comic-black);
+text-shadow: -3px -3px 0 var(--comic-white);
+}
+
+.p-img-container {
+position: relative;
+width: 150px;
+height: 150px;
+margin-bottom: 1rem;
+}
+
+.p-img {
+width: 100%;
+height: 100%;
+border-radius: 50%;
+object-fit: cover;
+border: 6px solid var(--comic-black);
+box-shadow: 
+0 0 0 4px var(--comic-yellow),
+0 0 0 10px var(--comic-black),
+8px 8px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.verified-badge {
+position: absolute;
+bottom: 10px;
+right: 10px;
+background: var(--comic-yellow);
+color: var(--comic-black);
+width: 38px;
+height: 38px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+border: 4px solid var(--comic-black);
+box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+font-weight: bold;
+}
+
+.p-name {
+font-family: var(--font-comic);
+font-size: 2.5rem;
+font-weight: 900;
+letter-spacing: 2px;
+color: var(--comic-red);
+text-shadow: 
+3px 3px 0 var(--comic-black),
+-2px -2px 0 var(--comic-black),
+2px -2px 0 var(--comic-black),
+-2px 2px 0 var(--comic-black);
+animation: fadeIn 0.8s ease;
+transform: rotate(-1deg);
+}
+
+.p-bio {
+font-family: var(--font-title);
+font-size: 1.05rem;
+color: var(--comic-black);
+line-height: 1.6;
+max-width: 90%;
+font-weight: 600;
+position: relative;
+padding: 1rem;
+background: var(--comic-bg);
+border: 3px solid var(--comic-black);
+}
+
+/* Speech Bubble for Bio */
+.p-bio::before {
+content: '';
+position: absolute;
+bottom: -12px;
+left: 50%;
+transform: translateX(-50%);
+width: 0;
+height: 0;
+border-left: 12px solid transparent;
+border-right: 12px solid transparent;
+border-top: 12px solid var(--comic-black);
+}
+
+.p-bio::after {
+content: '';
+position: absolute;
+bottom: -8px;
+left: 50%;
+transform: translateX(-50%);
+width: 0;
+height: 0;
+border-left: 10px solid transparent;
+border-right: 10px solid transparent;
+border-top: 10px solid var(--comic-bg);
+}
+
+.social-row {
+display: flex;
+gap: 1.5rem;
+justify-content: center;
+margin: 1rem 0;
+}
+
+.social-icon {
+color: var(--comic-black);
+font-size: 2rem;
+transition: all 0.2s;
+background: var(--comic-yellow);
+width: 50px;
+height: 50px;
+display: flex;
+align-items: center;
+justify-content: center;
+border: 3px solid var(--comic-black);
+box-shadow: 4px 4px 0 var(--comic-black);
+transform: rotate(-3deg);
+}
+
+.social-icon:hover {
+transform: rotate(3deg) translateY(-5px);
+box-shadow: 6px 6px 0 var(--comic-black);
+background: var(--comic-red);
+color: var(--comic-white);
+}
+
+.links-container {
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 1.2rem;
+}
+
+.link-card {
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 1.3rem;
+background: var(--comic-blue);
+border: 4px solid var(--comic-black);
+color: var(--comic-white);
+text-decoration: none;
+font-family: var(--font-bold);
+font-weight: 600;
+font-size: 1.1rem;
+transition: all 0.2s;
+position: relative;
+box-shadow: 6px 6px 0 var(--comic-black);
+text-transform: uppercase;
+letter-spacing: 1px;
+opacity: 0;
+}
+
+.link-card::before {
+content: '★';
+position: absolute;
+left: 20px;
+font-size: 1.5rem;
+color: var(--comic-yellow);
+}
+
+.link-card::after {
+content: '★';
+position: absolute;
+right: 20px;
+font-size: 1.5rem;
+color: var(--comic-yellow);
+}
+
+.link-card:hover {
+transform: translateY(-5px) rotate(-1deg);
+box-shadow: 10px 10px 0 var(--comic-black);
+background: var(--comic-red);
+}
+
+.link-card:active {
+transform: translateY(0);
+box-shadow: 3px 3px 0 var(--comic-black);
+}
+
+/* Staggered Animation */
+.delay-1 { animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.1s forwards; }
+.delay-2 { animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s forwards; }
+.delay-3 { animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s forwards; }
+.delay-4 { animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s forwards; }
+.delay-5 { animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.5s forwards; }
+
+@keyframes popIn {
+0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+.footer-credit {
+margin-top: 2rem;
+font-family: var(--font-title);
+font-size: 0.85rem;
+color: var(--comic-black);
+font-weight: bold;
+}
+
+.footer-credit a {
+color: var(--comic-red);
+text-decoration: none;
+border-bottom: 2px solid var(--comic-red);
+}
+</style>
+</head>
+<body>
+<!-- Comic Effects Background -->
+<div class="comic-effects">
+<div class="effect-text" style="top: 10%; left: 5%;">POW!</div>
+<div class="effect-text" style="top: 60%; right: 10%; animation-delay: 5s;">BAM!</div>
+<div class="effect-text" style="bottom: 20%; left: 15%; animation-delay: 10s;">WHAM!</div>
+</div>
+
+<!-- ================== CREATOR APP ================== -->
+<div id="creator-app" class="hidden">
+<nav class="creator-nav">
+<div class="brand">💥 COMICLINK!</div>
+</nav>
+
+<section class="hero-section">
+<h1 class="hero-title">KAPOW! YOUR LINK HUB!</h1>
+<p class="hero-sub">
+Create your own superhero link-in-bio with AUTHENTIC comic book style!
+<strong>No database! No tracking! Pure vintage comic vibes!</strong>
+All your data encoded in ONE magic URL!
+</p>
+<div class="hero-features">
+<div class="feat-badge">⚡ INSTANT!</div>
+<div class="feat-badge">🛡️ PRIVATE!</div>
+<div class="feat-badge">💥 EPIC!</div>
+</div>
+</section>
+
+<div class="creator-body">
+<div class="panel">
+<h3>📝 YOUR HERO PROFILE</h3>
+<div class="form-group">
+<label class="label">⚡ Hero Name</label>
+<input type="text" id="c_name" class="input" placeholder="Captain Awesome">
+</div>
+<div class="form-group">
+<label class="label">💬 Your Catchphrase</label>
+<input type="text" id="c_bio" class="input" placeholder="Saving the internet, one link at a time!">
+</div>
+<div class="form-group">
+<label class="label">🦸 Profile Picture URL</label>
+<input type="url" id="c_img" class="input" placeholder="https://... (or leave blank)">
+</div>
+<div class="form-group" style="margin-top: 1.5rem;">
+<label class="label">🔗 SOCIAL POWERS</label>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;">
+<input type="text" id="s_insta" class="input" placeholder="Instagram">
+<input type="text" id="s_twitter" class="input" placeholder="X/Twitter">
+<input type="text" id="s_linkedin" class="input" placeholder="LinkedIn">
+<input type="text" id="s_github" class="input" placeholder="GitHub">
+</div>
+</div>
+<div class="form-group" style="margin-top: 1.5rem;">
+<label class="label">💥 SUPER LINKS</label>
+<div id="links-wrapper"></div>
+<button onclick="addLinkRow()" class="btn-add">+ ADD LINK</button>
+</div>
+</div>
+
+<div class="panel">
+<h3>🎨 COMIC STYLE</h3>
+<div class="form-group">
+<label class="label">📚 Comic Theme</label>
+<select id="c_theme" class="input">
+<option value="classic">Classic Comics</option>
+<option value="golden">Golden Age</option>
+<option value="silver">Silver Age</option>
+<option value="modern">Modern Pop Art</option>
+<option value="dark">Dark Knight</option>
+</select>
+</div>
+<div class="form-group">
+<label class="label">🖼️ Custom BG (Optional)</label>
+<input type="url" id="c_bg_img" class="input" placeholder="https://...">
+<small style="color:#666; display:block; margin-top:0.5rem; font-weight:bold;">
+Overrides theme background
+</small>
+</div>
+<div class="form-group">
+<label class="label">📐 Panel Style</label>
+<select id="c_shape" class="input">
+<option value="0px">Sharp Comic Panels</option>
+<option value="8px">Rounded Panels</option>
+<option value="16px">Soft Panels</option>
+</select>
+</div>
+<button onclick="generate()" class="btn-generate">
+GENERATE! 💥
+</button>
+</div>
+</div>
+
+<!-- Result Modal -->
+<div id="result-modal" class="result-modal hidden">
+<div class="modal-content">
+<h2>LINK CREATED!</h2>
+<p style="margin-bottom: 1rem; color: #333; font-weight: bold;">
+Your comic book profile is READY! Shorten this URL for best results:
+</p>
+<textarea id="final-url" class="input" rows="3" readonly style="font-size: 0.8rem; margin-bottom: 1rem;"></textarea>
+<div style="display: flex; gap: 0.7rem; flex-direction: column;">
+<button onclick="copyUrl()" class="btn-generate" style="padding: 1rem;">
+📋 COPY LINK!
+</button>
+<button onclick="openBitly()" class="bitly-btn">
+🔗 Shorten on Bit.ly
+</button>
+</div>
+<button onclick="closeModal()" style="background: transparent; border: none; margin-top: 1rem; cursor: pointer; color: #999; font-weight: bold; text-decoration: underline;">Close</button>
+</div>
+</div>
+</div>
+
+<!-- ================== VIEWER APP ================== -->
+<div id="viewer-app" class="hidden">
+<div class="glass-card">
+<div class="p-img-container">
+<img src="" id="v_img" class="p-img">
+<div class="verified-badge">✓</div>
+</div>
+<h1 id="v_name" class="p-name"></h1>
+<p id="v_bio" class="p-bio"></p>
+<div id="v_socials" class="social-row"></div>
+<div id="v_links" class="links-container"></div>
+<div class="footer-credit">
+<a href="?">💥 Made with ComicLink</a>
+</div>
+</div>
+</div>
+
+<script>
+// Router
+const params = new URLSearchParams(window.location.search);
+if (params.has('n') || params.has('l')) {
+initViewer();
+} else {
+initCreator();
+}
+
+// CREATOR LOGIC
+function initCreator() {
+document.getElementById('creator-app').classList.remove('hidden');
+addLinkRow();
+addLinkRow();
+}
+
+function addLinkRow() {
+const wrapper = document.getElementById('links-wrapper');
+const div = document.createElement('div');
+div.className = 'link-row';
+div.innerHTML = `
+<i class="fa-solid fa-grip-lines" style="color: #666;"></i>
+<div style="flex:1; display:flex; flex-direction:column; gap:0.3rem;">
+<input type="text" class="l-title" placeholder="Link Title (e.g. My Portfolio)" style="border:none; outline:none; background:transparent; font-weight:700; width:100%; color:#000; font-family: var(--font-bold);">
+<input type="text" class="l-url" placeholder="https://..." style="border:none; outline:none; background:transparent; font-size:0.9rem; color:#666; width:100%;">
+</div>
+<button onclick="this.parentElement.remove()" class="btn-icon" title="Remove"><i class="fa-solid fa-trash"></i></button>
+`;
+wrapper.appendChild(div);
+}
+
+function generate() {
+const name = document.getElementById('c_name').value.trim();
+const bio = document.getElementById('c_bio').value.trim();
+const img = document.getElementById('c_img').value.trim();
+const theme = document.getElementById('c_theme').value;
+const bgImg = document.getElementById('c_bg_img').value.trim();
+const shape = document.getElementById('c_shape').value;
+
+const s_insta = document.getElementById('s_insta').value.trim();
+const s_twit = document.getElementById('s_twitter').value.trim();
+const s_link = document.getElementById('s_linkedin').value.trim();
+const s_git = document.getElementById('s_github').value.trim();
+
+const rows = document.querySelectorAll('.link-row');
+let linksArr = [];
+rows.forEach(row => {
+const t = row.querySelector('.l-title').value.trim();
+const u = row.querySelector('.l-url').value.trim();
+if(t && u) linksArr.push(`${t}*${u}`);
+});
+
+if(!name) { alert("Please enter your Hero Name!"); return; }
+
+const p = new URLSearchParams();
+p.set('n', name);
+if(bio) p.set('b', bio);
+if(img) p.set('i', img);
+p.set('t', theme);
+if(bgImg) p.set('bg', bgImg);
+p.set('s', shape);
+
+let socials = [];
+if(s_insta) socials.push(`ig:${s_insta}`);
+if(s_twit) socials.push(`tw:${s_twit}`);
+if(s_link) socials.push(`li:${s_link}`);
+if(s_git) socials.push(`gh:${s_git}`);
+if(socials.length) p.set('so', socials.join(','));
+
+if(linksArr.length) p.set('l', linksArr.join('~'));
+
+const finalUrl = `${window.location.origin}${window.location.pathname}?${p.toString()}`;
+document.getElementById('final-url').value = finalUrl;
+document.getElementById('result-modal').classList.remove('hidden');
+}
+
+function copyUrl() {
+const copyText = document.getElementById("final-url");
+copyText.select();
+navigator.clipboard.writeText(copyText.value);
+alert("KAPOW! Copied to clipboard!");
+}
+
+function openBitly() {
+const copyText = document.getElementById("final-url");
+copyText.select();
+navigator.clipboard.writeText(copyText.value).then(() => {
+window.open('https://bitly.com', '_blank');
+});
+}
+
+function closeModal() {
+document.getElementById('result-modal').classList.add('hidden');
+}
+
+// VIEWER LOGIC
+function initViewer() {
+document.getElementById('viewer-app').classList.remove('hidden');
+
+const n = params.get('n');
+const b = params.get('b');
+const i = params.get('i');
+const t = params.get('t') || 'classic';
+const bg = params.get('bg');
+const s = params.get('s') || '0px';
+const l = params.get('l');
+const so = params.get('so');
+
+document.getElementById('v_name').textContent = n;
+document.getElementById('v_bio').textContent = b || '';
+
+const imgEl = document.getElementById('v_img');
+imgEl.src = i ? i : `https://ui-avatars.com/api/?name=${n}&background=random&size=256`;
+
+applyTheme(t, bg, s);
+
+if(so) {
+const socialBox = document.getElementById('v_socials');
+const sList = so.split(',');
+sList.forEach(item => {
+const [type, val] = item.split(':');
+let icon = '', url = '';
+if(type === 'ig') { icon = 'fa-instagram'; url = `https://instagram.com/${val}`; }
+if(type === 'tw') { icon = 'fa-twitter'; url = `https://twitter.com/${val}`; }
+if(type === 'li') { icon = 'fa-linkedin'; url = `https://linkedin.com/in/${val}`; }
+if(type === 'gh') { icon = 'fa-github'; url = `https://github.com/${val}`; }
+if(icon) {
+const a = document.createElement('a');
+a.href = url; a.target = "_blank"; a.className = "social-icon";
+a.innerHTML = `<i class="fa-brands ${icon}"></i>`;
+socialBox.appendChild(a);
+}
+});
+}
+
+if(l) {
+const linkBox = document.getElementById('v_links');
+const list = l.split('~');
+list.forEach((item, index) => {
+const [title, url] = item.split('*');
+if(title && url) {
+const a = document.createElement('a');
+a.className = `link-card delay-${Math.min(index+1, 5)}`;
+a.href = url; a.target = "_blank";
+a.textContent = title;
+linkBox.appendChild(a);
+}
+});
+}
+}
+
+function applyTheme(themeName, customBg, radius) {
+const root = document.documentElement;
+root.style.setProperty('--btn-radius', radius);
+
+const themes = {
+'classic': { bg: '#fef6e4', primary: '#ff0000', secondary: '#0066ff' },
+'golden': { bg: '#fff8dc', primary: '#d4af37', secondary: '#8b4513' },
+'silver': { bg: '#e6f2ff', primary: '#4169e1', secondary: '#c0c0c0' },
+'modern': { bg: '#ffe0f0', primary: '#ff1493', secondary: '#00ced1' },
+'dark': { bg: '#1a1a2e', primary: '#ff4500', secondary: '#4a4a4a' }
+};
+
+const t = themes[themeName] || themes['classic'];
+
+if(customBg) {
+document.body.style.background = `url('${customBg}') center/cover fixed`;
+} else {
+document.body.style.backgroundColor = t.bg;
+root.style.setProperty('--comic-bg', t.bg);
+root.style.setProperty('--comic-red', t.primary);
+root.style.setProperty('--comic-blue', t.secondary);
+}
+}
+</script>
+</body>
+</html>
