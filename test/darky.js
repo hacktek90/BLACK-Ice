@@ -127,31 +127,4 @@ const asciiLogo = `
     █▀█ █░█ █▀▄ █▀█ █▄▀ ██▄ █▀▄`;
 console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: monospace;');
 
-(function () {
-  const VERCEL_HOST = "blackice-ac.vercel.app";
-  const VERCEL_HOME = "https://blackice-ac.vercel.app/Home.html";
 
-  // Whitelisted hosts (no redirect)
-  const ALLOWED_HOSTS = [
-    "blackice-ac.vercel.app",
-    "blackice-skd.vercel.app",
-    "black-ice.pages.dev"
-  ];
-
-  const currentHost = window.location.hostname;
-
-  // 🔑 Check for ?admin=elite
-  const params = new URLSearchParams(window.location.search);
-  const isEliteAdmin = params.get("admin") === "elite";
-
-  // 🚫 Skip redirect if:
-  // - host is in allowed list
-  // - OR ?admin=elite is present
-  const isAllowedHost = ALLOWED_HOSTS.includes(currentHost);
-
-  if (!isAllowedHost && !isEliteAdmin) {
-    window.location.replace(VERCEL_HOME);
-    return; // stop further execution
-  }
-
-})();
