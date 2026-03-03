@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>SwissShare · Mini</title>
+
+  <!-- Inter Tight -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- UIkit CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.18.0/dist/css/uikit.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.18.0/dist/js/uikit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.18.0/dist/js/uikit-icons.min.js"></script>
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- QR -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --navy-900: #020617;
+      --navy-800: #0f172a;
+      --navy-700: #1e293b;
+      --navy-accent: #2563eb;
+      --slate-200: #e2e8f0;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+    }
+
+    * {
+      font-family: "Inter Tight", system-ui, sans-serif;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100dvh;
+      background-color: var(--navy-900);
+      background-image:
+        linear-gradient(rgba(30,41,59,.40) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,41,59,.40) 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: var(--slate-200);
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      body { overflow: auto !important; }
+    }
+
+    ::selection {
+      background: var(--navy-accent);
+      color: white;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.25rem;
+      opacity: 0.4;
+      filter: blur(2px);
+      transition: all 0.3s ease;
+    }
+
+    .hero:hover {
+      opacity: 1;
+      filter: blur(0);
+    }
+
+    .hero-content {
+      width: 100%;
+      max-width: 42rem;
+      text-align: center;
+      margin-top: -4rem;
+    }
+
+    @media (min-width: 640px) {
+      .hero { padding: 0 1.5rem; }
+      .hero-content { margin-top: -5rem; }
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      background: rgba(2, 6, 23, 0.8);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      color: var(--slate-400);
+    }
+
+    .status-dot {
+      position: relative;
+      width: 0.5rem;
+      height: 0.5rem;
+    }
+
+    .status-dot .ping {
+      position: absolute;
+      display: inline-flex;
+      width: 100%;
+      height: 100%;
+      border-radius: 9999px;
+      background: #34d399;
+      opacity: 0.75;
+      animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .status-dot .dot {
+      position: relative;
+      display: inline-flex;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 9999px;
+      background: #10b981;
+    }
+
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.05em;
+      color: white;
+      line-height: 0.95;
+      margin: 1.5rem 0 0 0;
+    }
+
+    @media (min-width: 640px) { .hero-title { font-size: 3.75rem; } }
+    @media (min-width: 768px) { .hero-title { font-size: 4.5rem; } }
+
+    .hero-title span { color: var(--navy-accent); }
+
+    .hero-desc {
+      color: var(--slate-400);
+      max-width: 28rem;
+      margin: 1.5rem auto 0;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    @media (min-width: 640px) { .hero-desc { font-size: 1rem; } }
+
+    /* Glass Dock */
+    .dock-wrapper {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 94%;
+      max-width: 560px;
+      z-index: 50;
+    }
+
+    @media (min-width: 640px) { .dock-wrapper { width: 92%; } }
+
+    .glass-dock {
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.22), 0 24px 50px rgba(0, 0, 0, 0.65);
+      border-radius: 1rem;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .glass-dock { padding: 0.625rem; gap: 0.625rem; }
+    }
+
+    .dock-btn {
+      width: 2.75rem;
+      height: 2.75rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    @media (min-width: 640px) {
+      .dock-btn { width: 3rem; height: 3rem; }
+    }
+
+    .dock-btn:active { transform: scale(0.95); }
+
+    .dock-btn.primary {
+      background: var(--navy-accent);
+      color: white;
+    }
+
+    .dock-btn.primary:hover { background: #3b82f6; }
+
+    .dock-btn.secondary {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      color: var(--slate-200);
+    }
+
+    .dock-btn.secondary:hover { background: var(--slate-800); }
+
+    .dock-btn.ghost {
+      background: transparent;
+      color: var(--slate-400);
+      border: none;
+    }
+
+    .dock-btn.ghost:hover {
+      color: white;
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .dock-btn.ghost.bordered {
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      color: var(--slate-300);
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 1.5rem;
+      background: rgba(51, 65, 85, 0.6);
+      display: none;
+    }
+
+    @media (min-width: 640px) { .dock-divider { display: block; } }
+
+    .dock-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .dock-input-wrapper .icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--slate-500);
+      font-size: 1.125rem;
+      pointer-events: none;
+    }
+
+    .dock-input {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+      font-size: 13px;
+      color: var(--slate-200);
+      transition: all 0.2s;
+    }
+
+    @media (min-width: 640px) {
+      .dock-input { padding: 0.875rem 1rem 0.875rem 2.5rem; font-size: 0.875rem; }
+    }
+
+    .dock-input::placeholder { color: var(--slate-500); }
+    .dock-input:focus {
+      outline: none;
+      background: var(--slate-800);
+      border-color: var(--navy-accent);
+    }
+
+    /* Hide on mobile / desktop */
+    .hide-mobile { display: none !important; }
+    @media (min-width: 640px) { .hide-mobile { display: flex !important; } }
+    .hide-desktop { display: flex !important; }
+    @media (min-width: 640px) { .hide-desktop { display: none !important; } }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.86);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      z-index: 100;
+      display: none;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-backdrop.bottom { align-items: flex-end; }
+    .modal-backdrop.center { align-items: center; justify-content: center; padding: 0.75rem; }
+
+    @media (min-width: 640px) { .modal-backdrop.center { padding: 1rem; } }
+
+    /* Modal Card */
+    .modal-card {
+      background: var(--navy-900);
+      border: 1px solid var(--slate-700);
+      border-radius: 1rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal-card.bottom-sheet {
+      width: 100%;
+      border-radius: 1rem 1rem 0 0;
+      border-bottom: none;
+      transform: translateY(0.75rem);
+    }
+
+    .modal-backdrop.active .modal-card.bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-card.white {
+      background: white;
+      color: var(--navy-900);
+      border-radius: 1.5rem;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      color: var(--slate-500);
+      cursor: pointer;
+      padding: 0.5rem;
+      font-size: 1.25rem;
+      transition: color 0.2s;
+    }
+
+    @media (min-width: 640px) {
+      .modal-close { top: 1rem; right: 1rem; }
+    }
+
+    .modal-close:hover { color: white; }
+    .modal-card.white .modal-close:hover { color: var(--navy-900); }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--slate-800);
+    }
+
+    .modal-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem 0;
+    }
+
+    @media (min-width: 640px) { .modal-title { font-size: 1.25rem; } }
+
+    .modal-subtitle {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--slate-500);
+      margin: 0;
+    }
+
+    .modal-body { padding: 1.25rem; }
+    @media (min-width: 640px) { .modal-body { padding: 1.5rem; } }
+
+    /* Quick Modal (Mobile) */
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .quick-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--slate-700);
+      background: rgba(30, 41, 59, 0.4);
+      color: var(--slate-100);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .quick-action-btn:hover { background: var(--slate-800); }
+
+    /* Upload Modal */
+    .drop-zone {
+      position: relative;
+      border: 1px dashed var(--slate-700);
+      border-radius: 0.75rem;
+      background: rgba(30, 41, 59, 0.2);
+      transition: border-color 0.2s;
+    }
+
+    .drop-zone.highlight { border-color: var(--navy-accent); }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-idle {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) { .upload-idle { padding: 2.25rem; } }
+
+    .upload-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background: var(--slate-800);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.75rem;
+      color: var(--navy-accent);
+      font-size: 1.5rem;
+    }
+
+    .upload-idle p { margin: 0; }
+    .upload-idle .main-text { font-size: 0.875rem; color: var(--slate-200); }
+    .upload-idle .sub-text { font-size: 0.75rem; color: var(--slate-500); margin-top: 0.25rem; }
+
+    .uploading-state {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 6, 23, 0.9);
+      border-radius: 0.75rem;
+    }
+
+    .uploading-state.active { display: flex; }
+
+    .uploading-state .spinner {
+      font-size: 1.875rem;
+      color: var(--navy-accent);
+      animation: spin 1s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .uploading-state p {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--slate-400);
+      margin: 0;
+    }
+
+    /* Upload Result */
+    .upload-result {
+      margin-top: 1.25rem;
+      border-top: 1px solid var(--slate-800);
+      padding-top: 1rem;
+      display: none;
+    }
+
+    .upload-result.active { display: block; }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--slate-500);
+      margin-bottom: 0.75rem;
+    }
+
+    .result-url-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .result-url-box {
+      flex: 1;
+      background: rgba(2, 6, 23, 1);
+      border: 1px solid var(--slate-800);
+      border-radius: 0.5rem;
+      padding: 0.625rem 0.75rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .result-url-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: var(--slate-200);
+      outline: none;
+    }
+
+    @media (min-width: 640px) { .result-url-box input { font-size: 0.875rem; } }
+
+    .btn-copy {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--navy-accent);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: var(--navy-accent);
+      color: white;
+    }
+
+    .preview-container {
+      margin-top: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--slate-800);
+      background: rgba(0, 0, 0, 0.4);
+      min-height: 64px;
+      max-height: 35dvh;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-container img,
+    .preview-container video {
+      max-width: 100%;
+      max-height: 13rem;
+      object-fit: contain;
+    }
+
+    .preview-container audio { width: 100%; }
+
+    .preview-fallback {
+      font-size: 0.75rem;
+      color: var(--slate-500);
+      padding: 0.75rem;
+    }
+
+    /* Kraken Modal */
+    .kraken-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 0.75rem 0.75rem 1rem;
+      border-bottom: 1px solid var(--slate-800);
+    }
+
+    @media (min-width: 640px) { .kraken-header { padding: 0.75rem 1rem; } }
+
+    .kraken-header .info p { margin: 0; }
+    .kraken-header .info .sub { font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em; color: var(--slate-500); }
+    @media (min-width: 640px) { .kraken-header .info .sub { font-size: 11px; } }
+    .kraken-header .info .title { font-size: 0.875rem; color: var(--slate-200); }
+
+    .kraken-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-open {
+      font-size: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--slate-700);
+      background: transparent;
+      color: var(--slate-200);
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-open:hover { background: var(--slate-800); }
+
+    .kraken-frame {
+      width: 100%;
+      height: min(78dvh, 860px);
+      border: 0;
+      background: white;
+    }
+
+    /* QR Modal */
+    .qr-modal-content {
+      padding: 1.75rem 2rem;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) { .qr-modal-content { padding: 2rem; } }
+
+    .qr-modal-content h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .qr-modal-content canvas { margin: 0 auto; display: block; }
+
+    .qr-modal-content .hint {
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
+      color: var(--slate-500);
+    }
+
+    /* Scan Modal */
+    .scan-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .scan-modal-header span { font-size: 0.875rem; font-weight: 500; }
+
+    #qr-reader {
+      border-radius: 0.5rem;
+      border: 1px solid var(--slate-800);
+      background: black;
+      height: 260px;
+      overflow: hidden;
+    }
+
+    #scanStatus {
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--slate-500);
+      text-align: center;
+    }
+
+    #scanStatus .error { color: #f87171; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-200%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--slate-700);
+      color: white;
+      padding: 0.625rem 1rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.025em;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+      z-index: 200;
+    }
+
+    @media (min-width: 640px) { .toast { top: 1.5rem; } }
+
+    .toast.visible { transform: translateX(-50%) translateY(0); }
+
+    .toast .icon-ok { color: #34d399; }
+    .toast .icon-error { color: #f87171; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Hero -->
+  <main class="hero">
+    <div class="hero-content">
+      <div class="status-badge">
+        <span class="status-dot">
+          <span class="ping"></span>
+          <span class="dot"></span>
+        </span>
+        Mini (&le;100MB) · Big (Kraken)
+      </div>
+
+      <h1 class="hero-title">
+        Swiss<span>Share</span>
+      </h1>
+
+      <p class="hero-desc">
+        Upload small files instantly. Big files open KrakenFiles.
+      </p>
+    </div>
+  </main>
+
+  <!-- Dock (Centered) -->
+  <div class="dock-wrapper">
+    <div class="glass-dock">
+
+      <!-- Upload -->
+      <button type="button" class="dock-btn primary" onclick="openModal('uploadModal')" title="Upload">
+        <i class="ph-bold ph-plus" style="font-size:18px;"></i>
+      </button>
+
+      <!-- Big file -->
+      <button type="button" class="dock-btn secondary" onclick="openKraken()" title="Big file mode">
+        <i class="ph-bold ph-hard-drives" style="font-size:18px;"></i>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Input -->
+      <div class="dock-input-wrapper">
+        <i class="ph ph-link-simple icon"></i>
+        <input id="linkInput" type="text" class="dock-input" placeholder="Paste link…" onkeypress="handleLinkEnter(event)" />
+      </div>
+
+      <!-- QR (Desktop) -->
+      <button type="button" class="dock-btn ghost hide-mobile" onclick="generateQR()" title="Make QR">
+        <i class="ph ph-qr-code" style="font-size:20px;"></i>
+      </button>
+
+      <button type="button" class="dock-btn ghost hide-mobile" onclick="startScanner()" title="Scan QR">
+        <i class="ph ph-scan" style="font-size:20px;"></i>
+      </button>
+
+      <!-- Mobile-only more menu -->
+      <button type="button" class="dock-btn ghost bordered hide-desktop" onclick="openModal('quickModal')" title="More">
+        <i class="ph ph-dots-three-outline" style="font-size:20px;"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Actions Modal (Mobile) -->
+  <div id="quickModal" class="modal-backdrop bottom">
+    <div class="modal-card bottom-sheet" style="padding:1rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <p class="modal-subtitle" style="margin:0;">Actions</p>
+        <button type="button" onclick="closeAllModals()" style="background:none;border:none;color:var(--slate-400);cursor:pointer;font-size:1.25rem;">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+
+      <div class="quick-actions-grid">
+        <button class="quick-action-btn" onclick="closeAllModals(); generateQR();">
+          <i class="ph ph-qr-code"></i> QR
+        </button>
+        <button class="quick-action-btn" onclick="closeAllModals(); startScanner();">
+          <i class="ph ph-scan"></i> Scan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div id="uploadModal" class="modal-backdrop center">
+    <div class="modal-card" style="width:100%;max-width:28rem;">
+      <button type="button" class="modal-close" onclick="closeAllModals()">
+        <i class="ph ph-x"></i>
+      </button>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Upload</h2>
+        <p class="modal-subtitle" style="margin-bottom:1.25rem;">
+          &le;100MB &rarr; Mini · &gt;100MB &rarr; Big
+        </p>
+
+        <div id="dropZone" class="drop-zone">
+          <input id="fileInput" type="file" onclick="this.value=null" onchange="handleFileChosen(this.files[0])" />
+
+          <div id="uploadIdle" class="upload-idle">
+            <div class="upload-icon">
+              <i class="ph ph-cloud-arrow-up"></i>
+            </div>
+            <p class="main-text">Click or drop a file here</p>
+            <p class="sub-text">Auto-routing by file size.</p>
+          </div>
+
+          <div id="uploadingState" class="uploading-state">
+            <i class="ph ph-spinner spinner"></i>
+            <p>Uploading…</p>
+          </div>
+        </div>
+
+        <div id="uploadResult" class="upload-result">
+          <div class="result-header">
+            <span>Direct link</span>
+            <span>Mini mode</span>
+          </div>
+
+          <div class="result-url-row">
+            <div class="result-url-box">
+              <input id="resultUrl" readonly />
+            </div>
+            <button type="button" class="btn-copy" onclick="copyResultUrl()">Copy</button>
+          </div>
+
+          <div id="previewContainer" class="preview-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kraken Modal -->
+  <div id="krakenModal" class="modal-backdrop center" style="z-index:110;">
+    <div class="modal-card" style="width:100%;max-width:72rem;overflow:hidden;">
+      <div class="kraken-header">
+        <div class="info">
+          <p class="sub">Big file mode</p>
+          <p class="title">KrakenFiles</p>
+        </div>
+
+        <div class="kraken-actions">
+          <a href="https://krakenfiles.com" target="_blank" class="btn-open">Open</a>
+          <button type="button" onclick="closeAllModals()" style="background:none;border:none;color:var(--slate-400);cursor:pointer;padding:0.5rem;">
+            <i class="ph ph-x" style="font-size:1.25rem;"></i>
+          </button>
+        </div>
+      </div>
+
+      <iframe id="krakenFrame" src="about:blank" class="kraken-frame" allow="clipboard-read; clipboard-write"></iframe>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="modal-backdrop center">
+    <div class="modal-card white" style="width:100%;max-width:24rem;">
+      <button type="button" class="modal-close" onclick="closeAllModals()" style="color:var(--slate-400);">
+        <i class="ph ph-x"></i>
+      </button>
+
+      <div class="qr-modal-content">
+        <h3>Scan to open</h3>
+        <canvas id="qrCanvas"></canvas>
+        <p class="hint">Open on another device.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scanner Modal -->
+  <div id="scanModal" class="modal-backdrop center">
+    <div class="modal-card" style="width:100%;max-width:24rem;padding:1.25rem;">
+      <div class="scan-modal-header">
+        <span>QR scanner</span>
+        <button type="button" onclick="closeAllModals()" style="background:none;border:none;color:var(--slate-400);cursor:pointer;">
+          <i class="ph ph-x" style="font-size:1.25rem;"></i>
+        </button>
+      </div>
+      <div id="qr-reader"></div>
+      <p id="scanStatus">Requesting camera…</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <i id="toastIcon" class="ph-fill ph-check-circle icon-ok"></i>
+    <span id="toastMsg">Done</span>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const MINI_LIMIT_BYTES = 100 * 1024 * 1024;
+
+    function showToast(msg, type = "ok") {
+      const toast = $("toast");
+      const icon = $("toastIcon");
+      $("toastMsg").textContent = msg;
+      icon.className = type === "error"
+        ? "ph-fill ph-warning-circle icon-error"
+        : "ph-fill ph-check-circle icon-ok";
+      toast.classList.add("visible");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { toast.classList.remove("visible"); }, 2600);
+    }
+
+    function toPreviewURL(apiUrl) {
+      try {
+        const u = new URL(apiUrl);
+        if (u.pathname.startsWith("/dl/")) return apiUrl;
+        return `${u.origin}/dl${u.pathname}`;
+      } catch { return apiUrl; }
+    }
+
+    // Modals
+    function openModal(id) {
+      closeAllModals(id);
+      const backdrop = $(id);
+      backdrop.classList.add("active");
+    }
+
+    async function closeAllModals(exceptId = null) {
+      await stopScanner();
+      document.querySelectorAll(".modal-backdrop").forEach((b) => {
+        if (exceptId && b.id === exceptId) return;
+        b.classList.remove("active");
+      });
+    }
+
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAllModals(); });
+    document.querySelectorAll(".modal-backdrop").forEach((b) => {
+      b.addEventListener("click", (e) => { if (e.target === b) closeAllModals(); });
+    });
+
+    // Big mode
+    function openKraken() {
+      $("krakenFrame").src = "https://krakenfiles.com";
+      openModal("krakenModal");
+      showToast("Big file mode opened");
+    }
+
+    // Upload
+    async function handleFileChosen(file) {
+      if (!file) return;
+
+      if (file.size > MINI_LIMIT_BYTES) {
+        closeAllModals();
+        openKraken();
+        showToast("File >100MB → Big mode");
+        return;
+      }
+
+      $("uploadIdle").style.display = "none";
+      $("uploadingState").classList.add("active");
+      $("uploadResult").classList.remove("active");
+
+      const fd = new FormData();
+      fd.append("file", file);
+
+      try {
+        const res = await fetch("https://tmpfiles.org/api/v1/upload", { method: "POST", body: fd });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const json = await res.json();
+        if (json.status !== "success") throw new Error("API error");
+
+        const directUrl = toPreviewURL(json.data.url);
+        $("resultUrl").value = directUrl;
+
+        let preview = `<div class="preview-fallback">Preview not available</div>`;
+        if (file.type.startsWith("image/")) preview = `<img src="${directUrl}" />`;
+        else if (file.type.startsWith("audio/")) preview = `<audio controls src="${directUrl}"></audio>`;
+        else if (file.type.startsWith("video/")) preview = `<video controls src="${directUrl}"></video>`;
+        $("previewContainer").innerHTML = preview;
+
+        $("uploadingState").classList.remove("active");
+        $("uploadIdle").style.display = "block";
+        $("uploadResult").classList.add("active");
+        showToast("Upload complete");
+      } catch (err) {
+        console.error(err);
+        $("uploadingState").classList.remove("active");
+        $("uploadIdle").style.display = "block";
+        showToast("Upload failed", "error");
+      }
+    }
+
+    function copyResultUrl() {
+      const val = $("resultUrl").value;
+      if (!val) return;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(val).then(() => showToast("Link copied"));
+      } else {
+        const input = $("resultUrl");
+        input.select();
+        document.execCommand("copy");
+        showToast("Link copied");
+      }
+    }
+
+    // Drop support
+    const dz = $("dropZone");
+    ["dragenter","dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.add("highlight"); }));
+    ["dragleave","drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.remove("highlight"); }));
+    dz.addEventListener("drop", (e) => { const f = e.dataTransfer?.files?.[0]; if (f) handleFileChosen(f); });
+
+    // QR create
+    function handleLinkEnter(e) { if (e.key === "Enter") generateQR(); }
+
+    function generateQR() {
+      let url = $("linkInput").value.trim();
+      if (!url) return showToast("Paste a link first", "error");
+      if (!url.startsWith("http")) url = "https://" + url;
+
+      const canvas = $("qrCanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      QRCode.toCanvas(canvas, url, { width: 240, margin: 2, color: { dark: "#020617", light: "#ffffff" } },
+        (err) => { if (err) showToast("QR failed", "error"); else openModal("qrModal"); }
+      );
+    }
+
+    // Scanner
+    let html5QrCode = null;
+
+    function startScanner() {
+      openModal("scanModal");
+      $("scanStatus").textContent = "Initializing camera…";
+
+      setTimeout(() => {
+        if (html5QrCode) return;
+        html5QrCode = new Html5Qrcode("qr-reader");
+
+        html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          (decodedText) => {
+            $("linkInput").value = decodedText;
+            closeAllModals();
+            if (decodedText.startsWith("http")) { window.open(decodedText, "_blank"); showToast("Opening link…"); }
+            else showToast("Scanned");
+          },
+          () => {}
+        ).then(() => {
+          $("scanStatus").textContent = "Scanning…";
+        }).catch((e) => {
+          console.error(e);
+          $("scanStatus").innerHTML = "<span class='error'>Camera blocked</span>";
+          stopScanner();
+        });
+      }, 200);
+    }
+
+    function stopScanner() {
+      if (!html5QrCode) return Promise.resolve();
+      return html5QrCode.stop()
+        .then(() => { html5QrCode.clear(); html5QrCode = null; const el = $("qr-reader"); if (el) el.innerHTML = ""; })
+        .catch(() => { html5QrCode = null; });
+    }
+  </script>
+</body>
+</html>

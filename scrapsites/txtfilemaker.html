@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Basic SEO -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Long Text to TXT Converter | Free Online Tool</title>
+  <meta name="description" content="Convert long text to a clean .txt file in your browser. Paste, choose options, and download instantly with no sign-up or uploads." />
+  <!-- Optional: set a canonical URL when deployed -->
+  <!-- <link rel="canonical" href="YOUR_CANONICAL_URL" /> -->
+
+  <!-- Robots controls -->
+  <meta name="robots" content="index, follow" />
+
+  <!-- Social: Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Long Text to TXT Converter" />
+  <meta property="og:description" content="Turn any long text into a .txt file instantly. Works offline after load, no uploads." />
+  <meta property="og:site_name" content="Text to TXT" />
+
+  <!-- Social: Twitter/X Cards -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Long Text to TXT Converter" />
+  <meta name="twitter:description" content="Paste, set options, and download a .txt in one click—no server needed." />
+
+  <!-- PWA/brand basics -->
+  <meta name="theme-color" content="#111111" />
+  <link rel="icon" href="/favicon.ico" />
+
+  <!-- Structured data: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Long Text to TXT Converter",
+    "description": "A minimal web tool that converts long text into a downloadable .txt file in your browser.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "browserRequirements": "Requires JavaScript"
+  }
+  </script>
+
+  <style>
+    :root{
+      --bg:#fafafa; --ink:#111; --muted:#6b7280; --ring:#2563eb;
+      --card:#fff; --border:#e5e7eb; --radius:12px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Helvetica, Arial;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b0b0c; --ink:#e7e7ea; --muted:#a1a1aa; --ring:#60a5fa;
+        --card:#121214; --border:#1f1f22;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:var(--font); color:var(--ink); background:var(--bg)}
+    .shell{max-width:900px; margin:0 auto; padding:clamp(16px, 4vw, 40px)}
+    header h1{margin:0 0 4px 0; font-weight:800; letter-spacing:.2px; font-size:clamp(20px,3.4vw,28px)}
+    header p{margin:0; color:var(--muted)}
+    .card{margin-top:20px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:clamp(14px, 2.8vw, 20px)}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .field{flex:1 1 220px; min-width:220px}
+    label{display:block; font-size:14px; margin:8px 0 6px 0}
+    input[type="text"], select, textarea{
+      width:100%; padding:10px 12px; border:1px solid var(--border); background:transparent;
+      color:inherit; border-radius:10px; outline:none; transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    textarea{min-height:300px; resize:vertical; line-height:1.5}
+    input:focus, select:focus, textarea:focus{
+      border-color: color-mix(in oklab, var(--ring) 60%, var(--border));
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 20%, transparent);
+    }
+    .hint{color:var(--muted); font-size:13px; margin-top:6px}
+    .stats{color:var(--muted); font-size:13px; margin-top:8px}
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:16px}
+    .btn{appearance:none; border:1px solid var(--border); background:var(--ink); color:var(--card);
+      padding:10px 16px; border-radius:999px; cursor:pointer; font-weight:700; letter-spacing:.2px}
+    .btn.secondary{background:transparent; color:var(--ink)}
+    footer{margin:24px 0 0; color:var(--muted); font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>Long Text → .txt</h1>
+      <p>Convert any long text into a clean .txt download with a minimal, accessible interface.</p>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="tlabel" aria-describedby="tdesc">
+        <div class="field">
+          <label id="tlabel" for="text">Your text</label>
+          <textarea id="text" placeholder="Paste or type your text here..."></textarea>
+          <div id="tdesc" class="hint">Saved as text/plain in UTF‑8 by default.</div>
+          <div id="stats" class="stats" aria-live="polite">0 lines · 0 words · 0 characters</div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <div class="field">
+            <label for="filename">Filename</label>
+            <input id="filename" type="text" value="text.txt" autocomplete="off" />
+            <div class="hint">.txt will be added if omitted.</div>
+          </div>
+
+          <div class="field">
+            <label for="lineEndings">Line endings</label>
+            <select id="lineEndings">
+              <option value="keep">Keep as is</option>
+              <option value="lf">LF (Unix/macOS)</option>
+              <option value="crlf">CRLF (Windows)</option>
+            </select>
+            <div class="hint">Normalize line breaks for your target platform.</div>
+          </div>
+
+          <div class="field">
+            <label for="bom">UTF‑8 BOM</label>
+            <select id="bom">
+              <option value="no">No (recommended)</option>
+              <option value="yes">Yes (add EF BB BF)</option>
+            </select>
+            <div class="hint">Some legacy tools detect UTF‑8 more easily with a BOM.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="downloadBtn">Download .txt</button>
+          <button class="btn secondary" id="clearBtn" type="button">Clear</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      
+    </footer>
+  </div>
+
+  <script>
+    const $text = document.getElementById('text');
+    const $stats = document.getElementById('stats');
+    const $filename = document.getElementById('filename');
+    const $lineEndings = document.getElementById('lineEndings');
+    const $bom = document.getElementById('bom');
+    const $download = document.getElementById('downloadBtn');
+    const $clear = document.getElementById('clearBtn');
+
+    function countStats(s){
+      const lines = s.length ? s.split(/\r\n|\r|\n/).length : 0;
+      const words = s.trim().length ? (s.trim().match(/\S+/g) || []).length : 0;
+      const chars = s.length;
+      return {lines, words, chars};
+    }
+    function updateStats(){
+      const {lines, words, chars} = countStats($text.value);
+      $stats.textContent = `${lines} lines · ${words} words · ${chars} characters`;
+    }
+    $text.addEventListener('input', updateStats);
+    updateStats();
+
+    function normalizeLineEndings(s, mode){
+      if(mode === 'keep') return s;
+      let t = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      if(mode === 'crlf') t = t.replace(/\n/g, '\r\n');
+      return t;
+    }
+    function ensureTxtName(name){
+      const trimmed = name.trim();
+      if(!trimmed) return 'text.txt';
+      return /\.[Tt][Xx][Tt]$/.test(trimmed) ? trimmed : `${trimmed}.txt`;
+    }
+    function downloadTxt(){
+      let content = $text.value || '';
+      content = normalizeLineEndings(content, $lineEndings.value);
+      const addBOM = $bom.value === 'yes';
+      const parts = [];
+      if(addBOM) parts.push('\ufeff'); // EF BB BF
+      parts.push(content);
+
+      const blob = new Blob(parts, {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = ensureTxtName($filename.value);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    }
+    $download.addEventListener('click', downloadTxt);
+    $clear.addEventListener('click', ()=>{
+      $text.value = '';
+      updateStats();
+    });
+    (function initName(){
+      const d = new Date();
+      const iso = d.toISOString().slice(0,10);
+      $filename.value = `text-${iso}.txt`;
+    })();
+  </script>
+</body>
+</html>

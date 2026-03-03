@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swiss Text To Hand | Pro</title>
+    
+    <!-- HTML2Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800&family=Indie+Flower&family=Caveat&family=Shadows+Into+Light&family=Architects+Daughter&family=Patrick+Hand&family=Gochi+Hand&family=Just+Another+Hand&family=Reenie+Beanie&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent: #FF4F00;
+            
+            /* Default Dynamic Values */
+            --hand-size: 24px;
+            --hand-spacing: 0px;
+            --word-spacing: 0px;
+            --line-height: 40px; /* Important for lined paper sync */
+            --paper-pt: 48px;
+            --paper-px: 48px;
+            --ink-opacity: 1;
+        }
+        
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter Tight', sans-serif;
+            background-color: white;
+            color: black;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        ::selection {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        /* Font Classes */
+        .font-hand-1 { font-family: 'Indie Flower', cursive; }
+        .font-hand-2 { font-family: 'Caveat', cursive; }
+        .font-hand-3 { font-family: 'Shadows Into Light', cursive; }
+        .font-hand-4 { font-family: 'Architects Daughter', cursive; }
+        .font-hand-5 { font-family: 'Patrick Hand', cursive; }
+        .font-hand-6 { font-family: 'Gochi Hand', cursive; }
+        .font-hand-7 { font-family: 'Just Another Hand', cursive; }
+        .font-hand-8 { font-family: 'Reenie Beanie', cursive; }
+
+        /* Dynamic Output Styles */
+        #output {
+            font-size: var(--hand-size);
+            letter-spacing: var(--hand-spacing);
+            word-spacing: var(--word-spacing);
+            line-height: var(--line-height);
+            opacity: var(--ink-opacity);
+            padding-top: var(--paper-pt);
+            padding-left: var(--paper-px);
+            padding-right: var(--paper-px);
+            padding-bottom: 48px;
+        }
+
+        /* Smart Paper Styles */
+        .paper-plain { background: white; }
+        .paper-lined {
+            /* The background size now listens to the line-height variable */
+            background-image: linear-gradient(#999 1px, transparent 1px);
+            background-size: 100% var(--line-height);
+            background-position: 0 var(--paper-pt); /* Aligns lines with top padding */
+        }
+        .paper-grid {
+            background-image: linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Custom Range Slider - Swiss Style */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            background: black;
+            border: 2px solid white;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 0 1px black; /* Double border effect */
+        }
+        input[type=range]:hover::-webkit-slider-thumb {
+            background: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            background: #e5e5e5;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #ccc;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #000; }
+        
+        /* Header Styles */
+        .header {
+            width: 100%;
+            border-bottom: 2px solid black;
+            padding: 16px;
+            flex-shrink: 0;
+            background-color: white;
+            z-index: 20;
+        }
+        
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin: 0;
+        }
+        
+        .header h1 span {
+            color: var(--accent);
+        }
+        
+        .header-subtitle {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.4;
+            text-align: right;
+            display: none;
+        }
+        
+        /* Main Layout */
+        .main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 0;
+        }
+        
+        /* Controls Section */
+        .controls {
+            border-bottom: 2px solid black;
+            background-color: white;
+            order: 2;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+        
+        .controls-content {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            opacity: 0.6;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .font-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .font-button {
+            border: 1px solid black;
+            padding: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: white;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .font-button:hover {
+            background-color: black;
+            color: white;
+        }
+        
+        .slider-container {
+            margin-bottom: 24px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .slider-label label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .slider-value {
+            font-size: 0.75rem;
+            font-family: monospace;
+            opacity: 0.5;
+        }
+        
+        .slider-note {
+            font-size: 0.625rem;
+            margin-top: 4px;
+            color: #9ca3af;
+        }
+        
+        .paper-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .paper-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid black;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .paper-button:hover, .paper-button:focus {
+            background-color: var(--accent);
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        .paper-button-lined {
+            background-image: linear-gradient(black 1px, transparent 1px);
+            background-size: 100% 4px;
+        }
+        
+        .paper-button-grid {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjMDAwIi8+PC9zdmc+');
+        }
+        
+        .ink-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .ink-button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .ink-button:hover {
+            transform: scale(1.25);
+        }
+        
+        .ink-black { background-color: black; }
+        .ink-blue { background-color: #1e3a8a; }
+        .ink-red { background-color: #b91c1c; }
+        .ink-green { background-color: #14532d; }
+        .ink-gray { background-color: #6b7280; }
+        
+        /* Preview Section */
+        .preview {
+            background-color: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            order: 1;
+            position: relative;
+            padding-bottom: 80px; /* Space for download button */
+        }
+        
+        .preview-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 16px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        
+        .input-container {
+            width: 100%;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 16px;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            min-height: 100px;
+            font-family: 'Inter Tight', sans-serif;
+            font-size: 0.875rem;
+            resize: vertical;
+            outline: none;
+        }
+        
+        .text-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+        
+        .preview-stage {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .capture-area {
+            background-color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 800px;
+            min-height: 1000px;
+            transition: all 0.1s linear;
+        }
+        
+        .output {
+            font-family: 'Indie Flower', cursive;
+            color: black;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Download Button */
+        .download-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 50;
+            background-color: var(--accent);
+            color: white;
+            padding: 16px 32px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+        }
+        
+        .download-button:hover {
+            background-color: black;
+        }
+        
+        .download-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .header {
+                padding: 24px;
+            }
+            
+            .header h1 {
+                font-size: 3.75rem;
+            }
+            
+            .header-subtitle {
+                display: block;
+            }
+            
+            .controls {
+                border-bottom: none;
+                border-right: 2px solid black;
+                height: calc(100vh - 140px);
+                overflow-y: auto;
+                order: 1;
+            }
+            
+            .preview {
+                order: 2;
+                height: calc(100vh - 140px);
+                overflow-y: auto;
+                padding-bottom: 0;
+            }
+            
+            .main {
+                grid-template-columns: 1fr 2fr;
+            }
+            
+            .download-button {
+                bottom: 40px;
+                right: 40px;
+                padding: 16px 32px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .main {
+                grid-template-columns: 1fr 3fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                Text To<br>
+                <span>Handwriting</span>
+            </h1>
+            <div class="header-subtitle">
+                <!-- Empty subtitle -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="main">
+        
+        <!-- COLUMN 1: CONTROLS (Scrollable) -->
+        <section class="controls">
+            
+            <div class="controls-content">
+                
+                <!-- 1. Typography Selection -->
+                <div>
+                    <h2 class="section-title">1. Typeface</h2>
+                    <div class="font-buttons">
+                        <button onclick="setFont('font-hand-1')" class="font-button font-hand-1">Indie Flower</button>
+                        <button onclick="setFont('font-hand-2')" class="font-button font-hand-2">Caveat</button>
+                        <button onclick="setFont('font-hand-3')" class="font-button font-hand-3">Shadows</button>
+                        <button onclick="setFont('font-hand-4')" class="font-button font-hand-4">Architects</button>
+                        <button onclick="setFont('font-hand-5')" class="font-button font-hand-5">Patrick</button>
+                        <button onclick="setFont('font-hand-6')" class="font-button font-hand-6">Gochi</button>
+                        <button onclick="setFont('font-hand-7')" class="font-button font-hand-7">Marker</button>
+                        <button onclick="setFont('font-hand-8')" class="font-button font-hand-8">Reenie</button>
+                    </div>
+                </div>
+
+                <!-- 2. Fine Tuning (New Features) -->
+                <div>
+                    <h2 class="section-title">2. Adjustments</h2>
+                    
+                    <div>
+                        <!-- Font Size -->
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Size</label>
+                                <span id="val-size" class="slider-value">24px</span>
+                            </div>
+                            <input type="range" min="12" max="64" value="24" oninput="updateVar('--hand-size', this.value + 'px', 'val-size')">
+                        </div>
+
+                        <!-- Letter Spacing -->
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Letter Spacing</label>
+                                <span id="val-space" class="slider-value">0px</span>
+                            </div>
+                            <input type="range" min="-2" max="10" step="0.5" value="0" oninput="updateVar('--hand-spacing', this.value + 'px', 'val-space')">
+                        </div>
+
+                        <!-- Word Spacing -->
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Word Spacing</label>
+                                <span id="val-wspace" class="slider-value">0px</span>
+                            </div>
+                            <input type="range" min="-5" max="30" step="1" value="0" oninput="updateVar('--word-spacing', this.value + 'px', 'val-wspace')">
+                        </div>
+
+                        <!-- Line Height (Synced with Lines) -->
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label style="color: var(--accent);">Line Height</label>
+                                <span id="val-line" class="slider-value">40px</span>
+                            </div>
+                            <input type="range" min="20" max="100" value="40" oninput="updateVar('--line-height', this.value + 'px', 'val-line')">
+                            <p class="slider-note">*Syncs with paper lines</p>
+                        </div>
+
+                         <!-- Ink Opacity -->
+                         <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Ink Flow</label>
+                                <span id="val-flow" class="slider-value">100%</span>
+                            </div>
+                            <input type="range" min="0.3" max="1" step="0.1" value="1" oninput="updateVar('--ink-opacity', this.value, 'val-flow', '%')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Paper Settings -->
+                <div>
+                    <h2 class="section-title">3. Surface</h2>
+                    
+                    <div class="paper-buttons">
+                        <button onclick="setPaper('paper-plain')" class="paper-button"></button>
+                        <button onclick="setPaper('paper-lined')" class="paper-button paper-button-lined"></button>
+                        <button onclick="setPaper('paper-grid')" class="paper-button paper-button-grid"></button>
+                    </div>
+
+                    <!-- Margins -->
+                    <div>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Top Margin</label>
+                                <span id="val-mt" class="slider-value">48px</span>
+                            </div>
+                            <input type="range" min="0" max="200" value="48" oninput="updateVar('--paper-pt', this.value + 'px', 'val-mt')">
+                        </div>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <label>Side Margin</label>
+                                <span id="val-mx" class="slider-value">48px</span>
+                            </div>
+                            <input type="range" min="10" max="150" value="48" oninput="updateVar('--paper-px', this.value + 'px', 'val-mx')">
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- 4. Ink Color -->
+                 <div>
+                    <h2 class="section-title">4. Ink Color</h2>
+                    <div class="ink-buttons">
+                        <button onclick="setInk('text-black')" class="ink-button ink-black"></button>
+                        <button onclick="setInk('text-blue-800')" class="ink-button ink-blue"></button>
+                        <button onclick="setInk('text-red-700')" class="ink-button ink-red"></button>
+                        <button onclick="setInk('text-green-700')" class="ink-button ink-green"></button>
+                        <button onclick="setInk('text-gray-500')" class="ink-button ink-gray"></button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- COLUMN 2: INPUT & PREVIEW AREA -->
+        <section class="preview">
+            
+            <div class="preview-container">
+                
+                <!-- Input Box (Minimal) -->
+                <div class="input-container">
+                    <textarea 
+                        id="textInput" 
+                        placeholder="Type your notes here..." 
+                        class="text-input"
+                        oninput="updatePreview()"
+                    ></textarea>
+                </div>
+
+                <!-- Preview Stage -->
+                <div class="preview-stage">
+                    <div id="captureArea" class="capture-area paper-plain">
+                        <div id="output" class="output font-hand-1 text-black"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Download Button -->
+            <button onclick="downloadImage()" class="download-button">
+                Download
+                <svg xmlns="http://www.w3.org/2000/svg" class="download-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+            </button>
+
+        </section>
+
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        const input = document.getElementById('textInput');
+        const output = document.getElementById('output');
+        const captureArea = document.getElementById('captureArea');
+        const root = document.documentElement;
+
+        // Update Text
+        function updatePreview() {
+            if(input.value.trim() === "") {
+                output.textContent = "Start typing to visualize text...";
+                output.style.opacity = "0.5";
+            } else {
+                output.textContent = input.value;
+                output.style.opacity = getComputedStyle(root).getPropertyValue('--ink-opacity');
+            }
+        }
+
+        // Update CSS Variable (Sliders)
+        function updateVar(variable, value, displayId, suffix = '') {
+            root.style.setProperty(variable, value);
+            if(displayId) {
+                // Formatting for display (e.g., converting 0.5 to 50%)
+                let displayVal = value;
+                if(suffix === '%') {
+                    displayVal = Math.round(parseFloat(value) * 100) + '%';
+                }
+                document.getElementById(displayId).textContent = displayVal;
+            }
+            // Re-trigger opacity check if needed
+            if(variable === '--ink-opacity' && input.value.trim() !== "") {
+                output.style.opacity = value;
+            }
+        }
+
+        // Set Font Family
+        function setFont(fontClass) {
+            output.className = output.className.replace(/font-hand-\d/g, '');
+            output.classList.add(fontClass);
+        }
+
+        // Set Paper Type
+        function setPaper(paperClass) {
+            captureArea.className = captureArea.className.replace(/paper-\w+/g, '');
+            captureArea.classList.add(paperClass);
+        }
+
+        // Set Ink Color
+        function setInk(colorClass) {
+            output.className = output.className.replace(/text-\w+(-\d+)?/g, '');
+            output.classList.remove('text-black');
+            output.classList.add(colorClass);
+        }
+
+        // Download
+        function downloadImage() {
+            window.scrollTo(0,0);
+            html2canvas(captureArea, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'swiss-note-' + Date.now() + '.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        // Initialize
+        updatePreview();
+    </script>
+</body>
+</html>

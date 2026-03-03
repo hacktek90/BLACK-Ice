@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI - Intelligent Chat Interface</title>
+    <meta name="description" content="A modern Free AI chat interface with streaming responses and model selection">
+    
+    <!-- Puter.js Library -->
+    <script src="https://js.puter.com/v2/"></script>
+    
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Highlight.js for Code Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            /* Light Theme */
+            --bg-primary: #f9fafb;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-light: #dbeafe;
+            --user-bubble: #2563eb;
+            --user-text: #ffffff;
+            --ai-bubble: #f3f4f6;
+            --ai-text: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+        }
+        
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --accent-primary: #3b82f6;
+            --accent-hover: #60a5fa;
+            --accent-light: #1e3a5f;
+            --user-bubble: #3b82f6;
+            --user-text: #ffffff;
+            --ai-bubble: #374151;
+            --ai-text: #f9fafb;
+        }
+        
+        /* Reset and Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Main Container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+        }
+        
+        /* Header Styles */
+        .header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+        
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .header-btn:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .header-btn.active {
+            background-color: var(--accent-light);
+            color: var(--accent-primary);
+        }
+        
+        .model-select {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 32px 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            transition: all var(--transition-fast);
+        }
+        
+        .model-select:hover {
+            border-color: var(--accent-primary);
+        }
+        
+        .model-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        
+        .chat-messages {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        /* Message Styles */
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+        
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+        }
+        
+        .message-content {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .message.user .message-bubble {
+            background-color: var(--user-bubble);
+            color: var(--user-text);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.assistant .message-bubble {
+            background-color: var(--ai-bubble);
+            color: var(--ai-text);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 4px;
+        }
+        
+        .message.user .message-meta {
+            justify-content: flex-end;
+        }
+        
+        /* Markdown Styles */
+        .message-bubble p {
+            margin-bottom: 12px;
+        }
+        
+        .message-bubble p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .message-bubble code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875em;
+            background-color: rgba(0, 0, 0, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        [data-theme="dark"] .message-bubble code {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .message-bubble pre {
+            margin: 12px 0;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            background-color: #1e1e1e;
+        }
+        
+        .message-bubble pre code {
+            background-color: transparent;
+            padding: 16px;
+            display: block;
+            font-size: 0.8125rem;
+            line-height: 1.6;
+        }
+        
+        .message-bubble ul, .message-bubble ol {
+            margin: 12px 0;
+            padding-left: 24px;
+        }
+        
+        .message-bubble li {
+            margin-bottom: 6px;
+        }
+        
+        .message-bubble blockquote {
+            margin: 12px 0;
+            padding-left: 16px;
+            border-left: 3px solid var(--accent-primary);
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .message-bubble strong {
+            font-weight: 600;
+        }
+        
+        .message-bubble em {
+            font-style: italic;
+        }
+        
+        .message-bubble a {
+            color: var(--accent-primary);
+            text-decoration: underline;
+        }
+        
+        .message-bubble a:hover {
+            color: var(--accent-hover);
+        }
+        
+        /* Loading Animation */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 16px 20px;
+            background-color: var(--ai-bubble);
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+        
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .welcome-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .welcome-text {
+            font-size: 1rem;
+            max-width: 500px;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+        
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            max-width: 700px;
+            width: 100%;
+        }
+        
+        .suggestion-btn {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .suggestion-btn:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .suggestion-btn i {
+            color: var(--accent-primary);
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Input Area */
+        .input-area {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 16px 20px 24px;
+        }
+        
+        .input-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            background-color: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 8px 8px 8px 16px;
+            transition: all var(--transition-fast);
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        
+        .input-textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            max-height: 200px;
+            min-height: 44px;
+            line-height: 1.5;
+            padding: 10px 0;
+        }
+        
+        .input-textarea:focus {
+            outline: none;
+        }
+        
+        .input-textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-primary), #7c3aed);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .input-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 4px;
+        }
+        
+        .input-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .input-hint span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .key-hint {
+            background-color: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        /* Error Toast */
+        .error-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all var(--transition-normal);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 16px;
+            }
+            
+            .logo-subtitle {
+                display: none;
+            }
+            
+            .model-select {
+                padding: 6px 24px 6px 8px;
+                font-size: 0.75rem;
+            }
+            
+            .chat-container {
+                padding: 16px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .suggestion-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-area {
+                padding: 12px 16px 16px;
+            }
+            
+            .input-hint {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 1.1rem;
+            }
+            
+            .header-btn {
+                padding: 6px 8px;
+            }
+            
+            .header-btn span {
+                display: none;
+            }
+            
+            .message-bubble {
+                padding: 10px 14px;
+                font-size: 0.875rem;
+            }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-muted);
+        }
+        
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i data-lucide="bot"></i>
+                    </div>
+                    <div>
+                        <div class="logo-text">AIChat</div>
+                        <div class="logo-subtitle">AI Assistant</div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <select class="model-select" id="modelSelect" aria-label="Select AI Model">
+                    <option value="gpt-4o">GPT-4o</option>
+                    <option value="gpt-4o-mini">GPT-4o Mini</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    <option value="claude-sonnet-4">Claude Sonnet 4</option>
+                    <option value="claude-haiku-4">Claude Haiku 4</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="deepseek-chat">DeepSeek Chat</option>
+                    <option value="grok-4-fast">Grok 4 Fast</option>
+                    <option value="llama-3.3-70b">Llama 3.3 70B</option>
+                </select>
+                <button class="header-btn" id="themeToggle" aria-label="Toggle Theme">
+                    <i data-lucide="moon" id="themeIcon"></i>
+                    <span id="themeText">Dark</span>
+                </button>
+                <button class="header-btn" id="clearChat" aria-label="Clear Chat">
+                    <i data-lucide="trash-2"></i>
+                    <span>Clear</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Chat Container -->
+        <main class="chat-container" id="chatContainer">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">
+                        <i data-lucide="message-square"></i>
+                    </div>
+                    <h1 class="welcome-title">How can I help you today?</h1>
+                    <p class="welcome-text">
+                        I'm your AI assistant powered by Puter.js. Ask me anything—from creative writing to coding help, analysis to general questions.
+                    </p>
+                    <div class="suggestion-grid">
+                        <button class="suggestion-btn" data-prompt="Explain quantum computing in simple terms">
+                            <i data-lucide="atom"></i>
+                            Explain quantum computing
+                        </button>
+                        <button class="suggestion-btn" data-prompt="Write a Python function to sort a list">
+                            <i data-lucide="code"></i>
+                            Write Python sorting code
+                        </button>
+                        <button class="suggestion-btn" data-prompt="What are the best practices for REST API design?">
+                            <i data-lucide="server"></i>
+                            REST API best practices
+                        </button>
+                        <button class="suggestion-btn" data-prompt="Help me brainstorm creative ideas for a mobile app">
+                            <i data-lucide="lightbulb"></i>
+                            Mobile app ideas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Input Area -->
+        <footer class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        class="input-textarea" 
+                        id="messageInput" 
+                        placeholder="Type your message here..." 
+                        rows="1"
+                        aria-label="Message input"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" disabled aria-label="Send Message">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
+                <div class="input-actions">
+                    <div class="input-hint">
+                        <span><kbd class="key-hint">Enter</kbd> to send</span>
+                        <span><kbd class="key-hint">Shift + Enter</kbd> for new line</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Error Toast -->
+    <div class="error-toast" id="errorToast">
+        <i data-lucide="alert-circle"></i>
+        <span id="errorMessage">An error occurred</span>
+    </div>
+    
+    <script>
+        // ============================================
+        // PuterChat AI - Main Application Script
+        // ============================================
+        
+        (function() {
+            'use strict';
+            
+            // ============================================
+            // Configuration & State
+            // ============================================
+            const CONFIG = {
+                storageKeys: {
+                    history: 'puter-chat-history',
+                    theme: 'puter-chat-theme',
+                    model: 'puter-chat-model'
+                },
+                defaultModel: 'gpt-4o-mini',
+                streaming: true
+            };
+            
+            let state = {
+                messages: [],
+                isGenerating: false,
+                currentModel: CONFIG.defaultModel
+            };
+            
+            // ============================================
+            // DOM Elements
+            // ============================================
+            const elements = {
+                chatContainer: document.getElementById('chatContainer'),
+                chatMessages: document.getElementById('chatMessages'),
+                messageInput: document.getElementById('messageInput'),
+                sendBtn: document.getElementById('sendBtn'),
+                modelSelect: document.getElementById('modelSelect'),
+                themeToggle: document.getElementById('themeToggle'),
+                themeIcon: document.getElementById('themeIcon'),
+                themeText: document.getElementById('themeText'),
+                clearChat: document.getElementById('clearChat'),
+                welcomeScreen: document.getElementById('welcomeScreen'),
+                errorToast: document.getElementById('errorToast'),
+                errorMessage: document.getElementById('errorMessage')
+            };
+            
+            // ============================================
+            // Utility Functions
+            // ============================================
+            
+            function generateId() {
+                return 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            function formatTime(date) {
+                return new Date(date).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            
+            function showError(message, duration = 4000) {
+                elements.errorMessage.textContent = message;
+                elements.errorToast.classList.add('show');
+                lucide.createIcons(); // Ensure error icon renders
+                
+                setTimeout(() => {
+                    elements.errorToast.classList.remove('show');
+                }, duration);
+            }
+            
+            function saveState() {
+                try {
+                    localStorage.setItem(CONFIG.storageKeys.history, JSON.stringify(state.messages));
+                    localStorage.setItem(CONFIG.storageKeys.model, state.currentModel);
+                } catch (e) {
+                    console.warn('Failed to save state:', e);
+                }
+            }
+            
+            function loadState() {
+                try {
+                    const history = localStorage.getItem(CONFIG.storageKeys.history);
+                    const savedModel = localStorage.getItem(CONFIG.storageKeys.model);
+                    
+                    if (history) {
+                        state.messages = JSON.parse(history);
+                    }
+                    
+                    if (savedModel) {
+                        state.currentModel = savedModel;
+                        elements.modelSelect.value = savedModel;
+                    }
+                } catch (e) {
+                    console.warn('Failed to load state:', e);
+                }
+            }
+            
+            // ============================================
+            // Theme Management
+            // ============================================
+            
+            function initTheme() {
+                const savedTheme = localStorage.getItem(CONFIG.storageKeys.theme) || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                updateThemeUI(savedTheme);
+            }
+            
+            function updateThemeUI(theme) {
+                if (theme === 'dark') {
+                    elements.themeIcon.setAttribute('data-lucide', 'sun');
+                    elements.themeText.textContent = 'Light';
+                } else {
+                    elements.themeIcon.setAttribute('data-lucide', 'moon');
+                    elements.themeText.textContent = 'Dark';
+                }
+                // Re-render icons specifically in the header to update theme button icon
+                lucide.createIcons({ root: elements.header });
+            }
+            
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem(CONFIG.storageKeys.theme, newTheme);
+                updateThemeUI(newTheme);
+            }
+            
+            // ============================================
+            // Markdown Rendering
+            // ============================================
+            
+            function configureMarked() {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    highlight: function(code, lang) {
+                        if (lang && hljs.getLanguage(lang)) {
+                            try {
+                                return hljs.highlight(code, { language: lang }).value;
+                            } catch (e) {
+                                console.warn('Highlight.js error:', e);
+                            }
+                        }
+                        return hljs.highlightAuto(code).value;
+                    }
+                });
+            }
+            
+            function renderMarkdown(text) {
+                try {
+                    return marked.parse(text);
+                } catch (e) {
+                    console.warn('Markdown parsing error:', e);
+                    return escapeHtml(text);
+                }
+            }
+            
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            // ============================================
+            // Message Rendering
+            // ============================================
+            
+            function hideWelcomeScreen() {
+                elements.welcomeScreen.classList.add('hidden');
+            }
+            
+            function showWelcomeScreen() {
+                elements.welcomeScreen.classList.remove('hidden');
+            }
+            
+            function createMessageElement(message) {
+                const isUser = message.role === 'user';
+                const div = document.createElement('div');
+                div.className = `message ${message.role}`;
+                div.dataset.id = message.id;
+                
+                div.innerHTML = `
+                    <div class="message-avatar">
+                        <i data-lucide="${isUser ? 'user' : 'bot'}"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble ${isUser ? '' : 'markdown-body'}">
+                            ${isUser ? escapeHtml(message.content) : renderMarkdown(message.content)}
+                        </div>
+                        <div class="message-meta">
+                            <span>${isUser ? 'You' : 'AI Assistant'}</span>
+                            <span>•</span>
+                            <span>${formatTime(message.timestamp)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                return div;
+            }
+            
+            function createTypingIndicator() {
+                const div = document.createElement('div');
+                div.className = 'message assistant';
+                div.id = 'typingIndicator';
+                div.innerHTML = `
+                    <div class="message-avatar">
+                        <i data-lucide="bot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                `;
+                return div;
+            }
+            
+            function renderMessages() {
+                const container = elements.chatMessages;
+                
+                // Clear current messages (except welcome screen)
+                container.querySelectorAll('.message').forEach(el => el.remove());
+                
+                if (state.messages.length === 0) {
+                    showWelcomeScreen();
+                    return;
+                }
+                
+                hideWelcomeScreen();
+                
+                // Render all messages
+                state.messages.forEach(msg => {
+                    container.appendChild(createMessageElement(msg));
+                });
+                
+                // Initialize Lucide icons for newly rendered messages
+                lucide.createIcons();
+                
+                scrollToBottom();
+            }
+            
+            function addUserMessage(content) {
+                const message = {
+                    id: generateId(),
+                    role: 'user',
+                    content: content,
+                    timestamp: new Date().toISOString()
+                };
+                
+                state.messages.push(message);
+                saveState();
+                
+                hideWelcomeScreen();
+                elements.chatMessages.appendChild(createMessageElement(message));
+                
+                // Initialize Lucide icons for the new message
+                lucide.createIcons();
+                
+                scrollToBottom();
+            }
+            
+            async function addAssistantMessage(content) {
+                const message = {
+                    id: generateId(),
+                    role: 'assistant',
+                    content: '',
+                    timestamp: new Date().toISOString()
+                };
+                
+                state.messages.push(message);
+                
+                // Show typing indicator
+                hideWelcomeScreen();
+                const typingIndicator = createTypingIndicator();
+                elements.chatMessages.appendChild(typingIndicator);
+                
+                // Initialize Lucide icons for the typing indicator
+                lucide.createIcons();
+                
+                scrollToBottom();
+                
+                try {
+                    if (CONFIG.streaming && typeof puter.ai.chat === 'function') {
+                        // Streaming response
+                        const response = await puter.ai.chat(content, {
+                            model: state.currentModel,
+                            stream: true
+                        });
+                        
+                        const messageElement = typingIndicator.querySelector('.message-content');
+                        const bubbleDiv = document.createElement('div');
+                        bubbleDiv.className = 'message-bubble markdown-body';
+                        messageElement.insertBefore(bubbleDiv, messageElement.firstChild);
+                        
+                        // Remove typing indicator and add proper message structure
+                        const messageDiv = typingIndicator;
+                        messageDiv.className = 'message assistant';
+                        messageDiv.id = '';
+                        
+                        const metaDiv = document.createElement('div');
+                        metaDiv.className = 'message-meta';
+                        metaDiv.innerHTML = `
+                            <span>AI Assistant</span>
+                            <span>•</span>
+                            <span>${formatTime(message.timestamp)}</span>
+                        `;
+                        messageDiv.appendChild(metaDiv);
+                        
+                        // Stream the response
+                        let fullResponse = '';
+                        for await (const chunk of response) {
+                            if (chunk?.text) {
+                                fullResponse += chunk.text;
+                                
+                                // BUG FIX: Remove the typing animation DOM element 
+                                // as soon as we start receiving text content
+                                const typingAnimation = messageDiv.querySelector('.typing-indicator');
+                                if (typingAnimation) {
+                                    typingAnimation.remove();
+                                }
+
+                                bubbleDiv.innerHTML = renderMarkdown(fullResponse);
+                                scrollToBottom();
+                            }
+                        }
+                        
+                        // Update message with final content
+                        message.content = fullResponse;
+                        bubbleDiv.innerHTML = renderMarkdown(fullResponse);
+                    } else {
+                        // Non-streaming response (fallback)
+                        const response = await puter.ai.chat(content, {
+                            model: state.currentModel
+                        });
+                        
+                        message.content = typeof response === 'string' ? response : (response.text || response.message || JSON.stringify(response));
+                        
+                        // Replace typing indicator with message
+                        typingIndicator.remove();
+                        elements.chatMessages.appendChild(createMessageElement(message));
+                        lucide.createIcons();
+                    }
+                    
+                    saveState();
+                    scrollToBottom();
+                    
+                } catch (error) {
+                    console.error('AI Chat Error:', error);
+                    typingIndicator.remove();
+                    
+                    // Add error message
+                    message.content = "I apologize, but I encountered an error while processing your request. Please try again.";
+                    elements.chatMessages.appendChild(createMessageElement(message));
+                    lucide.createIcons();
+                    
+                    showError('Failed to get AI response. Please try again.');
+                }
+            }
+            
+            function scrollToBottom() {
+                elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+            }
+            
+            // ============================================
+            // Event Handlers
+            // ============================================
+            
+            async function handleSendMessage() {
+                const content = elements.messageInput.value.trim();
+                
+                if (!content || state.isGenerating) return;
+                
+                // Clear input
+                elements.messageInput.value = '';
+                updateInputHeight();
+                elements.sendBtn.disabled = true;
+                
+                // Add user message
+                addUserMessage(content);
+                
+                // Generate response
+                state.isGenerating = true;
+                
+                try {
+                    await addAssistantMessage(content);
+                } finally {
+                    state.isGenerating = false;
+                }
+            }
+            
+            function handleInputKeydown(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (elements.messageInput.value.trim() && !state.isGenerating) {
+                        handleSendMessage();
+                    }
+                }
+            }
+            
+            function handleInputInput() {
+                const hasContent = elements.messageInput.value.trim().length > 0;
+                elements.sendBtn.disabled = !hasContent || state.isGenerating;
+                updateInputHeight();
+            }
+            
+            function updateInputHeight() {
+                elements.messageInput.style.height = 'auto';
+                elements.messageInput.style.height = Math.min(elements.messageInput.scrollHeight, 200) + 'px';
+            }
+            
+            function handleModelChange(e) {
+                state.currentModel = e.target.value;
+                localStorage.setItem(CONFIG.storageKeys.model, state.currentModel);
+            }
+            
+            function handleClearChat() {
+                if (confirm('Are you sure you want to clear all chat history?')) {
+                    state.messages = [];
+                    saveState();
+                    renderMessages();
+                }
+            }
+            
+            function handleSuggestionClick(e) {
+                const button = e.target.closest('.suggestion-btn');
+                if (button) {
+                    const prompt = button.dataset.prompt;
+                    elements.messageInput.value = prompt;
+                    handleInputInput();
+                    elements.messageInput.focus();
+                }
+            }
+            
+            // ============================================
+            // Puter.js Availability Check
+            // ============================================
+            
+            function checkPuterAvailability() {
+                if (typeof puter === 'undefined' || typeof puter.ai === 'undefined') {
+                    console.warn('Puter.js not loaded. AI features will be disabled.');
+                    
+                    // Disable send button
+                    elements.sendBtn.disabled = true;
+                    elements.messageInput.disabled = true;
+                    elements.messageInput.placeholder = 'AI services are currently unavailable. Please check your connection.';
+                    
+                    return false;
+                }
+                return true;
+            }
+            
+            // ============================================
+            // Event Listeners
+            // ============================================
+            
+            function initEventListeners() {
+                // Input events
+                elements.messageInput.addEventListener('keydown', handleInputKeydown);
+                elements.messageInput.addEventListener('input', handleInputInput);
+                
+                // Button events
+                elements.sendBtn.addEventListener('click', handleSendMessage);
+                elements.themeToggle.addEventListener('click', toggleTheme);
+                elements.clearChat.addEventListener('click', handleClearChat);
+                
+                // Model selection
+                elements.modelSelect.addEventListener('change', handleModelChange);
+                
+                // Suggestion buttons
+                elements.chatMessages.addEventListener('click', handleSuggestionClick);
+                
+                // Auto-resize textarea on load
+                updateInputHeight();
+            }
+            
+            // ============================================
+            // Initialization
+            // ============================================
+            
+            function init() {
+                console.log('Initializing PuterChat AI...');
+                
+                // Configure markdown
+                configureMarked();
+                
+                // Load saved state
+                loadState();
+                
+                // Initialize theme
+                initTheme();
+                
+                // Initialize event listeners
+                initEventListeners();
+                
+                // Render existing messages
+                renderMessages();
+                
+                // Initialize Lucide icons globally for static content
+                lucide.createIcons();
+                
+                // Check Puter.js availability
+                const puterAvailable = checkPuterAvailability();
+                if (puterAvailable) {
+                    console.log('Puter.js AI is ready! Current model:', state.currentModel);
+                }
+            }
+            
+            // Start the application when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
