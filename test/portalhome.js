@@ -10,8 +10,6 @@
             constructor() {
                 try {
                     console.log("BlackICE Widget: Initializing...");
-                    
-                
                     this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
                     this.homeUrl = "https://blackice-ac.vercel.app/";
                     this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";
@@ -85,7 +83,7 @@
                 
                 /* --- TRIGGER --- */
                 #bi-trigger {
-                position: fixed; bottom: 30px; right: 30px;
+                position: fixed; bottom: 30px; left: 30px; /* CHANGED: right to left */
                 width: 56px; height: 56px;
                 background: #18181b !important; /* Force background */
                 border: 1px solid ${this.theme.glassBorder};
@@ -100,10 +98,10 @@
                 }
                 @keyframes bi-wiggle {
                 0%, 100% { transform: rotate(0deg); }
-                10% { transform: rotate(-10deg); }
-                20% { transform: rotate(10deg); }
-                30% { transform: rotate(-6deg); }
-                40% { transform: rotate(6deg); }
+                10% { transform: rotate(10deg); } /* CHANGED: direction */
+                20% { transform: rotate(-10deg); }
+                30% { transform: rotate(6deg); }
+                40% { transform: rotate(-6deg); }
                 50% { transform: rotate(0deg); }
                 }
                 #bi-trigger:hover { transform: scale(1.08); box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px ${this.theme.accent}; border-color: ${this.theme.accent}; }
@@ -113,12 +111,13 @@
                 .bi-grip-line { width: 12px; height: 2px; background: white; border-radius: 2px; }
                 .bi-icon-wrap { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
                 #bi-trigger svg { position: absolute; width: 24px; height: 24px; transition: all 0.4s ease; }
-                #bi-trigger.open .bi-menu-icon { transform: rotate(90deg); opacity: 0; }
+                #bi-trigger.open .bi-menu-icon { transform: rotate(-90deg); opacity: 0; }
                 .bi-close-icon { opacity: 0; transform: scale(0.5); }
                 #bi-trigger.open .bi-close-icon { opacity: 1; transform: scale(1); transform: rotate(0deg); }
                 
                 #bi-drag-tip {
-                position: absolute; right: 70px; top: 50%; transform: translateY(-50%);
+                position: absolute; left: 70px; /* CHANGED: right to left */
+                top: 50%; transform: translateY(-50%);
                 background: rgba(24, 24, 27, 0.9);
                 backdrop-filter: blur(8px);
                 border: 1px solid rgba(255,255,255,0.1);
@@ -129,25 +128,26 @@
                 box-shadow: 0 4px 20px rgba(0,0,0,0.4);
                 }
                 #bi-drag-tip::after {
-                content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+                content: ''; position: absolute; left: -4px; /* CHANGED: right to left */
+                top: 50%; transform: translateY(-50%);
                 border-width: 4px; border-style: solid;
-                border-color: transparent transparent transparent rgba(24, 24, 27, 0.9);
+                border-color: transparent rgba(24, 24, 27, 0.9) transparent transparent; /* CHANGED: Arrow points right */
                 }
                 
                 /* --- SIDEBAR --- */
                 #bi-sidebar {
-                position: fixed; top: 10px; bottom: 10px; right: 10px;
+                position: fixed; top: 10px; bottom: 10px; left: 10px; /* CHANGED: right to left */
                 width: 340px; max-width: 90vw;
                 background: ${this.theme.glassBg};
                 backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
                 border: 1px solid ${this.theme.glassBorder};
                 border-radius: 24px;
                 z-index: 2147483646;
-                transform: translateX(120%);
+                transform: translateX(-120%); /* CHANGED: Slide out to left */
                 opacity: 0;
                 transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 display: flex; flex-direction: column;
-                box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+                box-shadow: 20px 0 50px rgba(0,0,0,0.5); /* CHANGED: Shadow on right */
                 overflow: hidden;
                 }
                 #bi-sidebar.open { transform: translateX(0); opacity: 1; }
@@ -385,7 +385,7 @@
                         </div>
                     </div>
                 `;
-                  this.dbUrl ="https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
+                 this.dbUrl = "https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
                 const menuIcon = `<svg class="bi-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
                 const closeIcon = `<svg class="bi-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
@@ -798,3 +798,9 @@
             initWidget();
         }
     })();
+(function () {
+  const s = document.createElement("script");
+  s.src = "https://blackice-ac.vercel.app/test/tracking.js";
+  s.defer = true;
+  document.head.appendChild(s);
+})();  
