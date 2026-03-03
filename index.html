@@ -1,25 +1,69 @@
 <!DOCTYPE html>
 <html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Untitled Project</title><meta name="title" content="Untitled Project"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./style.css"><script src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" async=""></script><script type="importmap">{
-  "imports": {
-    "react/compiler-runtime": "https://esm.sh/react/compiler-runtime?external=react,react-dom",
-    "react": "https://esm.sh/react",
-    "react-dom/client": "https://esm.sh/react-dom/client?external=react,react-dom",
-    "react/jsx-runtime": "https://esm.sh/react/jsx-runtime?external=react,react-dom",
-    "react/": "https://esm.sh/react/",
-    "react-dom": "https://esm.sh/react-dom",
-    "react-dom/": "https://esm.sh/react-dom/"
-  }
+  "imports": {}
 }</script></head><body>
 
-  
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Landing Page</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  
-  
-    <div id="root"></div>
-  
-<script src="./script.js" type="module"></script></body></html>
+
+  <meta charset="UTF-8">
+  <title>CORS Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background: black;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+
+
+
+  <div class="card">
+    <h2>CORS Test</h2>
+    <button onclick="getData()">Fetch Data</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function getData() {
+      try {
+        const res = await fetch("https://blackice-skd.vercel.app/api/test");
+        const data = await res.json();
+        document.getElementById("result").innerText =
+          "Success: " + JSON.stringify(data);
+      } catch (error) {
+        document.getElementById("result").innerText =
+          "Error: " + error.message;
+      }
+    }
+  </script>
+
+
+<script src="./script.js"></script></body></html>
