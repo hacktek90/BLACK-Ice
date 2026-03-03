@@ -1688,57 +1688,8 @@ btn.addEventListener('keydown', (e) => {
         document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
 
-    <script>
-        (function () {
-
-    const CANONICAL_DOMAIN = "blackice-ac.vercel.app";
-    const CANONICAL_ORIGIN = "https://" + CANONICAL_DOMAIN;
-
-
-    
-
-    /* ===============================
-       🔒 IFRAME-ONLY LOGIC BELOW
-       =============================== */
-
-    /* 1️⃣ IFRAME PARENT CHECK */
-    try {
-        const parentHost = window.top.location.hostname.toLowerCase();
-
-        const allowedParents = [
-            "blackice-ac.vercel.app",
-            "black-ice-3dbk.onrender.com",
-            "uios-eta.vercel.app"
-        ];
-
-        if (allowedParents.includes(parentHost)) {
-            return;
-        }
-
-    } catch (e) {
-        location.replace(CANONICAL_ORIGIN);
-        return;
-    }
-
-    /* 2️⃣ Force canonical domain (iframe-only) */
-    if (location.hostname !== CANONICAL_DOMAIN) {
-        location.replace(
-            CANONICAL_ORIGIN +
-            location.pathname +
-            location.search +
-            location.hash
-        );
-        return;
-    }
-
-    /* 3️⃣ Redirect root/index ONLY in iframe */
-    const path = location.pathname.toLowerCase();
-    if (path === "/" || path === "/index.html") {
-        location.replace("/Home.html");
-    }
-
-})();
-    </script>
+   
+  
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9029531054632994"
      crossorigin="anonymous"></script>
