@@ -4,66 +4,271 @@
   "imports": {}
 }</script></head><body>
 
+  
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta charset="UTF-8">
-  <title>CORS Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
-      width: 300px;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      background: black;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover {
-      opacity: 0.8;
-    }
-    #result {
-      margin-top: 15px;
-      font-size: 14px;
-      color: green;
-    }
-  </style>
+    <title>BlackICE Portal — AI, Productivity &amp; Web Tools Platform(SUBHO)</title>
 
+    <meta name="description" content="BlackICE Portal is a minimal, modern web-based platform offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration — accessible instantly in your browser.">
+    <meta name="author" content="BlackICE">
+    <meta name="robots" content="index, follow">
 
+    <meta name="theme-color" content="#09090b">
+    <meta name="color-scheme" content="dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <div class="card">
-    <h2>CORS Test</h2>
-    <button onclick="getData()">Fetch Data</button>
-    <div id="result"></div>
-  </div>
+    <meta property="og:title" content="BlackICE Portal">
+    <meta property="og:description" content="A modern, minimal portal for launching AI tools, productivity apps, and web utilities.">
+    <meta property="og:url" content="https://blackice-ac.vercel.app/">
+    <meta property="og:site_name" content="BlackICE">
+    <meta property="og:image" content="/preview-image.png">
 
-  <script>
-    async function getData() {
-      try {
-        const res = await fetch("https://blackice-skd.vercel.app/api/test");
-        const data = await res.json();
-        document.getElementById("result").innerText =
-          "Success: " + JSON.stringify(data);
-      } catch (error) {
-        document.getElementById("result").innerText =
-          "Error: " + error.message;
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Inter Tight"', 'sans-serif'],
+            },
+            colors: {
+              background: '#09090b',
+              glass: 'rgba(9, 9, 11, 0.65)',
+              'glass-border': 'rgba(255, 255, 255, 0.08)',
+              accent: '#3b82f6',
+            },
+            animation: {
+              'fade-in': 'fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          }
+        }
       }
-    }
-  </script>
+    </script>
 
+    <style type="text/tailwindcss">
+      @layer utilities {
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          @apply bg-background;
+        }
+        ::-webkit-scrollbar-thumb {
+          @apply bg-zinc-800 rounded-full;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          @apply bg-zinc-700;
+        }
+      }
+    </style>
+  
 
+  
+
+    <!-- Ambient Glow Background -->
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    
+    <!-- Background Gradient Overlay -->
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_center,_#1a1a1e_0%,_#09090b_100%)] -z-20"></div>
+
+    <!-- Main Container -->
+    <div class="w-full max-w-[900px] px-5 py-10 flex flex-col items-center gap-[60px] animate-fade-in opacity-0">
+      
+      <main class="text-center w-full flex flex-col items-center">
+        
+        <!-- Hero Title -->
+        <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold tracking-tight leading-[1.1] mb-5 bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_0_60px_rgba(59,130,246,0.3)]" role="button" tabindex="0" onclick="window.open('/test/dev.html', '_blank')" onkeydown="if(event.key==='Enter'){window.open('/test/dev.html','_blank')}" title="Enter Developer Mode">
+          BlackICE Portal
+        </h1>
+
+        <p class="text-lg text-zinc-400 max-w-[500px] mx-auto leading-relaxed font-light">
+          The operating system for your web productivity.<br class="hidden sm:block">Seamlessly integrated AI, Utilities, and Workspace tools.
+        </p>
+        
+        <!-- === SEARCH BAR === -->
+        <div class="w-full max-w-[560px] mt-9">
+          <form class="flex items-center bg-white/4 border border-white/10 rounded-full p-1.5 transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.3)] focus-within:border-accent focus-within:bg-white/6 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]" onsubmit="handleSearch(event, 'standard')">
+            
+            <!-- Engine Selector -->
+            <div class="relative flex items-center justify-center pl-3.5 h-10 pr-4 border-r border-white/10 cursor-pointer group">
+              <select id="engine-select" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="updateUI()">
+                <option value="https://search.brave.com/search?q=%s" data-domain="search.brave.com" data-ai-url="https://search.brave.com/ask?q=%s">Brave</option>
+                <option value="https://www.perplexity.ai/?q=%s" data-domain="perplexity.ai" data-ai-url="">Perplexity</option>
+                <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com" data-ai-url="https://duck.ai/chat?q=%s">DuckDuckGo</option>
+              </select>
+              <img id="engine-favicon" class="w-5 h-5 rounded-sm pointer-events-none transition-transform duration-200 group-hover:scale-110" src="https://www.google.com/s2/favicons?domain=search.brave.com&amp;sz=32" alt="Search Engine">
+              <svg class="w-3 h-3 text-zinc-500 ml-2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+
+            <!-- Input -->
+            <input type="text" id="search-query" class="flex-1 bg-transparent border-none outline-none text-white text-base font-normal px-4 placeholder:text-zinc-500/70" placeholder="Search the web..." required="" autocomplete="off">
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 pl-1">
+              <!-- Standard Search Button -->
+              <button type="submit" class="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center flex-shrink-0 transition-all duration-200 hover:bg-blue-600 hover:scale-105 active:scale-95" title="Standard Search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </button>
+              
+              <!-- AI Search Button -->
+              <!-- Note: The JS toggles 'w-0 opacity-0...' to hide this -->
+              <button type="button" id="ai-search-btn" class="ai-btn w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 text-white flex items-center justify-center flex-shrink-0 transition-all duration-300 overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] hover:scale-105 active:scale-95" title="AI Search / Chat" onclick="handleSearch(event, 'ai')">
+                 <!-- Sparkles Icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"></path></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- === END SEARCH BAR === -->
+
+        <div class="flex items-center justify-center mt-5 px-6 py-3 bg-black/40 border border-white/8 rounded-full backdrop-blur-md">
+          <span class="text-sm font-medium text-white/80">Click the button toggle at left bottom to open projects</span>
+        </div>
+      </main>
+
+      <!-- Glass Capabilities Card -->
+      <section class="w-full bg-glass backdrop-blur-xl border border-glass-border rounded-3xl p-10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] text-center">
+        <span class="block text-xs font-semibold uppercase tracking-[0.1em] text-accent mb-6">System Capabilities</span>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 text-left mt-5">
+          <!-- Feature 1 -->
+          <div class="p-4 rounded-xl bg-white/3 border border-white/5 hover:bg-white/6 hover:-translate-y-0.5 transition-all duration-200">
+            <h3 class="text-base font-medium text-white mb-1.5">AI Core</h3>
+            <p class="text-sm text-zinc-400 leading-relaxed">Focus enhancement, health tracking, and automated intelligence workflows.</p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="p-4 rounded-xl bg-white/3 border border-white/5 hover:bg-white/6 hover:-translate-y-0.5 transition-all duration-200">
+            <h3 class="text-base font-medium text-white mb-1.5">Productivity</h3>
+            <p class="text-sm text-zinc-400 leading-relaxed">Task management, habit tracking, and advanced planning systems.</p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="p-4 rounded-xl bg-white/3 border border-white/5 hover:bg-white/6 hover:-translate-y-0.5 transition-all duration-200">
+            <h3 class="text-base font-medium text-white mb-1.5">Creation</h3>
+            <p class="text-sm text-zinc-400 leading-relaxed">Docs, slides, whiteboards, and mind maps in one unified interface.</p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="p-4 rounded-xl bg-white/3 border border-white/5 hover:bg-white/6 hover:-translate-y-0.5 transition-all duration-200">
+            <h3 class="text-base font-medium text-white mb-1.5">Dev Tools</h3>
+            <p class="text-sm text-zinc-400 leading-relaxed">HTML viewers, Git utilities, and minimal developer environments.</p>
+          </div>
+        </div>
+
+        <!-- SEO Hidden Content -->
+        <div class="sr-only">
+          <h2>All-in-One Web Tools &amp; AI Utilities Platform</h2>
+          <p>
+            BlackICE Portal is a browser-based platform combining AI-powered tools,
+            productivity apps, developer utilities, document creation systems, media
+            tools, and real-time collaboration in a single minimal interface.
+          </p>
+          <ul>
+            <li>Use AI tools for focus, health tracking, and automation</li>
+            <li>Manage tasks, habits, notes, and planning workflows</li>
+            <li>Create documents, slides, mind maps, and whiteboards</li>
+            <li>Access developer utilities like HTML viewers and Git fetchers</li>
+            <li>Collaborate via chat, calls, shared docs, and drawing boards</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "BlackICE Portal",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Web",
+        "description": "A minimal web-based portal offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration.",
+        "url": "https://blackice-ac.vercel.app/",
+        "creator": {
+          "@type": "Organization",
+          "name": "BlackICE"
+        }
+      }
+    </script>
+     
+    <!-- Interactive Logic -->
+    <script>
+      const aiButton = document.getElementById('ai-search-btn');
+
+      function updateUI() {
+        const select = document.getElementById('engine-select');
+        const icon = document.getElementById('engine-favicon');
+        const selectedOption = select.options[select.selectedIndex];
+        const domain = selectedOption.getAttribute('data-domain');
+        const aiUrl = selectedOption.getAttribute('data-ai-url');
+        
+        // Update Favicon
+        icon.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+        
+        // Toggle AI Button Visibility using Tailwind classes
+        // We remove the collapse classes if AI URL exists, otherwise add them
+        if (aiUrl && aiUrl !== "") {
+          // Show
+          aiButton.classList.remove('w-0', 'opacity-0', 'p-0', 'm-0', 'pointer-events-none');
+        } else {
+          // Hide
+          aiButton.classList.add('w-0', 'opacity-0', 'p-0', 'm-0', 'pointer-events-none');
+        }
+      }
+
+      function handleSearch(e, type) {
+        e.preventDefault();
+        const select = document.getElementById('engine-select');
+        const input = document.getElementById('search-query');
+        const query = encodeURIComponent(input.value);
+        
+        if (!query) return;
+
+        const selectedOption = select.options[select.selectedIndex];
+        let urlTemplate = "";
+
+        if (type === 'ai') {
+            urlTemplate = selectedOption.getAttribute('data-ai-url');
+            if(!urlTemplate) urlTemplate = selectedOption.value; 
+        } else {
+            urlTemplate = selectedOption.value;
+        }
+        
+        const finalUrl = urlTemplate.replace('%s', query);
+        window.open(finalUrl, '_blank');
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        updateUI();
+      });
+    </script>
+
+    <!-- External Scripts (Preserved from original) -->
+    <script src="/test/portalhome.js" defer=""></script>
+    <script src="/test/darky.js" defer=""></script>
+
+  
 <script src="./script.js"></script></body></html>
