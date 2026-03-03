@@ -1,0 +1,258 @@
+:root {
+  --accent: #111;
+  --bg: #f9f9f9;
+  --text: #111;
+}
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  flex-direction: row; /* Default for larger screens */
+}
+
+/* Sidebar and Main Content Layout */
+#sidebar {
+  width: 220px; /* Fixed width for desktop */
+  background: #fff;
+  border-right: 1px solid var(--accent);
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+#main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 16px;
+  overflow-y: auto;
+  width: 100%; /* Ensure main content takes available width */
+}
+
+/* Canvas Sizing */
+#canvas {
+  border: 1px solid var(--accent);
+  background: #fff;
+  width: min(90vw, 650px); /* Responsive width, capped at 650px */
+  height: 60vh; /* Responsive height */
+  max-height: 520px;
+  touch-action: none;
+  border-radius: 0;
+}
+
+/* Toolbar and Inputs */
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  max-width: 650px;
+}
+input[type="text"],
+input[type="file"],
+button,
+input[type="range"],
+select {
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  background: #fff;
+  transition: 0.2s;
+  width: 100%; /* Make inputs and selects full width in sidebar by default */
+}
+button {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover {
+  background: #222;
+}
+
+/* Status and Answer */
+#status, #answer {
+  max-width: 650px;
+  width: 100%;
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  padding: 12px;
+  background: #f0f0f0;
+  text-align: left;
+  font-size: 14px;
+}
+
+/* Tool Group */
+.tool-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  border: 1px solid var(--accent);
+  padding: 5px;
+  border-radius: 0;
+  width: 100%;
+}
+.tool-group button {
+  flex: 1 1 auto;
+  min-width: 40px;
+  width: auto;
+  padding: 8px 10px;
+}
+.active-tool {
+  background: #555 !important;
+}
+
+/* Color Picker UI */
+#color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+#color {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--accent);
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+#color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+#color::-webkit-color-swatch {
+  border: none;
+}
+#color-display {
+  flex-grow: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--accent);
+  background: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Section Titles */
+.section-title {
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: var(--accent);
+  text-align: center;
+  width: 100%;
+}
+
+/* Text Input Container */
+#textInputContainer {
+  display: none; /* Hidden by default */
+  width: 100%;
+  flex-direction: column; /* Stack input and help text */
+  gap: 5px;
+}
+#text-help {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  line-height: 1.4;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------- */
+/* RESPONSIVE DESIGN (MOBILE)        */
+/* ------------------------------------------- */
+
+@media (max-width: 768px) {
+  body {
+    flex-direction: column; /* Stack sidebar and main content vertically */
+    height: auto; /* Allow body to grow based on content */
+    overflow-y: auto; /* Allow scrolling for the entire page */
+  }
+
+  #sidebar {
+    width: 100%; /* Sidebar takes full width */
+    height: auto; /* Height adapts to content */
+    border-right: none; /* Remove right border */
+    border-bottom: 1px solid var(--accent); /* Add bottom border */
+    padding: 15px 10px; /* Slightly reduced padding */
+    gap: 10px; /* Slightly reduced gap */
+    flex-wrap: wrap; /* Allow sections within sidebar to wrap */
+  }
+
+  #main-content {
+    padding: 15px 10px; /* Slightly reduced padding for main content */
+    height: auto; /* Allow main content to grow */
+    min-height: calc(100vh - 100px); /* Ensure canvas has enough space if sidebar is small */
+  }
+
+  #canvas {
+    width: 95vw; /* Slightly more aggressive width for mobile */
+    height: 50vh; /* Reduced height on mobile to make room for controls */
+    max-height: 400px; /* Max height for mobile canvas */
+  }
+
+  /* Adjust tool group buttons for better fit on small screens */
+  .tool-group button {
+    flex: 1 1 calc(33% - 10px); /* 3 buttons per row */
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  /* Make filter options and apply button stack nicely */
+  #filterSelect, #applyFilterBtn {
+    width: 100%;
+  }
+
+  /* Stack AI question and button on smaller screens */
+  #toolbar {
+    flex-direction: column;
+    gap: 5px;
+  }
+  #q, #askBtn {
+    width: 100%;
+  }
+}
+
+/* Even smaller screens (e.g., very narrow phones) */
+@media (max-width: 480px) {
+  #sidebar {
+    padding: 10px 5px;
+    gap: 8px;
+  }
+  #main-content {
+    padding: 10px 5px;
+  }
+  .tool-group button {
+    flex: 1 1 calc(50% - 7.5px); /* 2 buttons per row */
+  }
+  #canvas {
+    width: 98vw; /* Almost full width */
+    height: 45vh;
+  }
+  input[type="text"],
+  input[type="file"],
+  button,
+  input[type="range"],
+  select,
+  #status, #answer {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+}
