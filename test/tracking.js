@@ -81,7 +81,7 @@
 
     cfScript.setAttribute(
       "data-cf-beacon",
-      '{"token": "b5a71e89ec674296bffb5791b1953eb9"}'
+      '{"token": "3a816b5483fd44b39c996e551b885aec"}'
     );
 
     document.head.appendChild(cfScript);
