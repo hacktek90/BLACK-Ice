@@ -1,0 +1,4 @@
+Right click block script ----------------<script src="https://cdn.jsdelivr.net/gh/hacktek90/cursor@main/rightclkblock.js" defer></script>
+,
+simpler version -------<script> document.addEventListener('contextmenu', event => event.preventDefault()); ></script>
+For overlay of project sidebar ----------<script src="https://cdn.jsdelivr.net/gh/hacktek90/cursor@main/projectbar.js" defer></script>
