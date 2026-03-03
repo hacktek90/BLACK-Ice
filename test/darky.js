@@ -134,7 +134,7 @@ console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: m
   // Whitelisted hosts (no redirect)
   const ALLOWED_HOSTS = [
     "blackice-ac.vercel.app",
-    "uios-eta.vercel.app",
+    "blackice-skd.vercel.app",
     "black-ice.pages.dev"
   ];
 
