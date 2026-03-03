@@ -1,0 +1,2556 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <meta name="theme-color" content="#6366f1">
+    <!-- Primary Meta Tags -->
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Compiler – HTML, CSS & JS Live Editor | CodeZap</title>
+<meta name="description" content="CodeZap’s Web Compiler – an online live editor for HTML, CSS & JavaScript. Write, run, collaborate and export web code in real-time.">
+<meta name="keywords" content="web compiler, html css js editor, live code editor, online web compiler, CodeZap, collaborate code, export HTML CSS JS">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://black-ice-3dbk.onrender.com/webcompiller.html">
+<meta property="og:title" content="Web Compiler – HTML, CSS & JS Live Editor | CodeZap">
+<meta property="og:description" content="Use CodeZap’s Web Compiler to build and preview HTML, CSS & JavaScript code live. Collaborate, export and share your work seamlessly.">
+<meta property="og:image" content="https://black-ice-3dbk.onrender.com/assets/og-image.png">
+<meta property="og:site_name" content="CodeZap">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://black-ice-3dbk.onrender.com/webcompiller.html">
+<meta name="twitter:title" content="Web Compiler – HTML, CSS & JS Live Editor | CodeZap">
+<meta name="twitter:description" content="Write HTML, CSS & JS in a browser with the CodeZap Web Compiler. Instant preview, collaboration and export features built-in.">
+<meta name="twitter:image" content="https://black-ice-3dbk.onrender.com/assets/og-image.png">
+
+<!-- Misc / SEO Best-Practices -->
+<link rel="canonical" href="https://black-ice-3dbk.onrender.com/webcompiller.html">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#ffffff">
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236366f1;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23059669;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23grad)'/%3E%3Cpath d='M8 10h16v2H8zm0 4h12v2H8zm0 4h14v2H8zm0 4h10v2H8z' fill='white' opacity='0.9'/%3E%3Cpath d='M22 18l4 3-4 3v-2h-3v-2h3v-2z' fill='%23fbbf24'/%3E%3C/svg%3E" type="image/svg+xml">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/comment-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchtags.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/foldgutter.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236366f1;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23059669;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23grad)'/%3E%3Cpath d='M40 50h100v12H40zm0 24h80v12H40zm0 24h90v12H40zm0 24h70v12H40z' fill='white' opacity='0.9'/%3E%3Cpath d='M120 90l20 15-20 15v-10h-15v-10h15v-10z' fill='%23fbbf24'/%3E%3C/svg%3E">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f1f5f9;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(148, 163, 184, 0.1) 50px, rgba(148, 163, 184, 0.1) 51px),
+                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(148, 163, 184, 0.1) 50px, rgba(148, 163, 184, 0.1) 51px);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .editor-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .tab-container {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: #374151;
+            background: #f1f5f9;
+        }
+
+        .tab.active {
+            color: #6366f1;
+            background: white;
+            border-bottom-color: #6366f1;
+        }
+
+        .tab-content {
+            padding: 0;
+            display: none;
+            background: #1e1e1e;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .CodeMirror {
+            height: 300px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            border: 1px solid #3c4043;
+            background: #1e1e1e;
+        }
+
+        .CodeMirror-gutters {
+            background: #252526;
+            border-right: 1px solid #3c4043;
+        }
+
+        .CodeMirror-linenumber {
+            color: #858585;
+            font-size: 13px;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid #ffffff;
+        }
+
+        .CodeMirror-selected {
+            background: #264f78;
+        }
+
+        .CodeMirror-activeline-background {
+            background: #2a2d2e;
+        }
+
+        .preview-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-section iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 12px;
+            background: white;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .toggle {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: #d1d5db;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle.active {
+            background: #10b981;
+        }
+
+        .toggle.active::before {
+            transform: translateX(24px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-transform: none;
+            letter-spacing: 0.5px;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .button:hover::before {
+            left: 100%;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .button.primary:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .button.secondary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .button.secondary:hover {
+            background: linear-gradient(135deg, #5855eb, #7c3aed);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .button.outline {
+            background: transparent;
+            color: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .button.outline:hover {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .button.ghost {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border-color: transparent;
+        }
+
+        .button.ghost:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: #5855eb;
+        }
+
+        .button.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .button.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        #error {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            padding: 12px;
+            background: #fef2f2;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+        }
+
+
+
+        .fullscreen-mode .editor-section {
+            display: none;
+        }
+
+        .fullscreen-mode .preview-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            border-radius: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .fullscreen-mode .preview-section iframe {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        .fullscreen-mode .controls {
+            display: none;
+        }
+
+        .fullscreen-exit {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-exit:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        .fullscreen-mode .fullscreen-exit {
+            display: block;
+        }
+        
+        .preview-embed-mode .fullscreen-exit {
+            display: none;
+        }
+        
+        .cloud-delete-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 2001;
+            transition: all 0.3s ease;
+        }
+        
+        .cloud-delete-btn:hover {
+            background: rgba(220, 38, 38, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .admin-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            z-index: 9999;
+            animation: adminGlow 2s ease-in-out infinite alternate;
+            border: 2px solid #ffd700;
+        }
+        
+        @keyframes adminGlow {
+            from { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+            to { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8); }
+        }
+        
+        .cloud-manager-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cloud-manager-panel {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cloud-manager-header {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a1a;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cloud-manager-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cloud-manager-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .cloud-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        
+        .cloud-item:hover {
+            border-color: #6366f1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cloud-item-info {
+            flex: 1;
+        }
+        
+        .cloud-item-id {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .cloud-item-date {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .cloud-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .cloud-action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .copy-btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+        
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
+
+
+        /* Embed mode styles */
+        .embed-mode {
+            padding: 0;
+            background: white;
+        }
+        
+        .embed-mode .container {
+            max-width: none;
+            margin: 0;
+            gap: 0;
+            animation: none;
+        }
+        
+        .embed-mode .editor-section {
+            border-radius: 0;
+            box-shadow: none;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .embed-mode .preview-section {
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+        }
+        
+        .embed-mode .preview-section iframe {
+            border-radius: 0;
+            height: 100vh;
+        }
+        
+        .embed-mode .controls {
+            display: none;
+        }
+        
+        .embed-mode .CodeMirror {
+            height: 200px;
+        }
+        
+
+        
+        /* Embed dropdown menu */
+        .embed-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .embed-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .embed-menu.show {
+            display: block;
+        }
+        
+        .embed-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+        }
+        
+        .embed-option:last-child {
+            border-bottom: none;
+        }
+        
+        .embed-option:hover {
+            background: #f8fafc;
+        }
+        
+        .embed-option-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        
+        .embed-option-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        /* Professional Collaboration System */
+        .collab-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(16, 185, 129, 0.9));
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .collab-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
+        }
+        
+        .collab-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collab-title {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .collab-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .collab-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .collab-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .collab-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .collab-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .collab-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .collab-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .collab-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        .collab-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .collab-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #34d399;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .collab-users {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        
+        .user-item:hover {
+            border-color: #6366f1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .user-status {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-online {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-typing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .user-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .kick-btn {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .kick-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .promote-btn {
+            background: #f0fdf4;
+            color: #059669;
+        }
+        
+        .promote-btn:hover {
+            background: #059669;
+            color: white;
+        }
+        
+        .collab-logs {
+            max-height: 180px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            color: #64748b;
+            font-size: 11px;
+            min-width: 60px;
+        }
+        
+        .log-message {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .collab-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .feature-btn {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        .feature-btn:hover {
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-btn.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+        
+        .typing-indicator {
+            font-size: 12px;
+            color: #6366f1;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        /* Kick Notification */
+        .kick-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(239, 68, 68, 0.4);
+            z-index: 3000;
+            text-align: center;
+            animation: kickAlert 0.5s ease;
+        }
+        
+        @keyframes kickAlert {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .kick-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .kick-message {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Live Chat */
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
+            z-index: 1500;
+            display: none;
+        }
+        
+        .chat-alert {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.5);
+        }
+        
+        .chat-toggle.has-messages {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .chat-panel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            height: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1500;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 16px;
+            border-radius: 16px 16px 0 0;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            max-height: 280px;
+        }
+        
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            animation: messageIn 0.3s ease;
+        }
+        
+        @keyframes messageIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .chat-message.own {
+            background: #6366f1;
+            color: white;
+            margin-left: 40px;
+            text-align: right;
+        }
+        
+        .chat-message.other {
+            background: #f1f5f9;
+            color: #374151;
+            margin-right: 40px;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            font-size: 11px;
+            margin-bottom: 2px;
+            opacity: 0.8;
+        }
+        
+        .message-time {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+        
+        .chat-input-container {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+        
+        .chat-input:focus {
+            border-color: #6366f1;
+        }
+        
+        .chat-send {
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Logs Viewer */
+        .logs-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logs-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+        }
+        
+        .logs-header {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logs-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-content {
+            flex: 1;
+        }
+        
+        .log-timestamp {
+            color: #6b7280;
+            font-size: 12px;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .tab {
+                flex: 1;
+                text-align: center;
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+            .CodeMirror {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-section">
+            <div class="tab-container">
+                <div class="tab active" data-tab="html">📄 HTML</div>
+                <div class="tab" data-tab="css">🎨 CSS</div>
+                <div class="tab" data-tab="js">⚡ JavaScript</div>
+
+            </div>
+            <div class="tab-content active" id="html-content">
+                <textarea id="html"></textarea>
+            </div>
+            <div class="tab-content" id="css-content">
+                <textarea id="css"></textarea>
+            </div>
+            <div class="tab-content" id="js-content">
+                <textarea id="js"></textarea>
+            </div>
+
+        </div>
+        <div class="preview-section">
+            <div class="controls">
+                <div class="toggle-container">
+                    <span>Auto Run</span>
+                    <div class="toggle active" id="auto-run"></div>
+                </div>
+                <div class="button-group">
+                    <button class="button primary" id="run">▶ Run Code</button>
+                    <button class="button secondary" id="fullscreen">🔍 Fullscreen</button><button class="button ghost"
+        onclick="window.location.href='https://black-ice-3dbk.onrender.com/scrapsites/repocompiller.html'">
+  Fetch Git
+</button>
+
+
+                    <button class="button outline" id="save">💾 Save</button>
+                    <button class="button outline" id="load">📁 Load</button>
+                    <button class="button ghost" id="download">⬇ Export</button>
+                    <button class="button ghost" id="share">🔗 Share</button>
+                    <button class="button ghost" id="collaborate">🤝 Collaborate</button>
+                    <button class="button ghost" id="view-logs" style="display: none;">📈 View All Logs</button>
+                    <button class="button ghost" id="cloud-manager" style="display: none;">☁️ Cloud Manager</button>
+
+                    <div class="embed-dropdown">
+                        <button class="button ghost" id="embed">💼 Embed</button>
+                        <div class="embed-menu" id="embed-menu">
+                            <div class="embed-option" data-mode="full">
+                                <div class="embed-option-title">⚙️ Full Compiler</div>
+                                <div class="embed-option-desc">Show code editors + preview</div>
+                            </div>
+                            <div class="embed-option" data-mode="preview">
+                                <div class="embed-option-title">👁️ Preview Only</div>
+                                <div class="embed-option-desc">Auto fullscreen preview with close button</div>
+                            </div>
+                            <div class="embed-option" data-mode="cloud" style="display: none;">
+                                <div class="embed-option-title">☁️ Cloud Embed</div>
+                                <div class="embed-option-desc">Preview stored in cloud with delete option</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <iframe id="preview"></iframe>
+            <div id="error"></div>
+        </div>
+        <button class="fullscreen-exit" id="fullscreen-exit">×</button>
+    </div>
+    
+    <!-- Cloud Manager -->
+    <div class="cloud-manager-overlay" id="cloud-manager-overlay">
+        <div class="cloud-manager-panel">
+            <div class="cloud-manager-header">
+                <div class="cloud-manager-title">☁️ Cloud Embed Manager</div>
+                <button style="background: none; border: none; font-size: 20px; cursor: pointer;" id="cloud-manager-close">×</button>
+            </div>
+            <div class="cloud-manager-body" id="cloud-manager-body">
+                <div style="text-align: center; color: #64748b; padding: 40px;">Loading cloud embeds...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kick Notification -->
+    <div class="kick-notification" id="kick-notification" style="display: none;">
+        <div class="kick-title">⚠️ You've been removed</div>
+        <div class="kick-message">You have been removed from the collaboration room</div>
+    </div>
+    
+    <!-- Collaboration Dialog -->
+    <div class="collab-overlay" id="collab-overlay">
+        <div class="collab-dialog">
+            <div class="collab-header">
+                <div class="collab-title">🤝 Collaboration</div>
+                <button class="collab-close" id="collab-close">×</button>
+            </div>
+            
+            <div class="collab-body">
+                <div class="collab-section">
+                    <div class="collab-label">👤 Your Identity</div>
+                    <input type="text" class="collab-input" id="user-name" placeholder="Enter your full name (required)" maxlength="30">
+                    <div class="error-message" id="name-error" style="display: none;">Name is required (3-30 characters)</div>
+                </div>
+                
+                <div class="collab-section">
+                    <div class="collab-label">🏠 Room Management</div>
+                    <input type="text" class="collab-input" id="room-name" placeholder="Enter room name (optional)" maxlength="20">
+                    <div class="collab-buttons">
+                        <button class="button primary" id="create-room">🎆 Create New Room</button>
+                        <button class="button outline" id="join-room">🚪 Join Existing Room</button>
+                        <button class="button danger" id="leave-room" style="display: none;">🚪 Leave Room</button>
+                    </div>
+                    <div class="collab-features" id="room-features" style="display: none;">
+                        <button class="feature-btn" id="toggle-readonly">🔒 Read-only</button>
+                        <button class="feature-btn" id="save-snapshot">📸 Snapshot</button>
+                        <button class="feature-btn" id="version-history">📚 History</button>
+                        <button class="feature-btn" id="copy-room-link">🔗 Share Link</button>
+                    </div>
+                </div>
+            
+                <div class="collab-section" id="room-info" style="display: none;">
+                    <div class="collab-label">🟢 Room Status</div>
+                    <div class="collab-status">
+                        <div class="status-dot"></div>
+                        <span id="room-status">Connected to room</span>
+                    </div>
+                </div>
+                
+                <div class="collab-section" id="users-section" style="display: none;">
+                    <div class="collab-label">👥 Active Users (<span id="user-count">0</span>)<span class="typing-indicator" id="typing-indicator"></span></div>
+                    <div class="collab-users" id="users-list"></div>
+                </div>
+                
+                <div class="collab-section" id="logs-section" style="display: none;">
+                    <div class="collab-label">📈 Recent Activity</div>
+                    <div class="collab-logs" id="activity-logs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Live Chat -->
+    <button class="chat-toggle" id="chat-toggle">
+        💬
+        <div class="chat-alert" id="chat-alert">!</div>
+    </button>
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header">
+            <span>💬 Live Chat</span>
+            <button style="background: none; border: none; color: white; cursor: pointer;" id="chat-close">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Type a message..." maxlength="100">
+            <button class="chat-send" id="chat-send">➤</button>
+        </div>
+    </div>
+    
+    <!-- Logs Viewer -->
+    <div class="logs-viewer" id="logs-viewer">
+        <div class="logs-content">
+            <div class="logs-header">
+                <h3>📈 Complete Activity Logs</h3>
+                <button style="background: none; border: none; color: white; cursor: pointer; font-size: 20px;" id="logs-close">×</button>
+            </div>
+            <div class="logs-body" id="logs-body"></div>
+        </div>
+    </div>
+    <script>
+        const baseConfig = {
+            lineNumbers: true,
+            theme: 'material-darker',
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            styleActiveLine: true,
+            foldGutter: true,
+            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']
+        };
+
+        const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html'), {
+            ...baseConfig,
+            mode: 'htmlmixed',
+            autoCloseTags: true,
+            matchTags: {bothTags: true}
+        });
+        
+        const cssEditor = CodeMirror.fromTextArea(document.getElementById('css'), {
+            ...baseConfig,
+            mode: 'css',
+            autoCloseBrackets: true,
+            matchBrackets: true
+        });
+        
+        const jsEditor = CodeMirror.fromTextArea(document.getElementById('js'), {
+            ...baseConfig,
+            mode: 'javascript',
+            autoCloseBrackets: true,
+            matchBrackets: true
+        });
+
+        const preview = document.getElementById('preview');
+        const error = document.getElementById('error');
+        const autoRunToggle = document.getElementById('auto-run');
+        let autoRun = true;
+
+        function updatePreview() {
+            const html = htmlEditor.getValue();
+            const css = `<style>${cssEditor.getValue()}</style>`;
+            const js = `<script>${jsEditor.getValue()}<\/script>`;
+            const content = `${html}${css}${js}`;
+            
+            error.textContent = '';
+            try {
+                const blob = new Blob([content], { type: 'text/html' });
+                preview.src = URL.createObjectURL(blob);
+            } catch (e) {
+                error.textContent = `Error: ${e.message}`;
+            }
+        }
+
+        autoRunToggle.addEventListener('click', () => {
+            autoRun = !autoRun;
+            autoRunToggle.classList.toggle('active', autoRun);
+            if (autoRun) updatePreview();
+        });
+
+        document.getElementById('run').addEventListener('click', updatePreview);
+
+        document.getElementById('save').addEventListener('click', () => {
+            localStorage.setItem('codezap_html', htmlEditor.getValue());
+            localStorage.setItem('codezap_css', cssEditor.getValue());
+            localStorage.setItem('codezap_js', jsEditor.getValue());
+            alert('Code saved!');
+        });
+
+        document.getElementById('load').addEventListener('click', () => {
+            htmlEditor.setValue(localStorage.getItem('codezap_html') || '');
+            cssEditor.setValue(localStorage.getItem('codezap_css') || '');
+            jsEditor.setValue(localStorage.getItem('codezap_js') || '');
+            if (autoRun) updatePreview();
+        });
+
+        document.getElementById('download').addEventListener('click', () => {
+            const content = `${htmlEditor.getValue()}<style>${cssEditor.getValue()}</style><script>${jsEditor.getValue()}<\/script>`;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'codezap_output.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Original change handlers removed - now handled by Firebase sync
+
+
+
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(targetTab + '-content').classList.add('active');
+                
+                // Refresh CodeMirror when tab becomes visible
+                setTimeout(() => {
+                    if (targetTab === 'html') htmlEditor.refresh();
+                    else if (targetTab === 'css') cssEditor.refresh();
+                    else if (targetTab === 'js') jsEditor.refresh();
+
+                }, 10);
+            });
+        });
+
+        // Initialize with sample code (only if no URL params)
+        if (!window.location.search) {
+            htmlEditor.setValue('<h1>Hello, CodeZap!</h1>\n<p>Start coding here...</p>');
+            cssEditor.setValue('body {\n    font-family: Arial, sans-serif;\n    text-align: center;\n    padding: 20px;\n}');
+            jsEditor.setValue('console.log("Welcome to CodeZap!");');
+            updatePreview();
+        }
+        // Fullscreen functionality
+        let isFullscreen = false;
+        const fullscreenBtn = document.getElementById('fullscreen');
+        const fullscreenExitBtn = document.getElementById('fullscreen-exit');
+
+        function enterFullscreen() {
+            isFullscreen = true;
+            document.body.classList.add('fullscreen-mode');
+            updatePreview();
+        }
+
+        function exitFullscreen() {
+            isFullscreen = false;
+            document.body.classList.remove('fullscreen-mode');
+        }
+
+        fullscreenBtn.addEventListener('click', enterFullscreen);
+        fullscreenExitBtn.addEventListener('click', exitFullscreen);
+
+        // Exit fullscreen with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isFullscreen) {
+                exitFullscreen();
+            }
+        });
+
+        // URL sharing functionality with compression
+        function compressData(data) {
+            try {
+                const jsonStr = JSON.stringify(data);
+                
+                // Try pako compression first (gzip + base64)
+                try {
+                    const gzipped = pako.gzip(jsonStr);
+                    const base64 = btoa(String.fromCharCode.apply(null, gzipped));
+                    return { data: base64, method: 'pako' };
+                } catch (pakoError) {
+                    console.warn('Pako compression failed, falling back to LZ-string:', pakoError);
+                }
+                
+                // Fallback to LZ-string
+                const lzCompressed = LZString.compressToEncodedURIComponent(jsonStr);
+                return { data: lzCompressed, method: 'lz' };
+            } catch (e) {
+                console.error('Compression failed:', e);
+                return { data: '', method: 'none' };
+            }
+        }
+        
+        function decompressData(compressed, method) {
+            try {
+                let decompressed;
+                
+                if (method === 'pako') {
+                    const binaryString = atob(compressed);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    decompressed = pako.ungzip(bytes, { to: 'string' });
+                } else {
+                    decompressed = LZString.decompressFromEncodedURIComponent(compressed);
+                }
+                
+                return JSON.parse(decompressed);
+            } catch (e) {
+                console.error('Decompression failed:', e);
+                return null;
+            }
+        }
+        
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const compressed = params.get('c');
+            const method = params.get('m') || 'lz';
+            const embedMode = params.get('embed');
+            const codeRoomId = params.get('cr');
+            
+            if (embedMode) {
+                document.body.style.padding = '0';
+                if (embedMode === 'preview' || embedMode === 'cloud') {
+                    document.body.classList.add('preview-embed-mode');
+                    enterFullscreen();
+                    
+
+                } else {
+                    document.body.classList.add('embed-mode');
+                }
+            }
+            
+            if (codeRoomId) {
+                loadFromCloudRoom(codeRoomId);
+            } else if (compressed) {
+                const data = decompressData(compressed, method);
+                if (data) {
+                    htmlEditor.setValue(data.h || '');
+                    cssEditor.setValue(data.c || '');
+                    jsEditor.setValue(data.j || '');
+                    
+                    setTimeout(() => {
+                        updatePreview();
+                    }, 100);
+                }
+            }
+        }
+
+        function generateShareURL() {
+            const data = {
+                h: htmlEditor.getValue(),
+                c: cssEditor.getValue(),
+                j: jsEditor.getValue()
+            };
+            
+            const compressed = compressData(data);
+            const baseURL = window.location.origin + window.location.pathname;
+            
+            return `${baseURL}?c=${compressed.data}&m=${compressed.method}`;
+        }
+        
+        function generateEmbedURL(mode = 'full') {
+            const data = {
+                h: htmlEditor.getValue(),
+                c: cssEditor.getValue(),
+                j: jsEditor.getValue()
+            };
+            
+            const compressed = compressData(data);
+            const baseURL = window.location.origin + window.location.pathname;
+            
+            return `${baseURL}?c=${compressed.data}&m=${compressed.method}&embed=${mode}`;
+        }
+
+        document.getElementById('share').addEventListener('click', () => {
+            if (currentRoom) {
+                const roomLink = `${window.location.origin}${window.location.pathname}?room=${currentRoom}`;
+                navigator.clipboard.writeText(roomLink).then(() => {
+                    alert('Room link copied to clipboard!');
+                }).catch(() => {
+                    prompt('Copy this room link:', roomLink);
+                });
+            } else {
+                const shareURL = generateShareURL();
+                navigator.clipboard.writeText(shareURL).then(() => {
+                    alert('Share link copied to clipboard!');
+                }).catch(() => {
+                    prompt('Copy this link to share:', shareURL);
+                });
+            }
+        });
+        
+        // Embed dropdown functionality
+        document.getElementById('embed').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const menu = document.getElementById('embed-menu');
+            menu.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', () => {
+            document.getElementById('embed-menu').classList.remove('show');
+        });
+        
+        document.querySelectorAll('.embed-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const mode = option.dataset.mode;
+                
+                if (mode === 'cloud') {
+                    generateCloudEmbed();
+                } else {
+                    const embedURL = generateEmbedURL(mode);
+                    const dimensions = mode === 'preview' ? 'width="100%" height="100%"' : 'width="800" height="500"';
+                    const embedCode = `<iframe src="${embedURL}" ${dimensions} frameborder="0"></iframe>`;
+                    
+                    navigator.clipboard.writeText(embedCode).then(() => {
+                        alert(`${mode === 'preview' ? 'Preview embed' : 'Full compiler embed'} code copied!`);
+                    }).catch(() => {
+                        prompt('Copy this embed code:', embedCode);
+                    });
+                }
+                
+                document.getElementById('embed-menu').classList.remove('show');
+            });
+        });
+
+        // Load code from URL on page load
+        window.addEventListener('load', () => {
+            loadFromURL();
+            
+            // Show cloud embed option and admin indicator for admin
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('admin') === 'elite') {
+                document.querySelector('[data-mode="cloud"]').style.display = 'block';
+                document.getElementById('cloud-manager').style.display = 'inline-block';
+                addAdminIndicator();
+            }
+        });
+
+        // Enhanced Firebase Collaboration System
+        const firebaseConfig = {
+            apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+            authDomain: "h-90-8a7c5.firebaseapp.com",
+            databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+            projectId: "h-90-8a7c5",
+            storageBucket: "h-90-8a7c5.firebasestorage.app",
+            messagingSenderId: "367196609301",
+            appId: "1:367196609301:web:156e24c1b4532c26af671c",
+            measurementId: "G-W5K7F4VQGP"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        let currentRoom = null;
+        let currentUser = {
+            id: 'user_' + Math.random().toString(36).substr(2, 9),
+            name: 'Anonymous',
+            isCreator: false,
+            joinedAt: Date.now(),
+            isTyping: false,
+            permissions: { canEdit: true, canSave: true }
+        };
+        let typingTimeout = null;
+        let roomSettings = {
+            readOnly: false,
+            voiceEnabled: false,
+            maxUsers: 10
+        };
+        let isUpdatingFromFirebase = false;
+        let roomRef = null;
+        
+        // Collaboration Dialog Management
+        document.getElementById('collaborate').addEventListener('click', () => {
+            document.getElementById('collab-overlay').style.display = 'block';
+            updateCollabDialog();
+        });
+        
+        document.getElementById('collab-close').addEventListener('click', () => {
+            document.getElementById('collab-overlay').style.display = 'none';
+        });
+        
+        document.getElementById('collab-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('collab-overlay').style.display = 'none';
+            }
+        });
+        
+        // Room Management
+        document.getElementById('create-room').addEventListener('click', createRoom);
+        document.getElementById('join-room').addEventListener('click', joinRoom);
+        document.getElementById('leave-room').addEventListener('click', leaveRoom);
+        document.getElementById('copy-room-link').addEventListener('click', copyRoomLink);
+        
+        // Real-time name validation
+        document.getElementById('user-name').addEventListener('input', (e) => {
+            const name = e.target.value.trim();
+            if (name.length >= 3) {
+                e.target.classList.remove('error');
+                document.getElementById('name-error').style.display = 'none';
+            }
+        });
+        document.getElementById('user-name').addEventListener('input', updateUserName);
+        document.getElementById('toggle-readonly').addEventListener('click', toggleReadOnly);
+
+        document.getElementById('save-snapshot').addEventListener('click', saveSnapshot);
+        document.getElementById('version-history').addEventListener('click', showVersionHistory);
+        document.getElementById('view-logs').addEventListener('click', showAllLogs);
+        document.getElementById('logs-close').addEventListener('click', () => {
+            document.getElementById('logs-viewer').style.display = 'none';
+        });
+        
+        // Chat functionality
+        document.getElementById('chat-toggle').addEventListener('click', toggleChat);
+        document.getElementById('chat-close').addEventListener('click', () => {
+            document.getElementById('chat-panel').style.display = 'none';
+        });
+        document.getElementById('chat-send').addEventListener('click', sendChatMessage);
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+        
+        function createRoom() {
+            const userName = document.getElementById('user-name').value.trim();
+            if (!validateUserName(userName)) return;
+            
+            const roomName = document.getElementById('room-name').value.trim() || generateRoomId();
+            currentUser.name = userName;
+            currentUser.isCreator = true;
+            joinCollaborationRoom(roomName);
+        }
+        
+        function joinRoom() {
+            const userName = document.getElementById('user-name').value.trim();
+            if (!validateUserName(userName)) return;
+            
+            const roomName = document.getElementById('room-name').value.trim();
+            if (!roomName) {
+                showError('room-name', 'Please enter a room name');
+                return;
+            }
+            
+            currentUser.name = userName;
+            currentUser.isCreator = false;
+            joinCollaborationRoom(roomName);
+        }
+        
+        function leaveRoom() {
+            if (roomRef && currentRoom) {
+                addActivityLog(`${currentUser.name} left the room`);
+                roomRef.child('users').child(currentUser.id).remove();
+                if (currentUser.isCreator) {
+                    roomRef.remove();
+                }
+                roomRef = null;
+                currentRoom = null;
+                document.getElementById('chat-panel').style.display = 'none';
+                updateCollabDialog();
+                // Redirect to clean URL
+                window.history.pushState({}, '', window.location.pathname);
+            }
+        }
+        
+        function joinCollaborationRoom(roomId) {
+            currentRoom = roomId;
+            roomRef = database.ref(`rooms/${roomId}`);
+            
+            // Check room capacity
+            roomRef.child('users').once('value', (snapshot) => {
+                const users = snapshot.val() || {};
+                if (Object.keys(users).length >= roomSettings.maxUsers && !currentUser.isCreator) {
+                    alert('Room is full!');
+                    return;
+                }
+                
+                // Add user to room
+                roomRef.child('users').child(currentUser.id).set({
+                    name: currentUser.name,
+                    isCreator: currentUser.isCreator,
+                    joinedAt: firebase.database.ServerValue.TIMESTAMP,
+                    lastActive: firebase.database.ServerValue.TIMESTAMP,
+                    isTyping: false,
+                    permissions: currentUser.permissions
+                });
+                
+                // Set up listeners
+                setupCollaborationListeners();
+                
+                // Update URL
+                window.history.pushState({}, '', `?room=${roomId}`);
+                document.title = `CodeZap - Room: ${roomId}`;
+                
+                updateCollabDialog();
+                addActivityLog(`${currentUser.name} joined the room`);
+            });
+        }
+        
+        function setupCollaborationListeners() {
+            // Content sync
+            roomRef.child('content/html').on('value', (snapshot) => {
+                const content = snapshot.val() || '';
+                updateEditorFromFirebase(htmlEditor, content);
+            });
+            
+            roomRef.child('content/css').on('value', (snapshot) => {
+                const content = snapshot.val() || '';
+                updateEditorFromFirebase(cssEditor, content);
+            });
+            
+            roomRef.child('content/js').on('value', (snapshot) => {
+                const content = snapshot.val() || '';
+                updateEditorFromFirebase(jsEditor, content);
+            });
+            
+            // Users tracking
+            roomRef.child('users').on('value', (snapshot) => {
+                updateUsersList(snapshot.val() || {});
+            });
+            
+            // Activity logs
+            roomRef.child('logs').limitToLast(10).on('value', (snapshot) => {
+                updateActivityLogs(snapshot.val() || {});
+            });
+            
+            // Chat messages
+            roomRef.child('chat').limitToLast(20).on('value', (snapshot) => {
+                updateChatMessages(snapshot.val() || {});
+            });
+            
+            // Kick notifications
+            roomRef.child('kicks').child(currentUser.id).on('value', (snapshot) => {
+                if (snapshot.val()) {
+                    showKickNotification();
+                    setTimeout(() => {
+                        window.location.href = window.location.pathname;
+                    }, 3000);
+                }
+            });
+            
+            // Room settings
+            roomRef.child('settings').on('value', (snapshot) => {
+                roomSettings = { ...roomSettings, ...(snapshot.val() || {}) };
+                updateRoomFeatures();
+            });
+            
+            // Typing indicators
+            roomRef.child('users').on('value', (snapshot) => {
+                const users = snapshot.val() || {};
+                updateTypingIndicator(users);
+                updateUsersList(users);
+            });
+        }
+        
+        function syncToFirebase(editor, type) {
+            if (isUpdatingFromFirebase || !roomRef) return;
+            
+            const content = editor.getValue();
+            roomRef.child('content').child(type).set(content);
+            roomRef.child('users').child(currentUser.id).child('lastActive').set(firebase.database.ServerValue.TIMESTAMP);
+            
+            addActivityLog(`${currentUser.name} edited ${type.toUpperCase()}`);
+        }
+        
+        function updateEditorFromFirebase(editor, newContent) {
+            if (editor.getValue() === newContent) return;
+            
+            isUpdatingFromFirebase = true;
+            const cursor = editor.getCursor();
+            const scrollInfo = editor.getScrollInfo();
+            
+            editor.setValue(newContent);
+            editor.setCursor(cursor);
+            editor.scrollTo(scrollInfo.left, scrollInfo.top);
+            
+            isUpdatingFromFirebase = false;
+            
+            if (autoRun) {
+                updatePreview();
+                updateMobilePreview();
+            }
+        }
+        
+        function updateCollabDialog() {
+            const roomInfo = document.getElementById('room-info');
+            const usersSection = document.getElementById('users-section');
+            const logsSection = document.getElementById('logs-section');
+            const leaveBtn = document.getElementById('leave-room');
+            const viewLogsBtn = document.getElementById('view-logs');
+            const chatToggle = document.getElementById('chat-toggle');
+            const collaborateBtn = document.getElementById('collaborate');
+            
+            if (currentRoom) {
+                roomInfo.style.display = 'block';
+                usersSection.style.display = 'block';
+                logsSection.style.display = 'block';
+                leaveBtn.style.display = 'inline-block';
+                viewLogsBtn.style.display = 'inline-block';
+                chatToggle.style.display = 'block';
+                collaborateBtn.textContent = '⚙️ Room Settings';
+                document.getElementById('room-status').textContent = `Connected to "${currentRoom}"`;
+                updateRoomFeatures();
+            } else {
+                roomInfo.style.display = 'none';
+                usersSection.style.display = 'none';
+                logsSection.style.display = 'none';
+                leaveBtn.style.display = 'none';
+                viewLogsBtn.style.display = 'none';
+                chatToggle.style.display = 'none';
+                collaborateBtn.textContent = '🤝 Collaborate';
+                document.getElementById('room-features').style.display = 'none';
+            }
+        }
+        
+        function updateUsersList(users) {
+            const usersList = document.getElementById('users-list');
+            const userCount = document.getElementById('user-count');
+            
+            usersList.innerHTML = '';
+            const userArray = Object.entries(users);
+            userCount.textContent = userArray.length;
+            
+            userArray.forEach(([id, user]) => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                const isCurrentUser = id === currentUser.id;
+                const canManage = currentUser.isCreator && !isCurrentUser;
+                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                
+                userItem.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-avatar">${initials}</div>
+                        <div class="user-details">
+                            <div class="user-name">${user.name}${isCurrentUser ? ' (You)' : ''}</div>
+                            <div class="user-role">${user.isCreator ? 'Room Creator' : 'Member'}</div>
+                        </div>
+                        ${user.isTyping ? '<span class="user-status status-typing">typing</span>' : '<span class="user-status status-online">online</span>'}
+                    </div>
+                    ${canManage ? `
+                        <div class="user-actions">
+                            <button class="user-action-btn kick-btn" onclick="kickUser('${id}', '${user.name}')">Remove</button>
+                            ${!user.isCreator ? `<button class="user-action-btn promote-btn" onclick="promoteUser('${id}', '${user.name}')">Promote</button>` : ''}
+                        </div>
+                    ` : ''}
+                `;
+                usersList.appendChild(userItem);
+            });
+        }
+        
+        function updateActivityLogs(logs) {
+            const activityLogs = document.getElementById('activity-logs');
+            activityLogs.innerHTML = '';
+            
+            Object.entries(logs).forEach(([id, log]) => {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                logItem.innerHTML = `
+                    <span class="log-time">${new Date(log.timestamp).toLocaleTimeString()}</span>
+                    <span class="log-message">${log.message}</span>
+                `;
+                activityLogs.appendChild(logItem);
+            });
+            
+            activityLogs.scrollTop = activityLogs.scrollHeight;
+        }
+        
+        function addActivityLog(message) {
+            if (!roomRef) return;
+            
+            roomRef.child('logs').push({
+                message: message,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                userId: currentUser.id
+            });
+        }
+        
+        function copyRoomLink() {
+            const roomLink = `${window.location.origin}${window.location.pathname}?room=${currentRoom}`;
+            navigator.clipboard.writeText(roomLink).then(() => {
+                const btn = document.getElementById('copy-room-link');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }, 2000);
+            }).catch(() => {
+                prompt('Copy this room link:', roomLink);
+            });
+        }
+        
+        function generateRoomId() {
+            return 'room_' + Math.random().toString(36).substr(2, 8);
+        }
+        
+        function updateUserName() {
+            const newName = document.getElementById('user-name').value.trim();
+            if (!validateUserName(newName)) return;
+            
+            currentUser.name = newName;
+            if (roomRef) {
+                roomRef.child('users').child(currentUser.id).child('name').set(newName);
+                addActivityLog(`User renamed to ${newName}`);
+            }
+        }
+        
+        function kickUser(userId, userName) {
+            if (confirm(`Remove ${userName} from the room?`)) {
+                // Send kick notification to user
+                roomRef.child('kicks').child(userId).set({
+                    message: 'You have been removed from the room',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                
+                setTimeout(() => {
+                    roomRef.child('users').child(userId).remove();
+                    roomRef.child('kicks').child(userId).remove();
+                }, 1000);
+                
+                addActivityLog(`${userName} was removed from the room`);
+            }
+        }
+        
+        function promoteUser(userId, userName) {
+            if (confirm(`Promote ${userName} to creator?`)) {
+                roomRef.child('users').child(userId).child('isCreator').set(true);
+                roomRef.child('users').child(currentUser.id).child('isCreator').set(false);
+                currentUser.isCreator = false;
+                addActivityLog(`${userName} was promoted to creator`);
+            }
+        }
+        
+        function toggleReadOnly() {
+            if (!currentUser.isCreator) return;
+            roomSettings.readOnly = !roomSettings.readOnly;
+            roomRef.child('settings').child('readOnly').set(roomSettings.readOnly);
+            addActivityLog(`Read-only mode ${roomSettings.readOnly ? 'enabled' : 'disabled'}`);
+        }
+        
+
+        
+        function saveSnapshot() {
+            const snapshot = {
+                html: htmlEditor.getValue(),
+                css: cssEditor.getValue(),
+                js: jsEditor.getValue(),
+                timestamp: Date.now(),
+                author: currentUser.name
+            };
+            roomRef.child('snapshots').push(snapshot);
+            addActivityLog(`${currentUser.name} saved a snapshot`);
+            alert('Snapshot saved!');
+        }
+        
+        function showVersionHistory() {
+            roomRef.child('snapshots').limitToLast(5).once('value', (snapshot) => {
+                const snapshots = snapshot.val() || {};
+                const history = Object.entries(snapshots).map(([id, snap]) => 
+                    `${new Date(snap.timestamp).toLocaleString()} - ${snap.author}`
+                ).join('\n');
+                alert('Recent Snapshots:\n' + (history || 'No snapshots found'));
+            });
+        }
+        
+        function updateRoomFeatures() {
+            document.getElementById('room-features').style.display = currentUser.isCreator ? 'flex' : 'none';
+            document.getElementById('toggle-readonly').classList.toggle('active', roomSettings.readOnly);
+            
+            // Disable editors if read-only and not creator
+            const isReadOnly = roomSettings.readOnly && !currentUser.isCreator;
+            htmlEditor.setOption('readOnly', isReadOnly);
+            cssEditor.setOption('readOnly', isReadOnly);
+            jsEditor.setOption('readOnly', isReadOnly);
+        }
+        
+        function updateTypingIndicator(users) {
+            const typingUsers = Object.values(users).filter(user => 
+                user.isTyping && user.name !== currentUser.name
+            ).map(user => user.name.split(' ')[0]);
+            
+            const indicator = document.getElementById('typing-indicator');
+            if (typingUsers.length > 0) {
+                indicator.textContent = ` - ${typingUsers.join(', ')} typing...`;
+            } else {
+                indicator.textContent = '';
+            }
+        }
+        
+        function setTypingStatus(isTyping) {
+            if (roomRef && currentUser.isTyping !== isTyping) {
+                currentUser.isTyping = isTyping;
+                roomRef.child('users').child(currentUser.id).child('isTyping').set(isTyping);
+            }
+        }
+        
+        // Validation functions
+        function validateUserName(name) {
+            const nameInput = document.getElementById('user-name');
+            const errorDiv = document.getElementById('name-error');
+            
+            if (!name || name.length < 3 || name.length > 30) {
+                nameInput.classList.add('error');
+                errorDiv.style.display = 'block';
+                return false;
+            }
+            
+            nameInput.classList.remove('error');
+            errorDiv.style.display = 'none';
+            return true;
+        }
+        
+        function showError(inputId, message) {
+            const input = document.getElementById(inputId);
+            input.classList.add('error');
+            setTimeout(() => input.classList.remove('error'), 3000);
+        }
+        
+        // Auto-join room from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomFromUrl = urlParams.get('room');
+        if (roomFromUrl) {
+            document.getElementById('collab-overlay').style.display = 'block';
+            document.getElementById('room-name').value = roomFromUrl;
+            document.getElementById('user-name').focus();
+        }
+        
+        // Add Firebase sync to editor change events with typing indicators
+        htmlEditor.on('change', () => {
+            syncToFirebase(htmlEditor, 'html');
+            setTypingStatus(true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => setTypingStatus(false), 1000);
+            if (autoRun && !isUpdatingFromFirebase) {
+                updatePreview();
+            }
+        });
+        
+        cssEditor.on('change', () => {
+            syncToFirebase(cssEditor, 'css');
+            setTypingStatus(true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => setTypingStatus(false), 1000);
+            if (autoRun && !isUpdatingFromFirebase) {
+                updatePreview();
+            }
+        });
+        
+        jsEditor.on('change', () => {
+            syncToFirebase(jsEditor, 'js');
+            setTypingStatus(true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => setTypingStatus(false), 1000);
+            if (autoRun && !isUpdatingFromFirebase) {
+                updatePreview();
+            }
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (roomRef && currentRoom) {
+                addActivityLog(`${currentUser.name} left the room`);
+                roomRef.child('users').child(currentUser.id).remove();
+                if (currentUser.isCreator) {
+                    // Check if there are other users to promote
+                    roomRef.child('users').once('value', (snapshot) => {
+                        const users = snapshot.val() || {};
+                        const otherUsers = Object.entries(users).filter(([id]) => id !== currentUser.id);
+                        if (otherUsers.length > 0) {
+                            // Promote first other user to creator
+                            const [newCreatorId] = otherUsers[0];
+                            roomRef.child('users').child(newCreatorId).child('isCreator').set(true);
+                        } else {
+                            // No other users, delete room
+                            roomRef.remove();
+                        }
+                    });
+                }
+            }
+        });
+        
+        // New feature functions
+        function showKickNotification() {
+            const notification = document.getElementById('kick-notification');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        function toggleChat() {
+            const panel = document.getElementById('chat-panel');
+            const chatAlert = document.getElementById('chat-alert');
+            const isVisible = panel.style.display === 'flex';
+            panel.style.display = isVisible ? 'none' : 'flex';
+            
+            if (!isVisible) {
+                document.getElementById('chat-input').focus();
+                chatAlert.style.display = 'none';
+            }
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message || !roomRef) return;
+            
+            const chatMessage = {
+                text: message,
+                author: currentUser.name,
+                authorId: currentUser.id,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                expiresAt: Date.now() + 10000 // 10 seconds
+            };
+            
+            roomRef.child('chat').push(chatMessage);
+            input.value = '';
+        }
+        
+        function updateChatMessages(messages) {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+            
+            const now = Date.now();
+            const validMessages = Object.entries(messages).filter(([id, msg]) => 
+                !msg.expiresAt || msg.expiresAt > now
+            );
+            
+            // Clean up expired messages
+            Object.entries(messages).forEach(([id, msg]) => {
+                if (msg.expiresAt && msg.expiresAt <= now) {
+                    roomRef.child('chat').child(id).remove();
+                }
+            });
+            
+            validMessages.forEach(([id, message]) => {
+                const messageDiv = document.createElement('div');
+                const isOwn = message.authorId === currentUser.id;
+                messageDiv.className = `chat-message ${isOwn ? 'own' : 'other'}`;
+                
+                messageDiv.innerHTML = `
+                    ${!isOwn ? `<div class="message-author">${message.author}</div>` : ''}
+                    <div>${message.text}</div>
+                    <div class="message-time">${new Date(message.timestamp).toLocaleTimeString()}</div>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Show alert for all users when there are new messages and chat is closed
+            const chatPanel = document.getElementById('chat-panel');
+            const chatAlert = document.getElementById('chat-alert');
+            if (validMessages.length > 0 && chatPanel.style.display !== 'flex') {
+                chatAlert.style.display = 'flex';
+            }
+        }
+        
+        function showAllLogs() {
+            if (!roomRef) return;
+            
+            roomRef.child('logs').once('value', (snapshot) => {
+                const logs = snapshot.val() || {};
+                const logsBody = document.getElementById('logs-body');
+                logsBody.innerHTML = '';
+                
+                Object.entries(logs).reverse().forEach(([id, log]) => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    logEntry.innerHTML = `
+                        <div class="log-content">${log.message}</div>
+                        <div class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
+                    `;
+                    logsBody.appendChild(logEntry);
+                });
+                
+                document.getElementById('logs-viewer').style.display = 'flex';
+            });
+        }
+        
+        // Cloud embed functions (owner only)
+        function generateCloudEmbed() {
+            const codeRoomId = 'cr_' + Math.random().toString(36).substr(2, 12);
+            const data = {
+                html: htmlEditor.getValue(),
+                css: cssEditor.getValue(),
+                js: jsEditor.getValue(),
+                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                owner: currentUser.id
+            };
+            
+            database.ref(`coderooms/${codeRoomId}`).set(data).then(() => {
+                const embedURL = `${window.location.origin}${window.location.pathname}?cr=${codeRoomId}&embed=cloud`;
+                const embedCode = `<iframe src="${embedURL}" width="100%" height="100%" frameborder="0"></iframe>`;
+                
+                navigator.clipboard.writeText(embedCode).then(() => {
+                    alert('Cloud embed code copied! Code stored in cloud.');
+                }).catch(() => {
+                    prompt('Copy this cloud embed code:', embedCode);
+                });
+            }).catch(error => {
+                console.error('Failed to create cloud embed:', error);
+                alert('Failed to create cloud embed. Please try again.');
+            });
+        }
+        
+        function loadFromCloudRoom(codeRoomId) {
+            database.ref(`coderooms/${codeRoomId}`).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    htmlEditor.setValue(data.html || '');
+                    cssEditor.setValue(data.css || '');
+                    jsEditor.setValue(data.js || '');
+                    
+                    setTimeout(() => {
+                        updatePreview();
+                    }, 100);
+                } else {
+                    console.error('Code room not found');
+                }
+            }).catch(error => {
+                console.error('Failed to load cloud code:', error);
+            });
+        }
+        
+        function addCloudDeleteButton() {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'cloud-delete-btn';
+            deleteBtn.textContent = '🗑️ Delete';
+            deleteBtn.onclick = deleteCloudRoom;
+            document.body.appendChild(deleteBtn);
+        }
+        
+        function deleteCloudRoom() {
+            const params = new URLSearchParams(window.location.search);
+            const codeRoomId = params.get('cr');
+            
+            if (codeRoomId && confirm('Delete this cloud embed permanently?')) {
+                database.ref(`coderooms/${codeRoomId}`).remove().then(() => {
+                    alert('Cloud embed deleted successfully!');
+                    window.close();
+                }).catch(error => {
+                    console.error('Failed to delete cloud embed:', error);
+                    alert('Failed to delete cloud embed.');
+                });
+            }
+        }
+        
+        // Admin indicator
+        function addAdminIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'admin-indicator';
+            indicator.textContent = '👑 ADMIN MODE';
+            document.body.appendChild(indicator);
+        }
+        
+        // Cloud Manager System
+        document.getElementById('cloud-manager').addEventListener('click', openCloudManager);
+        document.getElementById('cloud-manager-close').addEventListener('click', closeCloudManager);
+        
+        function openCloudManager() {
+            document.getElementById('cloud-manager-overlay').style.display = 'flex';
+            loadCloudEmbeds();
+        }
+        
+        function closeCloudManager() {
+            document.getElementById('cloud-manager-overlay').style.display = 'none';
+        }
+        
+        function loadCloudEmbeds() {
+            const body = document.getElementById('cloud-manager-body');
+            body.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Loading cloud embeds...</div>';
+            
+            database.ref('coderooms').once('value').then(snapshot => {
+                const embeds = snapshot.val() || {};
+                const embedArray = Object.entries(embeds);
+                
+                if (embedArray.length === 0) {
+                    body.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">No cloud embeds found</div>';
+                    return;
+                }
+                
+                body.innerHTML = '';
+                embedArray.forEach(([id, data]) => {
+                    const item = document.createElement('div');
+                    item.className = 'cloud-item';
+                    
+                    const date = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Unknown';
+                    
+                    item.innerHTML = `
+                        <div class="cloud-item-info">
+                            <div class="cloud-item-id">${id}</div>
+                            <div class="cloud-item-date">Created: ${date}</div>
+                        </div>
+                        <div class="cloud-item-actions">
+                            <button class="cloud-action-btn copy-btn" onclick="copyIframe('${id}')">📋 Copy Iframe</button>
+                            <button class="cloud-action-btn delete-btn" onclick="deleteEmbed('${id}')">🗑️ Delete</button>
+                        </div>
+                    `;
+                    
+                    body.appendChild(item);
+                });
+            }).catch(error => {
+                console.error('Failed to load cloud embeds:', error);
+                body.innerHTML = '<div style="text-align: center; color: #ef4444; padding: 40px;">Failed to load cloud embeds</div>';
+            });
+        }
+        
+        function copyIframe(embedId) {
+            const embedURL = `${window.location.origin}${window.location.pathname}?cr=${embedId}&embed=cloud`;
+            const embedCode = `<iframe src="${embedURL}" width="100%" height="100%" frameborder="0"></iframe>`;
+            
+            navigator.clipboard.writeText(embedCode).then(() => {
+                alert('Iframe code copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this iframe code:', embedCode);
+            });
+        }
+        
+        function deleteEmbed(embedId) {
+            if (confirm(`Delete cloud embed ${embedId}?`)) {
+                database.ref(`coderooms/${embedId}`).remove().then(() => {
+                    alert('Cloud embed deleted successfully!');
+                    loadCloudEmbeds();
+                }).catch(error => {
+                    console.error('Failed to delete embed:', error);
+                    alert('Failed to delete embed.');
+                });
+            }
+        }
+        
+        // Make functions global for onclick handlers
+        window.kickUser = kickUser;
+        window.promoteUser = promoteUser;
+        window.deleteCloudRoom = deleteCloudRoom;
+        window.copyIframe = copyIframe;
+        window.deleteEmbed = deleteEmbed;
+
+
+
+    </script>
+</body>
+</html>

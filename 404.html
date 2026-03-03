@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Not Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 1. Reset & Base Styles --- */
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: #F4F4F4;
+        color: #111;
+        min-height: 100vh;
+        width: 100vw;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    ::selection {
+        background-color: #000;
+        color: #fff;
+    }
+
+    /* --- 2. Grid System (Visualized) --- */
+    .grid-line {
+        position: absolute;
+        background-color: rgba(0,0,0,0.06);
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .grid-line-v-25 { top: 0; bottom: 0; left: 25%; width: 1px; }
+    .grid-line-v-50 { top: 0; bottom: 0; left: 50%; width: 1px; }
+    .grid-line-v-75 { top: 0; bottom: 0; left: 75%; width: 1px; }
+    .grid-line-h-top { left: 0; right: 0; top: 100px; height: 1px; }
+    .grid-line-h-bottom { left: 0; right: 0; bottom: 100px; height: 1px; }
+
+    /* --- 3. Main Layout --- */
+    .main-container {
+        position: relative;
+        z-index: 10;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    /* --- 4. Header --- */
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100px;
+        padding: 0 1.5rem; /* 24px */
+        flex-shrink: 0;
+    }
+    
+    .status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem; /* 8px */
+        font-size: 0.875rem; /* 14px */
+        font-weight: 500;
+        letter-spacing: -0.025em;
+    }
+    
+    .status-dot {
+        width: 0.5rem; /* 8px */
+        height: 0.5rem;
+        background-color: #FF3333;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .coordinates {
+        font-size: 0.75rem; /* 12px */
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #9ca3af;
+        display: none; /* Hidden on mobile */
+    }
+
+    /* --- 5. Content Area --- */
+    .content-area {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding-bottom: 3rem; /* 48px */
+    }
+    
+    .left-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2.5rem 1.5rem; /* 40px 24px */
+    }
+    
+    .error-code {
+        font-size: 5rem; /* 80px - Smaller base for mobile */
+        line-height: 0.8;
+        font-weight: 500;
+        letter-spacing: -0.05em;
+        text-align: center;
+        user-select: none;
+    }
+    
+    .right-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 1.5rem; /* 24px */
+        text-align: center;
+        flex-grow: 1;
+    }
+    
+    .error-info {
+        max-width: 28rem; /* 448px */
+        margin-bottom: 2rem; /* 32px */
+    }
+    
+    .error-title {
+        font-size: 1.5rem; /* 24px */
+        font-weight: 400;
+        line-height: 1.2;
+        margin-bottom: 1rem; /* 16px */
+    }
+    
+    .error-subtitle {
+        color: #9ca3af;
+    }
+    
+    .divider {
+        width: 3rem; /* 48px */
+        height: 1px;
+        background-color: #000;
+        margin: 1.5rem auto; /* 24px auto */
+    }
+    
+    .error-description {
+        font-size: 0.875rem; /* 14px */
+        color: #6b7280;
+        line-height: 1.6;
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem; /* 24px */
+        width: 100%;
+    }
+    
+    .primary-button, .secondary-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem; /* 16px */
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    
+    .primary-button {
+        font-size: 1.125rem; /* 18px */
+        font-weight: 500;
+        color: #111;
+        padding: 0.75rem 0; /* 12px 0 */
+    }
+    
+    .primary-button:hover {
+        color: #FF3333;
+    }
+    
+    .secondary-button {
+        font-size: 0.875rem; /* 14px */
+        color: #6b7280;
+        padding: 0.5rem 0; /* 8px 0 */
+    }
+    
+    .secondary-button:hover {
+        color: #000;
+    }
+    
+    .button-line {
+        display: none; /* Hidden on mobile */
+        width: 2rem; /* 32px */
+        height: 1px;
+        background-color: currentColor;
+        transition: background-color 0.2s ease;
+    }
+
+    /* --- 6. Decorative Element --- */
+    .decorative-element {
+        position: fixed;
+        bottom: 2rem; /* 32px */
+        right: 2rem;
+        width: 6rem; /* 96px */
+        height: 6rem;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 50%;
+        display: none; /* Hidden on mobile */
+        align-items: center;
+        justify-content: center;
+        animation: spin 10s linear infinite;
+        pointer-events: none;
+    }
+    
+    .decorative-element::before, .decorative-element::after {
+        content: '';
+        position: absolute;
+        background-color: rgba(0,0,0,0.1);
+    }
+    
+    .decorative-element::before { width: 100%; height: 1px; }
+    .decorative-element::after { width: 1px; height: 100%; }
+
+    /* --- 7. Animations --- */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* --- 8. Responsive Breakpoints --- */
+    @media (min-width: 640px) { /* sm */
+        .error-code { font-size: 7rem; } /* 112px */
+    }
+
+    @media (min-width: 768px) { /* md */
+        .grid-line-v-25, .grid-line-v-50, .grid-line-v-75, .grid-line-h-bottom { display: block; }
+        
+        .header { padding: 0 3rem; } /* 48px */
+        .coordinates { display: block; }
+        
+        .content-area {
+            flex-direction: row;
+            padding-bottom: 0;
+        }
+        
+        .left-content {
+            width: 50%;
+            padding: 0 3rem; /* 48px */
+            border-right: 1px solid rgba(0,0,0,0.05);
+            align-items: flex-start;
+        }
+        
+        .error-code {
+            font-size: 10rem; /* 160px */
+            text-align: left;
+            margin-left: -1rem; /* -16px */
+        }
+        
+        .right-content {
+            width: 50%;
+            padding: 0 3rem; /* 48px */
+            align-items: flex-start;
+            text-align: left;
+        }
+        
+        .divider { margin: 1.5rem 0; } /* 24px 0 */
+        
+        .action-buttons {
+            align-items: flex-start;
+            width: auto;
+        }
+        
+        .primary-button, .secondary-button {
+            width: auto;
+            justify-content: flex-start;
+        }
+        
+        .button-line { display: block; }
+        
+        .decorative-element { display: flex; }
+    }
+
+    @media (min-width: 1024px) { /* lg */
+        .error-code { font-size: 12rem; } /* 192px */
+    }
+    
+    @media (min-width: 1280px) { /* xl */
+        .error-code { font-size: 14rem; } /* 224px */
+    }
+
+</style>
+</head>
+<body>
+
+    <!-- THE GRID SYSTEM (Visualized) -->
+    <div class="grid-line grid-line-v-25"></div>
+    <div class="grid-line grid-line-v-50"></div>
+    <div class="grid-line grid-line-v-75"></div>
+    <div class="grid-line grid-line-h-top"></div>
+    <div class="grid-line grid-line-h-bottom"></div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="main-container">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="status">
+                <span class="status-dot"></span>
+                SYSTEM STATUS: 404
+            </div>
+            <div class="coordinates">
+                Coordinates: Missing
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <div class="content-area">
+
+            <!-- Left: The "404" Type -->
+            <div class="left-content">
+                <h1 class="error-code">404</h1>
+            </div>
+
+            <!-- Right: The Explanation & Action -->
+            <div class="right-content">
+                
+                <div class="error-info">
+                    <h2 class="error-title">
+                        The requested object<br>
+                        <span class="error-subtitle">could not be located.</span>
+                    </h2>
+                    
+                    <div class="divider"></div>
+                    
+                    <p class="error-description">
+                        The URL you entered is either incorrect or the page has been moved. Please navigate back to the index.
+                    </p>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/" class="primary-button">
+                        <span class="button-line"></span>
+                        Return Index
+                    </a>
+                    
+                    <button onclick="history.back()" class="secondary-button">
+                        <span class="button-line"></span>
+                        Go Back
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <!-- Decorative Element -->
+    <div class="decorative-element"></div>
+
+</body>
+</html>

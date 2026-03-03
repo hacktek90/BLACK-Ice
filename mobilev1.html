@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackICE Portal Host</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #09090b;
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .hero-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            margin: 0 0 12px 0;
+            font-size: 24px; font-weight: 600;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            margin: 0; color: #a1a1aa; font-size: 14px; line-height: 1.6;
+        }
+
+        /* Visual Hint Container */
+        .hint-wrap {
+            margin-top: 32px;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+
+        /* The Visual "Fake Button" Icon */
+        .hint-icon {
+            width: 48px; height: 48px;
+            background: rgba(24, 24, 27, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #3b82f6;
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            animation: pulse-blue 2s infinite;
+        }
+
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .hint-text {
+            font-size: 12px; font-weight: 500;
+            color: #71717a; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+
+        .glow {
+            position: absolute; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(0,0,0,0) 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            pointer-events: none; z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="glow"></div>
+
+    <div class="hero-card">
+        <h1>Welcome to BlackICE</h1>
+        <p>Your portal is ready.</p>
+        
+        <div class="hint-wrap">
+            <div class="hint-icon">
+                <!-- Grid Icon matching the widget -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </div>
+            <div class="hint-text">Click the button below to launch projects</div>
+        </div>
+    </div>
+
+    <script src="https://blackice-ac.vercel.app/test/portal.js" defer></script>
+
+</body>
+</html>

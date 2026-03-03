@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Search | BlackICE Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0b0b0b;
+    color: #fff;
+    margin: 0;
+    padding: 40px;
+  }
+  h1 {
+    margin-bottom: 10px;
+  }
+  input {
+    width: 100%;
+    max-width: 420px;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    border: none;
+  }
+  .result {
+    background: #161616;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .result a {
+    color: #4cc9f0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .muted {
+    color: #aaa;
+    font-size: 14px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Search BlackICE Academy</h1>
+<p class="muted">Results for your query</p>
+
+<input type="search" id="searchInput" placeholder="Search labs, CTFs, courses…" />
+
+<div id="results"></div>
+
+<script>
+  // Sample searchable data (expand anytime)
+  const data = [
+    {
+      title: "Web Hacking Lab",
+      description: "Practice SQLi, XSS, CSRF and authentication flaws.",
+      url: "/Home.html"
+    },
+    {
+      title: "CTF Challenges",
+      description: "Live capture-the-flag challenges with real exploits.",
+      url: "/projects.html"
+    },
+    {
+      title: "Blue Team Defense",
+      description: "Learn monitoring, detection, and incident response.",
+      url: "/index.html"
+    }
+  ];
+
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get("q") || "";
+
+  const input = document.getElementById("searchInput");
+  const resultsBox = document.getElementById("results");
+
+  input.value = query;
+
+  function renderResults(searchTerm) {
+    resultsBox.innerHTML = "";
+    if (!searchTerm) return;
+
+    const matches = data.filter(item =>
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (matches.length === 0) {
+      resultsBox.innerHTML = "<p class='muted'>No results found.</p>";
+      return;
+    }
+
+    matches.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "result";
+      div.innerHTML = `
+        <a href="${item.url}">${item.title}</a>
+        <p class="muted">${item.description}</p>
+      `;
+      resultsBox.appendChild(div);
+    });
+  }
+
+  input.addEventListener("input", e => {
+    renderResults(e.target.value);
+  });
+
+  renderResults(query);
+</script>
+
+</body>
+</html>
