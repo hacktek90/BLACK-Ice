@@ -258,9 +258,12 @@
                 }
 
                 /* --- IFRAME & OVERLAY --- */
-                #bi-iframe-container { position: fixed; inset: 0; width: 100%; height: 100%; background: #fff; z-index: 2147483645; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+                /* FIX: Changed background from #fff to transparent */
+                #bi-iframe-container { position: fixed; inset: 0; width: 100%; height: 100%; background: transparent; z-index: 2147483645; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
                 #bi-iframe-container.active { opacity: 1; pointer-events: auto; }
-                #bi-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+                /* FIX: Changed background from #fff to transparent */
+                #bi-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+                
                 #bi-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 2147483645; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
                 #bi-overlay.visible { opacity: 1; pointer-events: auto; }
                 
@@ -553,9 +556,8 @@
                         (site.title || '').toLowerCase() === decodedParam.toLowerCase()
                     );
                     if (project) {
-                        let finalUrl = project.url;
-                        try { const u = new URL(project.url); finalUrl = window.location.origin + u.pathname; } catch(e) {}
-                        this.openProject(finalUrl, project.title);
+                        // LOGIC: Use the raw URL from the database directly
+                        this.openProject(project.url, project.title);
                     }
                 }
             }
@@ -589,8 +591,9 @@
 
                 const createCard = (p, isPinned) => {
                     const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(p.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
+                    
+                    // LOGIC: Use the raw URL from the database directly
                     let finalUrl = p.url;
-                    try { const u = new URL(p.url); finalUrl = window.location.origin + u.pathname; } catch(e) {}
 
                     const el = document.createElement('div');
                     el.className = `bi-card ${isPinned ? 'pinned' : ''}`;
@@ -803,4 +806,4 @@
   s.src = "https://blackice-ac.vercel.app/test/tracking.js";
   s.defer = true;
   document.head.appendChild(s);
-})();  
+})();
