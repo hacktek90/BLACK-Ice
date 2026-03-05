@@ -32,9 +32,9 @@
 
     <!-- Canonical link -->
     <link rel="canonical" href="https://blackice-ac.vercel.app/index.html" />
-  
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script type="application/ld+json">
         {
   "@context": "https://schema.org",
@@ -1360,7 +1360,67 @@
             line-height: 1.5;
         }
 
+        /* === MADE IN INDIA BADGE === */
+        .india-badge {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(26, 26, 26, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 1001;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInBadge 1s ease-out;
+            user-select: none;
+            cursor: default;
+            transition: transform 0.2s ease;
+        }
 
+        .india-badge:hover {
+            transform: scale(1.05);
+            background: rgba(26, 26, 26, 0.95);
+        }
+
+        .india-badge .flag {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes fadeInBadge {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Adjust for mobile to avoid overlapping status page or other elements */
+        @media(max-width: 600px) {
+            .india-badge {
+                bottom: 20px;
+                right: 20px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .india-badge .flag {
+                font-size: 16px;
+            }
+        }
 
         .custombg {
             width: 100%;
@@ -1660,6 +1720,12 @@ document.querySelectorAll('.card').forEach(card=>{
             </p>
         </div>
 
+        <!-- MADE IN INDIA BADGE -->
+        <div class="india-badge">
+            <span class="flag">🇮🇳</span>
+            <span>Made in India</span>
+        </div>
+
 
         <script>
             const btn = document.getElementById('circleBtn');
@@ -1690,31 +1756,33 @@ btn.addEventListener('keydown', (e) => {
         document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
 
-   
-  
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9029531054632994"
-     crossorigin="anonymous"></script>
-     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
+
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9029531054632994"
+        crossorigin="anonymous"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJ7N8R2CLY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'G-BJ7N8R2CLY');
-</script>
+    </script>
     <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-W9F9C7ZS');</script>
+})(window,document,'script','dataLayer','GTM-W9F9C7ZS');
+    </script>
     <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W9F9C7ZS"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-<!-- End Google Tag Manager -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W9F9C7ZS" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <!-- End Google Tag Manager -->
 
 </body>
 
