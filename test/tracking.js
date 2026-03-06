@@ -3,6 +3,21 @@
   if (window.__blackiceTrackingLoaded) return;
   window.__blackiceTrackingLoaded = true;
 
+  /* -------------------- COOKIE CONSENT (CookieScript) -------------------- */
+  if (!window.__cookieScriptLoaded) {
+    window.__cookieScriptLoaded = true;
+
+    const cookieScript = document.createElement("script");
+    cookieScript.src =
+      "https://cdn.cookie-script.com/s/d2ada550176f5678967d3ed26a049dc1.js";
+    cookieScript.type = "text/javascript";
+    cookieScript.charset = "UTF-8";
+    cookieScript.async = true;
+    cookieScript.id = "cookie-script-loader";
+
+    document.head.appendChild(cookieScript);
+  }
+
   /* -------------------- SENTRY CDN -------------------- */
   if (!window.__sentryScriptLoaded) {
     window.__sentryScriptLoaded = true;
