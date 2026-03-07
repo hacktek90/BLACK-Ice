@@ -1,118 +1,67 @@
 {
-    "project": {
-      "name": "BLACKICE Academy",
-      "tagline": "Hack it. Defend it. Learn both sides.",
-      "description": "BLACKICE Academy is a hands-on cinematic platform for learning ethical hacking and defensive security through missions, CTF labs, and defender telemetry dashboards.",
-      "live_site": "https://blackice-ac.vercel.app/",
-      "preview_image": "https://thumb.monster/site/https://blackice-ac.vercel.app/",
-      "license": "MIT",
-      "status": "active"
+  "theme": "mint",
+
+  "project": {
+    "name": "BLACKICE Academy",
+    "tagline": "Hack it. Defend it. Learn both sides.",
+    "description": "BLACKICE Academy is a hands-on cinematic platform for learning ethical hacking and defensive security through missions, CTF labs, and defender telemetry dashboards.",
+    "live_site": "https://blackice-ac.vercel.app/",
+    "license": "MIT"
+  },
+
+  "features": [
+    {
+      "title": "Missions & Writeups",
+      "description": "Progressive challenges with graded hints and solutions."
     },
-  
-    "features": [
-      {
-        "title": "Missions & Writeups",
-        "description": "Progressive challenges with graded hints and solutions."
-      },
-      {
-        "title": "Sandboxed CTF Labs",
-        "description": "Safe contained vulnerable targets such as login cracking labs."
-      },
-      {
-        "title": "Curriculum Tracks",
-        "description": "Network Penetration, Web Exploitation, and Forensics & Blue Team learning paths."
-      },
-      {
-        "title": "Defender View",
-        "description": "Telemetry traces, diffs, and mitigation practice for defensive security."
-      },
-      {
-        "title": "Gamified Learning",
-        "description": "Leaderboards, badges, and competitive learning."
-      }
-    ],
-  
-    "tech_stack": [
-      "HTML5",
-      "CSS3",
-      "JavaScript",
-      "GitHub Pages",
-      "Docker (optional)",
-      "Node.js Live Server (optional)"
-    ],
-  
-    "project_structure": {
-      "index.html": "Landing page",
-      "assets": "CSS, JavaScript, images",
-      "labs": {
-        "description": "Vulnerable lab setups",
-        "examples": ["lab-01", "lab-02"]
-      },
-      "missions": "Guided hacking missions",
-      "docs": "Extra documentation and syllabus"
+    {
+      "title": "Sandboxed CTF Labs",
+      "description": "Safe contained vulnerable targets for practice."
     },
-  
-    "getting_started": {
-      "clone": "git clone https://github.com/<your-username>/BLACK-Ice.git",
-      "enter_directory": "cd BLACK-Ice",
-      "preview": {
-        "command": "python3 -m http.server 8000",
-        "url": "http://localhost:8000"
-      },
-      "live_reload": {
-        "install": "npm install -g live-server",
-        "run": "live-server"
-      }
+    {
+      "title": "Curriculum Tracks",
+      "description": "Network Penetration, Web Exploitation, and Forensics."
     },
-  
-    "usage_steps": [
-      "Explore curriculum modules",
-      "Launch labs in isolated environment",
-      "Switch to Defender View for telemetry analysis",
-      "Climb the leaderboard"
-    ],
-  
-    "contributing": {
-      "steps": [
-        "Fork the repository",
-        "Create a feature branch",
-        "Add labs, missions, or fixes",
-        "Open a pull request"
-      ],
-      "ideas": [
-        "New CTF labs",
-        "Blue-team scenarios",
-        "UI/UX improvements",
-        "Accessibility fixes"
-      ]
+    {
+      "title": "Defender View",
+      "description": "Telemetry traces and mitigation practice."
     },
-  
-    "ethics": {
-      "notice": "For educational purposes only",
-      "rules": [
-        "Do not use techniques on systems without permission",
-        "Labs are intentionally vulnerable",
-        "Practice responsibly"
-      ]
-    },
-  
-    "security": {
-      "reporting": [
-        "Do not disclose vulnerabilities publicly",
-        "Report privately to maintainers",
-        "Contributors will be credited"
-      ]
-    },
-  
-    "roadmap": [
-      "Cloud-native attack and defense labs",
-      "Replayable attack telemetry timeline",
-      "Dockerized offline bundles",
-      "Auto-graded certification missions"
-    ],
-  
-    "credits": {
-      "creator": "BLACKICE Academy",
-      "hosting": "Vercel"
+    {
+      "title": "Gamified Learning",
+      "description": "Leaderboards and badges."
     }
-  }
+  ],
+
+  "tech_stack": [
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "GitHub Pages",
+    "Docker (optional)",
+    "Node.js (optional)"
+  ],
+
+  "structure": {
+    "index.html": "Landing page",
+    "assets": "CSS, JS, images",
+    "labs": "Vulnerable labs",
+    "missions": "Guided challenges",
+    "docs": "Extra documentation"
+  },
+
+  "ethics": {
+    "notice": "Educational purposes only",
+    "rules": [
+      "Do not attack systems without permission",
+      "Use labs responsibly",
+      "Follow ethical hacking principles"
+    ]
+  },
+
+  "roadmap": [
+    "Cloud attack labs",
+    "Replayable telemetry",
+    "Docker offline bundles",
+    "Certification missions"
+  ]
+}
