@@ -11,14 +11,14 @@
 
 <style>
     :root {
-        /* Palette: Swiss International Style */
-        --c-white: #ffffff;
-        --c-black: #000000;
-        --c-gray-100: #f0f0f0;
-        --c-gray-300: #cccccc;
+        /* Palette: Swiss International Style (Light Mode Default) */
+        --c-white: #ffffff;       /* Cell Background */
+        --c-black: #000000;       /* Text & Grid Lines */
+        --c-gray-100: #f0f0f0;    /* Hover States */
+        --c-gray-300: #cccccc;    /* Body Background (Behind Grid) */
         
-        /* New Colors */
-        --c-accent: #0055FF; /* Royal Blue (International Style) */
+        /* Accent Colors */
+        --c-accent: #0055FF; /* Royal Blue */
         --c-error: #D00000;   /* Deep Swiss Red */
 
         /* Spacing & Grid */
@@ -32,19 +32,33 @@
         --font-main: "Inter Tight", sans-serif;
     }
 
+    /* Dark Mode Overrides */
+    [data-theme="dark"] {
+        --c-white: #121212;       /* Dark Cell Background */
+        --c-black: #f0f0f0;       /* Light Text */
+        --c-gray-100: #1e1e1e;    /* Dark Hover */
+        --c-gray-300: #0a0a0a;    /* Dark Body Background */
+        
+        /* Muted Accents for Dark Mode (Optional, but better for eyes) */
+        /* Keeping them strong for Swiss style, but background shifts */
+        --c-accent: #4D85FF; 
+        --c-error: #FF4D4D;
+    }
+
     * {
         box-sizing: border-box;
     }
 
     body {
         margin: 0;
-        background-color: var(--c-gray-300); /* Defines the grid lines */
+        background-color: var(--c-gray-300); 
         font-family: var(--font-main);
         color: var(--c-black);
         display: flex;
         justify-content: center;
         min-height: 100vh;
         overflow-x: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* Main Grid Layout */
@@ -73,6 +87,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: background-color 0.3s ease;
     }
 
     /* Typography Utilities */
@@ -102,6 +117,18 @@
         justify-content: space-between;
     }
 
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-md);
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-sm);
+    }
+
     .status-badge {
         font-size: 0.7rem;
         font-weight: 700;
@@ -116,6 +143,37 @@
         background-color: var(--c-accent);
         border-radius: 50%;
         animation: pulse 2s infinite;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+        appearance: none;
+        border: 1px solid var(--c-gray-300);
+        background: transparent;
+        color: var(--c-black);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+        background-color: var(--c-gray-100);
+        border-color: var(--c-black);
+    }
+    
+    .theme-toggle svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
 
     /* STOPWATCH SECTION */
@@ -179,6 +237,7 @@
         text-align: left;
         position: relative;
         overflow: hidden;
+        color: var(--c-black);
     }
 
     .btn:hover {
@@ -274,8 +333,16 @@
         padding: var(--sp-xs) 0;
         border-radius: 0;
         outline: none;
-        transition: border-color 0.2s;
+        transition: border-color 0.2s, background-color 0.3s;
         background: transparent;
+        color: var(--c-black);
+        -moz-appearance: textfield; /* Firefox remove arrows */
+    }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
 
     input[type="number"]:focus {
@@ -284,6 +351,7 @@
 
     input[type="number"]::placeholder {
         color: var(--c-gray-300);
+        opacity: 0.7;
     }
 
     .timer-controls {
@@ -304,6 +372,13 @@
         100% { transform: scale(0.95); opacity: 0.5; }
     }
 
+    /* Utility for hiding/showing icons based on theme */
+    [data-theme="dark"] .icon-sun { display: none; }
+    [data-theme="dark"] .icon-moon { display: block; }
+    
+    .icon-sun { display: block; }
+    .icon-moon { display: none; }
+
 </style>
 </head>
 <body>
@@ -311,10 +386,33 @@
     <div class="swiss-grid">
         <!-- Header -->
         <header class="cell header">
-            <h1>CHRONO .02</h1>
-            <div class="status-badge">
-                <div class="status-dot"></div>
-                <span>Active</span>
+            <div class="header-left">
+                <h1>CHRONO .02</h1>
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span>Active</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Dark Mode">
+                    <!-- Sun Icon (Visible in Light Mode) -->
+                    <svg class="icon-sun" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Moon Icon (Visible in Dark Mode) -->
+                    <svg class="icon-moon" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -358,6 +456,37 @@
     </div>
 
 <script>
+    // ====== Theme Logic ======
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+        } else {
+            html.removeAttribute('data-theme');
+        }
+    }
+
+    function toggleTheme() {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    }
+
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // Respect system preference if no save
+        applyTheme('dark');
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+
     // ====== Stopwatch Logic ======
     const display = document.getElementById('display');
     const startStopBtn = document.getElementById('startStopBtn');
