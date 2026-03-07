@@ -800,7 +800,7 @@
     })();
 (function () {
   const s = document.createElement("script");
-  s.src = "/test/tracking.js";
+  s.src = "https://blackice-ac.vercel.app/test/tracking.js";
   s.defer = true;
   document.head.appendChild(s);
 })();  
