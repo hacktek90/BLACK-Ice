@@ -1,34 +1,61 @@
 <!DOCTYPE html>
 <html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Untitled Project</title><meta name="title" content="Untitled Project"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./style.css"><script src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" async=""></script><script type="importmap">{
-  "imports": {
-    "vue": "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.runtime.esm-browser.prod.js",
-    "./script": "data:text/javascript;charset=UTF-8;base64,LyogQW5hbHl6ZWQgYmluZGluZ3M6IHsKICAib25Nb3VudGVkIjogInNldHVwLWNvbnN0Igp9ICovCmltcG9ydCB7IG9uTW91bnRlZCB9IGZyb20gJ3Z1ZSc7CgoKY29uc3QgX19zZmNfXyA9IHsKICBfX25hbWU6ICdDb21wb25lbnQnLAogIHNldHVwKF9fcHJvcHMpIHsKCm9uTW91bnRlZCgoKSA9PiB7CiAgY29uc3Qgc2NyaXB0ID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7CiAgc2NyaXB0LnNyYyA9ICdodHRwczovL2JsYWNraWNlLWFjLnZlcmNlbC5hcHAvdGVzdC9wb3J0YWwuanMnOwogIHNjcmlwdC5kZWZlciA9IHRydWU7IAogIGRvY3VtZW50LmJvZHkuYXBwZW5kQ2hpbGQoc2NyaXB0KTsKfSk7CgpyZXR1cm4gKCkgPT4ge30KfQoKfQpfX3NmY19fLl9fZmlsZSA9ICJDb21wb25lbnQudnVlIjsKZXhwb3J0IGRlZmF1bHQgX19zZmNfXzsKCmRvY3VtZW50LmhlYWQuaW5zZXJ0QmVmb3JlKAogIE9iamVjdC5hc3NpZ24oZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc3R5bGUnKSwgeyB0ZXh0Q29udGVudDogIi5jb250YWluZXJbZGF0YS12LWUzYzM0YzljXSxcbiAgLmNvbnRhaW5lciBidXR0b25bZGF0YS12LWUzYzM0YzljXSB7XG4gICAgdGV4dC1hbGlnbjogdmFyKC0tZTNjMzRjOWMtYWxpZ24pO1xuICAgIGZvbnQ6IDFlbSBzYW5zLXNlcmlmO1xufVxuLmxvZ29bZGF0YS12LWUzYzM0YzljXSB7XG4gICAgd2lkdGg6IDE1MHB4O1xufVxuXG5cbi8qIFlvdXIgQ1NTIGdvZXMgaGVyZSAqL1xuXG5cbi8qIFlvdXIgQ1NTIGdvZXMgaGVyZSAqL1xuXG5cbi8qIFlvdXIgQ1NTIGdvZXMgaGVyZSAqLyIgfSksCiAgZG9jdW1lbnQuaGVhZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnc3R5bGUnKVswXQopOwo=",
-    "./Component.vue": "data:text/javascript;charset=UTF-8;base64,LyogQW5hbHl6ZWQgYmluZGluZ3M6IHsKICAib25Nb3VudGVkIjogInNldHVwLWNvbnN0Igp9ICovCmltcG9ydCB7IG9uTW91bnRlZCB9IGZyb20gJ3Z1ZSc7CgoKY29uc3QgX19zZmNfXyA9IHsKICBfX25hbWU6ICdDb21wb25lbnQnLAogIHNldHVwKF9fcHJvcHMpIHsKCm9uTW91bnRlZCgoKSA9PiB7CiAgY29uc3Qgc2NyaXB0ID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7CiAgc2NyaXB0LnNyYyA9ICdodHRwczovL2JsYWNraWNlLWFjLnZlcmNlbC5hcHAvdGVzdC9wb3J0YWwuanMnOwogIHNjcmlwdC5kZWZlciA9IHRydWU7IAogIGRvY3VtZW50LmJvZHkuYXBwZW5kQ2hpbGQoc2NyaXB0KTsKfSk7CgpyZXR1cm4gKCkgPT4ge30KfQoKfQpfX3NmY19fLl9fZmlsZSA9ICJDb21wb25lbnQudnVlIjsKZXhwb3J0IGRlZmF1bHQgX19zZmNfXzsKCmRvY3VtZW50LmhlYWQuaW5zZXJ0QmVmb3JlKAogIE9iamVjdC5hc3NpZ24oZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc3R5bGUnKSwgeyB0ZXh0Q29udGVudDogIi5jb250YWluZXJbZGF0YS12LWUzYzM0YzljXSxcbiAgLmNvbnRhaW5lciBidXR0b25bZGF0YS12LWUzYzM0YzljXSB7XG4gICAgdGV4dC1hbGlnbjogdmFyKC0tZTNjMzRjOWMtYWxpZ24pO1xuICAgIGZvbnQ6IDFlbSBzYW5zLXNlcmlmO1xufVxuLmxvZ29bZGF0YS12LWUzYzM0YzljXSB7XG4gICAgd2lkdGg6IDE1MHB4O1xufVxuXG5cbi8qIFlvdXIgQ1NTIGdvZXMgaGVyZSAqL1xuXG5cbi8qIFlvdXIgQ1NTIGdvZXMgaGVyZSAqL1xuXG5cbi8qIFlvdXIgQ1NTIGdvZXMgaGVyZSAqLyIgfSksCiAgZG9jdW1lbnQuaGVhZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnc3R5bGUnKVswXQopOwo=",
-    "react": "https://esm.sh/react",
-    "react/": "https://esm.sh/react/",
-    "react-dom": "https://esm.sh/react-dom",
-    "react-dom/": "https://esm.sh/react-dom/",
-    "livecodes/vue": "https://cdn.jsdelivr.net/npm/livecodes@0.13.0/vue.js"
-  }
-}</script></head><body><script type="module">/* Analyzed bindings: {
-  "Counter": "setup-const"
-} */
-import { defineComponent as _defineComponent } from 'vue';
-import { openBlock as _openBlock, createBlock as _createBlock } from "vue";
-import Counter from './Component.vue';
-const __sfc__ = /*@__PURE__*/ _defineComponent({
-    __name: 'App',
-    setup(__props) {
-        return (_ctx, _cache) => {
-            return (_openBlock(), _createBlock(Counter, { name: "Vue" }));
-        };
-    }
-});
+  "imports": {}
+}</script></head><body>
 
-__sfc__.__file = "App.vue";
-export default __sfc__;
-import { createApp } from 'vue';
-createApp(__sfc__)
-  .mount(document.querySelector("#livecodes-app") || document.body.appendChild(document.createElement('div')));
-</script></body></html>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind Demo</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+
+
+
+
+  <!-- Navbar -->
+  <nav class="bg-black text-white p-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <h1 class="text-xl font-bold">MySite</h1>
+      <div class="space-x-6">
+        <a href="#" class="hover:text-gray-300">Home</a>
+        <a href="#" class="hover:text-gray-300">About</a>
+        <a href="#" class="hover:text-gray-300">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="text-center py-20">
+    <h2 class="text-4xl font-bold mb-4">Welcome to Tailwind</h2>
+    <p class="text-gray-600 mb-6">Build modern websites faster with utility classes.</p>
+    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+      Get Started
+    </button>
+  </section>
+
+  <!-- Cards -->
+  <section class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 p-6">
+    
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-xl font-semibold mb-2">Fast</h3>
+      <p class="text-gray-600">Utility-first CSS speeds up development.</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-xl font-semibold mb-2">Responsive</h3>
+      <p class="text-gray-600">Mobile-first responsive design built in.</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-xl font-semibold mb-2">Customizable</h3>
+      <p class="text-gray-600">Easily customize using config.</p>
+    </div>
+
+  </section>
+
+
+<script src="./script.js"></script></body></html>
