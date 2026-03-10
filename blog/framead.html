@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Framr — India's Social Media Revolution</title>
+  <meta
+      name="description"
+      content="A made in india social media site with is built for privacy not owned by tech giants , made in india focused , no worry of US surveillence , Collaboration with Open source "
+    /><meta name=keywords content="SocialMEdia,instagram,facebook,x,twitter,madeinindia,snapchat,xxx,hamster ">
+    <meta name="author" content="BlackICE" />
+    <meta name="robots" content="index, follow" /><meta name="title" content="Framr Social Media site(SUBHO)">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --saffron: #FF9933;
+      --india-green: #138808;
+      --navy: #080C24;
+      --cream: #FFF8F0;
+      --accent: #FF4D6D;
+      --gold: #FFD700;
+      --text-muted: #8A8FAD;
+      --card-bg: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #fff;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--saffron);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transition: transform 0.1s ease;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(255,153,51,0.5);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transition: transform 0.2s ease, width 0.3s, height 0.3s;
+    }
+
+    /* BACKGROUND GRID */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,153,51,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,153,51,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* NOISE TEXTURE */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 6vw;
+      background: rgba(8,12,36,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--saffron), #FFD700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .nav-flag {
+      display: inline-flex; gap: 2px; align-items: center; margin-left: 6px;
+    }
+    .nav-flag span { display: inline-block; width: 5px; height: 14px; border-radius: 2px; }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--saffron), #FF6B35);
+      color: #fff; border: none; padding: 10px 24px;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+      border-radius: 100px; cursor: none; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(255,153,51,0.3);
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255,153,51,0.5); }
+
+    /* HERO */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 140px 6vw 80px; z-index: 1;
+      overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,153,51,0.18) 0%, transparent 70%);
+      top: -100px; left: -100px; animation: drift1 8s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(19,136,8,0.12) 0%, transparent 70%);
+      bottom: -80px; right: -80px; animation: drift2 10s ease-in-out infinite;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,77,109,0.12) 0%, transparent 70%);
+      top: 40%; left: 60%; animation: drift3 12s ease-in-out infinite;
+    }
+
+    @keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
+    @keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-40px)} }
+    @keyframes drift3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,-20px)} }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,153,51,0.1); border: 1px solid rgba(255,153,51,0.3);
+      border-radius: 100px; padding: 8px 20px; margin-bottom: 32px;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.5px;
+      animation: fadeUp 0.8s ease both;
+    }
+    .badge-dot { width: 6px; height: 6px; background: var(--saffron); border-radius: 50%; animation: pulse 1.5s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 800; line-height: 1.05; letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.9s 0.1s ease both;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--saffron) 0%, #FFD700 50%, #FF6B35 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-muted);
+      max-width: 600px; line-height: 1.7; margin-bottom: 48px;
+      font-weight: 300;
+      animation: fadeUp 1s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--saffron), #FF6B35);
+      color: #fff; text-decoration: none; padding: 16px 40px;
+      border-radius: 100px; font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 32px rgba(255,153,51,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(255,153,51,0.5); }
+    .btn-ghost {
+      border: 1px solid var(--border); color: rgba(255,255,255,0.7);
+      text-decoration: none; padding: 15px 36px;
+      border-radius: 100px; font-family: 'Syne', sans-serif; font-weight: 600;
+      font-size: 1rem; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--saffron); color: var(--saffron); }
+
+    /* MOCK APP */
+    .hero-mockup {
+      position: relative; margin-top: 80px; width: 100%; max-width: 900px;
+      animation: fadeUp 1.2s 0.4s ease both;
+    }
+    .mockup-frame {
+      background: linear-gradient(135deg, rgba(255,153,51,0.15), rgba(19,136,8,0.08));
+      border: 1px solid rgba(255,153,51,0.2);
+      border-radius: 24px; padding: 3px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    }
+    .mockup-inner {
+      background: #0D1230; border-radius: 22px; overflow: hidden;
+    }
+    .mockup-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 20px; background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dot:nth-child(1) { background: #FF5F57; }
+    .mockup-dot:nth-child(2) { background: #FEBC2E; }
+    .mockup-dot:nth-child(3) { background: #28C840; }
+    .mockup-url { margin-left: 16px; background: rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 16px; font-size: 0.75rem; color: var(--text-muted); }
+
+    .mockup-content {
+      display: grid; grid-template-columns: 240px 1fr; min-height: 380px;
+    }
+    .mockup-sidebar {
+      border-right: 1px solid var(--border); padding: 24px 20px;
+    }
+    .sidebar-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem;
+      background: linear-gradient(135deg, var(--saffron), #FFD700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 28px;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: 10px; margin-bottom: 4px; font-size: 0.85rem; color: var(--text-muted);
+      transition: background 0.2s;
+    }
+    .sidebar-item.active { background: rgba(255,153,51,0.12); color: var(--saffron); font-weight: 600; }
+    .sidebar-icon { width: 18px; height: 18px; border-radius: 4px; }
+
+    .mockup-feed { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .feed-card {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; display: flex; gap: 14px;
+    }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; }
+    .feed-right { flex: 1; }
+    .feed-name { font-size: 0.82rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .feed-text { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+    .feed-actions { display: flex; gap: 16px; margin-top: 10px; }
+    .feed-action { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+    .feed-action.liked { color: var(--accent); }
+
+    /* STATS BAR */
+    .stats-bar {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; gap: 0;
+      padding: 0 6vw; margin-bottom: 120px;
+    }
+    .stat-item {
+      flex: 1; max-width: 240px; text-align: center;
+      padding: 40px 24px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .stat-item:first-child { border-radius: 20px 0 0 20px; }
+    .stat-item:last-child { border-radius: 0 20px 20px 0; }
+    .stat-item:hover { border-color: rgba(255,153,51,0.4); }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--saffron), #FFD700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      display: block; margin-bottom: 6px;
+    }
+    .stat-label { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* SECTIONS */
+    section { position: relative; z-index: 1; }
+
+    .section-tag {
+      display: inline-block; background: rgba(255,153,51,0.1);
+      border: 1px solid rgba(255,153,51,0.25); border-radius: 6px;
+      padding: 4px 14px; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 1.5px; color: var(--saffron); text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800; line-height: 1.15; letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .section-desc { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; max-width: 480px; }
+
+    /* FEATURES */
+    .features {
+      padding: 0 6vw 120px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .features-left {}
+    .features-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .feature-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px 24px;
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,153,51,0.4), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover { border-color: rgba(255,153,51,0.3); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 16px;
+    }
+    .feature-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* MADE IN INDIA */
+    .india-section {
+      padding: 100px 6vw;
+      text-align: center;
+      background: linear-gradient(180deg, transparent, rgba(255,153,51,0.04), transparent);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 120px;
+    }
+    .tricolor {
+      display: flex; justify-content: center; margin-bottom: 32px;
+    }
+    .tricolor-bar {
+      height: 6px; border-radius: 3px;
+    }
+    .tricolor-bar:nth-child(1) { width: 80px; background: var(--saffron); }
+    .tricolor-bar:nth-child(2) { width: 80px; background: #fff; margin: 0 4px; }
+    .tricolor-bar:nth-child(3) { width: 80px; background: var(--india-green); }
+
+    .india-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 800; letter-spacing: -2px; margin-bottom: 20px;
+    }
+    .india-sub { color: var(--text-muted); font-size: 1.1rem; max-width: 560px; margin: 0 auto 48px; line-height: 1.7; }
+
+    .india-badges {
+      display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    }
+    .india-badge {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 100px; padding: 10px 22px;
+      font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .india-badge:hover { border-color: rgba(255,153,51,0.4); background: rgba(255,153,51,0.06); }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 0 6vw 120px; }
+    .testimonials-header { text-align: center; margin-bottom: 60px; }
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .testi-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .testi-card:hover { border-color: rgba(255,153,51,0.3); transform: translateY(-4px); }
+    .testi-quote { font-size: 2rem; color: var(--saffron); margin-bottom: 16px; line-height: 1; }
+    .testi-text { font-size: 0.9rem; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 24px; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar { width: 40px; height: 40px; border-radius: 50%; }
+    .testi-name { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; }
+    .testi-handle { font-size: 0.75rem; color: var(--text-muted); }
+    .stars { color: #FFD700; font-size: 0.8rem; margin-bottom: 8px; }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 100px 6vw 140px; text-align: center; position: relative;
+    }
+    .cta-glow {
+      position: absolute; width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(255,153,51,0.12) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 800; letter-spacing: -1.5px; margin-bottom: 20px;
+    }
+    .cta-section p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 48px; }
+    .cta-big {
+      background: linear-gradient(135deg, var(--saffron), #FF6B35, #FF4D6D);
+      color: #fff; text-decoration: none; padding: 20px 56px;
+      border-radius: 100px; font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 1.15rem; display: inline-block;
+      box-shadow: 0 20px 60px rgba(255,153,51,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative; z-index: 1;
+    }
+    .cta-big:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 30px 80px rgba(255,153,51,0.6); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 40px 6vw;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
+      background: linear-gradient(135deg, var(--saffron), #FFD700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-text { color: var(--text-muted); font-size: 0.82rem; }
+    .footer-flag { font-size: 1.2rem; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* SCROLLING TICKER */
+    .ticker { overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 14px 0; margin-bottom: 80px; position: relative; z-index: 1; }
+    .ticker-inner {
+      display: flex; gap: 0; animation: ticker 20s linear infinite;
+      width: max-content;
+    }
+    .ticker-item {
+      padding: 0 40px; font-size: 0.82rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .ticker-item::after { content: '◆'; color: var(--saffron); font-size: 0.5rem; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .features { grid-template-columns: 1fr; gap: 48px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .mockup-content { grid-template-columns: 1fr; }
+      .mockup-sidebar { display: none; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .stats-bar { flex-direction: column; gap: 0; }
+      .stat-item:first-child { border-radius: 20px 20px 0 0; }
+      .stat-item:last-child { border-radius: 0 0 20px 20px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">framr</div>
+  <a href="https://blackice-ac.vercel.app/Home.html?project=Framr%20Social" target="_blank" class="nav-cta">Join Now →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+  <div class="hero-orb orb-3"></div>
+
+  <div class="badge">
+    <span class="badge-dot"></span>
+    🇮🇳 &nbsp;India's Newest Social Platform is Here
+  </div>
+
+  <h1>
+    Where Every Frame<br/>
+    Tells an <em>Indian Story</em>
+  </h1>
+
+  <p class="hero-sub">
+    Framr is India's homegrown social media platform — built for creators,
+    dreamers, and storytellers across Bharat. Share moments, connect with
+    your community, and celebrate what makes India incredible.
+  </p>
+
+  <div class="hero-actions">
+    <a href="https://blackice-ac.vercel.app/Home.html?project=Framr%20Social" target="_blank" class="btn-primary">Explore Framr →</a>
+    <a href="#features" class="btn-ghost">See Features</a>
+  </div>
+
+  <!-- App Mockup -->
+  <div class="hero-mockup">
+    <div class="mockup-frame">
+      <div class="mockup-inner">
+        <div class="mockup-bar">
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-url">framr.lovable.app</div>
+        </div>
+        <div class="mockup-content">
+          <div class="mockup-sidebar">
+            <div class="sidebar-logo">framr</div>
+            <div class="sidebar-item active">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+              Home Feed
+            </div>
+            <div class="sidebar-item">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              Explore India
+            </div>
+            <div class="sidebar-item">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              My Frames
+            </div>
+            <div class="sidebar-item">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              Messages
+            </div>
+            <div class="sidebar-item">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile
+            </div>
+          </div>
+          <div class="mockup-feed">
+            <div class="feed-card">
+              <svg class="avatar" viewBox="0 0 38 38"><circle cx="19" cy="19" r="19" fill="#FF993310"/><circle cx="19" cy="15" r="7" fill="#FF9933"/><ellipse cx="19" cy="32" rx="12" ry="8" fill="#FF9933"/></svg>
+              <div class="feed-right">
+                <div class="feed-name">Priya Sharma · Mumbai 🌸</div>
+                <div class="feed-text">Just posted my first frame from the Gateway of India sunset 🌅 This app feels like home! #Framr #Mumbai</div>
+                <div class="feed-actions">
+                  <div class="feed-action liked">♥ 2.4k</div>
+                  <div class="feed-action">💬 84</div>
+                  <div class="feed-action">↗ Share</div>
+                </div>
+              </div>
+            </div>
+            <div class="feed-card">
+              <svg class="avatar" viewBox="0 0 38 38"><circle cx="19" cy="19" r="19" fill="#13880810"/><circle cx="19" cy="15" r="7" fill="#138808"/><ellipse cx="19" cy="32" rx="12" ry="8" fill="#138808"/></svg>
+              <div class="feed-right">
+                <div class="feed-name">Arjun Dev · Bengaluru 🔥</div>
+                <div class="feed-text">Building the future of India's internet from right here. Framr is exactly what we needed — our own platform, our own stories. 🇮🇳</div>
+                <div class="feed-actions">
+                  <div class="feed-action liked">♥ 5.1k</div>
+                  <div class="feed-action">💬 312</div>
+                  <div class="feed-action">↗ Share</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="ticker-item">Made in India</div>
+    <div class="ticker-item">Built for Creators</div>
+    <div class="ticker-item">Your Stories Matter</div>
+    <div class="ticker-item">Aatmanirbhar Digital</div>
+    <div class="ticker-item">Every Frame Counts</div>
+    <div class="ticker-item">Share Your Bharat</div>
+    <div class="ticker-item">जय भारत</div>
+    <div class="ticker-item">Made in India</div>
+    <div class="ticker-item">Built for Creators</div>
+    <div class="ticker-item">Your Stories Matter</div>
+    <div class="ticker-item">Aatmanirbhar Digital</div>
+    <div class="ticker-item">Every Frame Counts</div>
+    <div class="ticker-item">Share Your Bharat</div>
+    <div class="ticker-item">जय भारत</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat-item">
+    <span class="stat-num">50K+</span>
+    <span class="stat-label">Early Users</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">28</span>
+    <span class="stat-label">Indian States Represented</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">1M+</span>
+    <span class="stat-label">Frames Shared</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">100%</span>
+    <span class="stat-label">Made in India 🇮🇳</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-left reveal">
+    <div class="section-tag">Features</div>
+    <h2 class="section-title">A platform made<br/>for every Indian</h2>
+    <p class="section-desc">From the mountains of Himachal to the shores of Kerala — Framr is built to connect all of India's diverse voices in one vibrant space.</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,153,51,0.12)">🖼️</div>
+      <h3>Frame & Share</h3>
+      <p>Post photos, videos, and stories with beautiful Indian-themed frames and filters.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(19,136,8,0.12)">🌐</div>
+      <h3>Multilingual</h3>
+      <p>Post in Hindi, Tamil, Bengali, Telugu, and 10+ Indian languages natively.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,77,109,0.12)">🤝</div>
+      <h3>Community First</h3>
+      <p>Join local communities, follow regional creators, and grow your tribe.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,215,0,0.12)">🔒</div>
+      <h3>Privacy by Design</h3>
+      <p>Your data stays in India. Full control over what you share and with whom.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INDIA SECTION -->
+<section class="india-section reveal">
+  <div class="tricolor">
+    <div class="tricolor-bar"></div>
+    <div class="tricolor-bar"></div>
+    <div class="tricolor-bar"></div>
+  </div>
+  <h2 class="india-title">Proudly <em style="font-style:normal;background:linear-gradient(135deg,#FF9933,#138808);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Made in India</em></h2>
+  <p class="india-sub">At a time when the world looks outward, Framr looks inward — celebrating Indian culture, creativity, and community. This is India's internet, built by Indians, for Indians.</p>
+  <div class="india-badges">
+    <span class="india-badge">🇮🇳 Indian-Founded</span>
+    <span class="india-badge">🛡️ Data Stored in India</span>
+    <span class="india-badge">💻 Built with Indian Tech Talent</span>
+    <span class="india-badge">🌍 Aatmanirbhar Bharat</span>
+    <span class="india-badge">🗣️ 10+ Indian Languages</span>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="testimonials-header reveal">
+    <div class="section-tag">Community Love</div>
+    <h2 class="section-title">What India is saying</h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Finally, a social platform where I don't feel like a product. Framr genuinely feels like it was built with love for our culture and our people.</p>
+      <div class="testi-author">
+        <svg class="testi-avatar" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#FF993320"/><circle cx="20" cy="15" r="8" fill="#FF9933"/><ellipse cx="20" cy="34" rx="13" ry="8" fill="#FF9933"/></svg>
+        <div>
+          <div class="testi-name">Ananya Krishnan</div>
+          <div class="testi-handle">@ananyak · Chennai</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The Hindi interface and local community features are game-changers. Meri family se baat karna aur unki zindagi dekhna bahut aasaan ho gaya hai!</p>
+      <div class="testi-author">
+        <svg class="testi-avatar" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#13880820"/><circle cx="20" cy="15" r="8" fill="#138808"/><ellipse cx="20" cy="34" rx="13" ry="8" fill="#138808"/></svg>
+        <div>
+          <div class="testi-name">Rahul Gupta</div>
+          <div class="testi-handle">@rahulg · Lucknow</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">As a travel photographer documenting India's hidden gems, Framr gave me an audience that actually cares about my stories. The reach is incredible!</p>
+      <div class="testi-author">
+        <svg class="testi-avatar" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#FF4D6D20"/><circle cx="20" cy="15" r="8" fill="#FF4D6D"/><ellipse cx="20" cy="34" rx="13" ry="8" fill="#FF4D6D"/></svg>
+        <div>
+          <div class="testi-name">Meera Iyer</div>
+          <div class="testi-handle">@meeraframes · Bengaluru</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="section-tag">Get Started</div>
+  <h2>Ready to tell your<br/>Indian story?</h2>
+  <p>Join thousands of Indians already sharing their world on Framr.<br/>It takes 30 seconds to sign up. No credit card. No catch.</p>
+  <a href="https://framr.lovable.app/" target="_blank" class="cta-big">Start Framing — It's Free →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">framr</div>
+  <div class="footer-text">© 2024 Framr. Proudly Made in India 🇮🇳</div>
+  <div class="footer-flag">🇮🇳</div>
+</footer>
+
+<script>
+  // CUSTOM CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform += ' scale(1.5)';
+      ring.style.width = '56px'; ring.style.height = '56px';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px'; ring.style.height = '36px';
+    });
+  });
+
+  // SCROLL REVEAL
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // COUNT UP ANIMATION
+  function countUp(el, target, suffix='') {
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = (target >= 1000
+        ? (current/1000).toFixed(0) + 'K'
+        : Math.floor(current)) + (suffix || '');
+    }, 20);
+  }
+</script>
+</body>
+</html>
