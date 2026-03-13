@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@sentry/browser": "^10.43.0",
-    "@vercel/analytics": "^1.6.1"
+    "@tailwindcss/cli": "^4.2.1",
+    "@vercel/analytics": "^1.6.1",
+    "tailwindcss": "^4.2.1"
   }
 }
