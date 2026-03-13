@@ -633,6 +633,28 @@
             }
         }
 
+        /* PRODUCT HUNT BADGE STYLES */
+        .ph-badge-wrapper {
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.9;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .ph-badge-wrapper:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .ph-badge-wrapper img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
         /* BENTO GRID */
         .bento {
             display: grid;
@@ -1543,6 +1565,12 @@
                         <div class="inner">BICOChat AI</div>
                     </a>
                 </div>
+                
+                <!-- Product Hunt Badge -->
+                <div class="ph-badge-wrapper">
+                    <a href="https://www.producthunt.com/products/blackice-portalos?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-blackice-portalos" target="_blank" rel="noopener noreferrer"><img alt="BlackICE PortalOS - The Future of Web OS | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1097231&amp;theme=light&amp;t=1773386799745"></a>
+                </div>
+
             </div>
 
             <div class="bento">
