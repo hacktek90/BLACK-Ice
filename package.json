@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@sentry/browser": "^10.43.0",
     "@vercel/analytics": "^1.6.1"
   }
 }
