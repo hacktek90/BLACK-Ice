@@ -604,7 +604,7 @@
                     };
 
                     el.innerHTML = `
-                    <img src="${screenshot}" class="bi-card-img" loading="lazy" />
+                    <img src="${screenshot}" class="bi-card-img" loading="lazy" alt="Preview of scraped webpage" />
                     <div class="bi-card-info">
                         <div class="bi-card-title">${p.title || 'Untitled Project'}</div>
                         <div class="bi-card-desc">Click to launch app</div>
@@ -803,4 +803,4 @@
   s.src = "https://blackice-ac.vercel.app/test/tracking.js";
   s.defer = true;
   document.head.appendChild(s);
-})();  
+})();
