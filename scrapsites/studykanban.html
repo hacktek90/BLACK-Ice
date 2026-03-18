@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ultimate Study Kanban</title>
+
+    <!-- 1. Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 2. Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- 3. Flatpickr (Date Picker) CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- 4. SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+        :root {
+            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --bg-column: #f8f9fa;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            /* Force full height app layout */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Prevent body scroll */
+        }
+
+        /* --- Kanban Column Styles --- */
+        .kanban-column {
+            background-color: var(--bg-column);
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            /* Fill parent height */
+            max-height: 100%;
+        }
+
+        .task-list {
+            padding: 10px;
+            flex-grow: 1;
+            overflow-y: auto;
+            /* Scroll tasks vertically inside column */
+            overflow-x: hidden;
+        }
+
+        /* --- Mobile Scroll Snap Layout --- */
+        #boardRow {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100%;
+            /* Fill available space */
+            /* Smooth snapping for mobile */
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            /* Momentum scrolling on iOS */
+        }
+
+        /* Hide scrollbar but keep functionality */
+        #boardRow::-webkit-scrollbar {
+            display: none;
+        }
+
+        #boardRow {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .col-wrapper {
+            scroll-snap-align: start;
+            /* Snap each column to the left edge */
+            flex-shrink: 0;
+            /* Prevent columns from squishing */
+            width: 100%;
+            /* Full width on mobile */
+            padding: 8px;
+            height: 100%;
+        }
+
+        /* Responsive Column Widths */
+        @media (min-width: 576px) {
+            .col-wrapper {
+                width: 80%;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .col-wrapper {
+                width: 50%;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .col-wrapper {
+                width: 33.333%;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .col-wrapper {
+                width: 25%;
+            }
+        }
+
+        /* --- Card Styles --- */
+        .kanban-card {
+            cursor: grab;
+            border-left: 4px solid #6c757d;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+
+        .priority-high {
+            border-left-color: #dc3545 !important;
+        }
+
+        .priority-medium {
+            border-left-color: #ffc107 !important;
+        }
+
+        .priority-low {
+            border-left-color: #198754 !important;
+        }
+
+        /* Overdue Styling */
+        .is-overdue {
+            background-color: #fff5f5;
+            border: 1px solid #feb2b2 !important;
+        }
+
+        /* SortableJS Ghost Class */
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #e9ecef;
+            border: 2px dashed #adb5bd;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            height: 4px;
+            background-color: #e9ecef;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .progress-bar-custom {
+            height: 100%;
+            background-color: #198754;
+            transition: width 0.5s ease;
+        }
+
+        /* --- Responsive Navbar --- */
+        .navbar {
+            flex-shrink: 0;
+            /* Prevent navbar from collapsing */
+        }
+
+        /* Hide text labels on very small screens */
+        @media (max-width: 360px) {
+            .nav-btn-text {
+                display: none;
+            }
+        }
+
+        /* --- Dark Mode Overrides --- */
+        body.dark-mode {
+            background-color: #212529;
+            color: #f8f9fa;
+        }
+
+        body.dark-mode .kanban-column {
+            background-color: #343a40;
+            border-color: #495057;
+        }
+
+        body.dark-mode .kanban-card {
+            background-color: #495057;
+            border-color: #6c757d;
+            color: #f8f9fa;
+        }
+
+        body.dark-mode .is-overdue {
+            background-color: #452d2d;
+            border-color: #c92a2a !important;
+        }
+
+        body.dark-mode .card-header,
+        body.dark-mode .card-body {
+            background-color: transparent;
+            border-color: #495057;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+
+        body.dark-mode .badge.bg-light {
+            background-color: #495057 !important;
+            color: #f8f9fa !important;
+            border-color: #6c757d !important;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #343a40;
+            border-color: #495057;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #f8f9fa;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: #495057;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar-custom" id="globalProgress" style="width: 0%"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-layers-half me-1"></i><span class="d-none d-sm-inline">StudyKanban</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2">
+                <!-- Analytics Button -->
+                <button class="btn btn-outline-info btn-sm" onclick="app.showAnalytics()">
+                    <i class="bi bi-pie-chart-fill"></i> <span class="nav-btn-text">Stats</span>
+                </button>
+
+                <!-- Settings Dropdown (Contains Search on Mobile) -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <!-- Search visible in dropdown on all sizes for consistency, or use d-md-none for specific mobile placement -->
+                        <li class="px-2 d-lg-none">
+                            <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" id="searchInputMobile" placeholder="Search tasks...">
+                        </li>
+                        <li class="d-lg-none">
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#"
+                                onclick="app.exportData()"><i class="bi bi-download me-2"></i>Export JSON</a></li>
+                        <li><a class="dropdown-item" href="#"
+                                onclick="document.getElementById('importFile').click()"><i class="bi bi-upload me-2"></i>Import</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#"
+                                onclick="app.resetBoard()"><i class="bi bi-trash me-2"></i>Reset</a></li>
+                    </ul>
+                </div>
+
+                <!-- Theme Toggle -->
+                <button class="btn btn-outline-light btn-sm" onclick="app.toggleTheme()">
+                    <i class="bi bi-moon-stars" id="themeIcon"></i>
+                </button>
+
+                <!-- Desktop Search (Visible on large screens) -->
+                <div class="input-group d-none d-lg-flex" style="width: 180px;">
+                    <span class="input-group-text bg-secondary border-0"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control bg-dark text-white border-0" id="searchInputDesktop" placeholder="Search...">
+                </div>
+
+                <input type="file" id="importFile" style="display: none;" accept=".json" onchange="app.importData(this)">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Board -->
+    <div class="container-fluid px-0 flex-grow-1 overflow-hidden d-flex flex-column">
+        <div class="row m-0 h-100" id="boardRow">
+            <!-- Columns injected by JS -->
+        </div>
+    </div>
+
+    <!-- Modal: Add/Edit Task -->
+    <div class="modal fade" id="taskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskModalLabel">Manage Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="taskForm">
+                        <input type="hidden" id="taskId">
+                        <input type="hidden" id="taskColumnId">
+
+                        <div class="mb-3">
+                            <label class="form-label">Topic</label>
+                            <input type="text" class="form-control" id="taskTitle" required placeholder="e.g. Organic Chemistry Ch.4">
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Subject</label>
+                                <select class="form-select" id="taskTag">
+                                    <option value="General">General</option>
+                                    <option value="Math">Math</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chem">Chemistry</option>
+                                    <option value="Bio">Biology</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select" id="taskPriority">
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Due Date</label>
+                            <input type="text" class="form-control" id="taskDueDate" placeholder="Select date..." readonly>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="app.saveTask()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Analytics -->
+    <div class="modal fade" id="analyticsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Progress Overview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <canvas id="progressChart" style="max-height: 300px;"></canvas>
+                    <div class="mt-3">
+                        <p class="text-muted small mb-0">Tasks Completed:
+                            <strong id="statDone" class="text-success">0</strong></p>
+                        <p class="text-muted small mb-0">Pending Tasks:
+                            <strong id="statPending" class="text-warning">0</strong></p>
+                        <p class="text-muted small mb-0">Overdue Tasks:
+                            <strong id="statOverdue" class="text-danger">0</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        class KanbanPro {
+            constructor() {
+                this.storageKey = 'kanban_pro_v3';
+                this.taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
+                this.analyticsModal = new bootstrap.Modal(document.getElementById('analyticsModal'));
+                
+                this.datePicker = flatpickr("#taskDueDate", {
+                    enableTime: false,
+                    dateFormat: "Y-m-d",
+                    minDate: "today"
+                });
+
+                this.myChart = null;
+
+                this.defaultState = {
+                    columns: [
+                        { id: 'c1', title: '📚 To Learn' },
+                        { id: 'c2', title: '🔥 In Progress' },
+                        { id: 'c3', title: '👀 Reviewing' },
+                        { id: 'c4', title: '✅ Done' }
+                    ],
+                    tasks: [
+                        { id: 't1', columnId: 'c1', title: 'Calculus Limits', tag: 'Math', priority: 'high', dueDate: null },
+                        { id: 't2', columnId: 'c2', title: 'Newton\'s Laws', tag: 'Physics', priority: 'medium', dueDate: '2023-12-31' },
+                        { id: 't3', columnId: 'c4', title: 'HTML5 Semantics', tag: 'General', priority: 'low', dueDate: null }
+                    ],
+                    theme: 'light'
+                };
+
+                this.state = this.loadState();
+                this.sortableInstances = [];
+                this.init();
+            }
+
+            init() {
+                this.initTheme();
+                this.renderBoard();
+                this.setupSearch();
+            }
+
+            loadState() {
+                const stored = localStorage.getItem(this.storageKey);
+                return stored ? JSON.parse(stored) : this.defaultState;
+            }
+
+            saveState() {
+                this.syncStateFromDOM();
+                localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+                this.updateGlobalProgress();
+            }
+
+            escapeHtml(text) {
+                if (!text) return text;
+                return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+
+            // --- Core Rendering ---
+            renderBoard() {
+                const boardRow = document.getElementById('boardRow');
+                boardRow.innerHTML = '';
+                
+                // Get search term from either desktop or mobile input
+                const searchVal = document.getElementById('searchInputDesktop').value || document.getElementById('searchInputMobile').value;
+                const term = searchVal.toLowerCase();
+
+                this.state.columns.forEach(col => {
+                    const colDiv = document.createElement('div');
+                    // Using custom wrapper class for snap scrolling
+                    colDiv.className = 'col-wrapper';
+                    
+                    colDiv.innerHTML = `
+                        <div class="kanban-column shadow-sm">
+                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-transparent flex-shrink-0">
+                                <h6 class="m-0 fw-bold text-uppercase">${col.title} 
+                                    <span class="badge bg-secondary ms-1 count-badge">0</span>
+                                </h6>
+                                <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="app.openAddTask('${col.id}')">
+                                    <i class="bi bi-plus-circle-fill text-primary fs-5"></i>
+                                </button>
+                            </div>
+                            <div class="task-list" id="${col.id}">
+                                <!-- Tasks go here -->
+                            </div>
+                        </div>
+                    `;
+                    boardRow.appendChild(colDiv);
+
+                    const list = colDiv.querySelector('.task-list');
+                    const tasks = this.state.tasks.filter(t => t.columnId === col.id);
+                    
+                    const filtered = tasks.filter(t => 
+                        t.title.toLowerCase().includes(term) || 
+                        t.tag.toLowerCase().includes(term)
+                    );
+
+                    colDiv.querySelector('.count-badge').innerText = filtered.length;
+
+                    filtered.forEach(task => {
+                        list.appendChild(this.createCardElement(task));
+                    });
+                });
+
+                this.initSortable();
+                this.updateGlobalProgress();
+            }
+
+            createCardElement(task) {
+                const el = document.createElement('div');
+                el.className = `card mb-2 shadow-sm kanban-card priority-${task.priority}`;
+                el.id = task.id;
+
+                let dateIcon = '';
+                if (task.dueDate && task.columnId !== 'c4') {
+                    const today = new Date().toISOString().slice(0, 10);
+                    if (task.dueDate < today) {
+                        el.classList.add('is-overdue');
+                        dateIcon = '<i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>';
+                    }
+                }
+
+                const safeTitle = this.escapeHtml(task.title);
+                const safeTag = this.escapeHtml(task.tag);
+                const safeDate = task.dueDate || '';
+
+                el.innerHTML = `
+                    <div class="card-body p-2 position-relative">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div style="flex:1;" onclick="app.openEditTask('${task.id}', event)">
+                                <div class="fw-bold small">${safeTitle}</div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="badge bg-light text-dark border small">${safeTag}</span>
+                                    ${task.dueDate ? `<small class="text-muted ms-2" title="Due Date">${dateIcon}${safeDate}</small>` : ''}
+                                </div>
+                            </div>
+                            <div class="dropdown ms-2">
+                                <i class="bi bi-three-dots-vertical text-secondary" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li><a class="dropdown-item small" href="#" onclick="app.openEditTask('${task.id}', event)">Edit</a></li>
+                                    <li><a class="dropdown-item small text-danger" href="#" onclick="app.deleteTask('${task.id}', event)">Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return el;
+            }
+
+            // --- SortableJS Integration ---
+            initSortable() {
+                this.sortableInstances.forEach(s => s.destroy());
+                this.sortableInstances = [];
+
+                const lists = document.querySelectorAll('.task-list');
+                lists.forEach(list => {
+                    const sortable = new Sortable(list, {
+                        group: 'kanban',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        delay: 0, 
+                        onEnd: (evt) => {
+                            this.saveState();
+                            this.updateColumnCounts();
+                        }
+                    });
+                    this.sortableInstances.push(sortable);
+                });
+            }
+
+            updateColumnCounts() {
+                this.state.columns.forEach(col => {
+                    const list = document.getElementById(col.id);
+                    if(!list) return;
+                    const count = list.children.length;
+                    const columnNode = list.closest('.kanban-column');
+                    const badge = columnNode.querySelector('.count-badge');
+                    if(badge) badge.innerText = count;
+                });
+            }
+
+            syncStateFromDOM() {
+                const newTasks = [];
+                this.state.columns.forEach(col => {
+                    const list = document.getElementById(col.id);
+                    if(!list) return;
+                    
+                    const cardIds = Array.from(list.children).map(el => el.id);
+                    
+                    cardIds.forEach(id => {
+                        const task = this.state.tasks.find(t => t.id === id);
+                        if(task) {
+                            task.columnId = col.id;
+                            newTasks.push(task);
+                        }
+                    });
+                });
+                this.state.tasks = newTasks;
+            }
+
+            // --- Task Actions ---
+            openAddTask(colId) {
+                document.getElementById('taskForm').reset();
+                this.datePicker.clear();
+                document.getElementById('taskId').value = '';
+                document.getElementById('taskColumnId').value = colId;
+                document.getElementById('taskModalLabel').innerText = "Add New Task";
+                this.taskModal.show();
+            }
+
+            openEditTask(id, e) {
+                if(e) e.preventDefault();
+                const task = this.state.tasks.find(t => t.id === id);
+                if(!task) return;
+
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskTag').value = task.tag;
+                document.getElementById('taskPriority').value = task.priority;
+                document.getElementById('taskColumnId').value = task.columnId;
+                
+                if (task.dueDate) this.datePicker.setDate(task.dueDate);
+                else this.datePicker.clear();
+
+                document.getElementById('taskModalLabel').innerText = "Edit Task";
+                this.taskModal.show();
+            }
+
+            saveTask() {
+                const id = document.getElementById('taskId').value;
+                const title = document.getElementById('taskTitle').value;
+                const tag = document.getElementById('taskTag').value;
+                const priority = document.getElementById('taskPriority').value;
+                const colId = document.getElementById('taskColumnId').value;
+                const dueDate = document.getElementById('taskDueDate').value || null;
+
+                if(!title.trim()) return Swal.fire('Error', 'Title is required', 'error');
+
+                if(id) {
+                    const task = this.state.tasks.find(t => t.id === id);
+                    task.title = title; task.tag = tag; task.priority = priority; task.dueDate = dueDate;
+                } else {
+                    this.state.tasks.push({
+                        id: 't-' + Date.now(),
+                        title, tag, priority, columnId: colId, dueDate
+                    });
+                }
+
+                this.saveState();
+                this.taskModal.hide();
+                
+                // Sync search inputs
+                const searchVal = document.getElementById('searchInputDesktop').value || document.getElementById('searchInputMobile').value;
+                if(searchVal) this.renderBoard(); 
+                
+                const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500});
+                Toast.fire({icon: 'success', title: 'Saved'});
+            }
+
+            deleteTask(id, e) {
+                if(e) e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.state.tasks = this.state.tasks.filter(t => t.id !== id);
+                        this.saveState();
+                        document.getElementById(id)?.remove();
+                        this.updateColumnCounts();
+                        Swal.fire('Deleted!', 'Your task has been deleted.', 'success');
+                    }
+                });
+            }
+
+            // --- Analytics ---
+            showAnalytics() {
+                this.analyticsModal.show();
+                this.updateChart();
+            }
+
+            updateChart() {
+                const ctx = document.getElementById('progressChart').getContext('2d');
+                
+                const counts = {};
+                this.state.columns.forEach(c => counts[c.title] = 0);
+                let overdue = 0;
+                const today = new Date().toISOString().slice(0, 10);
+
+                this.state.tasks.forEach(t => {
+                    const colTitle = this.getColTitle(t.columnId);
+                    if(counts[colTitle] !== undefined) counts[colTitle]++;
+                    if(t.dueDate && t.dueDate < today && t.columnId !== 'c4') overdue++;
+                });
+
+                const dataValues = Object.values(counts);
+                const labels = Object.keys(counts);
+
+                const doneCount = counts['✅ Done'] || 0;
+                document.getElementById('statDone').innerText = doneCount;
+                document.getElementById('statPending').innerText = this.state.tasks.length - doneCount;
+                document.getElementById('statOverdue').innerText = overdue;
+
+                if(this.myChart) this.myChart.destroy();
+                
+                this.myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: ['#6c757d', '#ffc107', '#0dcaf0', '#198754'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            getColTitle(id) {
+                const c = this.state.columns.find(x => x.id === id);
+                return c ? c.title : 'Unknown';
+            }
+
+            updateGlobalProgress() {
+                const total = this.state.tasks.length;
+                const done = this.state.tasks.filter(t => t.columnId === 'c4').length;
+                const pct = total === 0 ? 0 : Math.round((done/total)*100);
+                document.getElementById('globalProgress').style.width = pct + '%';
+            }
+
+            // --- Utilities ---
+            setupSearch() {
+                // Event listener for Desktop Search
+                document.getElementById('searchInputDesktop').addEventListener('input', (e) => {
+                    document.getElementById('searchInputMobile').value = e.target.value;
+                    this.renderBoard();
+                });
+                // Event listener for Mobile Search
+                document.getElementById('searchInputMobile').addEventListener('input', (e) => {
+                    document.getElementById('searchInputDesktop').value = e.target.value;
+                    this.renderBoard();
+                });
+            }
+
+            initTheme() {
+                const body = document.body;
+                const icon = document.getElementById('themeIcon');
+                if(this.state.theme === 'dark') {
+                    body.classList.add('dark-mode');
+                    icon.classList.replace('bi-moon-stars', 'bi-sun-fill');
+                } else {
+                    body.classList.remove('dark-mode');
+                    icon.classList.replace('bi-sun-fill', 'bi-moon-stars');
+                }
+            }
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+                this.initTheme();
+                this.saveState();
+            }
+
+            exportData() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state));
+                const dlAnchor = document.createElement('a');
+                dlAnchor.setAttribute("href", dataStr);
+                dlAnchor.setAttribute("download", "kanban_pro_backup.json");
+                document.body.appendChild(dlAnchor);
+                dlAnchor.click();
+                dlAnchor.remove();
+            }
+
+            importData(input) {
+                const file = input.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        this.state = JSON.parse(e.target.result);
+                        this.saveState();
+                        Swal.fire('Success', 'Data imported!', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } catch(err) {
+                        Swal.fire('Error', 'Invalid JSON file', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            resetBoard() {
+                Swal.fire({
+                    title: 'Reset Everything?',
+                    text: "This will wipe all data.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Yes, reset'
+                }).then((r) => {
+                    if(r.isConfirmed) {
+                        localStorage.removeItem(this.storageKey);
+                        location.reload();
+                    }
+                });
+            }
+        }
+
+        const app = new KanbanPro();
+    </script>
+</body>
+
+</html>
