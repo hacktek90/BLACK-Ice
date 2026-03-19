@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Tab</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-color: #F2F2F2;
+            --card-bg: #FFFFFF;
+            --text-main: #111111;
+            --text-muted: #555555;
+            --accent-color: #FF3B30; /* Swiss Red */
+            --border-color: #111111;
+            --grid-dot: rgba(0,0,0,0.1);
+            --modal-bg: #FFFFFF;
+            
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --spacing: 1.5rem;
+            --radius: 0px; /* Sharp edges */
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-color: #0A0A0A;
+            --card-bg: #141414;
+            --text-main: #EAEAEA;
+            --text-muted: #888888;
+            --border-color: #FFFFFF;
+            --grid-dot: rgba(255,255,255,0.1);
+            --modal-bg: #141414;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- DESIGN ELEMENT: GRAIN OVERLAY --- */
+        .grain-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* --- DESIGN ELEMENT: DOT GRID BACKGROUND --- */
+        .bg-grid {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+            background-size: 24px 24px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- DESIGN ELEMENT: GEOMETRIC DECORATIONS --- */
+        .deco-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid var(--grid-dot);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .circle-1 {
+            width: 600px; height: 600px;
+            top: -200px; right: -100px;
+            border-width: 2px;
+            border-color: var(--grid-dot);
+        }
+
+        .circle-2 {
+            width: 300px; height: 300px;
+            bottom: 10%; left: -50px;
+            border-style: dashed;
+        }
+
+        /* --- UTILITIES --- */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .btn:hover {
+            background: var(--text-main);
+            color: var(--bg-color);
+        }
+
+        .btn-danger {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .brand {
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: -0.05em;
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 0.2rem 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* --- MAIN LAYOUT --- */
+        main {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem; /* Reduced gap slightly for tools */
+            margin-bottom: 2rem;
+        }
+
+        /* Time Section */
+        .time-display {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        #clock { 
+            font-size: 7rem; 
+            font-weight: 800; 
+            line-height: 0.85; 
+            letter-spacing: -0.06em; 
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Decorative line behind clock */
+        .time-display::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            width: 120%;
+            height: 2px;
+            background: var(--accent-color);
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        #date { 
+            font-family: var(--font-mono); 
+            color: var(--text-muted); 
+            margin-top: 1rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.15em; 
+            font-size: 0.8rem; 
+            font-weight: 700;
+        }
+        
+        #greeting { 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+            color: var(--accent-color); 
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Search Section */
+        .search-container { 
+            position: relative; 
+            max-width: 500px; 
+            width: 100%;
+        }
+        
+        .search-form {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .search-form:focus-within {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--accent-color);
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            padding: 1rem;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            font-weight: 500;
+        }
+
+        .search-indicator {
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            border-left: 1px solid var(--grid-dot);
+            cursor: pointer;
+        }
+
+        /* --- TOOLS SECTION (Timer & Note) --- */
+        .tools-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px; /* Match links grid gap */
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            background-color: var(--grid-dot); /* Creates the border effect */
+        }
+
+        .tool-module {
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 160px;
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid var(--grid-dot);
+            padding-bottom: 0.75rem;
+        }
+
+        /* Timer Specifics */
+        .timer-display {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0.5rem 0;
+            letter-spacing: -0.05em;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+
+        .timer-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-input {
+            width: 60px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .time-input:focus { border-color: var(--accent-color); }
+
+        /* Sticky Note Specifics */
+        .note-area {
+            flex: 1;
+            width: 100%;
+            background: transparent;
+            border: none;
+            resize: none;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+        .note-area::placeholder { color: var(--grid-dot); opacity: 0.5; }
+
+        /* Links Grid */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 2px;
+            background-color: var(--grid-dot);
+            border: 1px solid var(--border-color);
+        }
+
+        .link-card {
+            background-color: var(--bg-color);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            height: 160px;
+            position: relative;
+            border-right: 1px solid var(--grid-dot);
+        }
+
+        .link-card:hover {
+            background-color: var(--card-bg);
+        }
+
+        .link-card:hover .link-title {
+            color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        /* Swiss Index Number */
+        .link-index {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            align-self: flex-start;
+        }
+
+        .link-icon-wrapper {
+            align-self: center;
+            margin: 0.5rem 0;
+            color: var(--text-main);
+            transition: color 0.2s;
+        }
+
+        .link-card:hover .link-icon-wrapper {
+            color: var(--accent-color);
+        }
+
+        .link-title { 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            align-self: flex-start;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        /* --- STATUS FOOTER (Design Element) --- */
+        .status-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-color);
+            z-index: 5;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px; height: 6px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* --- SETTINGS MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-out; }
+
+        .modal {
+            background: var(--modal-bg);
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--text-main);
+            box-shadow: 12px 12px 0px rgba(0,0,0,0.2);
+            max-height: 85vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--grid-dot);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body { padding: 1.5rem; }
+
+        .modal-title { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--text-muted); }
+        
+        .form-select, .form-input {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .link-manager-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0px; /* Collapsed borders */
+            border: 1px solid var(--border-color);
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-color);
+        }
+        
+        .link-item:last-child { border-bottom: none; }
+        .link-item span { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
+
+        .add-link-form {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border: 1px dashed var(--border-color);
+            margin-top: 1rem;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .row { display: flex; gap: 0.75rem; }
+        .row > * { flex: 1; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 2000;
+            text-transform: uppercase;
+        }
+        .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tools-wrapper { grid-template-columns: 1fr; }
+            #clock { font-size: 4.5rem; }
+            .circle-1 { width: 300px; height: 300px; top: -50px; right: -50px; }
+            .links-grid { grid-template-columns: 1fr 1fr; }
+            header { padding: 1.5rem; }
+            .status-footer { flex-direction: column; gap: 0.5rem; padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Design Overlays -->
+    <div class="bg-grid"></div>
+    <div class="grain-overlay"></div>
+    
+    <!-- Decorative Background Geometry -->
+    <div class="deco-circle circle-1"></div>
+    <div class="deco-circle circle-2"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <i data-lucide="layers" size="16"></i> START
+        </div>
+        <button id="open-settings" class="btn" aria-label="Settings">
+            <i data-lucide="sliders-horizontal" size="16"></i> Config
+        </button>
+    </header>
+
+    <div class="container">
+        <main>
+            <!-- Clock -->
+            <section class="time-display">
+                <div id="greeting">System Ready</div>
+                <div id="clock">00:00</div>
+                <div id="date">INITIALIZING...</div>
+            </section>
+
+            <!-- Search -->
+            <section class="search-container">
+                <form id="search-form" class="search-form">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search Query..." autocomplete="off" autofocus>
+                    <div id="search-engine-indicator" class="search-indicator" title="Settings to Change Engine">
+                        <i data-lucide="search" size="14"></i> <span id="engine-name">Google</span>
+                    </div>
+                </form>
+            </section>
+
+            <!-- TOOLS SECTION (Timer & Note) -->
+            <section class="tools-wrapper">
+                
+                <!-- Timer Module -->
+                <div class="tool-module">
+                    <div class="tool-header">
+                        <span><i data-lucide="timer" width="14"></i> Focus Timer</span>
+                        <span id="timer-status">IDLE</span>
+                    </div>
+                    
+                    <div class="timer-display" id="timer-display">25:00</div>
+                    
+                    <div class="timer-input-group">
+                        <input type="number" id="timer-min" class="time-input" value="25" min="0" max="99" title="Minutes">
+                        <span style="align-self:center">:</span>
+                        <input type="number" id="timer-sec" class="time-input" value="00" min="0" max="59" title="Seconds">
+                    </div>
+
+                    <div class="timer-controls">
+                        <button id="timer-toggle-btn" class="btn">Start</button>
+                        <button id="timer-reset-btn" class="btn btn-danger">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Sticky Note Module -->
+                <div class="tool-module">
+                    <div class="tool-header">
+                        <span><i data-lucide="sticky-note" width="14"></i> Memo</span>
+                        <span id="note-status">SYNCED</span>
+                    </div>
+                    <textarea id="sticky-note" class="note-area" placeholder="Enter tasks or notes..."></textarea>
+                </div>
+
+            </section>
+
+            <!-- Quick Links -->
+            <section class="links-grid" id="links-grid">
+                <!-- Links injected via JS -->
+            </section>
+        </main>
+    </div>
+
+    <!-- Technical Status Footer -->
+    <footer class="status-footer">
+        <div class="status-item">
+            <div class="status-dot"></div>
+            <span>Connection: Secure</span>
+        </div>
+        <div class="status-item">
+            <span>Latency: 12ms</span>
+        </div>
+        <div class="status-item">
+            <span>Ver: 2.5.0</span> <!-- Updated version -->
+        </div>
+        <div class="status-item">
+            <span>Locale: EN-US</span>
+        </div>
+    </footer>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast">Notification</div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Configuration</h2>
+                <button id="close-settings" class="btn" style="border:none; padding: 0.5rem;"><i data-lucide="x" size="20"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Appearance -->
+                <div class="form-group">
+                    <label class="form-label">Interface Theme</label>
+                    <button id="theme-toggle-btn" class="btn">Toggle Light / Dark Mode</button>
+                </div>
+
+                <!-- Search Engine -->
+                <div class="form-group">
+                    <label class="form-label">Default Search Engine</label>
+                    <select id="engine-select" class="form-select">
+                        <option value="google">Google</option>
+                        <option value="duckduckgo">DuckDuckGo</option>
+                        <option value="brave">Brave</option>
+                        <option value="perplexity">Perplexity</option>
+                        <option value="bing">Bing</option>
+                        <option value="ecosia">Ecosia</option>
+                    </select>
+                </div>
+
+                <!-- Link Management -->
+                <div class="form-group">
+                    <label class="form-label">Managed Bookmarks</label>
+                    <div class="link-manager-list" id="link-list">
+                        <!-- List items injected JS -->
+                    </div>
+
+                    <label class="form-label" style="margin-top: 1.5rem;">Add New Bookmark</label>
+                    <div class="add-link-form">
+                        <input type="text" id="new-link-title" class="form-input" placeholder="Title (e.g. Portfolio)">
+                        <input type="text" id="new-link-url" class="form-input" placeholder="URL (e.g. mysite.com)">
+                        <div class="row">
+                            <input type="text" id="new-link-icon" class="form-input" placeholder="Icon Name (Lucide)" list="icon-suggestions">
+                            <datalist id="icon-suggestions">
+                                <option value="mail"><option value="github"><option value="twitter"><option value="youtube"><option value="instagram"><option value="linkedin"><option value="figma"><option value="dribbble"><option value="trello"><option value="slack">
+                            </datalist>
+                            <button id="add-link-btn" class="btn" style="justify-content: center;">Add</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; text-align: right;">
+                    <button id="reset-btn" class="btn btn-danger" style="font-size: 0.7rem;">Factory Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG & STATE ---
+        const DEFAULT_STATE = {
+            theme: 'light',
+            searchEngine: 'google',
+            links: [
+                { id: 1, title: 'Gmail', url: 'https://mail.google.com', icon: 'mail' },
+                { id: 2, title: 'GitHub', url: 'https://github.com', icon: 'github' },
+                { id: 3, title: 'YouTube', url: 'https://youtube.com', icon: 'youtube' },
+                { id: 4, title: 'Twitter', url: 'https://twitter.com', icon: 'twitter' },
+                { id: 5, title: 'Figma', url: 'https://figma.com', icon: 'figma' },
+                { id: 6, title: 'Dribbble', url: 'https://dribbble.com', icon: 'dribbble' }
+            ],
+            noteContent: "",
+            timerMinutes: 25
+        };
+
+        // Added Brave and Perplexity
+        const SEARCH_ENGINES = {
+            google: { url: 'https://www.google.com/search?q=', name: 'Google' },
+            duckduckgo: { url: 'https://duckduckgo.com/?q=', name: 'DuckDuckGo' },
+            brave: { url: 'https://search.brave.com/search?q=', name: 'Brave' },
+            perplexity: { url: 'https://www.perplexity.ai/search?q=', name: 'Perplexity' },
+            bing: { url: 'https://www.bing.com/search?q=', name: 'Bing' },
+            ecosia: { url: 'https://www.ecosia.org/search?q=', name: 'Ecosia' }
+        };
+
+        let state = loadState();
+
+        // Timer Variables
+        let timerInterval = null;
+        let timerTime = 0; // in seconds
+        let isTimerRunning = false;
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            clock: document.getElementById('clock'),
+            date: document.getElementById('date'),
+            greeting: document.getElementById('greeting'),
+            linksGrid: document.getElementById('links-grid'),
+            searchForm: document.getElementById('search-form'),
+            searchInput: document.getElementById('search-input'),
+            engineName: document.getElementById('engine-name'),
+            engineSelect: document.getElementById('engine-select'),
+            modal: document.getElementById('settings-modal'),
+            openSettingsBtn: document.getElementById('open-settings'),
+            closeSettingsBtn: document.getElementById('close-settings'),
+            themeBtn: document.getElementById('theme-toggle-btn'),
+            linkList: document.getElementById('link-list'),
+            newTitle: document.getElementById('new-link-title'),
+            newUrl: document.getElementById('new-link-url'),
+            newIcon: document.getElementById('new-link-icon'),
+            addLinkBtn: document.getElementById('add-link-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            toast: document.getElementById('toast'),
+            // Note Elements
+            noteArea: document.getElementById('sticky-note'),
+            // Timer Elements
+            timerDisplay: document.getElementById('timer-display'),
+            timerMinInput: document.getElementById('timer-min'),
+            timerSecInput: document.getElementById('timer-sec'),
+            timerToggleBtn: document.getElementById('timer-toggle-btn'),
+            timerResetBtn: document.getElementById('timer-reset-btn'),
+            timerStatus: document.getElementById('timer-status')
+        };
+
+        // --- INITIALIZATION ---
+        function init() {
+            applyTheme(state.theme);
+            renderLinks();
+            updateEngineUI();
+            startClock();
+            
+            // Note Init
+            els.noteArea.value = state.noteContent || "";
+            
+            // Timer Init
+            timerTime = (state.timerMinutes || 25) * 60;
+            updateTimerDisplay();
+            els.timerMinInput.value = Math.floor(timerTime / 60);
+            els.timerSecInput.value = timerTime % 60;
+
+            // Event Listeners
+            els.openSettingsBtn.addEventListener('click', () => toggleModal(true));
+            els.closeSettingsBtn.addEventListener('click', () => toggleModal(false));
+            els.modal.addEventListener('click', (e) => { if(e.target === els.modal) toggleModal(false); });
+            
+            els.themeBtn.addEventListener('click', toggleTheme);
+            
+            els.engineSelect.addEventListener('change', (e) => {
+                state.searchEngine = e.target.value;
+                saveState();
+                updateEngineUI();
+            });
+
+            els.searchForm.addEventListener('submit', handleSearch);
+            els.addLinkBtn.addEventListener('click', addNewLink);
+            els.resetBtn.addEventListener('click', resetData);
+
+            // Note Listener
+            els.noteArea.addEventListener('input', (e) => {
+                state.noteContent = e.target.value;
+                saveState();
+            });
+
+            // Timer Listeners
+            els.timerToggleBtn.addEventListener('click', toggleTimer);
+            els.timerResetBtn.addEventListener('click', resetTimer);
+            els.timerMinInput.addEventListener('change', updateTimerFromInput);
+            els.timerSecInput.addEventListener('change', updateTimerFromInput);
+        }
+
+        // --- CORE FUNCTIONS ---
+
+        function loadState() {
+            const saved = localStorage.getItem('swiss-start-state');
+            return saved ? JSON.parse(saved) : DEFAULT_STATE;
+        }
+
+        function saveState() {
+            localStorage.setItem('swiss-start-state', JSON.stringify(state));
+        }
+
+        function showToast(message) {
+            els.toast.textContent = message;
+            els.toast.classList.add('visible');
+            setTimeout(() => els.toast.classList.remove('visible'), 3000);
+        }
+
+        function startClock() {
+            const updateTime = () => {
+                const now = new Date();
+                els.clock.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                els.date.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+                
+                const hour = now.getHours();
+                els.greeting.textContent = hour < 12 ? "GOOD MORNING" : hour < 18 ? "GOOD AFTERNOON" : "GOOD EVENING";
+            };
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function applyTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            els.themeBtn.textContent = theme === 'dark' ? 'Switch to Light' : 'Switch to Dark';
+        }
+
+        function toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            applyTheme(state.theme);
+            saveState();
+        }
+
+        function updateEngineUI() {
+            const engine = SEARCH_ENGINES[state.searchEngine];
+            els.engineName.textContent = engine.name;
+            els.engineSelect.value = state.searchEngine;
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = els.searchInput.value.trim();
+            if (query) {
+                const baseUrl = SEARCH_ENGINES[state.searchEngine].url;
+                window.location.href = baseUrl + encodeURIComponent(query);
+            }
+        }
+
+        // --- TIMER LOGIC ---
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timerTime / 60).toString().padStart(2, '0');
+            const s = (timerTime % 60).toString().padStart(2, '0');
+            els.timerDisplay.textContent = `${m}:${s}`;
+            // Update inputs if not focused (to avoid overwrite while typing)
+            if(document.activeElement !== els.timerMinInput) els.timerMinInput.value = m;
+            if(document.activeElement !== els.timerSecInput) els.timerSecInput.value = s;
+        }
+
+        function updateTimerFromInput() {
+            if (isTimerRunning) return; // Prevent changing while running
+            let m = parseInt(els.timerMinInput.value) || 0;
+            let s = parseInt(els.timerSecInput.value) || 0;
+            // Clamp
+            if (m < 0) m = 0;
+            if (s < 0) s = 0;
+            if (s > 59) s = 59;
+            
+            timerTime = (m * 60) + s;
+            state.timerMinutes = m; // Save default minutes
+            saveState();
+            updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            if (isTimerRunning) {
+                // Pause
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                els.timerToggleBtn.textContent = "Resume";
+                els.timerToggleBtn.classList.remove('btn-danger');
+                els.timerStatus.textContent = "PAUSED";
+                els.timerStatus.style.color = "var(--text-muted)";
+            } else {
+                // Start
+                if (timerTime <= 0) {
+                    showToast("Set time > 00:00");
+                    return;
+                }
+                isTimerRunning = true;
+                els.timerToggleBtn.textContent = "Pause";
+                els.timerStatus.textContent = "RUNNING";
+                els.timerStatus.style.color = "var(--accent-color)";
+                
+                timerInterval = setInterval(() => {
+                    if (timerTime > 0) {
+                        timerTime--;
+                        updateTimerDisplay();
+                    } else {
+                        // Finished
+                        resetTimer();
+                        showToast("Timer Complete");
+                        // Optional: Play sound here if allowed
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            els.timerToggleBtn.textContent = "Start";
+            els.timerStatus.textContent = "IDLE";
+            els.timerStatus.style.color = "var(--text-muted)";
+            
+            // Reset to saved default or current inputs
+            let m = parseInt(els.timerMinInput.value) || 25;
+            let s = parseInt(els.timerSecInput.value) || 0;
+            timerTime = (m * 60) + s;
+            updateTimerDisplay();
+        }
+
+
+        // --- LINK MANAGEMENT ---
+
+        function renderLinks() {
+            // Render Grid with Index Numbers
+            els.linksGrid.innerHTML = state.links.map((link, index) => {
+                // Pad index with zero: 01, 02...
+                const displayIndex = (index + 1).toString().padStart(2, '0');
+                return `
+                <a href="${link.url}" class="link-card">
+                    <span class="link-index">${displayIndex}</span>
+                    <div class="link-icon-wrapper">
+                        <i data-lucide="${link.icon}" size="28"></i>
+                    </div>
+                    <span class="link-title">${link.title}</span>
+                </a>
+            `}).join('');
+
+            // Render Settings List
+            els.linkList.innerHTML = state.links.map(link => `
+                <div class="link-item">
+                    <span><i data-lucide="${link.icon}" width="16"></i> ${link.title}</span>
+                    <button class="btn btn-danger" onclick="deleteLink(${link.id})" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;">
+                        <i data-lucide="trash-2" width="14"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            // Refresh Icons
+            lucide.createIcons();
+        }
+
+        function addNewLink() {
+            const title = els.newTitle.value.trim();
+            let url = els.newUrl.value.trim();
+            const icon = els.newIcon.value.trim() || 'globe';
+
+            if (!title || !url) {
+                showToast("Please fill Title and URL");
+                return;
+            }
+
+            if (!url.startsWith('http')) {
+                url = 'https://' + url;
+            }
+
+            const newLink = {
+                id: Date.now(),
+                title,
+                url,
+                icon
+            };
+
+            state.links.push(newLink);
+            saveState();
+            renderLinks();
+            showToast("Bookmark Added");
+            
+            // Reset form
+            els.newTitle.value = '';
+            els.newUrl.value = '';
+            els.newIcon.value = '';
+        }
+
+        // Exposed globally for inline onclick handler
+        window.deleteLink = function(id) {
+            state.links = state.links.filter(l => l.id !== id);
+            saveState();
+            renderLinks();
+            showToast("Bookmark Removed");
+        };
+
+        function resetData() {
+            if(confirm("Reset all settings to default? This cannot be undone.")) {
+                localStorage.removeItem('swiss-start-state');
+                location.reload();
+            }
+        }
+
+        function toggleModal(show) {
+            if(show) {
+                els.modal.classList.add('active');
+            } else {
+                els.modal.classList.remove('active');
+            }
+        }
+
+        // Run
+        init();
+    </script>
+</body>
+</html>
