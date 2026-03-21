@@ -21,6 +21,7 @@
             --text-main: #111111;
             --text-muted: #555555;
             --accent-color: #FF3B30; /* Swiss Red */
+            --accent-blue: #3b82f6; /* For AI button */
             --border-color: #111111;
             --grid-dot: rgba(0,0,0,0.1);
             --modal-bg: #FFFFFF;
@@ -173,7 +174,7 @@
         main {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 2rem; /* Reduced gap slightly for tools */
+            gap: 2rem;
             margin-bottom: 2rem;
         }
 
@@ -193,7 +194,6 @@
             z-index: 2;
         }
         
-        /* Decorative line behind clock */
         .time-display::after {
             content: '';
             position: absolute;
@@ -225,19 +225,22 @@
             letter-spacing: 0.1em;
         }
 
-        /* Search Section */
-        .search-container { 
+        /* --- UPDATED SEARCH SECTION --- */
+        .search-wrapper { 
             position: relative; 
-            max-width: 500px; 
             width: 100%;
+            max-width: 560px;
+            margin: 0 auto;
         }
-        
+
         .search-form {
             display: flex;
+            align-items: stretch; /* Stretch height to match inputs/buttons */
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             box-shadow: 4px 4px 0px var(--border-color);
             transition: transform 0.2s, box-shadow 0.2s;
+            height: 56px; /* Fixed height for consistent look */
         }
 
         .search-form:focus-within {
@@ -245,37 +248,103 @@
             box-shadow: 6px 6px 0px var(--accent-color);
         }
 
+        /* Engine Selector */
+        .engine-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px; /* Compact width */
+            border-right: 1px solid var(--border-color);
+            background: var(--bg-color);
+            cursor: pointer;
+        }
+
+        .engine-selector select {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .engine-icon {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            border-radius: 2px;
+        }
+
+        /* Input */
         .search-input {
             flex: 1;
             background: transparent;
             border: none;
             font-size: 1.1rem;
-            padding: 1rem;
+            padding: 0 1rem;
             color: var(--text-main);
             font-family: var(--font-sans);
             font-weight: 500;
         }
 
-        .search-indicator {
+        /* Actions (Buttons) */
+        .search-actions {
             display: flex;
             align-items: center;
-            padding: 0 1rem;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            border-left: 1px solid var(--grid-dot);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
             cursor: pointer;
+            width: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* AI Button specific styling */
+        .action-btn.ai-btn {
+            color: var(--accent-blue);
+            border-left: 1px solid var(--border-color);
+            overflow: hidden;
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: width 0.3s ease, opacity 0.3s ease;
+        }
+
+        .action-btn.ai-btn.visible {
+            width: 50px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .action-btn.ai-btn:hover {
+            background: var(--accent-blue);
+            color: white;
         }
 
         /* --- TOOLS SECTION (Timer & Note) --- */
         .tools-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2px; /* Match links grid gap */
+            gap: 2px;
             border: 1px solid var(--border-color);
             margin-bottom: 1rem;
-            background-color: var(--grid-dot); /* Creates the border effect */
+            background-color: var(--grid-dot);
         }
 
         .tool-module {
@@ -382,7 +451,6 @@
             transform: translateX(5px);
         }
 
-        /* Swiss Index Number */
         .link-index {
             font-family: var(--font-mono);
             font-size: 0.7rem;
@@ -411,7 +479,7 @@
             transition: transform 0.2s, color 0.2s;
         }
 
-        /* --- STATUS FOOTER (Design Element) --- */
+        /* --- STATUS FOOTER --- */
         .status-footer {
             border-top: 1px solid var(--border-color);
             padding: 1rem 3rem;
@@ -502,7 +570,7 @@
         .link-manager-list {
             display: flex;
             flex-direction: column;
-            gap: 0px; /* Collapsed borders */
+            gap: 0px;
             border: 1px solid var(--border-color);
         }
 
@@ -591,12 +659,62 @@
                 <div id="date">INITIALIZING...</div>
             </section>
 
-            <!-- Search -->
-            <section class="search-container">
+            <!-- UPDATED Search Section -->
+            <section class="search-wrapper">
                 <form id="search-form" class="search-form">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search Query..." autocomplete="off" autofocus>
-                    <div id="search-engine-indicator" class="search-indicator" title="Settings to Change Engine">
-                        <i data-lucide="search" size="14"></i> <span id="engine-name">Google</span>
+                    <!-- Engine Selector (Left) -->
+                    <div class="engine-selector">
+                        <select id="engine-select" onchange="updateSearchUI()">
+                            <!-- Google -->
+                            <option 
+                                value="https://www.google.com/search?q=%s" 
+                                data-ai-url="https://bard.google.com/?q=%s" 
+                                data-domain="google.com"
+                                selected
+                            >Google</option>
+                            
+                            <!-- DuckDuckGo -->
+                            <option 
+                                value="https://duckduckgo.com/?q=%s" 
+                                data-ai-url="https://duck.ai/chat?q=%s" 
+                                data-domain="duckduckgo.com"
+                            >DuckDuckGo</option>
+                            
+                            <!-- Brave -->
+                            <option 
+                                value="https://search.brave.com/search?q=%s" 
+                                data-ai-url="https://search.brave.com/ask?q=%s" 
+                                data-domain="search.brave.com"
+                            >Brave</option>
+
+                            <!-- Perplexity -->
+                            <option 
+                                value="https://www.perplexity.ai/?q=%s" 
+                                data-ai-url="" 
+                                data-domain="perplexity.ai"
+                            >Perplexity</option>
+
+                            <!-- Bing -->
+                            <option 
+                                value="https://www.bing.com/search?q=%s" 
+                                data-ai-url="https://www.bing.com/chat?q=%s" 
+                                data-domain="bing.com"
+                            >Bing</option>
+                        </select>
+                        <img id="engine-favicon" class="engine-icon" src="" alt="Engine">
+                    </div>
+
+                    <!-- Input (Center) -->
+                    <input type="text" id="search-input" class="search-input" placeholder="Search the web..." autocomplete="off" autofocus>
+                    
+                    <!-- Buttons (Right) -->
+                    <div class="search-actions">
+                        <button type="submit" class="action-btn" title="Standard Search">
+                            <i data-lucide="search" size="18"></i>
+                        </button>
+                        <button type="button" id="ai-search-btn" class="action-btn ai-btn" title="AI Search / Chat" onclick="handleSearch(event, 'ai')">
+                            <i data-lucide="sparkles" size="18"></i>
+                        </button>
                     </div>
                 </form>
             </section>
@@ -653,7 +771,7 @@
             <span>Latency: 12ms</span>
         </div>
         <div class="status-item">
-            <span>Ver: 2.5.0</span> <!-- Updated version -->
+            <span>Ver: 3.0.0</span>
         </div>
         <div class="status-item">
             <span>Locale: EN-US</span>
@@ -678,18 +796,7 @@
                     <button id="theme-toggle-btn" class="btn">Toggle Light / Dark Mode</button>
                 </div>
 
-                <!-- Search Engine -->
-                <div class="form-group">
-                    <label class="form-label">Default Search Engine</label>
-                    <select id="engine-select" class="form-select">
-                        <option value="google">Google</option>
-                        <option value="duckduckgo">DuckDuckGo</option>
-                        <option value="brave">Brave</option>
-                        <option value="perplexity">Perplexity</option>
-                        <option value="bing">Bing</option>
-                        <option value="ecosia">Ecosia</option>
-                    </select>
-                </div>
+                <!-- Note: Search Engine settings removed from here as it is now handled directly in the search bar -->
 
                 <!-- Link Management -->
                 <div class="form-group">
@@ -723,7 +830,7 @@
         // --- CONFIG & STATE ---
         const DEFAULT_STATE = {
             theme: 'light',
-            searchEngine: 'google',
+            // Removed searchEngine from state as it is now handled by DOM selection
             links: [
                 { id: 1, title: 'Gmail', url: 'https://mail.google.com', icon: 'mail' },
                 { id: 2, title: 'GitHub', url: 'https://github.com', icon: 'github' },
@@ -736,21 +843,11 @@
             timerMinutes: 25
         };
 
-        // Added Brave and Perplexity
-        const SEARCH_ENGINES = {
-            google: { url: 'https://www.google.com/search?q=', name: 'Google' },
-            duckduckgo: { url: 'https://duckduckgo.com/?q=', name: 'DuckDuckGo' },
-            brave: { url: 'https://search.brave.com/search?q=', name: 'Brave' },
-            perplexity: { url: 'https://www.perplexity.ai/search?q=', name: 'Perplexity' },
-            bing: { url: 'https://www.bing.com/search?q=', name: 'Bing' },
-            ecosia: { url: 'https://www.ecosia.org/search?q=', name: 'Ecosia' }
-        };
-
         let state = loadState();
 
         // Timer Variables
         let timerInterval = null;
-        let timerTime = 0; // in seconds
+        let timerTime = 0; 
         let isTimerRunning = false;
 
         // --- DOM ELEMENTS ---
@@ -761,8 +858,9 @@
             linksGrid: document.getElementById('links-grid'),
             searchForm: document.getElementById('search-form'),
             searchInput: document.getElementById('search-input'),
-            engineName: document.getElementById('engine-name'),
             engineSelect: document.getElementById('engine-select'),
+            engineFavicon: document.getElementById('engine-favicon'),
+            aiBtn: document.getElementById('ai-search-btn'),
             modal: document.getElementById('settings-modal'),
             openSettingsBtn: document.getElementById('open-settings'),
             closeSettingsBtn: document.getElementById('close-settings'),
@@ -789,8 +887,10 @@
         function init() {
             applyTheme(state.theme);
             renderLinks();
-            updateEngineUI();
             startClock();
+            
+            // Initialize Search UI (Favicon + AI Button visibility)
+            updateSearchUI();
             
             // Note Init
             els.noteArea.value = state.noteContent || "";
@@ -808,13 +908,9 @@
             
             els.themeBtn.addEventListener('click', toggleTheme);
             
-            els.engineSelect.addEventListener('change', (e) => {
-                state.searchEngine = e.target.value;
-                saveState();
-                updateEngineUI();
-            });
-
-            els.searchForm.addEventListener('submit', handleSearch);
+            // Search Form Listeners
+            els.searchForm.addEventListener('submit', (e) => handleSearch(e, 'standard'));
+            
             els.addLinkBtn.addEventListener('click', addNewLink);
             els.resetBtn.addEventListener('click', resetData);
 
@@ -872,19 +968,54 @@
             saveState();
         }
 
-        function updateEngineUI() {
-            const engine = SEARCH_ENGINES[state.searchEngine];
-            els.engineName.textContent = engine.name;
-            els.engineSelect.value = state.searchEngine;
+        // --- UPDATED SEARCH LOGIC ---
+
+        function updateSearchUI() {
+            const select = els.engineSelect;
+            const selectedOption = select.options[select.selectedIndex];
+            const domain = selectedOption.getAttribute('data-domain');
+            const aiUrl = selectedOption.getAttribute('data-ai-url');
+            
+            // Update Favicon using Google's service
+            if(domain) {
+                els.engineFavicon.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+            }
+
+            // Toggle AI Button Visibility
+            if (aiUrl && aiUrl !== "") {
+                els.aiBtn.classList.add('visible');
+            } else {
+                els.aiBtn.classList.remove('visible');
+            }
         }
 
-        function handleSearch(e) {
-            e.preventDefault();
+        function handleSearch(e, type) {
+            if(e) e.preventDefault(); // Prevent form submission if triggered by button click
+            
             const query = els.searchInput.value.trim();
-            if (query) {
-                const baseUrl = SEARCH_ENGINES[state.searchEngine].url;
-                window.location.href = baseUrl + encodeURIComponent(query);
+            if (!query) return;
+
+            const select = els.engineSelect;
+            const selectedOption = select.options[select.selectedIndex];
+            
+            let urlTemplate = "";
+
+            if (type === 'ai') {
+                // Use AI URL attribute
+                urlTemplate = selectedOption.getAttribute('data-ai-url');
+                if(!urlTemplate) {
+                    // Fallback to standard if AI missing
+                    urlTemplate = selectedOption.value; 
+                }
+            } else {
+                // Standard search
+                urlTemplate = selectedOption.value;
             }
+            
+            // Replace %s with query
+            const finalUrl = urlTemplate.replace('%s', encodeURIComponent(query));
+            
+            window.open(finalUrl, '_blank');
         }
 
         // --- TIMER LOGIC ---
@@ -893,29 +1024,26 @@
             const m = Math.floor(timerTime / 60).toString().padStart(2, '0');
             const s = (timerTime % 60).toString().padStart(2, '0');
             els.timerDisplay.textContent = `${m}:${s}`;
-            // Update inputs if not focused (to avoid overwrite while typing)
             if(document.activeElement !== els.timerMinInput) els.timerMinInput.value = m;
             if(document.activeElement !== els.timerSecInput) els.timerSecInput.value = s;
         }
 
         function updateTimerFromInput() {
-            if (isTimerRunning) return; // Prevent changing while running
+            if (isTimerRunning) return; 
             let m = parseInt(els.timerMinInput.value) || 0;
             let s = parseInt(els.timerSecInput.value) || 0;
-            // Clamp
             if (m < 0) m = 0;
             if (s < 0) s = 0;
             if (s > 59) s = 59;
             
             timerTime = (m * 60) + s;
-            state.timerMinutes = m; // Save default minutes
+            state.timerMinutes = m; 
             saveState();
             updateTimerDisplay();
         }
 
         function toggleTimer() {
             if (isTimerRunning) {
-                // Pause
                 clearInterval(timerInterval);
                 isTimerRunning = false;
                 els.timerToggleBtn.textContent = "Resume";
@@ -923,7 +1051,6 @@
                 els.timerStatus.textContent = "PAUSED";
                 els.timerStatus.style.color = "var(--text-muted)";
             } else {
-                // Start
                 if (timerTime <= 0) {
                     showToast("Set time > 00:00");
                     return;
@@ -938,10 +1065,8 @@
                         timerTime--;
                         updateTimerDisplay();
                     } else {
-                        // Finished
                         resetTimer();
                         showToast("Timer Complete");
-                        // Optional: Play sound here if allowed
                     }
                 }, 1000);
             }
@@ -954,7 +1079,6 @@
             els.timerStatus.textContent = "IDLE";
             els.timerStatus.style.color = "var(--text-muted)";
             
-            // Reset to saved default or current inputs
             let m = parseInt(els.timerMinInput.value) || 25;
             let s = parseInt(els.timerSecInput.value) || 0;
             timerTime = (m * 60) + s;
@@ -965,9 +1089,7 @@
         // --- LINK MANAGEMENT ---
 
         function renderLinks() {
-            // Render Grid with Index Numbers
             els.linksGrid.innerHTML = state.links.map((link, index) => {
-                // Pad index with zero: 01, 02...
                 const displayIndex = (index + 1).toString().padStart(2, '0');
                 return `
                 <a href="${link.url}" class="link-card">
@@ -979,7 +1101,6 @@
                 </a>
             `}).join('');
 
-            // Render Settings List
             els.linkList.innerHTML = state.links.map(link => `
                 <div class="link-item">
                     <span><i data-lucide="${link.icon}" width="16"></i> ${link.title}</span>
@@ -989,7 +1110,6 @@
                 </div>
             `).join('');
 
-            // Refresh Icons
             lucide.createIcons();
         }
 
@@ -1019,13 +1139,11 @@
             renderLinks();
             showToast("Bookmark Added");
             
-            // Reset form
             els.newTitle.value = '';
             els.newUrl.value = '';
             els.newIcon.value = '';
         }
 
-        // Exposed globally for inline onclick handler
         window.deleteLink = function(id) {
             state.links = state.links.filter(l => l.id !== id);
             saveState();
