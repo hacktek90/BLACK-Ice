@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>P2P // SWISS</title>
-<!-- Inter Tight Font -->
+    <meta name="keywords" content="P2P chat, peer to peer chat, online chat platform, private chat, secure messaging, instant messaging, real-time chat, anonymous chat, encrypted chat, chat without server, decentralized chat, direct messaging, online communication">
+
+<meta name="description" content="Experience secure and private peer-to-peer (P2P) chat online. Connect instantly with others through fast, encrypted, and decentralized messaging without relying on central servers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800&display=swap" rel="stylesheet">
-<!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
-<!-- PeerJS -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
 <style>
 :root {
     --bg: #ffffff;
     --fg: #000000;
-    --accent: #ff3300; /* International Orange */
+    --accent: #ff3300;
     --border: 2px solid #000000;
     --thin-border: 1px solid #000000;
     --font: 'Inter Tight', sans-serif;
@@ -37,7 +37,6 @@ body {
     overflow: hidden;
 }
 
-/* --- MAIN CONTAINER --- */
 .app-container {
     width: 480px;
     height: 90vh;
@@ -46,10 +45,9 @@ body {
     display: flex;
     flex-direction: column;
     background: #fff;
-    box-shadow: 15px 15px 0px rgba(0,0,0,0.15); /* Hard shadow */
+    box-shadow: 15px 15px 0px rgba(0,0,0,0.15);
 }
 
-/* --- HEADER --- */
 header {
     padding: 16px 20px;
     border-bottom: var(--border);
@@ -59,187 +57,206 @@ header {
     background: #fff;
 }
 
-.brand {
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
-}
+.brand { font-weight: 800; font-size: 20px; letter-spacing: -0.05em; text-transform: uppercase; }
 .brand span { color: var(--accent); }
 
 .status {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 8px;
-    border: 1px solid #000;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 8px; border: 1px solid #000;
 }
 .dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
 .dot.active { background: #00cc66; }
 
-/* --- ID SECTION --- */
-.id-panel {
-    border-bottom: var(--border);
-    padding: 16px 20px;
-    background: #f4f4f4;
-}
+.id-panel { border-bottom: var(--border); padding: 16px 20px; background: #f4f4f4; }
 .id-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; margin-bottom: 4px; }
-.id-display {
-    display: flex;
-    gap: 10px;
-}
+.id-display { display: flex; gap: 10px; }
 .my-id {
-    flex: 1;
-    font-family: 'Courier New', monospace;
-    font-weight: 700;
-    font-size: 14px;
-    border-bottom: 2px solid #000;
-    padding: 4px 0;
+    flex: 1; font-family: 'Courier New', monospace; font-weight: 700;
+    font-size: 14px; border-bottom: 2px solid #000; padding: 4px 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .copy-btn {
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 4px 12px;
-    font-weight: 700;
-    font-size: 10px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
+    background: #000; color: #fff; border: none; padding: 4px 12px;
+    font-weight: 700; font-size: 10px; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s; font-family: var(--font);
 }
 .copy-btn:hover { background: var(--accent); }
 
-/* --- CHAT AREA --- */
 #chatLog {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    background: #fff;
-    /* Dot pattern background */
+    flex: 1; padding: 20px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 12px; background: #fff;
     background-image: radial-gradient(#ddd 1px, transparent 1px);
     background-size: 20px 20px;
 }
-
-/* Scrollbar */
 #chatLog::-webkit-scrollbar { width: 4px; }
 #chatLog::-webkit-scrollbar-thumb { background: #000; }
 
 .msg {
-    max-width: 85%;
-    padding: 12px 16px;
-    font-size: 14px;
-    line-height: 1.4;
-    position: relative;
-    word-break: break-word;
+    max-width: 85%; padding: 12px 16px; font-size: 14px; line-height: 1.4;
+    position: relative; word-break: break-word;
     animation: slideIn 0.2s ease-out;
 }
-
 @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Message Variations */
 .sys {
-    align-self: center;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #666;
-    background: #f4f4f4;
-    padding: 4px 12px;
-    border: 1px solid #ddd;
-    max-width: 100%;
+    align-self: center; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; color: #666; background: #f4f4f4;
+    padding: 4px 12px; border: 1px solid #ddd; max-width: 100%;
 }
 
 .peer {
-    align-self: flex-start;
-    background: #fff;
-    border: 1px solid #000;
-    border-left: 4px solid var(--accent);
-    color: #000;
+    align-self: flex-start; background: #fff;
+    border: 1px solid #000; border-left: 4px solid var(--accent); color: #000;
 }
 
 .self {
-    align-self: flex-end;
-    background: #000;
-    color: #fff;
-    border: 1px solid #000;
+    align-self: flex-end; background: #000; color: #fff; border: 1px solid #000;
 }
 
 .timestamp {
-    display: block;
-    font-size: 9px;
-    opacity: 0.6;
-    margin-top: 4px;
-    text-align: right;
-    font-family: monospace;
+    display: block; font-size: 9px; opacity: 0.6; margin-top: 4px;
+    text-align: right; font-family: monospace;
 }
 .peer .timestamp { text-align: left; }
 
-/* --- CONTROLS --- */
-.controls-area {
-    border-top: var(--border);
-    display: flex;
-    flex-direction: column;
+/* --- Image in chat --- */
+.msg-image {
+    max-width: 100%; border-radius: 2px; margin-bottom: 4px; cursor: pointer;
+    display: block;
+}
+.peer .msg-image { border: 1px solid #000; }
+.self .msg-image { border: 1px solid rgba(255,255,255,0.2); }
+.msg-image:hover { opacity: 0.85; }
+
+.msg-text { margin-top: 2px; }
+.msg-text:empty { display: none; }
+
+/* --- Image size label --- */
+.img-size {
+    display: inline-block; font-size: 9px; font-family: monospace;
+    opacity: 0.5; margin-top: 2px;
 }
 
-.connect-row {
-    display: flex;
-    border-bottom: var(--thin-border);
-}
+/* --- Controls --- */
+.controls-area { border-top: var(--border); display: flex; flex-direction: column; }
+
+.connect-row { display: flex; border-bottom: var(--thin-border); }
 .connect-row input {
-    flex: 1;
-    padding: 12px 16px;
-    border: none;
-    font-family: inherit;
-    font-size: 13px;
-    outline: none;
-    background: #fcfcfc;
+    flex: 1; padding: 12px 16px; border: none;
+    font-family: inherit; font-size: 13px; outline: none; background: #fcfcfc;
 }
 .connect-row button {
-    border: none;
-    border-left: var(--thin-border);
-    background: #fff;
-    padding: 0 16px;
-    cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 11px;
+    border: none; border-left: var(--thin-border); background: #fff;
+    padding: 0 16px; cursor: pointer; font-weight: 700;
+    text-transform: uppercase; font-size: 11px; font-family: var(--font);
 }
 .connect-row button:hover { background: #f0f0f0; }
 
-.chat-row {
-    display: flex;
-    height: 60px;
-}
+.chat-row { display: flex; height: 60px; }
 .chat-row input {
-    flex: 1;
-    padding: 16px 20px;
-    border: none;
-    font-family: inherit;
-    font-size: 15px;
-    outline: none;
+    flex: 1; padding: 16px 20px; border: none;
+    font-family: inherit; font-size: 15px; outline: none;
 }
-.chat-row button {
-    width: 70px;
-    border: none;
-    border-left: var(--border);
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+.chat-actions { display: flex; }
+
+.attach-btn {
+    width: 44px; border: none; border-left: var(--thin-border);
+    background: #fff; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: background 0.2s;
+    color: #000;
+}
+.attach-btn:hover { background: #f0f0f0; }
+
+.send-btn {
+    width: 60px; border: none; border-left: var(--border);
+    background: var(--accent); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
 }
-.chat-row button:hover { background: #000; }
-.chat-row button:disabled { background: #ccc; cursor: not-allowed; }
+.send-btn:hover { background: #000; }
+.send-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-/* --- MOBILE --- */
+/* --- Preview Overlay --- */
+.preview-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.85);
+    display: none; flex-direction: column; z-index: 100;
+    animation: fadeIn 0.15s ease-out;
+}
+.preview-overlay.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.preview-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; color: #fff;
+}
+.preview-header h3 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; margin: 0;
+}
+.preview-close {
+    background: none; border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; width: 32px; height: 32px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font); font-size: 16px; font-weight: 700;
+    transition: background 0.2s;
+}
+.preview-close:hover { background: rgba(255,255,255,0.1); }
+
+.preview-body {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 0 20px; overflow: hidden;
+}
+.preview-body img {
+    max-width: 100%; max-height: 100%; object-fit: contain;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+.preview-footer {
+    padding: 16px 20px; display: flex; gap: 10px;
+}
+.preview-footer input {
+    flex: 1; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1); color: #fff; font-family: inherit;
+    font-size: 14px; outline: none; border-radius: 0;
+}
+.preview-footer input::placeholder { color: rgba(255,255,255,0.4); }
+.preview-footer input:focus { border-color: var(--accent); }
+
+.send-image-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 0 24px; font-weight: 700; font-size: 11px;
+    text-transform: uppercase; cursor: pointer; font-family: var(--font);
+    transition: background 0.2s;
+}
+.send-image-btn:hover { background: #fff; color: #000; }
+
+.cancel-image-btn {
+    background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3);
+    padding: 0 16px; font-weight: 700; font-size: 11px;
+    text-transform: uppercase; cursor: pointer; font-family: var(--font);
+    transition: background 0.2s;
+}
+.cancel-image-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* --- Lightbox --- */
+.lightbox {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.92);
+    display: none; align-items: center; justify-content: center;
+    z-index: 200; cursor: zoom-out; animation: fadeIn 0.15s ease-out;
+}
+.lightbox.active { display: flex; }
+.lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; }
+
+/* --- Sending indicator --- */
+.sending-bar {
+    height: 3px; background: var(--accent); width: 0;
+    transition: width 0.3s ease; display: none;
+}
+.sending-bar.active { display: block; width: 100%; animation: sendPulse 0.6s ease; }
+@keyframes sendPulse { 0% { width: 0; } 50% { width: 70%; } 100% { width: 100%; } }
+
 @media (max-width: 500px) {
     .app-container { width: 100%; height: 100vh; max-height: none; border: none; box-shadow: none; }
     .brand { font-size: 16px; }
@@ -249,7 +266,7 @@ header {
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-container" style="position: relative;">
     <header>
         <div class="brand">P2P <span>//</span> CHAT</div>
         <div class="status">
@@ -258,7 +275,6 @@ header {
         </div>
     </header>
 
-    <!-- ID Display -->
     <div class="id-panel">
         <div class="id-label">Your Session ID</div>
         <div class="id-display">
@@ -267,45 +283,70 @@ header {
         </div>
     </div>
 
-    <!-- Chat Log -->
     <div id="chatLog">
         <div class="sys">Waiting for connection...</div>
     </div>
 
-    <!-- Controls -->
+    <div class="sending-bar" id="sendingBar"></div>
+
     <div class="controls-area">
-        <!-- Connect Bar -->
         <div class="connect-row" id="connectRow">
             <input id="peerInput" placeholder="Enter Peer ID to connect..." autocomplete="off">
             <button id="connectBtn">Connect</button>
         </div>
-
-        <!-- Message Bar -->
         <div class="chat-row">
             <input id="msgInput" placeholder="Type a message..." autocomplete="off">
-            <button id="sendBtn" disabled>
-                <i data-lucide="send-horizontal" width="20"></i>
-            </button>
+            <div class="chat-actions">
+                <button class="attach-btn" id="attachBtn" title="Send Image">
+                    <i data-lucide="image-plus" width="20"></i>
+                </button>
+                <button class="send-btn" id="sendBtn" disabled title="Send">
+                    <i data-lucide="send-horizontal" width="20"></i>
+                </button>
+            </div>
         </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+    <!-- Image Preview Overlay -->
+    <div class="preview-overlay" id="previewOverlay">
+        <div class="preview-header">
+            <h3>Send Image</h3>
+            <button class="preview-close" id="previewClose">&times;</button>
+        </div>
+        <div class="preview-body">
+            <img id="previewImg" src="" alt="Preview">
+        </div>
+        <div class="preview-footer">
+            <input id="captionInput" placeholder="Add a caption..." autocomplete="off">
+            <button class="cancel-image-btn" id="cancelImageBtn">Cancel</button>
+            <button class="send-image-btn" id="sendImageBtn">Send</button>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <img id="lightboxImg" src="" alt="Full view">
     </div>
 </div>
 
 <script>
-// --- UTILS ---
 const $ = (id) => document.getElementById(id);
-const getTime = () => new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+const getTime = () => new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 const icons = () => lucide.createIcons();
 
-// --- STATE ---
 let myPeerId = null;
 let conn = null;
+let pendingImageData = null; // base64 string ready to send
 
-// --- ID GENERATOR ---
+// --- ID Generator ---
 const adj = ["Neon","Cyber","Swiss","Dark","Bold","Raw","Pure","Hyper","Mono","Flux"];
 const noun = ["Link","Node","Grid","Core","Base","Cell","Sync","Pulse","Data","Warp"];
 const genID = () => `${adj[Math.floor(Math.random()*adj.length)]}-${noun[Math.floor(Math.random()*noun.length)]}-${Math.floor(Math.random()*999)}`;
 
-// --- INIT PEER ---
+// --- Init Peer ---
 const peer = new Peer(genID());
 
 peer.on('open', (id) => {
@@ -315,8 +356,7 @@ peer.on('open', (id) => {
 });
 
 peer.on('connection', (c) => {
-    // Incoming connection
-    if(conn) conn.close(); // Only one peer for simplicity in this version
+    if(conn) conn.close();
     setupConnection(c);
 });
 
@@ -324,10 +364,9 @@ peer.on('error', (err) => {
     systemLog(`Error: ${err.type}`);
 });
 
-// --- CONNECTION HANDLER ---
+// --- Connection Handler ---
 function setupConnection(c) {
     conn = c;
-    
     conn.on('open', () => {
         setStatus(true);
         systemLog(`Connected to: ${conn.peer}`);
@@ -337,11 +376,17 @@ function setupConnection(c) {
         $('sendBtn').disabled = false;
         $('msgInput').focus();
     });
-
     conn.on('data', (data) => {
-        addMessage(data, 'peer');
+        // data can be { type: 'text', text } or { type: 'image', data, caption }
+        if (data && data.type === 'image') {
+            addImageMessage(data.data, data.caption || '', 'peer', data.size || '');
+        } else if (data && data.type === 'text') {
+            addMessage(data.text, 'self');
+        } else {
+            // Legacy: plain string
+            addMessage(data, 'peer');
+        }
     });
-
     conn.on('close', () => {
         setStatus(false);
         systemLog("Connection lost.");
@@ -352,42 +397,156 @@ function setupConnection(c) {
     });
 }
 
-$('connectBtn').onclick = () => {
+ $('connectBtn').onclick = () => {
     const pid = $('peerInput').value.trim();
     if(!pid) return;
     if(pid === myPeerId) return systemLog("Cannot connect to self.");
-    
     systemLog(`Connecting to ${pid}...`);
-    const c = peer.connect(pid);
-    setupConnection(c);
+    setupConnection(peer.connect(pid));
 };
 
-// --- MESSAGING ---
+// --- Text Messaging ---
 function sendMessage() {
     if(!conn || !conn.open) return;
     const txt = $('msgInput').value.trim();
     if(!txt) return;
-    
-    conn.send(txt);
+    conn.send({ type: 'text', text: txt });
     addMessage(txt, 'self');
     $('msgInput').value = '';
 }
 
-$('sendBtn').onclick = sendMessage;
-$('msgInput').onkeypress = (e) => { if(e.key === "Enter") sendMessage(); };
+ $('sendBtn').onclick = sendMessage;
+ $('msgInput').onkeypress = (e) => { if(e.key === "Enter") sendMessage(); };
 
-// --- UI HELPERS ---
+// --- Image Handling ---
+ $('attachBtn').onclick = () => { $('fileInput').click(); };
+
+ $('fileInput').onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+        systemLog("Only image files are supported.");
+        $('fileInput').value = '';
+        return;
+    }
+
+    // Compress and prepare
+    compressImage(file, 1200, 0.85, (base64, width, height, sizeKB) => {
+        pendingImageData = base64;
+        $('previewImg').src = base64;
+        $('captionInput').value = '';
+        $('previewOverlay').classList.add('active');
+        $('captionInput').focus();
+    });
+
+    // Reset so same file can be re-selected
+    $('fileInput').value = '';
+};
+
+// Image compression via canvas
+function compressImage(file, maxDim, quality, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const base64 = canvas.toDataURL('image/jpeg', quality);
+            // Estimate size
+            const sizeKB = Math.round((base64.length * 3 / 4) / 1024);
+            callback(base64, w, h, sizeKB);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Preview actions
+function closePreview() {
+    $('previewOverlay').classList.remove('active');
+    pendingImageData = null;
+    $('captionInput').value = '';
+}
+
+ $('previewClose').onclick = closePreview;
+ $('cancelImageBtn').onclick = closePreview;
+
+ $('sendImageBtn').onclick = () => {
+    if (!pendingImageData || !conn || !conn.open) return;
+
+    const caption = $('captionInput').value.trim();
+    const sizeKB = Math.round((pendingImageData.length * 3 / 4) / 1024);
+    const sizeStr = sizeKB > 1024 ? `${(sizeKB/1024).toFixed(1)} MB` : `${sizeKB} KB`;
+
+    // Show sending indicator
+    $('sendingBar').classList.add('active');
+
+    conn.send({ type: 'image', data: pendingImageData, caption: caption, size: sizeStr });
+
+    // Add to own chat
+    addImageMessage(pendingImageData, caption, 'self', sizeStr);
+
+    closePreview();
+
+    setTimeout(() => { $('sendingBar').classList.remove('active'); }, 600);
+};
+
+ $('captionInput').onkeypress = (e) => { if(e.key === "Enter") $('sendImageBtn').click(); };
+
+// --- UI Message Rendering ---
 function addMessage(text, type) {
     const div = document.createElement('div');
     div.className = `msg ${type}`;
     div.innerHTML = `
-        ${text}
+        <div class="msg-text">${escapeHTML(text)}</div>
         <span class="timestamp">${getTime()}</span>
     `;
     $('chatLog').appendChild(div);
     scrollToBottom();
 }
 
+function addImageMessage(src, caption, type, sizeStr) {
+    const div = document.createElement('div');
+    div.className = `msg ${type}`;
+    div.innerHTML = `
+        <img class="msg-image" src="${src}" alt="Shared image" loading="lazy">
+        ${sizeStr ? `<span class="img-size">${sizeStr}</span>` : ''}
+        <div class="msg-text">${escapeHTML(caption)}</div>
+        <span class="timestamp">${getTime()}</span>
+    `;
+    // Lightbox on click
+    const img = div.querySelector('.msg-image');
+    img.onclick = () => openLightbox(src);
+    $('chatLog').appendChild(div);
+    scrollToBottom();
+}
+
+function escapeHTML(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+// --- Lightbox ---
+function openLightbox(src) {
+    $('lightboxImg').src = src;
+    $('lightbox').classList.add('active');
+}
+
+ $('lightbox').onclick = () => {
+    $('lightbox').classList.remove('active');
+};
+
+// --- Utility ---
 function systemLog(text) {
     const div = document.createElement('div');
     div.className = 'sys';
@@ -415,22 +574,59 @@ function setStatus(active) {
     }
 }
 
-// --- CLIPBOARD ---
-$('copyBtn').onclick = () => {
+// --- Clipboard ---
+ $('copyBtn').onclick = () => {
     navigator.clipboard.writeText(myPeerId).then(() => {
-        const original = $('copyBtn').textContent;
-        $('copyBtn').textContent = "COPIED";
-        $('copyBtn').style.background = "var(--accent)";
-        setTimeout(() => {
-            $('copyBtn').textContent = original;
-            $('copyBtn').style.background = "#000";
-        }, 1500);
+        const btn = $('copyBtn');
+        btn.textContent = "COPIED";
+        btn.style.background = "var(--accent)";
+        setTimeout(() => { btn.textContent = "COPY"; btn.style.background = "#000"; }, 1500);
     });
 };
 
-// Init icons
-icons();
+// --- Paste image from clipboard ---
+ $('msgInput').addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) {
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (!file) continue;
+            compressImage(file, 1200, 0.85, (base64) => {
+                pendingImageData = base64;
+                $('previewImg').src = base64;
+                $('captionInput').value = '';
+                $('previewOverlay').classList.add('active');
+                $('captionInput').focus();
+            });
+            break;
+        }
+    }
+});
 
+// --- Drag & drop onto chat area ---
+const chatLog = $('chatLog');
+chatLog.addEventListener('dragover', (e) => { e.preventDefault(); chatLog.style.outline = '2px solid var(--accent)'; });
+chatLog.addEventListener('dragleave', () => { chatLog.style.outline = 'none'; });
+chatLog.addEventListener('drop', (e) => {
+    e.preventDefault();
+    chatLog.style.outline = 'none';
+    const file = e.dataTransfer?.files[0];
+    if (!file || !file.type.startsWith('image/')) {
+        if (file) systemLog("Only image files are supported.");
+        return;
+    }
+    compressImage(file, 1200, 0.85, (base64) => {
+        pendingImageData = base64;
+        $('previewImg').src = base64;
+        $('captionInput').value = '';
+        $('previewOverlay').classList.add('active');
+        $('captionInput').focus();
+    });
+});
+
+icons();
 </script>
 </body>
 </html>
