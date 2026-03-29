@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>DropMail — Free Temporary Email | Instant Disposable Inbox</title>
+    <meta name="description" content="Generate a free temporary email address instantly. Receive emails anonymously with no sign-up. Disposable inbox that auto-refreshes — perfect for avoiding spam.">
+    <meta name="keywords" content="temporary email, temp mail, disposable email, throwaway email, free temporary email, instant email, anonymous email, no signup email, fake email, burner email, temp inbox, dropmail, mail tm, temporary mailbox, disposable inbox, spam avoidance, one time email">
+    <meta name="author" content="DropMail">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="https://dropmail.app">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dropmail.app">
+    <meta property="og:title" content="DropMail — Free Temporary Email | Instant Disposable Inbox">
+    <meta property="og:description" content="Generate a free temporary email address instantly. Receive emails anonymously with no sign-up. Disposable inbox that auto-refreshes — perfect for avoiding spam.">
+    <meta property="og:site_name" content="DropMail">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DropMail — Free Temporary Email | Instant Disposable Inbox">
+    <meta name="twitter:description" content="Generate a free temporary email address instantly. Receive emails anonymously with no sign-up. Disposable inbox that auto-refreshes — perfect for avoiding spam.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 240 10% 3.9%;
+            --primary: 160 84% 39%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 240 4.8% 95.9%;
+            --accent-foreground: 240 5.9% 10%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 100%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 160 84% 39%;
+            --radius: 0.5rem;
+        }
+
+        .dark {
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 5.9%;
+            --card-foreground: 0 0% 98%;
+            --primary: 160 84% 39%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 240 3.7% 15.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 240 3.7% 15.9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 3.7% 15.9%;
+            --input: 240 3.7% 15.9%;
+            --ring: 160 84% 39%;
+        }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 50% -20%, hsla(160, 84%, 39%, 0.07) 0%, transparent 55%),
+                radial-gradient(circle at 1px 1px, hsla(var(--border), 0.5) 1px, transparent 0);
+            background-size: 100% 100%, 20px 20px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1.5rem;
+            border-bottom: 1px solid hsl(var(--border));
+            background: hsl(var(--card) / 0.6);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        .header-left { display: flex; align-items: center; gap: 0.625rem; }
+        .logo-icon { color: hsl(var(--primary)); font-size: 1.25rem; }
+        .logo-text { font-weight: 700; font-size: 1.125rem; letter-spacing: -0.02em; }
+        .header-right { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: hsl(var(--muted-foreground)); }
+        .listening-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: hsl(var(--primary));
+            animation: pulse 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 hsla(160, 84%, 39%, 0.4); }
+            50% { box-shadow: 0 0 0 6px hsla(160, 84%, 39%, 0); }
+        }
+
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .card-accent-top { position: relative; }
+        .card-accent-top::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4375rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            outline: none;
+            line-height: 1.4;
+        }
+        .btn:focus-visible { box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring)); }
+        .btn:disabled { opacity: 0.5; pointer-events: none; }
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+        .btn-primary:hover { background: hsl(160 84% 35%); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            border-color: hsl(var(--border));
+        }
+        .btn-secondary:hover { background: hsl(var(--accent)); }
+        .btn-ghost {
+            background: transparent;
+            color: hsl(var(--muted-foreground));
+        }
+        .btn-ghost:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
+        .btn-destructive {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+        .btn-destructive:hover { filter: brightness(1.15); }
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+        .btn-lg { padding: 0.625rem 1.5rem; font-size: 0.9375rem; }
+        .btn-icon { padding: 0.375rem; width: 2rem; height: 2rem; justify-content: center; }
+
+        .email-section { padding: 1.5rem; }
+        .email-label {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+        .email-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .email-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.125rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: hsl(var(--foreground));
+            word-break: break-all;
+            flex: 1;
+            min-width: 200px;
+        }
+        .email-actions { margin-top: 0.875rem; display: flex; gap: 0.5rem; }
+        .email-meta {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .welcome-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            gap: 1rem;
+        }
+        .welcome-icon {
+            width: 64px; height: 64px;
+            border: 2px dashed hsl(var(--muted-foreground) / 0.25);
+            border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            color: hsl(var(--muted-foreground));
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .welcome-state h2 { font-size: 1.25rem; font-weight: 600; }
+        .welcome-state p { color: hsl(var(--muted-foreground)); font-size: 0.9rem; max-width: 360px; }
+
+        .spinner {
+            width: 1.25rem; height: 1.25rem;
+            border: 2px solid hsl(var(--border));
+            border-top-color: hsl(var(--primary));
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-state {
+            display: flex; align-items: center; justify-content: center;
+            gap: 0.75rem; padding: 2rem; color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+
+        .inbox-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 420px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: hsl(var(--card));
+        }
+        @media (min-width: 768px) {
+            .inbox-section { grid-template-columns: 380px 1fr; }
+        }
+        .inbox-list {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid hsl(var(--border));
+        }
+        .inbox-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid hsl(var(--border));
+            flex-shrink: 0;
+        }
+        .inbox-header h2 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .badge {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            line-height: 1.4;
+        }
+        .badge-muted {
+            background: hsl(var(--secondary));
+            color: hsl(var(--muted-foreground));
+        }
+        .inbox-messages {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: hsl(var(--border)) transparent;
+        }
+        .inbox-messages::-webkit-scrollbar { width: 5px; }
+        .inbox-messages::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 9999px; }
+
+        .msg-item {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid hsl(var(--border));
+            cursor: pointer;
+            transition: background-color 0.12s;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        .msg-item:hover { background: hsl(var(--accent)); }
+        .msg-item.active { background: hsl(var(--accent)); }
+        .msg-item.unread { border-left: 3px solid hsl(var(--primary)); padding-left: calc(1rem - 3px); }
+        .msg-item.new-msg { animation: msgFlash 1.2s ease-out; }
+        @keyframes msgFlash {
+            0% { background: hsla(160, 84%, 39%, 0.15); }
+            100% { background: transparent; }
+        }
+        .msg-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: hsl(var(--primary) / 0.12);
+            color: hsl(var(--primary));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8125rem; font-weight: 600;
+            flex-shrink: 0;
+        }
+        .msg-content { flex: 1; min-width: 0; }
+        .msg-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+        .msg-sender { font-size: 0.8125rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .msg-time { font-size: 0.6875rem; color: hsl(var(--muted-foreground)); white-space: nowrap; flex-shrink: 0; }
+        .msg-subject { font-size: 0.8125rem; color: hsl(var(--foreground) / 0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.125rem; }
+        .msg-intro { font-size: 0.75rem; color: hsl(var(--muted-foreground)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.25rem; }
+        .msg-item.unread .msg-sender { font-weight: 700; color: hsl(var(--foreground)); }
+        .msg-item.unread .msg-subject { font-weight: 500; color: hsl(var(--foreground)); }
+
+        .inbox-empty {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 3rem 1rem; gap: 0.75rem;
+            color: hsl(var(--muted-foreground));
+        }
+        .inbox-empty i { font-size: 2rem; opacity: 0.4; }
+        .inbox-empty p { font-size: 0.875rem; text-align: center; }
+        .inbox-empty .sub { font-size: 0.75rem; opacity: 0.7; }
+
+        .inbox-detail {
+            display: none;
+            flex-direction: column;
+            background: hsl(var(--card));
+        }
+        @media (min-width: 768px) {
+            .inbox-detail { display: flex; }
+        }
+        .detail-empty {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            color: hsl(var(--muted-foreground)); font-size: 0.875rem;
+        }
+        .detail-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid hsl(var(--border));
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+        .detail-subject {
+            padding: 1rem 1.25rem 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+        .detail-meta {
+            padding: 0 1.25rem 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            font-size: 0.8125rem;
+            color: hsl(var(--muted-foreground));
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        .detail-meta span { display: flex; align-items: center; gap: 0.375rem; }
+        .detail-meta .meta-value { color: hsl(var(--foreground) / 0.85); }
+        .detail-body {
+            flex: 1;
+            overflow: hidden;
+        }
+        .detail-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            min-height: 300px;
+        }
+        .detail-footer {
+            padding: 0.75rem 1.25rem;
+            border-top: 1px solid hsl(var(--border));
+            display: flex; gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: hsl(var(--background) / 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            animation: fadeIn 0.15s;
+        }
+        .mobile-overlay.open { display: block; }
+        .mobile-panel {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: hsl(var(--card));
+            border-top: 1px solid hsl(var(--border));
+            border-radius: var(--radius) var(--radius) 0 0;
+            max-height: 92vh;
+            display: none; flex-direction: column;
+            animation: slideUp 0.25s ease-out;
+            z-index: 51;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @media (min-width: 768px) {
+            .mobile-overlay, .mobile-panel { display: none !important; }
+        }
+        .mobile-panel .detail-body { flex: 1; overflow-y: auto; }
+        .mobile-panel .detail-body iframe { min-height: 200px; }
+
+        .toast-container {
+            position: fixed; bottom: 1rem; right: 1rem;
+            display: flex; flex-direction: column; gap: 0.5rem;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .toast {
+            display: flex; align-items: center; gap: 0.625rem;
+            padding: 0.75rem 1rem;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            font-size: 0.8125rem;
+            box-shadow: 0 8px 24px hsla(0,0%,0%,0.25);
+            animation: toastIn 0.25s ease-out;
+            pointer-events: auto;
+            max-width: 340px;
+        }
+        .toast.removing { animation: toastOut 0.2s ease-in forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: none; } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(4px) scale(0.96); } }
+        .toast-icon { font-size: 1rem; flex-shrink: 0; }
+        .toast-success .toast-icon { color: hsl(var(--primary)); }
+        .toast-error .toast-icon { color: hsl(var(--destructive)); }
+        .toast-info .toast-icon { color: hsl(var(--muted-foreground)); }
+        .toast-close {
+            margin-left: auto; background: none; border: none;
+            color: hsl(var(--muted-foreground)); cursor: pointer;
+            padding: 0.125rem; font-size: 0.75rem; line-height: 1;
+        }
+        .toast-close:hover { color: hsl(var(--foreground)); }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        @media (max-width: 767px) {
+            .main { padding: 1rem; }
+            .email-text { font-size: 0.9375rem; }
+            .email-row { flex-direction: column; align-items: stretch; }
+            .inbox-list { border-right: none; }
+            .welcome-state { padding: 2rem 1rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "DropMail",
+        "description": "Free temporary email service. Generate a disposable email address instantly — no sign-up required.",
+        "url": "https://dropmail.app",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Free temporary email generation",
+            "No sign-up or registration required",
+            "Instant disposable inbox",
+            "Auto-refreshing message polling",
+            "HTML and plain text email support"
+        ]
+    }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-left">
+                <i class="fa-regular fa-envelope logo-icon"></i>
+                <span class="logo-text">DropMail</span>
+            </div>
+            <div class="header-right" id="status-bar"></div>
+        </header>
+
+        <main class="main" role="main">
+            <section class="card card-accent-top" id="email-card" aria-label="Email address generator">
+                <div class="email-section" id="email-section"></div>
+            </section>
+
+            <section class="inbox-section" id="inbox-section" aria-label="Temporary email inbox">
+                <div class="inbox-list" id="inbox-list">
+                    <div class="inbox-header">
+                        <h2>Inbox <span id="msg-badge"></span></h2>
+                        <button class="btn btn-ghost btn-icon btn-sm" id="refresh-btn" title="Refresh inbox" aria-label="Refresh inbox">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                    </div>
+                    <div class="inbox-messages" id="inbox-messages" role="list" aria-label="Message list"></div>
+                </div>
+                <div class="inbox-detail" id="inbox-detail">
+                    <div class="detail-empty" id="detail-empty">
+                        <span>Select a message to read</span>
+                    </div>
+                    <div id="detail-content" style="display:none;flex-direction:column;flex:1;"></div>
+                </div>
+            </section>
+        </main>
+
+        <div class="mobile-overlay" id="mobile-overlay"></div>
+        <div class="mobile-panel" id="mobile-panel">
+            <div id="mobile-detail-content" style="display:flex;flex-direction:column;flex:1;"></div>
+        </div>
+
+        <div class="toast-container" id="toast-container" aria-live="polite"></div>
+    </div>
+
+    <script>
+        const API = 'https://api.mail.tm';
+        const POLL_INTERVAL = 5000;
+
+        const state = {
+            email: null,
+            password: null,
+            token: null,
+            accountId: null,
+            messages: [],
+            knownIds: new Set(),
+            selectedId: null,
+            selectedMsg: null,
+            loading: false,
+            fetching: false,
+            lastChecked: null,
+        };
+
+        let pollTimer = null;
+        let statusTimer = null;
+
+        const $emailSection = document.getElementById('email-section');
+        const $inboxMessages = document.getElementById('inbox-messages');
+        const $msgBadge = document.getElementById('msg-badge');
+        const $detailEmpty = document.getElementById('detail-empty');
+        const $detailContent = document.getElementById('detail-content');
+        const $statusBar = document.getElementById('status-bar');
+        const $refreshBtn = document.getElementById('refresh-btn');
+        const $toastContainer = document.getElementById('toast-container');
+        const $mobileOverlay = document.getElementById('mobile-overlay');
+        const $mobilePanel = document.getElementById('mobile-panel');
+        const $mobileDetail = document.getElementById('mobile-detail-content');
+
+        function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        function generateUsername() {
+            const adj = ['swift','bold','calm','dark','fair','keen','rare','warm','cool','neat','pure','fast','safe','wise','tiny','wild','soft','lite','nova','flux','echo','haze','mist','dusk','glow','fern','opal','jade','rust','sage'];
+            const noun = ['wolf','hawk','bear','lion','lynx','deer','crow','fox','owl','hare','seal','ram','moth','wren','dove','pike','frog','puma','ibis','orca','yak','colt','bass','newt','crab','fawn','gear','iris'];
+            const n = Math.floor(Math.random() * 9999);
+            return `${randomFrom(adj)}${randomFrom(noun)}${n}`;
+        }
+
+        function generatePassword() {
+            const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*';
+            let p = '';
+            for (let i = 0; i < 18; i++) p += c[Math.floor(Math.random() * c.length)];
+            return p;
+        }
+
+        function relativeTime(dateStr) {
+            const d = new Date(dateStr);
+            const s = Math.floor((Date.now() - d) / 1000);
+            if (s < 5) return 'just now';
+            if (s < 60) return `${s}s ago`;
+            const m = Math.floor(s / 60);
+            if (m < 60) return `${m}m ago`;
+            const h = Math.floor(m / 60);
+            if (h < 24) return `${h}h ago`;
+            return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        }
+
+        function getInitial(name) {
+            if (!name) return '?';
+            return name.trim().charAt(0).toUpperCase();
+        }
+
+        function sanitizeHtml(html) {
+            if (!html) return '';
+            return html
+                .replace(/<script[\s\S]*?<\/script>/gi, '')
+                .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
+                .replace(/<form[\s\S]*?<\/form>/gi, '')
+                .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
+                .replace(/on\w+\s*=\s*'[^']*'/gi, '')
+                .replace(/javascript\s*:/gi, '');
+        }
+
+        function showToast(message, type = 'info') {
+            const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+            const el = document.createElement('div');
+            el.className = `toast toast-${type}`;
+            el.innerHTML = `
+                <i class="fa-solid ${icons[type] || icons.info} toast-icon"></i>
+                <span>${message}</span>
+                <button class="toast-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            el.querySelector('.toast-close').onclick = () => removeToast(el);
+            $toastContainer.appendChild(el);
+            setTimeout(() => removeToast(el), 3500);
+        }
+
+        function removeToast(el) {
+            if (!el || el.classList.contains('removing')) return;
+            el.classList.add('removing');
+            setTimeout(() => el.remove(), 200);
+        }
+
+        async function fetchDomains() {
+            const res = await fetch(`${API}/domains`);
+            if (!res.ok) throw new Error('Failed to fetch domains');
+            const data = await res.json();
+            const members = data['hydra:member'] || [];
+            if (!members.length) throw new Error('No domains available');
+            return members[0].domain;
+        }
+
+        async function createAccount(retries = 2) {
+            const domain = await fetchDomains();
+            for (let i = 0; i <= retries; i++) {
+                const username = generateUsername();
+                const password = generatePassword();
+                const address = `${username}@${domain}`;
+                const res = await fetch(`${API}/accounts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, password })
+                });
+                if (res.ok) {
+                    const account = await res.json();
+                    return { id: account.id, address, password };
+                }
+                if (res.status === 422 && i < retries) continue;
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || err.message || `Failed to create account (${res.status})`);
+            }
+        }
+
+        async function getToken(address, password) {
+            const res = await fetch(`${API}/token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, password })
+            });
+            if (!res.ok) throw new Error('Failed to authenticate');
+            const data = await res.json();
+            return data.token;
+        }
+
+        async function fetchMessages() {
+            if (!state.token || state.fetching) return;
+            state.fetching = true;
+            try {
+                const res = await fetch(`${API}/messages`, {
+                    headers: { 'Authorization': `Bearer ${state.token}` }
+                });
+                if (res.status === 401) { await reLogin(); return; }
+                if (!res.ok) return;
+                const data = await res.json();
+                const msgs = data['hydra:member'] || [];
+                const newIds = new Set(msgs.map(m => m.id));
+                const freshIds = msgs.filter(m => !state.knownIds.has(m.id)).map(m => m.id);
+                state.knownIds = newIds;
+                state.messages = msgs;
+                state.lastChecked = Date.now();
+                renderInbox(freshIds);
+                if (freshIds.length && state.messages.length) {
+                    showToast(`${freshIds.length} new message${freshIds.length > 1 ? 's' : ''} received`, 'success');
+                }
+            } catch (e) {
+                console.error('Fetch messages error:', e);
+            } finally {
+                state.fetching = false;
+            }
+        }
+
+        async function fetchMessage(id) {
+            if (!state.token) return null;
+            const res = await fetch(`${API}/messages/${id}`, {
+                headers: { 'Authorization': `Bearer ${state.token}` }
+            });
+            if (!res.ok) return null;
+            return res.json();
+        }
+
+        async function deleteMessage(id) {
+            if (!state.token) return;
+            const res = await fetch(`${API}/messages/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${state.token}` }
+            });
+            if (res.ok) {
+                state.messages = state.messages.filter(m => m.id !== id);
+                state.knownIds.delete(id);
+                if (state.selectedId === id) {
+                    state.selectedId = null;
+                    state.selectedMsg = null;
+                }
+                renderInbox();
+                renderDetail();
+                closeMobileDetail();
+                showToast('Message deleted', 'info');
+                fetchMessages();
+            }
+        }
+
+        async function markSeen(id) {
+            if (!state.token) return;
+            try {
+                await fetch(`${API}/messages/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/merge-patch+json'
+                    },
+                    body: JSON.stringify({ seen: true })
+                });
+                const msg = state.messages.find(m => m.id === id);
+                if (msg) msg.seen = true;
+            } catch (e) { /* silent */ }
+        }
+
+        async function reLogin() {
+            if (!state.email || !state.password) return;
+            try {
+                state.token = await getToken(state.email, state.password);
+            } catch (e) {
+                showToast('Session expired. Please generate a new email.', 'error');
+                stopPolling();
+                resetState();
+                renderEmailSection();
+                renderInbox();
+            }
+        }
+
+        function startPolling() {
+            stopPolling();
+            fetchMessages();
+            pollTimer = setInterval(fetchMessages, POLL_INTERVAL);
+            startStatusTimer();
+        }
+
+        function stopPolling() {
+            clearInterval(pollTimer);
+            clearInterval(statusTimer);
+            pollTimer = null;
+            statusTimer = null;
+        }
+
+        function startStatusTimer() {
+            clearInterval(statusTimer);
+            renderStatus();
+            statusTimer = setInterval(renderStatus, 1000);
+        }
+
+        async function generateEmail() {
+            if (state.loading) return;
+            state.loading = true;
+            state.selectedId = null;
+            state.selectedMsg = null;
+            state.messages = [];
+            state.knownIds.clear();
+            renderEmailSection();
+            renderInbox();
+            renderDetail();
+            try {
+                const account = await createAccount();
+                const token = await getToken(account.address, account.password);
+                state.email = account.address;
+                state.password = account.password;
+                state.accountId = account.id;
+                state.token = token;
+                showToast('Email address created', 'success');
+                startPolling();
+            } catch (e) {
+                showToast(e.message || 'Failed to create email', 'error');
+            } finally {
+                state.loading = false;
+                renderEmailSection();
+            }
+        }
+
+        async function copyEmail() {
+            if (!state.email) return;
+            try {
+                await navigator.clipboard.writeText(state.email);
+                showToast('Copied to clipboard', 'success');
+            } catch {
+                const ta = document.createElement('textarea');
+                ta.value = state.email;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('Copied to clipboard', 'success');
+            }
+        }
+
+        async function selectMessage(id) {
+            state.selectedId = id;
+            renderInbox();
+            markSeen(id);
+            const msg = await fetchMessage(id);
+            if (!msg) { showToast('Failed to load message', 'error'); return; }
+            state.selectedMsg = msg;
+            renderDetail();
+            if (window.innerWidth < 768) {
+                $mobileOverlay.classList.add('open');
+                $mobilePanel.style.display = 'flex';
+                renderMobileDetail(msg);
+            }
+        }
+
+        function closeMobileDetail() {
+            $mobileOverlay.classList.remove('open');
+            $mobilePanel.style.display = 'none';
+            $mobileDetail.innerHTML = '';
+        }
+
+        function resetState() {
+            state.email = null;
+            state.password = null;
+            state.token = null;
+            state.accountId = null;
+            state.messages = [];
+            state.knownIds.clear();
+            state.selectedId = null;
+            state.selectedMsg = null;
+            state.loading = false;
+            state.fetching = false;
+            state.lastChecked = null;
+        }
+
+        function renderEmailSection() {
+            if (state.loading) {
+                $emailSection.innerHTML = `
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <span>Creating your temporary email address...</span>
+                    </div>`;
+                return;
+            }
+            if (!state.email) {
+                $emailSection.innerHTML = `
+                    <div class="welcome-state">
+                        <div class="welcome-icon"><i class="fa-regular fa-envelope"></i></div>
+                        <h2>Create a Temporary Email</h2>
+                        <p>Generate a disposable email address instantly. No sign-up required.</p>
+                        <button class="btn btn-primary btn-lg" onclick="generateEmail()">
+                            <i class="fa-solid fa-bolt"></i>
+                            Generate Email
+                        </button>
+                    </div>`;
+                return;
+            }
+            $emailSection.innerHTML = `
+                <label class="email-label">Your Temporary Email Address</label>
+                <div class="email-row">
+                    <span class="email-text">${state.email}</span>
+                    <button class="btn btn-primary btn-sm" onclick="copyEmail()">
+                        <i class="fa-regular fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+                <div class="email-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="generateEmail()">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        Generate New
+                    </button>
+                </div>
+                <div class="email-meta">
+                    <i class="fa-solid fa-clock" style="font-size:0.6875rem;"></i>
+                    <span>Auto-refreshes every ${POLL_INTERVAL / 1000}s &middot; Messages are temporary and will be deleted</span>
+                </div>`;
+        }
+
+        function renderInbox(freshIds = []) {
+            const unread = state.messages.filter(m => !m.seen).length;
+            const total = state.messages.length;
+            if (total > 0) {
+                $msgBadge.innerHTML = unread > 0
+                    ? `<span class="badge">${unread} new</span>`
+                    : `<span class="badge badge-muted">${total}</span>`;
+            } else {
+                $msgBadge.innerHTML = '';
+            }
+            if (!state.email) {
+                $inboxMessages.innerHTML = `
+                    <div class="inbox-empty">
+                        <i class="fa-regular fa-envelope"></i>
+                        <p>Generate an email first</p>
+                    </div>`;
+                return;
+            }
+            if (!state.messages.length) {
+                $inboxMessages.innerHTML = `
+                    <div class="inbox-empty">
+                        <i class="fa-regular fa-bell"></i>
+                        <p>Waiting for messages</p>
+                        <p class="sub">Send an email to your temporary address above</p>
+                    </div>`;
+                return;
+            }
+            $inboxMessages.innerHTML = state.messages.map(m => {
+                const senderName = m.from?.name || m.from?.address || 'Unknown';
+                const senderAddr = m.from?.address || '';
+                const isActive = m.id === state.selectedId;
+                const isNew = freshIds.includes(m.id);
+                let cls = 'msg-item';
+                if (!m.seen) cls += ' unread';
+                if (isActive) cls += ' active';
+                if (isNew) cls += ' new-msg';
+                return `
+                    <div class="${cls}" onclick="selectMessage('${m.id}')" role="listitem" tabindex="0"
+                         onkeydown="if(event.key==='Enter')selectMessage('${m.id}')">
+                        <div class="msg-avatar">${getInitial(senderName)}</div>
+                        <div class="msg-content">
+                            <div class="msg-top">
+                                <span class="msg-sender truncate" title="${senderAddr}">${senderName}</span>
+                                <span class="msg-time">${relativeTime(m.createdAt)}</span>
+                            </div>
+                            <div class="msg-subject truncate">${m.subject || '(No subject)'}</div>
+                            <div class="msg-intro truncate">${m.intro || ''}</div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderDetail() {
+            const msg = state.selectedMsg;
+            if (!msg) {
+                $detailEmpty.style.display = 'flex';
+                $detailContent.style.display = 'none';
+                return;
+            }
+            $detailEmpty.style.display = 'none';
+            $detailContent.style.display = 'flex';
+            $detailContent.innerHTML = buildDetailHtml(msg, false);
+            injectIframe($detailContent.querySelector('.detail-body'), msg);
+        }
+
+        function renderMobileDetail(msg) {
+            $mobileDetail.innerHTML = buildDetailHtml(msg, true);
+            injectIframe($mobileDetail.querySelector('.detail-body'), msg);
+        }
+
+        function buildDetailHtml(msg, isMobile) {
+            const senderName = msg.from?.name || '';
+            const senderAddr = msg.from?.address || '';
+            const closeBtn = isMobile
+                ? `<button class="btn btn-ghost btn-sm" onclick="closeMobileDetail()"><i class="fa-solid fa-xmark"></i> Close</button>`
+                : '';
+            const htmlContent = Array.isArray(msg.html) ? msg.html.join('') : (msg.html || '');
+            const textContent = Array.isArray(msg.text) ? msg.text.join('\n') : (msg.text || '');
+            const hasContent = htmlContent || textContent;
+            return `
+                <div class="detail-header">
+                    ${closeBtn}
+                    <div style="flex:1;"></div>
+                    <button class="btn btn-ghost btn-icon btn-sm" title="Delete" onclick="deleteMessage('${msg.id}')">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                </div>
+                <div class="detail-subject">${msg.subject || '(No subject)'}</div>
+                <div class="detail-meta">
+                    <span><i class="fa-regular fa-user" style="font-size:0.75rem;"></i> <span class="meta-value">${senderName}</span> ${senderAddr ? `<span style="opacity:0.5;">&lt;${senderAddr}&gt;</span>` : ''}</span>
+                    <span><i class="fa-regular fa-clock" style="font-size:0.75rem;"></i> <span class="meta-value">${new Date(msg.createdAt).toLocaleString()}</span></span>
+                </div>
+                <div class="detail-body">
+                    ${hasContent ? '' : '<div style="padding:2rem;text-align:center;color:var(--muted-foreground);">No content</div>'}
+                </div>
+                <div class="detail-footer">
+                    <button class="btn btn-destructive btn-sm" onclick="deleteMessage('${msg.id}')">
+                        <i class="fa-regular fa-trash-can"></i> Delete
+                    </button>
+                </div>`;
+        }
+
+        function injectIframe(container, msg) {
+            if (!container) return;
+            const htmlContent = Array.isArray(msg.html) ? msg.html.join('') : (msg.html || '');
+            const textContent = Array.isArray(msg.text) ? msg.text.join('\n') : (msg.text || '');
+            const iframe = document.createElement('iframe');
+            iframe.sandbox = 'allow-same-origin';
+            iframe.title = 'Email content';
+            container.appendChild(iframe);
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            if (htmlContent) {
+                doc.write(`<!DOCTYPE html><html><head><style>
+                    body { font-family:'DM Sans',system-ui,sans-serif; color:#d4d4d8; background:#18181b; padding:1.25rem; line-height:1.65; font-size:0.9rem; margin:0; }
+                    img { max-width:100%; height:auto; }
+                    a { color:#34d399; }
+                    table { max-width:100%; }
+                    pre,code { background:#27272a; padding:0.125rem 0.375rem; border-radius:0.25rem; font-size:0.85em; }
+                    blockquote { border-left:3px solid #3f3f46; padding-left:1rem; margin-left:0; color:#a1a1aa; }
+                </style></head><body>${sanitizeHtml(htmlContent)}</body></html>`);
+            } else {
+                doc.write(`<!DOCTYPE html><html><head><style>
+                    body { font-family:'DM Sans',system-ui,sans-serif; color:#d4d4d8; background:#18181b; padding:1.25rem; line-height:1.65; font-size:0.9rem; margin:0; white-space:pre-wrap; word-wrap:break-word; }
+                </style></head><body>${textContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</body></html>`);
+            }
+            doc.close();
+        }
+
+        function renderStatus() {
+            if (!state.token) { $statusBar.innerHTML = ''; return; }
+            const secs = state.lastChecked ? Math.floor((Date.now() - state.lastChecked) / 1000) : '—';
+            $statusBar.innerHTML = `
+                <span class="listening-dot"></span>
+                <span>Listening &middot; checked ${secs}s ago</span>`;
+        }
+
+        $refreshBtn.addEventListener('click', () => {
+            fetchMessages();
+            const icon = $refreshBtn.querySelector('i');
+            icon.style.transition = 'transform 0.5s';
+            icon.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                icon.style.transition = 'none';
+                icon.style.transform = '';
+            }, 500);
+        });
+
+        $mobileOverlay.addEventListener('click', closeMobileDetail);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobileDetail(); });
+
+        renderEmailSection();
+        renderInbox();
+        renderStatus();
+    </script>
+</body>
+</html>
