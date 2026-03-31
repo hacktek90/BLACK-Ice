@@ -2,7 +2,31 @@
   "dependencies": {
     "@sentry/browser": "^10.43.0",
     "@tailwindcss/cli": "^4.2.1",
-    "@vercel/analytics": "^1.6.1",
-    "tailwindcss": "^4.2.1"
-  }
+    "@vercel/analytics": "^1.6.1"
+  },
+  "name": "black-ice",
+  "version": "1.0.0",
+  "description": "![BLACKICE Banner](drawfolder/banner.svg)",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hacktek90/BLACK-Ice.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hacktek90/BLACK-Ice/issues"
+  },
+  "homepage": "https://github.com/hacktek90/BLACK-Ice#readme"
 }
