@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>P2P // SWISS</title>
-    <meta name="keywords" content="P2P chat, peer to peer chat, online chat platform, private chat, secure messaging, instant messaging, real-time chat, anonymous chat, encrypted chat, chat without server, decentralized chat, direct messaging, online communication">
-
+<meta name="keywords" content="P2P chat, peer to peer chat, online chat platform, private chat, secure messaging, instant messaging, real-time chat, anonymous chat, encrypted chat, chat without server, decentralized chat, direct messaging, online communication">
 <meta name="description" content="Experience secure and private peer-to-peer (P2P) chat online. Connect instantly with others through fast, encrypted, and decentralized messaging without relying on central servers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/viewerjs@1.11.7/dist/viewer.min.css">
+<script src="https://unpkg.com/viewerjs@1.11.7/dist/viewer.min.js"></script>
 
 <style>
 :root {
@@ -23,39 +24,40 @@
     --font: 'Inter Tight', sans-serif;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }
 
 body {
-    background: var(--bg);
+    background: #d4d4d4;
     color: var(--fg);
     font-family: var(--font);
-    margin: 0;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
 }
 
 .app-container {
-    width: 480px;
-    height: 90vh;
-    max-height: 800px;
-    border: var(--border);
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    box-shadow: 15px 15px 0px rgba(0,0,0,0.15);
-    position: relative;
+    width: 100%; height: 100%;
+    max-width: 1400px;
+    display: flex; flex-direction: column;
+    background: var(--bg);
+    position: relative; overflow: hidden;
+}
+
+@media (min-width: 1401px) {
+    .app-container {
+        border: var(--border);
+        box-shadow: 20px 20px 0px rgba(0,0,0,0.12);
+        height: 96vh;
+    }
 }
 
 header {
-    padding: 16px 20px;
+    padding: 14px 20px;
     border-bottom: var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff; flex-shrink: 0;
 }
 
 .brand { font-weight: 800; font-size: 20px; letter-spacing: -0.05em; text-transform: uppercase; }
@@ -64,23 +66,23 @@ header {
 .status {
     font-size: 10px; font-weight: 700; text-transform: uppercase;
     display: flex; align-items: center; gap: 6px;
-    padding: 4px 8px; border: 1px solid #000;
+    padding: 4px 10px; border: 1px solid #000;
 }
-.dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
+.dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; flex-shrink: 0; }
 .dot.active { background: #00cc66; }
 
-.id-panel { border-bottom: var(--border); padding: 16px 20px; background: #f4f4f4; }
+.id-panel { border-bottom: var(--border); padding: 14px 20px; background: #f4f4f4; flex-shrink: 0; }
 .id-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; margin-bottom: 4px; }
 .id-display { display: flex; gap: 10px; }
 .my-id {
     flex: 1; font-family: 'Courier New', monospace; font-weight: 700;
     font-size: 14px; border-bottom: 2px solid #000; padding: 4px 0;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
 }
 .copy-btn {
-    background: #000; color: #fff; border: none; padding: 4px 12px;
+    background: #000; color: #fff; border: none; padding: 6px 14px;
     font-weight: 700; font-size: 10px; text-transform: uppercase;
-    cursor: pointer; transition: background 0.2s; font-family: var(--font);
+    cursor: pointer; transition: background 0.2s; font-family: var(--font); flex-shrink: 0;
 }
 .copy-btn:hover { background: var(--accent); }
 
@@ -88,389 +90,271 @@ header {
     flex: 1; padding: 20px; overflow-y: auto;
     display: flex; flex-direction: column; gap: 12px; background: #fff;
     background-image: radial-gradient(#ddd 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-size: 20px 20px; min-height: 0;
 }
 #chatLog::-webkit-scrollbar { width: 4px; }
+#chatLog::-webkit-scrollbar-track { background: transparent; }
 #chatLog::-webkit-scrollbar-thumb { background: #000; }
 
 .msg {
-    max-width: 85%; padding: 12px 16px; font-size: 14px; line-height: 1.4;
+    max-width: 75%; padding: 12px 16px; font-size: 14px; line-height: 1.5;
     position: relative; word-break: break-word;
     animation: slideIn 0.2s ease-out;
 }
-@keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) { .msg { max-width: 88%; } }
+
+@keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 .sys {
     align-self: center; font-size: 11px; font-weight: 700;
     text-transform: uppercase; color: #666; background: #f4f4f4;
-    padding: 4px 12px; border: 1px solid #ddd; max-width: 100%;
+    padding: 5px 14px; border: 1px solid #ddd; max-width: 100%;
 }
 
-.peer {
-    align-self: flex-start; background: #fff;
-    border: 1px solid #000; border-left: 4px solid var(--accent); color: #000;
-}
+.peer { align-self: flex-start; background: #fff; border: 1px solid #000; border-left: 4px solid var(--accent); color: #000; }
+.self { align-self: flex-end; background: #000; color: #fff; border: 1px solid #000; }
 
-.self {
-    align-self: flex-end; background: #000; color: #fff; border: 1px solid #000;
-}
-
-.timestamp {
-    display: block; font-size: 9px; opacity: 0.6; margin-top: 4px;
-    text-align: right; font-family: monospace;
-}
+.timestamp { display: block; font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; font-family: monospace; }
 .peer .timestamp { text-align: left; }
 
-/* --- Image in chat --- */
 .msg-image {
-    max-width: 100%; border-radius: 2px; margin-bottom: 4px; cursor: pointer;
+    max-width: 100%; max-height: 300px; object-fit: contain;
+    border-radius: 2px; margin-bottom: 4px; cursor: zoom-in;
     display: block;
 }
 .peer .msg-image { border: 1px solid #000; }
-.self .msg-image { border: 1px solid rgba(255,255,255,0.2); }
-.msg-image:hover { opacity: 0.85; }
+.self .msg-image { border: 1px solid rgba(255,255,255,0.15); }
+.msg-image:hover { opacity: 0.88; }
 
 .msg-text { margin-top: 2px; }
 .msg-text:empty { display: none; }
 
-.img-size {
-    display: inline-block; font-size: 9px; font-family: monospace;
-    opacity: 0.5; margin-top: 2px;
-}
+.img-size { display: inline-block; font-size: 9px; font-family: monospace; opacity: 0.5; margin-top: 2px; }
 
-/* --- File Card --- */
-.file-card {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 14px; cursor: pointer; text-decoration: none;
-    transition: opacity 0.15s;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.04);
-}
-.file-card:hover { opacity: 0.8; }
-
-.peer .file-card {
-    border-color: #ddd;
-    background: #f4f4f4;
-}
-.peer .file-card:hover { background: #ebebeb; }
-
-.file-ext-box {
-    width: 44px; height: 44px;
-    border: 2px solid currentColor;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 0.04em; flex-shrink: 0;
-    line-height: 1.1; text-align: center;
-}
-
-.file-info { flex: 1; min-width: 0; }
-
-.file-name {
-    font-size: 13px; font-weight: 700;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    display: block;
-}
-
-.file-meta {
-    font-size: 10px; opacity: 0.55; font-family: monospace;
-    display: block; margin-top: 2px;
-}
-
-.file-dl-icon {
-    flex-shrink: 0; opacity: 0.4;
-    display: flex; align-items: center;
-}
-
-.file-card + .msg-text { margin-top: 8px; }
-
-/* --- Controls --- */
-.controls-area { border-top: var(--border); display: flex; flex-direction: column; }
+.controls-area { border-top: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
 
 .connect-row { display: flex; border-bottom: var(--thin-border); }
 .connect-row input {
     flex: 1; padding: 12px 16px; border: none;
-    font-family: inherit; font-size: 13px; outline: none; background: #fcfcfc;
+    font-family: inherit; font-size: 13px; outline: none; background: #fcfcfc; min-width: 0;
 }
 .connect-row button {
     border: none; border-left: var(--thin-border); background: #fff;
-    padding: 0 16px; cursor: pointer; font-weight: 700;
+    padding: 0 18px; cursor: pointer; font-weight: 700;
     text-transform: uppercase; font-size: 11px; font-family: var(--font);
+    transition: background 0.15s; flex-shrink: 0;
 }
 .connect-row button:hover { background: #f0f0f0; }
 
-.chat-row { display: flex; height: 60px; }
+.chat-row { display: flex; min-height: 56px; }
 .chat-row input {
-    flex: 1; padding: 16px 20px; border: none;
-    font-family: inherit; font-size: 15px; outline: none;
+    flex: 1; padding: 14px 20px; border: none;
+    font-family: inherit; font-size: 15px; outline: none; min-width: 0;
 }
+.chat-actions { display: flex; flex-shrink: 0; }
 
-.chat-actions { display: flex; position: relative; }
-
-/* --- Attach Button --- */
 .attach-btn {
     width: 48px; border: none; border-left: var(--thin-border);
     background: #fff; cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
-    transition: background 0.15s, color 0.15s;
-    color: #000;
+    align-items: center; justify-content: center; transition: background 0.15s; color: #000;
 }
 .attach-btn:hover { background: #f0f0f0; }
-.attach-btn.open {
-    background: #000; color: #fff;
-}
-.attach-btn.open:hover { background: #222; }
 
-/* --- Custom Dropdown --- */
-.attach-dropdown {
-    position: absolute;
-    bottom: calc(100% + 2px);
-    right: 0;
-    background: #fff;
-    border: 2px solid #000;
-    min-width: 240px;
-    z-index: 60;
-    transform: translateY(8px);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.15s ease-out, opacity 0.12s ease-out;
-}
-.attach-dropdown.active {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-}
-.attach-dropdown::after {
-    content: '';
-    position: absolute;
-    bottom: -9px;
-    right: 17px;
-    width: 0; height: 0;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-top: 9px solid #000;
-}
-
-.dropdown-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 13px 16px;
-    border: none; border-bottom: 1px solid #eee;
-    background: #fff; cursor: pointer;
-    text-align: left; font-family: var(--font);
-    transition: background 0.08s, color 0.08s;
-    width: 100%;
-}
-.dropdown-item:last-of-type { border-bottom: none; }
-
-.dropdown-item:hover {
-    background: #000; color: #fff;
-}
-.dropdown-item:hover .dropdown-icon-wrap {
-    border-color: #fff;
-    background: rgba(255,255,255,0.1);
-}
-.dropdown-item:hover .file-hint { color: rgba(255,255,255,0.45); }
-.dropdown-item:hover .dropdown-item-icon { color: var(--accent); }
-
-.dropdown-icon-wrap {
-    width: 34px; height: 34px;
-    border: 2px solid #000;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: border-color 0.08s, background 0.08s;
-}
-
-.dropdown-item-icon {
-    color: #000;
-    transition: color 0.08s;
-}
-
-.dropdown-item-text {
-    flex: 1; display: flex; flex-direction: column;
-}
-
-.dropdown-item-label {
-    font-size: 13px; font-weight: 700;
-    letter-spacing: -0.01em;
-}
-
-.file-hint {
-    font-size: 9px; font-weight: 600;
-    color: #999; text-transform: uppercase;
-    letter-spacing: 0.05em; margin-top: 1px;
-    transition: color 0.08s;
-}
-
-.dropdown-footer {
-    padding: 8px 16px;
-    background: #f4f4f4;
-    border-top: 1px solid #ddd;
-    font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    color: #999;
-    display: flex; align-items: center; gap: 5px;
-}
-
-/* --- Send Button --- */
 .send-btn {
     width: 60px; border: none; border-left: var(--border);
     background: var(--accent); color: #fff; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center; transition: background 0.15s;
 }
 .send-btn:hover { background: #000; }
 .send-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-/* --- Preview Overlay --- */
+/* ── Preview Overlay ── */
 .preview-overlay {
-    position: absolute; inset: 0; background: rgba(0,0,0,0.85);
-    display: none; flex-direction: column; z-index: 100;
-    animation: fadeIn 0.15s ease-out;
+    position: absolute; inset: 0; background: rgba(0,0,0,0.88);
+    display: none; flex-direction: column; z-index: 100; animation: fadeIn 0.15s ease-out;
 }
 .preview-overlay.active { display: flex; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .preview-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 20px; color: #fff;
+    padding: 16px 20px; color: #fff; flex-shrink: 0;
 }
-.preview-header h3 {
-    font-size: 12px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.05em; margin: 0;
-}
+.preview-header h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
 .preview-close {
     background: none; border: 1px solid rgba(255,255,255,0.3);
-    color: #fff; width: 32px; height: 32px; cursor: pointer;
+    color: #fff; width: 36px; height: 36px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font); font-size: 16px; font-weight: 700;
-    transition: background 0.2s;
+    font-family: var(--font); font-size: 18px; font-weight: 700;
+    transition: background 0.2s; flex-shrink: 0;
 }
 .preview-close:hover { background: rgba(255,255,255,0.1); }
 
 .preview-body {
     flex: 1; display: flex; align-items: center; justify-content: center;
-    padding: 0 20px; overflow: hidden;
+    padding: 0 20px; overflow: hidden; min-height: 0;
 }
-.preview-body img {
-    max-width: 100%; max-height: 100%; object-fit: contain;
-    border: 2px solid rgba(255,255,255,0.2);
-}
+.preview-body img { max-width: 100%; max-height: 100%; object-fit: contain; border: 2px solid rgba(255,255,255,0.15); }
 
-.preview-footer {
-    padding: 16px 20px; display: flex; gap: 10px;
-}
+.preview-footer { padding: 16px 20px; display: flex; gap: 10px; flex-shrink: 0; }
 .preview-footer input {
     flex: 1; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.1); color: #fff; font-family: inherit;
-    font-size: 14px; outline: none; border-radius: 0;
+    background: rgba(255,255,255,0.08); color: #fff; font-family: inherit;
+    font-size: 14px; outline: none; min-width: 0;
 }
-.preview-footer input::placeholder { color: rgba(255,255,255,0.4); }
+.preview-footer input::placeholder { color: rgba(255,255,255,0.35); }
 .preview-footer input:focus { border-color: var(--accent); }
 
 .send-image-btn {
     background: var(--accent); color: #fff; border: none;
-    padding: 0 24px; font-weight: 700; font-size: 11px;
+    padding: 0 20px; font-weight: 700; font-size: 11px;
     text-transform: uppercase; cursor: pointer; font-family: var(--font);
-    transition: background 0.2s;
+    transition: background 0.2s; flex-shrink: 0;
 }
 .send-image-btn:hover { background: #fff; color: #000; }
 
 .cancel-image-btn {
     background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3);
-    padding: 0 16px; font-weight: 700; font-size: 11px;
+    padding: 0 14px; font-weight: 700; font-size: 11px;
     text-transform: uppercase; cursor: pointer; font-family: var(--font);
-    transition: background 0.2s;
+    transition: background 0.2s; flex-shrink: 0;
 }
 .cancel-image-btn:hover { background: rgba(255,255,255,0.1); }
 
-/* --- File Confirm Overlay --- */
-.file-confirm-overlay {
-    position: absolute; inset: 0; background: rgba(0,0,0,0.88);
-    display: none; flex-direction: column; z-index: 100;
-    animation: fadeIn 0.15s ease-out;
-}
-.file-confirm-overlay.active { display: flex; }
-
-.file-confirm-body {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-}
-
-.file-confirm-card {
-    background: #fff; border: 2px solid #000; padding: 32px;
-    max-width: 340px; width: 100%; text-align: center;
-}
-
-.file-confirm-icon {
-    width: 64px; height: 64px;
-    border: 3px solid #000; margin: 0 auto 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 0.04em; line-height: 1.1;
-}
-
-.file-confirm-name {
-    font-size: 15px; font-weight: 800; margin-bottom: 4px;
-    word-break: break-all;
-}
-
-.file-confirm-meta {
-    font-size: 11px; color: #666; font-family: monospace;
-    margin-bottom: 20px;
-}
-
-.file-confirm-actions { display: flex; gap: 8px; }
-
-.file-confirm-actions button {
-    flex: 1; padding: 12px; font-family: var(--font);
-    font-weight: 700; font-size: 11px; text-transform: uppercase;
-    cursor: pointer; transition: background 0.15s, color 0.15s;
-}
-
-.fc-cancel {
-    background: #fff; border: 2px solid #000; color: #000;
-}
-.fc-cancel:hover { background: #f0f0f0; }
-
-.fc-send {
-    background: var(--accent); border: 2px solid var(--accent); color: #fff;
-}
-.fc-send:hover { background: #000; border-color: #000; }
-
-.file-confirm-caption {
-    width: 100%; padding: 10px 12px; border: 1px solid #ddd;
-    font-family: var(--font); font-size: 13px; outline: none;
-    margin-bottom: 16px;
-}
-.file-confirm-caption:focus { border-color: #000; }
-
-/* --- Lightbox --- */
-.lightbox {
-    position: absolute; inset: 0; background: rgba(0,0,0,0.92);
-    display: none; align-items: center; justify-content: center;
-    z-index: 200; cursor: zoom-out; animation: fadeIn 0.15s ease-out;
-}
-.lightbox.active { display: flex; }
-.lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; }
-
-/* --- Sending indicator --- */
-.sending-bar {
-    height: 3px; background: var(--accent); width: 0;
-    transition: width 0.3s ease; display: none;
-}
+/* ── Sending indicator ── */
+.sending-bar { height: 3px; background: var(--accent); width: 0; flex-shrink: 0; display: none; }
 .sending-bar.active { display: block; width: 100%; animation: sendPulse 0.6s ease; }
 @keyframes sendPulse { 0% { width: 0; } 50% { width: 70%; } 100% { width: 100%; } }
 
-/* --- Drag over state --- */
-#chatLog.drag-over {
-    outline: 3px solid var(--accent);
-    outline-offset: -3px;
+/* ═══════════════════════════════════════════
+   Viewer.js — Brutalist Override
+   ═══════════════════════════════════════════ */
+.viewer-container {
+    background: rgba(0,0,0,0.94) !important;
+    font-family: var(--font) !important;
+}
+
+/* Backdrop */
+.viewer-backdrop { background: rgba(0,0,0,0.94) !important; }
+
+/* Canvas / image area */
+.viewer-canvas { background: transparent !important; }
+.viewer-canvas img { border-radius: 0 !important; }
+
+/* Toolbar — top bar */
+.viewer-toolbar {
+    background: rgba(0,0,0,0.92) !important;
+    border-bottom: 2px solid rgba(255,255,255,0.1) !important;
+    height: 52px !important;
+}
+.viewer-toolbar > ul { height: 52px !important; }
+.viewer-toolbar > ul > li { margin: 0 1px !important; }
+
+/* Toolbar buttons */
+.viewer-toolbar > ul > li > .viewer-btn {
+    color: rgba(255,255,255,0.7) !important;
+    width: 44px !important; height: 52px !important;
+    font-size: 18px !important;
+    border-radius: 0 !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+.viewer-toolbar > ul > li > .viewer-btn:hover,
+.viewer-toolbar > ul > li > .viewer-btn:focus {
+    background: rgba(255,255,255,0.08) !important;
+    color: #fff !important;
+}
+.viewer-toolbar > ul > li > .viewer-btn:active {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+/* Close button */
+.viewer-toolbar > ul > li:last-child > .viewer-btn:hover {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+/* Navbar (thumbnail strip) — hide */
+.viewer-navbar { display: none !important; }
+
+/* Title bar — hide default, we don't need it */
+.viewer-title { display: none !important; }
+
+/* Tooltip */
+.viewer-tooltip {
+    background: #000 !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 0 !important;
+    font-family: var(--font) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    padding: 6px 10px !important;
+    margin-top: 6px !important;
+}
+
+/* Footer info bar */
+.viewer-footer {
+    background: rgba(0,0,0,0.9) !important;
+    border-top: 1px solid rgba(255,255,255,0.08) !important;
+    height: 40px !important;
+    color: rgba(255,255,255,0.4) !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 11px !important;
+}
+
+/* Button list — flexbox override */
+.viewer-toolbar > ul {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Separator line in toolbar */
+.viewer-toolbar > ul > li + li {
+    border-left: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+/* Loading spinner */
+.viewer-loading {
+    border-top-color: var(--accent) !important;
+    border-right-color: var(--accent) !important;
+    border-bottom-color: var(--accent) !important;
+}
+
+/* Fix button svg fill */
+.viewer-toolbar svg { fill: currentColor !important; }
+
+/* Mobile adjustments for toolbar */
+@media (max-width: 600px) {
+    .viewer-toolbar { height: 48px !important; }
+    .viewer-toolbar > ul { height: 48px !important; }
+    .viewer-toolbar > ul > li > .viewer-btn {
+        width: 40px !important; height: 48px !important;
+        font-size: 16px !important;
+    }
+    .viewer-footer { height: 34px !important; font-size: 10px !important; }
 }
 
 @media (max-width: 500px) {
-    .app-container { width: 100%; height: 100vh; max-height: none; border: none; box-shadow: none; }
     .brand { font-size: 16px; }
-    .msg { font-size: 13px; max-width: 90%; }
-    .attach-dropdown { min-width: 210px; right: -2px; }
+    .msg { font-size: 13px; padding: 10px 14px; }
+    header { padding: 12px 16px; }
+    .id-panel { padding: 12px 16px; }
+    .my-id { font-size: 12px; }
+    #chatLog { padding: 14px; }
+    .connect-row input { padding: 10px 14px; font-size: 12px; }
+    .connect-row button { padding: 0 14px; font-size: 10px; }
+    .chat-row input { padding: 12px 16px; font-size: 14px; }
+    .msg-image { max-height: 220px; }
+}
+
+@media (max-width: 360px) {
+    .status { padding: 3px 6px; font-size: 9px; }
+    .copy-btn { padding: 5px 10px; font-size: 9px; }
+    .send-image-btn, .cancel-image-btn { font-size: 10px; padding: 0 10px; }
 }
 </style>
 </head>
@@ -500,70 +384,16 @@ header {
     <div class="sending-bar" id="sendingBar"></div>
 
     <div class="controls-area">
-        <div class="connect-row" id="connectRow">
-            <input id="peerInput" placeholder="Enter Peer ID to connect..." autocomplete="off">
+        <div class="connect-row">
+            <input id="peerInput" placeholder="Enter Peer ID to connect..." autocomplete="off" spellcheck="false">
             <button id="connectBtn">Connect</button>
         </div>
         <div class="chat-row">
             <input id="msgInput" placeholder="Type a message..." autocomplete="off">
             <div class="chat-actions">
-                <!-- Attach button + dropdown -->
-                <button class="attach-btn" id="attachBtn" title="Attach file">
-                    <i data-lucide="paperclip" width="20"></i>
+                <button class="attach-btn" id="attachBtn" title="Send Image">
+                    <i data-lucide="image-plus" width="20"></i>
                 </button>
-                <div class="attach-dropdown" id="attachDropdown">
-                    <button class="dropdown-item" data-type="image">
-                        <div class="dropdown-icon-wrap">
-                            <i data-lucide="image" width="16" class="dropdown-item-icon"></i>
-                        </div>
-                        <div class="dropdown-item-text">
-                            <span class="dropdown-item-label">Image</span>
-                            <span class="file-hint">JPG, PNG, GIF, WebP</span>
-                        </div>
-                    </button>
-                    <button class="dropdown-item" data-type="pdf">
-                        <div class="dropdown-icon-wrap">
-                            <i data-lucide="file-text" width="16" class="dropdown-item-icon"></i>
-                        </div>
-                        <div class="dropdown-item-text">
-                            <span class="dropdown-item-label">PDF</span>
-                            <span class="file-hint">.pdf documents</span>
-                        </div>
-                    </button>
-                    <button class="dropdown-item" data-type="document">
-                        <div class="dropdown-icon-wrap">
-                            <i data-lucide="file-spreadsheet" width="16" class="dropdown-item-icon"></i>
-                        </div>
-                        <div class="dropdown-item-text">
-                            <span class="dropdown-item-label">Document</span>
-                            <span class="file-hint">TXT, DOC, XLS, CSV, PPT</span>
-                        </div>
-                    </button>
-                    <button class="dropdown-item" data-type="video">
-                        <div class="dropdown-icon-wrap">
-                            <i data-lucide="film" width="16" class="dropdown-item-icon"></i>
-                        </div>
-                        <div class="dropdown-item-text">
-                            <span class="dropdown-item-label">Video</span>
-                            <span class="file-hint">MP4, MOV, WebM</span>
-                        </div>
-                    </button>
-                    <button class="dropdown-item" data-type="file">
-                        <div class="dropdown-icon-wrap">
-                            <i data-lucide="folder-open" width="16" class="dropdown-item-icon"></i>
-                        </div>
-                        <div class="dropdown-item-text">
-                            <span class="dropdown-item-label">Any File</span>
-                            <span class="file-hint">All file types</span>
-                        </div>
-                    </button>
-                    <div class="dropdown-footer">
-                        <i data-lucide="info" width="10"></i>
-                        MAX 15 MB PER FILE
-                    </div>
-                </div>
-                <!-- End dropdown -->
-
                 <button class="send-btn" id="sendBtn" disabled title="Send">
                     <i data-lucide="send-horizontal" width="20"></i>
                 </button>
@@ -571,10 +401,8 @@ header {
         </div>
     </div>
 
-    <!-- Hidden file input -->
-    <input type="file" id="fileInput" style="display:none;">
+    <input type="file" id="fileInput" accept="image/*" style="display:none;">
 
-    <!-- Image Preview Overlay -->
     <div class="preview-overlay" id="previewOverlay">
         <div class="preview-header">
             <h3>Send Image</h3>
@@ -589,109 +417,65 @@ header {
             <button class="send-image-btn" id="sendImageBtn">Send</button>
         </div>
     </div>
-
-    <!-- File Confirm Overlay -->
-    <div class="file-confirm-overlay" id="fileConfirmOverlay">
-        <div class="file-confirm-body">
-            <div class="file-confirm-card">
-                <div class="file-confirm-icon" id="fcIcon">PDF</div>
-                <div class="file-confirm-name" id="fcName">file.pdf</div>
-                <div class="file-confirm-meta" id="fcMeta">2.4 MB</div>
-                <input class="file-confirm-caption" id="fcCaption" placeholder="Add a message..." autocomplete="off">
-                <div class="file-confirm-actions">
-                    <button class="fc-cancel" id="fcCancel">Cancel</button>
-                    <button class="fc-send" id="fcSend">Send File</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-        <img id="lightboxImg" src="" alt="Full view">
-    </div>
 </div>
 
 <script>
 const $ = (id) => document.getElementById(id);
-const getTime = () => new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+const getTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 let myPeerId = null;
 let conn = null;
 let pendingImageData = null;
-let pendingFileData = null; // { base64, name, size, ext, category, mimeType }
-let dropdownOpen = false;
 
-// --- Constants ---
-const FILE_LIMIT = 15 * 1024 * 1024; // 15 MB
-const ACCEPT_MAP = {
-    image: 'image/jpeg,image/png,image/gif,image/webp',
-    pdf: '.pdf,application/pdf',
-    document: '.txt,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain',
-    video: 'video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm',
-    file: '*/*'
-};
+// ── Viewer.js Instance ──
+const chatViewer = new Viewer($('chatLog'), {
+    inline: false,
+    button: false,
+    navbar: false,
+    title: false,
+    toolbar: {
+        zoomIn: 1,
+        zoomOut: 1,
+        oneToOne: 1,
+        reset: 1,
+        prev: 0,
+        play: 0,
+        next: 0,
+        rotateLeft: 1,
+        rotateRight: 1,
+        flipHorizontal: 1,
+        flipVertical: 1,
+        close: 1
+    },
+    tooltip: true,
+    movable: true,
+    zoomable: true,
+    rotatable: true,
+    scalable: true,
+    transition: true,
+    fullscreen: false,
+    keyboard: true,
+    url: 'src',
+    zoomRatio: 0.2,
+    minZoomRatio: 0.1,
+    maxZoomRatio: 12,
+    toggleOnDblclick: true,
+    backdrop: true,
+    className: 'viewer-container'
+});
 
-// --- Utility ---
-function escapeHTML(str) {
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-}
+// ── ID Generator ──
+const adj = ["Neon", "Cyber", "Swiss", "Dark", "Bold", "Raw", "Pure", "Hyper", "Mono", "Flux"];
+const noun = ["Link", "Node", "Grid", "Core", "Base", "Cell", "Sync", "Pulse", "Data", "Warp"];
+const genID = () => `${adj[Math.floor(Math.random() * adj.length)]}-${noun[Math.floor(Math.random() * noun.length)]}-${Math.floor(Math.random() * 999)}`;
 
-function formatSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-}
-
-function getExt(filename) {
-    const parts = filename.split('.');
-    return parts.length > 1 ? parts.pop().toUpperCase() : 'FILE';
-}
-
-function getCategory(ext) {
-    ext = ext.toUpperCase();
-    if (['JPG','JPEG','PNG','GIF','WEBP','SVG','BMP','AVIF'].includes(ext)) return 'IMG';
-    if (ext === 'PDF') return 'PDF';
-    if (['DOC','DOCX','TXT','RTF','ODT','MD'].includes(ext)) return 'DOC';
-    if (['XLS','XLSX','CSV'].includes(ext)) return 'XLS';
-    if (['PPT','PPTX'].includes(ext)) return 'PPT';
-    if (['ZIP','RAR','7Z','TAR','GZ','BZ2'].includes(ext)) return 'ZIP';
-    if (['MP4','MOV','AVI','MKV','WEBM','M4V'].includes(ext)) return 'VID';
-    if (['MP3','WAV','OGG','FLAC','AAC','M4A'].includes(ext)) return 'AUD';
-    if (['JS','TS','PY','HTML','CSS','JSON','XML','JAVA','CPP','C','RB','GO','RS','PHP'].includes(ext)) return 'CODE';
-    return 'FILE';
-}
-
-function getMimeTypeForExt(ext) {
-    const map = {
-        'PDF': 'application/pdf',
-        'TXT': 'text/plain', 'MD': 'text/markdown',
-        'DOC': 'application/msword', 'DOCX': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'XLS': 'application/vnd.ms-excel', 'XLSX': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'CSV': 'text/csv',
-        'PPT': 'application/vnd.ms-powerpoint', 'PPTX': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'ZIP': 'application/zip', 'RAR': 'application/vnd.rar', '7Z': 'application/x-7z-compressed',
-        'MP4': 'video/mp4', 'MOV': 'video/quicktime', 'WEBM': 'video/webm', 'AVI': 'video/x-msvideo',
-        'MP3': 'audio/mpeg', 'WAV': 'audio/wav', 'OGG': 'audio/ogg', 'FLAC': 'audio/flac', 'AAC': 'audio/aac',
-        'JSON': 'application/json', 'XML': 'text/xml',
-    };
-    return map[ext.toUpperCase()] || 'application/octet-stream';
-}
-
-// --- ID Generator ---
-const adj = ["Neon","Cyber","Swiss","Dark","Bold","Raw","Pure","Hyper","Mono","Flux"];
-const noun = ["Link","Node","Grid","Core","Base","Cell","Sync","Pulse","Data","Warp"];
-const genID = () => `${adj[Math.floor(Math.random()*adj.length)]}-${noun[Math.floor(Math.random()*noun.length)]}-${Math.floor(Math.random()*999)}`;
-
-// --- Init Peer ---
+// ── Init Peer ──
 const peer = new Peer(genID());
 
 peer.on('open', (id) => {
     myPeerId = id;
     $('myId').textContent = id;
-    systemLog("Session Ready. Share your ID.");
+    sysLog("Session ready. Share your ID to start.");
 });
 
 peer.on('connection', (c) => {
@@ -699,16 +483,14 @@ peer.on('connection', (c) => {
     setupConnection(c);
 });
 
-peer.on('error', (err) => {
-    systemLog(`Error: ${err.type}`);
-});
+peer.on('error', (err) => sysLog(`Error: ${err.type}`));
 
-// --- Connection Handler ---
+// ── Connection ──
 function setupConnection(c) {
     conn = c;
     conn.on('open', () => {
         setStatus(true);
-        systemLog(`Connected to: ${conn.peer}`);
+        sysLog(`Connected to ${conn.peer}`);
         $('peerInput').value = conn.peer;
         $('peerInput').disabled = true;
         $('connectBtn').textContent = "LINKED";
@@ -717,18 +499,16 @@ function setupConnection(c) {
     });
     conn.on('data', (data) => {
         if (data && data.type === 'image') {
-            addImageMessage(data.data, data.caption || '', 'self', data.size || '');
-        } else if (data && data.type === 'file') {
-            addFileMessage(data.data, data.name, data.sizeStr, data.ext, data.category, data.caption || '', 'self');
+            addImageMsg(data.data, data.caption || '', 'peer', data.size || '');
         } else if (data && data.type === 'text') {
-            addMessage(data.text, 'self');
+            addTextMsg(data.text, 'peer');
         } else {
-            addMessage(data, 'peer');
+            addTextMsg(String(data), 'peer');
         }
     });
     conn.on('close', () => {
         setStatus(false);
-        systemLog("Connection lost.");
+        sysLog("Connection lost.");
         $('peerInput').disabled = false;
         $('connectBtn').textContent = "Connect";
         $('sendBtn').disabled = true;
@@ -739,138 +519,44 @@ function setupConnection(c) {
  $('connectBtn').onclick = () => {
     const pid = $('peerInput').value.trim();
     if (!pid) return;
-    if (pid === myPeerId) return systemLog("Cannot connect to self.");
-    systemLog(`Connecting to ${pid}...`);
+    if (pid === myPeerId) return sysLog("Cannot connect to yourself.");
+    sysLog(`Connecting to ${pid}...`);
     setupConnection(peer.connect(pid));
 };
 
-// --- Text Messaging ---
-function sendMessage() {
+// ── Text Messaging ──
+function sendText() {
     if (!conn || !conn.open) return;
     const txt = $('msgInput').value.trim();
     if (!txt) return;
     conn.send({ type: 'text', text: txt });
-    addMessage(txt, 'self');
+    addTextMsg(txt, 'self');
     $('msgInput').value = '';
 }
 
- $('sendBtn').onclick = sendMessage;
- $('msgInput').onkeypress = (e) => { if (e.key === "Enter") sendMessage(); };
+ $('sendBtn').onclick = sendText;
+ $('msgInput').addEventListener('keydown', (e) => { if (e.key === "Enter") sendText(); });
 
-// --- Dropdown Logic ---
-function toggleDropdown() {
-    dropdownOpen = !dropdownOpen;
-    $('attachDropdown').classList.toggle('active', dropdownOpen);
-    $('attachBtn').classList.toggle('open', dropdownOpen);
-}
+// ── Image Handling ──
+ $('attachBtn').onclick = () => $('fileInput').click();
 
-function closeDropdown() {
-    dropdownOpen = false;
-    $('attachDropdown').classList.remove('active');
-    $('attachBtn').classList.remove('open');
-}
-
- $('attachBtn').onclick = (e) => {
-    e.stopPropagation();
-    toggleDropdown();
-};
-
-// Close dropdown when clicking outside
-document.addEventListener('click', (e) => {
-    if (dropdownOpen && !$('attachDropdown').contains(e.target) && e.target !== $('attachBtn')) {
-        closeDropdown();
-    }
-});
-
-// Close on Escape
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        if (dropdownOpen) closeDropdown();
-        if ($('previewOverlay').classList.contains('active')) closePreview();
-        if ($('fileConfirmOverlay').classList.contains('active')) closeFileConfirm();
-        if ($('lightbox').classList.contains('active')) $('lightbox').classList.remove('active');
-    }
-});
-
-// Close dropdown when typing in message input
- $('msgInput').addEventListener('focus', () => { if (dropdownOpen) closeDropdown(); });
-
-// Dropdown item clicks
-document.querySelectorAll('.dropdown-item').forEach(item => {
-    item.onclick = (e) => {
-        e.stopPropagation();
-        const type = item.dataset.type;
-        closeDropdown();
-
-        if (!conn || !conn.open) {
-            systemLog("Not connected.");
-            return;
-        }
-
-        // Set accept and open file picker
-        const fileInput = $('fileInput');
-        fileInput.setAttribute('accept', ACCEPT_MAP[type] || '*/*');
-        fileInput.setAttribute('data-filetype', type);
-        fileInput.value = '';
-        fileInput.click();
-    };
-});
-
-// --- File Input Handler ---
  $('fileInput').onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const type = e.target.getAttribute('data-filetype');
-
-    // Size check
-    if (file.size > FILE_LIMIT) {
-        systemLog(`File too large. Max ${formatSize(FILE_LIMIT)}.`);
-        $('fileInput').value = '';
-        return;
-    }
-
-    if (type === 'image') {
-        // Image: compress and preview
-        compressImage(file, 1200, 0.85, (base64) => {
-            pendingImageData = base64;
-            $('previewImg').src = base64;
-            $('captionInput').value = '';
-            $('previewOverlay').classList.add('active');
-            $('captionInput').focus();
-        });
-    } else {
-        // Non-image: read as base64 and show confirm
-        readAsBase64(file, (base64) => {
-            const ext = getExt(file.name);
-            const category = getCategory(ext);
-            pendingFileData = {
-                base64: base64,
-                name: file.name,
-                size: file.size,
-                sizeStr: formatSize(file.size),
-                ext: ext,
-                category: category,
-                mimeType: file.type || getMimeTypeForExt(ext)
-            };
-            showFileConfirm(pendingFileData);
-        });
-    }
-
+    if (!file.type.startsWith('image/')) { sysLog("Only images supported."); $('fileInput').value = ''; return; }
+    compressImage(file, 1200, 0.82, (b64) => {
+        pendingImageData = b64;
+        $('previewImg').src = b64;
+        $('captionInput').value = '';
+        $('previewOverlay').classList.add('active');
+        $('captionInput').focus();
+    });
     $('fileInput').value = '';
 };
 
-// Read file as data URI (base64)
-function readAsBase64(file, callback) {
+function compressImage(file, maxDim, quality, cb) {
     const reader = new FileReader();
-    reader.onload = (e) => callback(e.target.result);
-    reader.onerror = () => systemLog("Failed to read file.");
-    reader.readAsDataURL(file);
-}
-
-// Image compression via canvas
-function compressImage(file, maxDim, quality, callback) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (ev) => {
         const img = new Image();
         img.onload = () => {
             let w = img.width, h = img.height;
@@ -878,25 +564,20 @@ function compressImage(file, maxDim, quality, callback) {
                 if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
                 else { w = Math.round(w * maxDim / h); h = maxDim; }
             }
-            const canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            const base64 = canvas.toDataURL('image/jpeg', quality);
-            callback(base64);
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            cb(c.toDataURL('image/jpeg', quality));
         };
-        img.src = e.target.result;
+        img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-// --- Image Preview Actions ---
 function closePreview() {
     $('previewOverlay').classList.remove('active');
     pendingImageData = null;
-    $('captionInput').value = '';
 }
-
  $('previewClose').onclick = closePreview;
  $('cancelImageBtn').onclick = closePreview;
 
@@ -908,166 +589,14 @@ function closePreview() {
 
     $('sendingBar').classList.add('active');
     conn.send({ type: 'image', data: pendingImageData, caption, size: sizeStr });
-    addImageMessage(pendingImageData, caption, 'self', sizeStr);
+    addImageMsg(pendingImageData, caption, 'self', sizeStr);
     closePreview();
-    setTimeout(() => { $('sendingBar').classList.remove('active'); }, 600);
+    setTimeout(() => $('sendingBar').classList.remove('active'), 600);
 };
 
- $('captionInput').onkeypress = (e) => { if (e.key === "Enter") $('sendImageBtn').click(); };
+ $('captionInput').addEventListener('keydown', (e) => { if (e.key === "Enter") $('sendImageBtn').click(); });
 
-// --- File Confirm Overlay ---
-function showFileConfirm(fd) {
-    $('fcIcon').textContent = fd.category;
-    $('fcName').textContent = fd.name;
-    $('fcMeta').textContent = `${fd.sizeStr} · ${fd.ext}`;
-    $('fcCaption').value = '';
-    $('fileConfirmOverlay').classList.add('active');
-    $('fcCaption').focus();
-}
-
-function closeFileConfirm() {
-    $('fileConfirmOverlay').classList.remove('active');
-    pendingFileData = null;
-}
-
- $('fcCancel').onclick = closeFileConfirm;
-
- $('fcSend').onclick = () => {
-    if (!pendingFileData || !conn || !conn.open) return;
-    const caption = $('fcCaption').value.trim();
-    const fd = pendingFileData;
-
-    $('sendingBar').classList.add('active');
-
-    conn.send({
-        type: 'file',
-        data: fd.base64,
-        name: fd.name,
-        sizeStr: fd.sizeStr,
-        ext: fd.ext,
-        category: fd.category,
-        mimeType: fd.mimeType,
-        caption
-    });
-
-    addFileMessage(fd.base64, fd.name, fd.sizeStr, fd.ext, fd.category, caption, 'self');
-    closeFileConfirm();
-    setTimeout(() => { $('sendingBar').classList.remove('active'); }, 600);
-};
-
- $('fcCaption').onkeypress = (e) => { if (e.key === "Enter") $('fcSend').click(); };
-
-// --- UI Message Rendering ---
-function addMessage(text, type) {
-    const div = document.createElement('div');
-    div.className = `msg ${type}`;
-    div.innerHTML = `
-        <div class="msg-text">${escapeHTML(text)}</div>
-        <span class="timestamp">${getTime()}</span>
-    `;
-    $('chatLog').appendChild(div);
-    scrollToBottom();
-}
-
-function addImageMessage(src, caption, type, sizeStr) {
-    const div = document.createElement('div');
-    div.className = `msg ${type}`;
-    div.innerHTML = `
-        <img class="msg-image" src="${src}" alt="Shared image" loading="lazy">
-        ${sizeStr ? `<span class="img-size">${sizeStr}</span>` : ''}
-        <div class="msg-text">${escapeHTML(caption)}</div>
-        <span class="timestamp">${getTime()}</span>
-    `;
-    div.querySelector('.msg-image').onclick = () => openLightbox(src);
-    $('chatLog').appendChild(div);
-    scrollToBottom();
-}
-
-function addFileMessage(dataUri, name, sizeStr, ext, category, caption, type) {
-    const div = document.createElement('div');
-    div.className = `msg ${type}`;
-
-    const a = document.createElement('a');
-    a.className = 'file-card';
-    a.href = dataUri;
-    a.download = name;
-    a.innerHTML = `
-        <div class="file-ext-box">${category}</div>
-        <div class="file-info">
-            <span class="file-name">${escapeHTML(name)}</span>
-            <span class="file-meta">${sizeStr} · ${ext}</span>
-        </div>
-        <div class="file-dl-icon">
-            <i data-lucide="download" width="18"></i>
-        </div>
-    `;
-
-    div.appendChild(a);
-
-    if (caption) {
-        const txt = document.createElement('div');
-        txt.className = 'msg-text';
-        txt.textContent = caption;
-        div.appendChild(txt);
-    }
-
-    const ts = document.createElement('span');
-    ts.className = 'timestamp';
-    ts.textContent = getTime();
-    div.appendChild(ts);
-
-    $('chatLog').appendChild(div);
-    lucide.createIcons({ nodes: [div] });
-    scrollToBottom();
-}
-
-// --- Lightbox ---
-function openLightbox(src) {
-    $('lightboxImg').src = src;
-    $('lightbox').classList.add('active');
-}
-
- $('lightbox').onclick = () => { $('lightbox').classList.remove('active'); };
-
-// --- Utility ---
-function systemLog(text) {
-    const div = document.createElement('div');
-    div.className = 'sys';
-    div.textContent = text;
-    $('chatLog').appendChild(div);
-    scrollToBottom();
-}
-
-function scrollToBottom() {
-    const log = $('chatLog');
-    log.scrollTop = log.scrollHeight;
-}
-
-function setStatus(active) {
-    const dot = $('statusDot');
-    const txt = $('statusText');
-    if (active) {
-        dot.classList.add('active');
-        txt.textContent = "ONLINE";
-        txt.style.color = "#000";
-    } else {
-        dot.classList.remove('active');
-        txt.textContent = "OFFLINE";
-        txt.style.color = "#999";
-    }
-}
-
-// --- Clipboard ---
- $('copyBtn').onclick = () => {
-    navigator.clipboard.writeText(myPeerId).then(() => {
-        const btn = $('copyBtn');
-        btn.textContent = "COPIED";
-        btn.style.background = "var(--accent)";
-        setTimeout(() => { btn.textContent = "COPY"; btn.style.background = "#000"; }, 1500);
-    });
-};
-
-// --- Paste image from clipboard ---
+// ── Paste Image ──
  $('msgInput').addEventListener('paste', (e) => {
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -1076,10 +605,9 @@ function setStatus(active) {
             e.preventDefault();
             const file = item.getAsFile();
             if (!file) continue;
-            if (!conn || !conn.open) { systemLog("Not connected."); continue; }
-            compressImage(file, 1200, 0.85, (base64) => {
-                pendingImageData = base64;
-                $('previewImg').src = base64;
+            compressImage(file, 1200, 0.82, (b64) => {
+                pendingImageData = b64;
+                $('previewImg').src = b64;
                 $('captionInput').value = '';
                 $('previewOverlay').classList.add('active');
                 $('captionInput').focus();
@@ -1089,48 +617,78 @@ function setStatus(active) {
     }
 });
 
-// --- Drag & drop onto chat area ---
+// ── Drag & Drop ──
 const chatLog = $('chatLog');
-chatLog.addEventListener('dragover', (e) => { e.preventDefault(); chatLog.classList.add('drag-over'); });
-chatLog.addEventListener('dragleave', (e) => {
-    if (!chatLog.contains(e.relatedTarget)) chatLog.classList.remove('drag-over');
-});
+chatLog.addEventListener('dragover', (e) => { e.preventDefault(); chatLog.style.outline = '2px solid var(--accent)'; });
+chatLog.addEventListener('dragleave', () => { chatLog.style.outline = 'none'; });
 chatLog.addEventListener('drop', (e) => {
     e.preventDefault();
-    chatLog.classList.remove('drag-over');
-    if (!conn || !conn.open) { systemLog("Not connected."); return; }
-
+    chatLog.style.outline = 'none';
     const file = e.dataTransfer?.files[0];
-    if (!file) return;
-
-    if (file.size > FILE_LIMIT) {
-        systemLog(`File too large. Max ${formatSize(FILE_LIMIT)}.`);
-        return;
-    }
-
-    if (file.type.startsWith('image/')) {
-        compressImage(file, 1200, 0.85, (base64) => {
-            pendingImageData = base64;
-            $('previewImg').src = base64;
-            $('captionInput').value = '';
-            $('previewOverlay').classList.add('active');
-            $('captionInput').focus();
-        });
-    } else {
-        readAsBase64(file, (base64) => {
-            const ext = getExt(file.name);
-            const category = getCategory(ext);
-            pendingFileData = {
-                base64, name: file.name, size: file.size,
-                sizeStr: formatSize(file.size), ext, category,
-                mimeType: file.type || getMimeTypeForExt(ext)
-            };
-            showFileConfirm(pendingFileData);
-        });
-    }
+    if (!file || !file.type.startsWith('image/')) { if (file) sysLog("Only images supported."); return; }
+    compressImage(file, 1200, 0.82, (b64) => {
+        pendingImageData = b64;
+        $('previewImg').src = b64;
+        $('captionInput').value = '';
+        $('previewOverlay').classList.add('active');
+        $('captionInput').focus();
+    });
 });
 
-// --- Init icons ---
+// ── Message Rendering ──
+function addTextMsg(text, type) {
+    const d = document.createElement('div');
+    d.className = `msg ${type}`;
+    d.innerHTML = `<div class="msg-text">${esc(text)}</div><span class="timestamp">${getTime()}</span>`;
+    $('chatLog').appendChild(d);
+    scrollDown();
+}
+
+function addImageMsg(src, caption, type, sizeStr) {
+    const d = document.createElement('div');
+    d.className = `msg ${type}`;
+    d.innerHTML = `
+        <img class="msg-image" src="${src}" alt="Image" loading="lazy">
+        ${sizeStr ? `<span class="img-size">${sizeStr}</span>` : ''}
+        <div class="msg-text">${esc(caption)}</div>
+        <span class="timestamp">${getTime()}</span>
+    `;
+    $('chatLog').appendChild(d);
+    // Tell Viewer.js about the new image
+    chatViewer.update();
+    scrollDown();
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ── Utility ──
+function sysLog(text) {
+    const d = document.createElement('div');
+    d.className = 'sys';
+    d.textContent = text;
+    $('chatLog').appendChild(d);
+    scrollDown();
+}
+
+function scrollDown() { const l = $('chatLog'); l.scrollTop = l.scrollHeight; }
+
+function setStatus(on) {
+    $('statusDot').classList.toggle('active', on);
+    $('statusText').textContent = on ? "ONLINE" : "OFFLINE";
+    $('statusText').style.color = on ? "#000" : "#999";
+}
+
+// ── Copy ID ──
+ $('copyBtn').onclick = () => {
+    navigator.clipboard.writeText(myPeerId).then(() => {
+        const b = $('copyBtn');
+        b.textContent = "COPIED";
+        b.style.background = "var(--accent)";
+        setTimeout(() => { b.textContent = "COPY"; b.style.background = "#000"; }, 1500);
+    });
+};
+
+// ── Init Icons ──
 lucide.createIcons();
 </script>
 </body>
