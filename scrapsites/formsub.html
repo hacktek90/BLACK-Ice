@@ -1,683 +1,542 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback & Suggestions</title>
-    <style>
-        :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --secondary-color: #64748b;
-            --background-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --error-color: #ef4444;
-            --success-color: #10b981;
-            --star-inactive: #cbd5e1;
-            --star-active: #fbbf24;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rating System</title>
+<!-- Importing Inter Font for that clean Swiss look -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+<style>
+  :root {
+    --bg-color: #f0f0f0;
+    --card-bg: #ffffff;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --accent: #ff3b30; /* Swiss Red accent */
+    --star-inactive: #e0e0e0;
+    --star-active: #111111;
+    --radius: 0px; /* Swiss style often prefers sharp corners, slight rounding for inputs */
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
 
-        body {
-            background-color: var(--background-color);
-            background-image: radial-gradient(#e0e7ff 1px, transparent 1px);
-            background-size: 24px 24px;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            user-select: none;
-        }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-        /* Container & Card */
-        .container {
-            width: 100%;
-            max-width: 500px;
-            perspective: 1000px;
-            position: relative;
-            z-index: 1;
-        }
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
 
-        .form-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
+  /* Layout Container */
+  .container {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card-bg);
+    padding: 60px 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    animation: slideUp 0.8s ease-out;
+  }
 
-        .hidden {
-            display: none !important;
-        }
+  /* Typography - Swiss Style Headers */
+  h1, h2 {
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
 
-        /* Limit Reached Overlay */
-        .limit-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            backdrop-filter: blur(2px);
-            text-align: center;
-            padding: 20px;
-        }
+  h1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
 
-        .limit-icon { font-size: 3rem; margin-bottom: 1rem; color: var(--secondary-color); }
+  h2 {
+    font-size: 1.25rem;
+    border-top: 2px solid var(--text-main);
+    padding-top: 20px;
+    margin-top: 40px;
+  }
 
-        /* Header */
-        .header { text-align: center; margin-bottom: 2rem; }
-        .header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; }
-        .header p { color: var(--text-muted); font-size: 0.95rem; }
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
 
-        /* Form Elements */
-        .form-group { margin-bottom: 1.5rem; position: relative; }
-        label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-main); }
-        
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: var(--radius-sm);
-            background-color: #f8fafc;
-            transition: all 0.2s ease;
-            outline: none;
-            color: var(--text-main);
-            user-select: text;
-        }
+  /* Form Elements */
+  input, textarea {
+    width: 100%;
+    padding: 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    background: #fafafa;
+    border: 2px solid transparent;
+    border-bottom: 2px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    transition: var(--transition);
+    color: var(--text-main);
+  }
 
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary-color);
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
+  input:focus, textarea:focus {
+    outline: none;
+    background: #fff;
+    border-bottom-color: var(--text-main);
+  }
 
-        textarea { resize: vertical; min-height: 120px; }
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
 
-        .error-msg { color: var(--error-color); font-size: 0.8rem; margin-top: 0.4rem; display: none; align-items: center; gap: 4px; }
-        .form-group.error input, .form-group.error select, .form-group.error textarea { border-color: var(--error-color); background-color: #fef2f2; }
-        .form-group.error .error-msg { display: flex; }
+  /* Custom Star Rating */
+  .stars-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+  }
 
-        /* Stars */
-        .rating-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; }
-        .stars { display: flex; gap: 8px; cursor: pointer; }
-        .star-icon { width: 36px; height: 36px; fill: var(--star-inactive); transition: transform 0.2s; }
-        .star-icon.hovered, .star-icon.selected { fill: var(--star-active); }
-        .star-icon:hover { transform: scale(1.2); }
-        .rating-text { margin-top: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--text-muted); height: 20px; }
+  .star-icon {
+    width: 40px;
+    height: 40px;
+    fill: var(--star-inactive);
+    cursor: pointer;
+    transition: transform 0.2s ease, fill 0.2s ease;
+  }
 
-        /* Buttons */
-        .btn-submit {
-            width: 100%; padding: 14px; background-color: var(--primary-color); color: white;
-            border: none; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: background-color 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
-        .btn-submit:hover { background-color: var(--primary-hover); }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .star-icon:hover {
+    transform: scale(1.2);
+  }
 
-        .spinner {
-            width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; display: none;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+  .star-icon.active, .star-icon.hover {
+    fill: var(--star-active);
+  }
 
-        /* Success State */
-        .success-card { text-align: center; animation: fadeIn 0.5s ease-out; }
-        .success-icon {
-            width: 80px; height: 80px; background-color: #d1fae5; color: var(--success-color);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;
-        }
-        .success-icon svg { width: 40px; height: 40px; }
+  /* Button */
+  button {
+    width: 100%;
+    padding: 18px;
+    margin-top: 30px;
+    background: var(--text-main);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
 
-        /* Toast */
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background-color: var(--text-main); color: white; padding: 12px 24px; border-radius: 50px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 0.9rem;
-            opacity: 0; transition: all 0.4s; z-index: 1000; display: flex; align-items: center; gap: 8px;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  button:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 59, 48, 0.2);
+  }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); } 20%, 40%, 60%, 80% { transform: translateX(4px); } }
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+  button:active {
+    transform: translateY(0);
+  }
 
-        /* --- ADMIN STYLES --- */
-        .admin-trigger {
-            margin-top: 20px; font-size: 0.8rem; color: #cbd5e1; cursor: pointer; text-decoration: underline;
-        }
-        .admin-trigger:hover { color: var(--secondary-color); }
+  /* Reviews List */
+  #reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
 
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); z-index: 2000;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .review-card {
+    background: #fff;
+    border-left: 4px solid var(--text-main);
+    padding: 20px;
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-        /* Modal Box */
-        .modal-box {
-            background: #fff; width: 90%; max-width: 600px; max-height: 85vh;
-            border-radius: var(--radius-md); padding: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s;
-        }
-        .modal-overlay.active .modal-box { transform: scale(1); }
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
 
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;
-        }
-        .modal-title { font-weight: 700; font-size: 1.2rem; }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary-color); }
-        .close-btn:hover { color: var(--error-color); }
+  .review-user {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
 
-        /* Login Form in Modal */
-        .login-form { display: flex; flex-direction: column; gap: 15px; padding: 20px 0; }
-        .btn-login { padding: 10px; background: var(--text-main); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; }
-        .btn-login:hover { opacity: 0.9; }
+  .review-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
 
-        /* Dashboard Content */
-        .dashboard-content { overflow-y: auto; flex-grow: 1; padding-right: 5px; }
-        .feedback-item {
-            border: 1px solid #e2e8f0; border-radius: var(--radius-sm); padding: 15px;
-            margin-bottom: 15px; background: #f8fafc;
-        }
-        .feedback-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
-        .feedback-category {
-            background: #e0e7ff; color: var(--primary-color); padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.7rem;
-        }
-        .feedback-subject { font-weight: 700; margin-bottom: 5px; color: var(--text-main); }
-        .feedback-msg { font-size: 0.95rem; color: #334155; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; }
-        .feedback-email { font-size: 0.8rem; font-style: italic; color: var(--text-muted); }
-        .mini-stars { color: var(--star-active); letter-spacing: 2px; }
+  .review-stars {
+    color: var(--text-main);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
 
-        /* Scrollbar */
-        .dashboard-content::-webkit-scrollbar { width: 6px; }
-        .dashboard-content::-webkit-scrollbar-track { background: #f1f1f1; }
-        .dashboard-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    </style>
+  .review-text {
+    color: #444;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 20px;
+    font-size: 0.9rem;
+  }
+
+  /* Toast Notification System */
+  #toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: #111;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .toast.error {
+    background: var(--accent);
+  }
+
+  /* Animations */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 480px) {
+    .container {
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+  }
+</style>
 </head>
+
 <body>
 
-    <main class="container">
-        
-        <!-- Feedback Form View -->
-        <div class="form-card" id="formCard">
-            
-            <!-- Limit Reached Overlay -->
-            <div class="limit-overlay hidden" id="limitOverlay">
-                <div class="limit-icon">🔒</div>
-                <h2>Daily Limit Reached</h2>
-                <p style="color: var(--secondary-color); margin-top: 8px;">You have already submitted feedback today. Please come back tomorrow.</p>
-            </div>
+<div class="container">
+  <header>
+    <h1>Rate Us</h1>
+    <p style="color: var(--text-muted); margin-bottom: 30px;">Your feedback shapes our future.</p>
+  </header>
 
-            <header class="header">
-                <h1>We value your opinion</h1>
-                <p>Help us improve by sharing your thoughts.</p>
-            </header>
-
-            <form id="feedbackForm" novalidate>
-                <!-- Rating -->
-                <div class="form-group" style="text-align: center;">
-                    <label>Overall Experience</label>
-                    <div class="rating-container">
-                        <div class="stars" id="starContainer" role="radiogroup" aria-label="Rating">
-                            <svg class="star-icon" data-value="1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            <svg class="star-icon" data-value="2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            <svg class="star-icon" data-value="3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            <svg class="star-icon" data-value="4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            <svg class="star-icon" data-value="5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        </div>
-                        <div class="rating-text" id="ratingText">Select a rating</div>
-                        <input type="hidden" id="ratingValue" name="rating" required>
-                        <div class="error-msg" id="ratingError">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                            Please select a star rating.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Category -->
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <div class="input-wrapper">
-                        <select id="category" name="category">
-                            <option value="" disabled selected>Choose a topic...</option>
-                            <option value="suggestion">Suggestion</option>
-                            <option value="bug_report">Bug Report</option>
-                            <option value="compliment">Compliment</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="error-msg">Please select a category.</div>
-                </div>
-
-                <!-- Subject -->
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="subject" name="subject" placeholder="Brief summary of your feedback">
-                    </div>
-                    <div class="error-msg">Subject is required.</div>
-                </div>
-
-                <!-- Message -->
-                <div class="form-group">
-                    <label for="message">Details</label>
-                    <div class="input-wrapper">
-                        <textarea id="message" name="message" placeholder="Please describe your feedback in detail..."></textarea>
-                    </div>
-                    <div class="error-msg">Message cannot be empty.</div>
-                </div>
-
-                <!-- Email -->
-                <div class="form-group">
-                    <label for="email">Email (Optional)</label>
-                    <div class="input-wrapper">
-                        <input type="email" id="email" name="email" placeholder="your.email@example.com">
-                    </div>
-                    <div class="error-msg">Please enter a valid email address.</div>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    <span class="btn-text">Submit Feedback</span>
-                    <div class="spinner"></div>
-                </button>
-            </form>
-        </div>
-
-        <!-- Success View -->
-        <div class="form-card success-card hidden" id="successCard">
-            <div class="success-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <h1>Thank You!</h1>
-            <p style="color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
-                We appreciate you taking the time to share your feedback. It helps us build a better product.
-            </p>
-        </div>
-
-        <!-- Admin Trigger -->
-        <div class="admin-trigger" id="adminTrigger">Admin Access</div>
-
-    </main>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-        <span id="toastMessage">Notification</span>
+  <main>
+    <!-- Username Input -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your name" autocomplete="off" />
     </div>
 
-    <!-- ADMIN MODAL -->
-    <div class="modal-overlay" id="adminModal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-title" id="modalTitle">Admin Login</div>
-                <button class="close-btn" id="closeModal">&times;</button>
-            </div>
-
-            <!-- Step 1: Login Form -->
-            <div id="loginStep" class="login-form">
-                <p style="font-size: 0.9rem; color: var(--secondary-color);">Enter admin password to view submissions.</p>
-                <input type="password" id="adminPassword" placeholder="Enter Password">
-                <button class="btn-login" id="btnAdminLogin">Login</button>
-            </div>
-
-            <!-- Step 2: Dashboard (Hidden initially) -->
-            <div id="dashboardStep" class="hidden" style="display: flex; flex-direction: column; height: 100%;">
-                <div class="dashboard-content" id="feedbackList">
-                    <!-- Items injected here -->
-                    <div style="text-align: center; padding: 20px; color: var(--text-muted);">Loading data...</div>
-                </div>
-                <div style="margin-top: 15px; text-align: right;">
-                    <button class="btn-login" style="background: var(--error-color);" id="btnLogout">Logout</button>
-                </div>
-            </div>
-        </div>
+    <!-- Star Rating -->
+    <div class="form-group">
+      <label>Rating</label>
+      <div class="stars-container" id="stars">
+        <!-- SVG Stars for sharpness -->
+        <svg class="star-icon" data-value="1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star-icon" data-value="2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star-icon" data-value="3" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star-icon" data-value="4" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star-icon" data-value="5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </div>
     </div>
 
-    <!-- Firebase SDK and Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+    <!-- Suggestion Textarea -->
+    <div class="form-group">
+      <label for="suggestion">Suggestion <span style="font-weight: 400; text-transform: none;">(Optional)</span></label>
+      <textarea id="suggestion" placeholder="Share your thoughts..."></textarea>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
-            authDomain: "h-90-8a7c5.firebaseapp.com",
-            databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
-            projectId: "h-90-8a7c5",
-            storageBucket: "h-90-8a7c5.firebasestorage.app",
-            messagingSenderId: "367196609301",
-            appId: "1:367196609301:web:156e24c1b4532c26af671c"
-        };
+    <button id="submit">Submit Feedback</button>
+  </main>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+  <section>
+    <h2>Recent Reviews</h2>
+    <div id="reviews">
+      <div class="empty-state">Loading reviews...</div>
+    </div>
+  </section>
+</div>
 
-        // --- UI Elements ---
-        const form = document.getElementById('feedbackForm');
-        const formCard = document.getElementById('formCard');
-        const successCard = document.getElementById('successCard');
-        const submitBtn = document.getElementById('submitBtn');
-        const spinner = submitBtn.querySelector('.spinner');
-        const btnText = submitBtn.querySelector('.btn-text');
-        const starContainer = document.getElementById('starContainer');
-        const stars = starContainer.querySelectorAll('.star-icon');
-        const ratingInput = document.getElementById('ratingValue');
-        const ratingText = document.getElementById('ratingText');
-        const limitOverlay = document.getElementById('limitOverlay');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toastMessage');
+<!-- Toast Container -->
+<div id="toast-container"></div>
 
-        // --- Admin UI Elements ---
-        const adminTrigger = document.getElementById('adminTrigger');
-        const adminModal = document.getElementById('adminModal');
-        const closeModal = document.getElementById('closeModal');
-        const loginStep = document.getElementById('loginStep');
-        const dashboardStep = document.getElementById('dashboardStep');
-        const adminPasswordInput = document.getElementById('adminPassword');
-        const btnAdminLogin = document.getElementById('btnAdminLogin');
-        const btnLogout = document.getElementById('btnLogout');
-        const feedbackList = document.getElementById('feedbackList');
-        const modalTitle = document.getElementById('modalTitle');
+<!-- Firebase Logic -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-        // --- State ---
-        let currentRating = 0;
-        const ratingDescriptions = [
-            "Select a rating", "Needs Improvement", "Fair", "Good", "Very Good", "Excellent"
-        ];
+// 🔥 Config
+const firebaseConfig = {
+  apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+  authDomain: "h-90-8a7c5.firebaseapp.com",
+  databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+  projectId: "h-90-8a7c5",
+  storageBucket: "h-90-8a7c5.firebasestorage.app",
+  messagingSenderId: "367196609301",
+  appId: "1:367196609301:web:156e24c1b4532c26af671c"
+};
 
-        // --- 1. Disable Right Click ---
-        window.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            return false;
-        });
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-        // --- 2. Check Rate Limit ---
-        function checkDailyLimit() {
-            const today = new Date().toISOString().split('T')[0];
-            const lastSubmitDate = localStorage.getItem('feedback_limit_date');
-            if (lastSubmitDate === today) {
-                limitOverlay.classList.remove('hidden');
-                form.querySelectorAll('input, select, textarea, button').forEach(el => el.disabled = true);
-                return true;
-            }
-            return false;
-        }
-        const isBlocked = checkDailyLimit();
+// State
+let rating = 0;
+const starsContainer = document.getElementById("stars");
+const stars = document.querySelectorAll(".star-icon");
 
-        // --- 3. Star Rating Logic ---
-        stars.forEach(star => {
-            star.addEventListener('mouseenter', () => {
-                if (isBlocked) return;
-                const hoverValue = parseInt(star.getAttribute('data-value'));
-                highlightStars(hoverValue);
-                ratingText.textContent = ratingDescriptions[hoverValue];
-                ratingText.style.color = 'var(--primary-color)';
-            });
-        });
+// --- UI Interactions ---
 
-        starContainer.addEventListener('mouseleave', () => {
-            if (isBlocked) return;
-            highlightStars(currentRating);
-            if (currentRating > 0) {
-                ratingText.textContent = ratingDescriptions[currentRating];
-                ratingText.style.color = 'var(--text-main)';
-            } else {
-                ratingText.textContent = ratingDescriptions[0];
-                ratingText.style.color = 'var(--text-muted)';
-            }
-        });
+// Star Hover Logic
+stars.forEach(star => {
+  // Hover preview
+  star.addEventListener("mouseenter", () => {
+    const value = parseInt(star.getAttribute("data-value"));
+    updateStarsVisual(value, "hover");
+  });
 
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                if (isBlocked) return;
-                currentRating = parseInt(star.getAttribute('data-value'));
-                ratingInput.value = currentRating;
-                highlightStars(currentRating);
-                ratingText.textContent = ratingDescriptions[currentRating];
-                ratingText.style.color = 'var(--text-main)';
-                document.querySelector('.rating-container').classList.remove('error');
-            });
-        });
+  // Click to set
+  star.addEventListener("click", () => {
+    rating = parseInt(star.getAttribute("data-value"));
+    updateStarsVisual(rating, "active");
+    
+    // Small animation feedback
+    star.style.transform = "scale(1.4)";
+    setTimeout(() => star.style.transform = "", 200);
+  });
+});
 
-        function highlightStars(count) {
-            stars.forEach(star => {
-                const value = parseInt(star.getAttribute('data-value'));
-                if (value <= count) {
-                    star.classList.add('hovered');
-                    star.style.fill = 'var(--star-active)';
-                } else {
-                    star.classList.remove('hovered');
-                    star.style.fill = 'var(--star-inactive)';
-                }
-            });
-        }
+// Reset on mouse leave (unless selected)
+starsContainer.addEventListener("mouseleave", () => {
+  updateStarsVisual(rating, "active");
+});
 
-        // --- 4. Form Submission ---
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (isBlocked) return;
+function updateStarsVisual(value, className) {
+  stars.forEach(s => {
+    const sVal = parseInt(s.getAttribute("data-value"));
+    if (sVal <= value) {
+      s.classList.add(className);
+    } else {
+      s.classList.remove(className);
+    }
+  });
+}
 
-            // Validation
-            let isValid = true;
-            
-            if (currentRating === 0) { showInputError('.rating-container', '#ratingError'); isValid = false; } 
-            else { clearInputError('.rating-container', '#ratingError'); }
+// Toast Notification System
+function showToast(message, type = "success") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  
+  // Icon based on type
+  const icon = type === "error" ? "✕" : "✓";
+  
+  toast.innerHTML = `<span>${icon}</span> ${message}`;
+  container.appendChild(toast);
 
-            const category = document.getElementById('category');
-            if (!category.value) { showInputError(category.closest('.form-group')); isValid = false; } 
-            else { clearInputError(category.closest('.form-group')); }
+  // Trigger animation
+  requestAnimationFrame(() => {
+    toast.classList.add("visible");
+  });
 
-            const subject = document.getElementById('subject');
-            if (!subject.value.trim()) { showInputError(subject.closest('.form-group')); isValid = false; } 
-            else { clearInputError(subject.closest('.form-group')); }
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove("visible");
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
 
-            const message = document.getElementById('message');
-            if (!message.value.trim()) { showInputError(message.closest('.form-group')); isValid = false; } 
-            else { clearInputError(message.closest('.form-group')); }
+// --- Firebase Logic ---
 
-            const email = document.getElementById('email');
-            if (email.value.trim() !== '') {
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(email.value)) { showInputError(email.closest('.form-group')); isValid = false; } 
-                else { clearInputError(email.closest('.form-group')); }
-            } else { clearInputError(email.closest('.form-group')); }
+document.getElementById("submit").onclick = () => {
+  const usernameInput = document.getElementById("username");
+  const suggestionInput = document.getElementById("suggestion");
+  const username = usernameInput.value.trim();
+  const suggestion = suggestionInput.value.trim();
 
-            if (!isValid) {
-                formCard.classList.add('shake');
-                showToast('Please fix the errors above.', 'error');
-                setTimeout(() => formCard.classList.remove('shake'), 500);
-                return;
-            }
+  // Validation
+  if (!username) {
+    showToast("Username is required", "error");
+    usernameInput.focus();
+    return;
+  }
+  if (rating === 0) {
+    showToast("Please select a star rating", "error");
+    return;
+  }
 
-            // Submit
-            startLoading();
+  // Cooldown check (24 hours)
+  const last = localStorage.getItem("lastSubmit");
+  const now = Date.now();
 
-            const feedbackData = {
-                rating: currentRating,
-                category: category.value,
-                subject: subject.value.trim(),
-                message: message.value.trim(),
-                email: email.value.trim() || "Anonymous",
-                timestamp: Date.now()
-            };
+  if (last && now - last < 86400000) {
+    const hoursLeft = Math.ceil((86400000 - (now - last)) / (1000 * 60 * 60));
+    showToast(`Please wait ${hoursLeft}h before submitting again`, "error");
+    return;
+  }
 
-            try {
-                const feedbacksRef = ref(db, 'feedbacks');
-                await push(feedbacksRef, feedbackData);
+  // Disable button while submitting
+  const btn = document.getElementById("submit");
+  const originalText = btn.innerText;
+  btn.innerText = "SENDING...";
+  btn.style.opacity = "0.7";
+  btn.disabled = true;
 
-                stopLoading();
-                const today = new Date().toISOString().split('T')[0];
-                localStorage.setItem('feedback_limit_date', today);
-                
-                formCard.style.display = 'none';
-                successCard.classList.remove('hidden');
-                showToast('Feedback submitted successfully!');
+  const review = {
+    username,
+    rating: Number(rating),
+    suggestion,
+    time: Date.now() // Store timestamp for sorting
+  };
 
-            } catch (error) {
-                console.error("Firebase Error:", error);
-                stopLoading();
-                showToast('Error saving feedback. Please try again.', 'error');
-            }
-        });
+  push(ref(db, "reviews"), review)
+    .then(() => {
+      localStorage.setItem("lastSubmit", now);
+      showToast("Feedback submitted successfully!");
+      
+      // Reset Form
+      usernameInput.value = "";
+      suggestionInput.value = "";
+      rating = 0;
+      updateStarsVisual(0, "active");
+    })
+    .catch((err) => {
+      console.error(err);
+      showToast("Error submitting. Try again.", "error");
+    })
+    .finally(() => {
+      btn.innerText = originalText;
+      btn.style.opacity = "1";
+      btn.disabled = false;
+    });
+};
 
-        // --- Helpers ---
-        function showInputError(groupSelector, specificErrorId = null) {
-            const group = typeof groupSelector === 'string' ? document.querySelector(groupSelector) : groupSelector;
-            group.classList.add('error');
-            if(specificErrorId) document.getElementById(specificErrorId).style.display = 'flex';
-        }
-        function clearInputError(groupSelector, specificErrorId = null) {
-            const group = typeof groupSelector === 'string' ? document.querySelector(groupSelector) : groupSelector;
-            group.classList.remove('error');
-            if(specificErrorId) document.getElementById(specificErrorId).style.display = 'none';
-        }
-        function startLoading() {
-            submitBtn.disabled = true; btnText.style.display = 'none'; spinner.style.display = 'block';
-        }
-        function stopLoading() {
-            submitBtn.disabled = false; btnText.style.display = 'block'; spinner.style.display = 'none';
-        }
-        function showToast(message, type = 'success') {
-            toastMessage.textContent = message;
-            toast.classList.add('show');
-            toast.style.backgroundColor = type === 'error' ? 'var(--error-color)' : 'var(--text-main)';
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
+// Load Reviews (Live)
+const reviewsDiv = document.getElementById("reviews");
 
-        // --- ADMIN LOGIC ---
+onValue(ref(db, "reviews"), snapshot => {
+  const data = [];
+  snapshot.forEach(child => {
+    data.push(child.val());
+  });
 
-        // Open Modal
-        adminTrigger.addEventListener('click', () => {
-            adminModal.classList.add('active');
-            // Reset state
-            loginStep.style.display = 'block';
-            dashboardStep.classList.add('hidden');
-            adminPasswordInput.value = '';
-        });
+  // Sort by time (newest first)
+  data.sort((a, b) => b.time - a.time);
 
-        // Close Modal
-        closeModal.addEventListener('click', () => {
-            adminModal.classList.remove('active');
-        });
+  reviewsDiv.innerHTML = "";
 
-        // Close on outside click
-        adminModal.addEventListener('click', (e) => {
-            if (e.target === adminModal) adminModal.classList.remove('active');
-        });
+  if (data.length === 0) {
+    reviewsDiv.innerHTML = `<div class="empty-state">No reviews yet. Be the first!</div>`;
+    return;
+  }
 
-        // Login Action
-        btnAdminLogin.addEventListener('click', () => {
-            const pass = adminPasswordInput.value;
-            if (pass === '589') {
-                // Success
-                loginStep.style.display = 'none';
-                dashboardStep.classList.remove('hidden');
-                modalTitle.textContent = "Feedback Dashboard";
-                loadDashboardData();
-            } else {
-                showToast('Incorrect Password', 'error');
-                adminPasswordInput.classList.add('shake'); // Add a shake effect to input
-                setTimeout(() => adminPasswordInput.classList.remove('shake'), 500);
-            }
-        });
+  data.forEach(d => {
+    const dateStr = new Date(d.time).toLocaleDateString(undefined, {
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
 
-        // Logout Action
-        btnLogout.addEventListener('click', () => {
-            adminModal.classList.remove('active');
-            setTimeout(() => {
-                loginStep.style.display = 'block';
-                dashboardStep.classList.add('hidden');
-                modalTitle.textContent = "Admin Login";
-                feedbackList.innerHTML = '';
-            }, 300);
-        });
+    const div = document.createElement("div");
+    div.className = "review-card";
+    
+    // Generate star string
+    const starDisplay = "★".repeat(d.rating) + "☆".repeat(5 - d.rating);
 
-        // Load Data from Firebase
-        function loadDashboardData() {
-            const feedbacksRef = ref(db, 'feedbacks');
-            
-            onValue(feedbacksRef, (snapshot) => {
-                feedbackList.innerHTML = ''; // Clear list
-                
-                const data = snapshot.val();
-                
-                if (!data) {
-                    feedbackList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">No feedback submitted yet.</div>';
-                    return;
-                }
+    div.innerHTML = `
+      <div class="review-header">
+        <span class="review-user">${d.username}</span>
+        <span class="review-time">${dateStr}</span>
+      </div>
+      <div class="review-stars">${starDisplay}</div>
+      ${d.suggestion ? `<div class="review-text">${escapeHtml(d.suggestion)}</div>` : ""}
+    `;
+    
+    reviewsDiv.appendChild(div);
+  });
+});
 
-                // Convert object to array and reverse for newest first
-                const feedbackArray = Object.entries(data).reverse();
+// Helper to prevent XSS
+function escapeHtml(text) {
+  if (!text) return text;
+  return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+}
+</script>
+<script>
+  // Disable right-click
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+</script>
 
-                feedbackArray.forEach(([key, item]) => {
-                    const date = new Date(item.timestamp).toLocaleString();
-                    const starsHtml = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
-                    
-                    const div = document.createElement('div');
-                    div.className = 'feedback-item';
-                    div.innerHTML = `
-                        <div class="feedback-meta">
-                            <span class="mini-stars">${starsHtml}</span>
-                            <span class="feedback-category">${item.category.replace('_', ' ')}</span>
-                            <span>${date}</span>
-                        </div>
-                        <div class="feedback-subject">${escapeHtml(item.subject)}</div>
-                        <div class="feedback-msg">${escapeHtml(item.message)}</div>
-                        <div class="feedback-email">${escapeHtml(item.email)}</div>
-                    `;
-                    feedbackList.appendChild(div);
-                });
-            });
-        }
-
-        // Simple XSS prevention helper
-        function escapeHtml(text) {
-            if (!text) return text;
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-    </script>
 </body>
 </html>
