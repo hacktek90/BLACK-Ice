@@ -39,14 +39,7 @@
       rel="stylesheet"
     />
 
-    <!-- jQuery (required for Select2) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- Select2 CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
-      rel="stylesheet"
-    />
+  
 
     <style>
       :root {
@@ -371,142 +364,7 @@
         color: rgba(255, 255, 255, 0.8);
       }
 
-      /* --- Select2 Dark Theme Override --- */
-      .alternate-site-select-wrapper {
-        margin-top: 14px;
-        width: 100%;
-      }
-
-      .alternate-site-select-wrapper .select2-container {
-        width: 100% !important;
-      }
-
-      .alternate-site-select-wrapper .select2-selection--single {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 999px !important;
-        height: 38px !important;
-        display: flex !important;
-        align-items: center !important;
-        padding: 0 16px !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer;
-      }
-
-      .alternate-site-select-wrapper .select2-selection--single:hover {
-        background: rgba(59, 130, 246, 0.1) !important;
-        border-color: rgba(59, 130, 246, 0.35) !important;
-      }
-
-      .alternate-site-select-wrapper .select2-selection--single:focus,
-      .alternate-site-select-wrapper .select2-container--open .select2-selection--single {
-        background: rgba(255, 255, 255, 0.07) !important;
-        border-color: var(--accent-blue) !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
-        outline: none !important;
-      }
-
-      .alternate-site-select-wrapper .select2-selection__rendered {
-        color: #ffffff !important;
-        font-family: "Inter Tight", sans-serif !important;
-        font-size: 0.8rem !important;
-        font-weight: 500 !important;
-        padding-left: 0 !important;
-        line-height: 38px !important;
-      }
-
-      .alternate-site-select-wrapper .select2-selection__rendered .select2-selection__placeholder {
-        color: var(--text-muted) !important;
-      }
-
-      .alternate-site-select-wrapper .select2-selection__arrow {
-        height: 38px !important;
-        right: 12px !important;
-        top: 0 !important;
-      }
-
-      .alternate-site-select-wrapper .select2-selection__arrow b {
-        border-color: var(--text-muted) transparent transparent transparent !important;
-      }
-
-      /* --- Select2 Dropdown Dark Theme --- */
-      .select2-dropdown--dark-theme {
-        background: #18181b !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        overflow: hidden !important;
-        box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-        margin-top: 6px !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-results {
-        background: transparent !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-results__option {
-        background: transparent !important;
-        color: #e4e4e7 !important;
-        font-family: "Inter Tight", sans-serif !important;
-        font-size: 0.85rem !important;
-        font-weight: 400 !important;
-        padding: 10px 16px !important;
-        transition: all 0.15s ease !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-results__option:last-child {
-        border-bottom: none !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-results__option--highlighted[aria-selected] {
-        background: rgba(59, 130, 246, 0.15) !important;
-        color: #ffffff !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-results__option[aria-selected="true"] {
-        background: rgba(59, 130, 246, 0.08) !important;
-        color: var(--accent-blue) !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-search--dropdown {
-        padding: 8px 10px !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-search__field {
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 8px !important;
-        color: #ffffff !important;
-        font-family: "Inter Tight", sans-serif !important;
-        font-size: 0.8rem !important;
-        padding: 6px 10px !important;
-        outline: none !important;
-        transition: border-color 0.2s ease !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-search__field:focus {
-        border-color: var(--accent-blue) !important;
-      }
-
-      .select2-dropdown--dark-theme .select2-search__field::placeholder {
-        color: var(--text-muted) !important;
-      }
-
-      /* Site option label styling with icon hint */
-      .site-option-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .site-option-label .site-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-
+    
       /* --- Animations --- */
       @keyframes fadeIn {
         to {
@@ -528,7 +386,9 @@
         border-width: 0;
       }
     </style>
-  </head>
+  <base target="_blank">
+<base target="_blank">
+</head>
 
   <body>
 
@@ -601,18 +461,36 @@
             <p>HTML viewers, Git utilities, and minimal developer environments.</p>
           </div>
           <div class="feature-item">
-            <h3>Alternate Sites</h3>
-            <p>
-              Access alternate deployments and mirror instances of the BlackICE
-              platform across different hosting providers.
-            </p>
-            <div class="alternate-site-select-wrapper">
-              <select id="alternate-site-select">
-                <option value="" disabled selected>Visit Alternate Site →</option>
-                <option value="https://black-ice.pages.dev/">black-ice.pages.dev</option>
-                <option value="https://black-ice-3dbk.onrender.com/">black-ice-3dbk.onrender.com </option>
-              </select>
-            </div>
+            <h3>Collaboration</h3>
+            <p>Real-time chat, video calls, shared documents, and team workspaces.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Automation</h3>
+            <p>Workflow automation, AI agents, and cross-app integrations.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Media Studio</h3>
+            <p>Image generation, video editing, audio processing, and content creation tools.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Research & Analysis</h3>
+            <p>AI-powered search, document analysis, and knowledge management.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Security & Privacy</h3>
+            <p>End-to-end encryption, secure vaults, and privacy-first architecture.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Integrations</h3>
+            <p>Connect with Slack, Google Drive, Notion, and 100+ popular apps.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Calendar & Scheduling</h3>
+            <p>Smart scheduling, focus time protection, and unified calendar views.</p>
+          </div>
+          <div class="feature-item">
+            <h3>Cloud Storage</h3>
+            <p>Secure file storage, sync across devices, and team asset management.</p>
           </div>
         </div>
 
@@ -621,14 +499,21 @@
           <p>
             BlackICE Portal is a browser-based platform combining AI-powered tools,
             productivity apps, developer utilities, document creation systems, media
-            tools, and real-time collaboration in a single minimal interface.
+            tools, workflow automation, and real-time collaboration in a single minimal interface.
           </p>
           <ul>
-            <li>Use AI tools for focus, health tracking, and automation</li>
-            <li>Manage tasks, habits, notes, and planning workflows</li>
-            <li>Create documents, slides, mind maps, and whiteboards</li>
-            <li>Access developer utilities like HTML viewers and Git fetchers</li>
-            <li>Collaborate via chat, calls, shared docs, and drawing boards</li>
+            <li>Use AI tools for focus, health tracking, and intelligent automation</li>
+            <li>Manage tasks, habits, notes, and advanced planning workflows</li>
+            <li>Create documents, slides, mind maps, and interactive whiteboards</li>
+            <li>Access developer utilities like HTML viewers, Git tools, and code editors</li>
+            <li>Collaborate via real-time chat, video calls, shared docs, and team workspaces</li>
+            <li>Automate workflows with AI agents and cross-platform integrations</li>
+            <li>Generate and edit media content with AI-powered image and video tools</li>
+            <li>Conduct research with AI search, document analysis, and knowledge management</li>
+            <li>Secure your data with end-to-end encryption and privacy controls</li>
+            <li>Connect with Slack, Google Drive, Notion, and 100+ popular applications</li>
+            <li>Optimize scheduling with smart calendar management and focus time protection</li>
+            <li>Store and sync files securely across all your devices</li>
           </ul>
         </div>
       </section>
@@ -701,34 +586,6 @@
       // Initialize state on page load
       document.addEventListener('DOMContentLoaded', updateUI);
     
-    </script>
-
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-      $(document).ready(function () {
-        $('#alternate-site-select').select2({
-          placeholder: 'Visit Alternate Site →',
-          allowClear: false,
-          minimumResultsForSearch: Infinity, // hide search box since only 2 options
-          dropdownCssClass: 'select2-dropdown--dark-theme',
-          dropdownAutoWidth: true,
-          width: '100%'
-        });
-
-        // Open link when a site is selected
-        $('#alternate-site-select').on('select2:select', function (e) {
-          const url = e.params.data.id;
-          if (url) {
-            window.open(url, '_blank');
-          }
-          // Reset back to placeholder after a short delay so user can re-select
-          setTimeout(() => {
-            $('#alternate-site-select').val(null).trigger('change');
-          }, 300);
-        });
-      });
     </script>
 
     <script src="/test/portalloader.js" defer></script>
