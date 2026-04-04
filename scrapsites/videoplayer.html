@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -1768,7 +1769,16 @@ class AdvancedPlayer {
 class PlyrPlayer {
     constructor() {
         this.player = new Plyr('#plyr-element', {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']
+            controls: [
+                'rewind',        // Rewind by seek time (default 10s)
+                'play',          // Play/pause button
+                'fast-forward',  // Fast forward by seek time (default 10s)
+                'progress',      // Progress bar and scrubber
+                'current-time',  // Current playback time
+                'mute',          // Mute toggle button
+                'volume',        // Volume slider
+                'fullscreen'     // Fullscreen toggle button
+            ]
         });
         
         // Event listeners for UI feedback if needed
