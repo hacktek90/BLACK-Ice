@@ -47,6 +47,7 @@
         --glass-bg: rgba(9, 9, 11, 0.65);
         --glass-border: rgba(255, 255, 255, 0.08);
         --accent-blue: #3b82f6;
+        --accent-green: #10b981; /* Added for Ecosia accent */
         --accent-glow: rgba(59, 130, 246, 0.5);
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
@@ -287,6 +288,37 @@
         pointer-events: none;
       }
 
+      /* --- Ecosia Support Message --- */
+      .ecosia-msg {
+        margin-top: 16px;
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
+        color: var(--text-muted);
+        background: rgba(16, 185, 129, 0.08); /* Subtle green tint */
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        padding: 8px 16px;
+        border-radius: 30px;
+        display: none; /* Hidden by default */
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      .ecosia-msg.visible {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .ecosia-msg span {
+        color: #10b981;
+        font-weight: 500;
+      }
+
+
       /* --- Glass Card for Features --- */
       .glass-card {
         background: var(--glass-bg);
@@ -413,13 +445,13 @@
           <form class="search-bar" onsubmit="handleSearch(event, 'standard')">
             <div class="engine-selector">
               <select id="engine-select" onchange="updateUI()">
-                <!-- Replaced Brave with Startpage -->
+                <!-- Reordered: Ecosia, Startpage, DuckDuckGo -->
+                <option value="https://www.ecosia.org/search?q=%s" data-domain="www.ecosia.org" data-ai-url="">Ecosia</option>
                 <option value="https://www.startpage.com/do/search?q=%s" data-domain="www.startpage.com" data-ai-url="">Startpage</option>
-                <option value="https://www.perplexity.ai/?q=%s" data-domain="perplexity.ai" data-ai-url="">Perplexity</option>
                 <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com" data-ai-url="https://duck.ai/chat?q=%s">DuckDuckGo</option>
               </select>
-              <!-- Updated default icon to Startpage -->
-              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=www.startpage.com&sz=32" alt="Search Engine">
+              <!-- Default icon updated to Ecosia -->
+              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=www.ecosia.org&sz=32" alt="Search Engine">
               <svg class="selector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <input type="text" id="search-query" class="search-input" placeholder="Search the web..." required autocomplete="off">
@@ -434,6 +466,12 @@
               </button>
             </div>
           </form>
+
+          <!-- Ecosia Support Message -->
+          <div id="ecosia-msg" class="ecosia-msg">
+            We Support <span>Ecosia</span> for Planting Trees and Privacy Focused Search
+          </div>
+          
         </div>
         <!-- === END SEARCH BAR === -->
 
@@ -541,6 +579,7 @@
     <script>
       // --- Search Functionality ---
       const aiButton = document.getElementById('ai-search-btn');
+      const ecosiaMsg = document.getElementById('ecosia-msg');
 
       function updateUI() {
         const select = document.getElementById('engine-select');
@@ -557,6 +596,13 @@
           aiButton.classList.remove('hidden');
         } else {
           aiButton.classList.add('hidden');
+        }
+
+        // Toggle Ecosia Message Visibility
+        if (domain === 'www.ecosia.org') {
+            ecosiaMsg.classList.add('visible');
+        } else {
+            ecosiaMsg.classList.remove('visible');
         }
       }
 
