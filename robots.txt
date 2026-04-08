@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://black-ice.pages.dev/sitemap.xml
+Sitemap: https://black-ice-xxd7.onrender.com/sitemap.xml
