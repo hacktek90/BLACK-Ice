@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://blackice-ac.vercel.app/sitemap.xml
+Sitemap: https://blackice-ac.vercel.app/blog/sitemap.xml
+Sitemap: https://blackice-ac.vercel.app/scrapsites/sitemap.xml
