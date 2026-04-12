@@ -1,4 +1,4 @@
-  // BlackICE widget
+ // BlackICE widget
     (function() {
             // Global flag to prevent double loading
             if (window.BlackICEWidget) {
@@ -9,12 +9,10 @@
             class BlackICEWidget {
                 constructor() {
                     try {
-                        console.log("BlackICE Widget: Initializing...");
-                        this.osUrl = "https://blackice-ac.vercel.app/scrapsites/osapk.html";
+                        console.log("BlackICE Widget: Initializing (Blue Toggle Mode)...");
+                        this.osUrl = "https://black-ice-3dbk.onrender.com/scrapsites/osapk.html";
                         this.homeUrl = "https://blackice-ac.vercel.app/";
                         this.crispId = "53f77668-00a3-4f45-8b0e-dd4d7c27ecdf";
-                        
-                        // Target URL for the new form button
                         this.formUrl = "https://blackice-ac.vercel.app/scrapsites/formsub.html";
 
                         this.theme = {
@@ -26,12 +24,13 @@
                             textMuted: "#a1a1aa"
                         };
 
-                        this.isOpen = false;
+                        this.isSidebarOpen = true; 
                         this.allProjects = [];
                         this.pinnedIds = JSON.parse(localStorage.getItem('bi_pinned') || '[]');
                         this.isGridView = false;
                         this.filterMode = 'all';
                         this.currentProjectUrl = '';
+                        this.isProjectOpen = false;
                         
                         this.init();
                     } catch (e) {
@@ -45,14 +44,8 @@
                     this.loadCrisp();
                     this.injectStyles();
                     this.createElements();
-                    this.setupDraggable();
                     this.setupActions();
                     this.fetchProjects();
-
-                    setTimeout(() => {
-                        const tooltip = document.getElementById('bi-drag-tip');
-                        if(tooltip) tooltip.style.opacity = '0';
-                    }, 6000);
                 }
 
                 loadFonts() {
@@ -64,7 +57,7 @@
                 }
 
                 loadCrisp() {
-                    if (window.$crisp) return; // Don't reload if exists
+                    if (window.$crisp) return;
                     window.$crisp = [];
                     window.CRISP_WEBSITE_ID = this.crispId;
                     const d = document;
@@ -84,117 +77,120 @@
                     .bi-root { font-family: ${this.theme.font}; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
                     .bi-root * { box-sizing: border-box; }
                     
-                    /* --- TRIGGER --- */
-                    #bi-trigger {
-                    position: fixed; bottom: 30px; left: 30px; /* CHANGED: right to left */
-                    width: 56px; height: 56px;
-                    background: #18181b !important; /* Force background */
-                    border: 1px solid ${this.theme.glassBorder};
-                    border-radius: 18px;
-                    cursor: grab;
-                    z-index: 2147483647;
-                    display: flex; flex-direction: column; align-items: center; justify-content: center;
-                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0,0,0,0.5);
-                    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-                    color: ${this.theme.textMain};
-                    animation: bi-wiggle 2s ease-in-out 1.5s;
+                    /* --- FLOATING TOGGLE BUTTON --- */
+                    #bi-float-toggle {
+                        position: fixed;
+                        top: 20px;
+                        left: 20px;
+                        width: 36px;
+                        height: 36px;
+                        background: rgba(59, 130, 246, 0.25); /* Blue Transparent */
+                        backdrop-filter: blur(4px);
+                        -webkit-backdrop-filter: blur(4px);
+                        border: 1px solid rgba(59, 130, 246, 0.3); /* Blue Border */
+                        border-radius: 8px;
+                        z-index: 10003; 
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: ns-resize;
+                        color: rgba(255, 255, 255, 0.9); 
+                        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); /* Blue Glow */
+                        transition: background 0.2s, transform 0.1s;
+                        user-select: none;
                     }
-                    @keyframes bi-wiggle {
-                    0%, 100% { transform: rotate(0deg); }
-                    10% { transform: rotate(10deg); } /* CHANGED: direction */
-                    20% { transform: rotate(-10deg); }
-                    30% { transform: rotate(6deg); }
-                    40% { transform: rotate(-6deg); }
-                    50% { transform: rotate(0deg); }
+                    #bi-float-toggle:hover {
+                        background: rgba(59, 130, 246, 0.5); /* Darker on hover */
+                        border-color: rgba(59, 130, 246, 0.8);
+                        color: white;
+                        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
                     }
-                    #bi-trigger:hover { transform: scale(1.08); box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px ${this.theme.accent}; border-color: ${this.theme.accent}; }
-                    #bi-trigger:active { cursor: grabbing; transform: scale(0.95); }
-                    
-                    .bi-grip-lines { display: flex; gap: 2px; margin-top: 4px; opacity: 0.4; }
-                    .bi-grip-line { width: 12px; height: 2px; background: white; border-radius: 2px; }
-                    .bi-icon-wrap { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-                    #bi-trigger svg { position: absolute; width: 24px; height: 24px; transition: all 0.4s ease; }
-                    #bi-trigger.open .bi-menu-icon { transform: rotate(-90deg); opacity: 0; }
-                    .bi-close-icon { opacity: 0; transform: scale(0.5); }
-                    #bi-trigger.open .bi-close-icon { opacity: 1; transform: scale(1); transform: rotate(0deg); }
-                    
-                    #bi-drag-tip {
-                    position: absolute; left: 70px; /* CHANGED: right to left */
-                    top: 50%; transform: translateY(-50%);
-                    background: rgba(24, 24, 27, 0.9);
-                    backdrop-filter: blur(8px);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    color: #e4e4e7; padding: 8px 12px; border-radius: 10px;
-                    font-family: ${this.theme.font}; font-size: 10px; font-weight: 600;
-                    text-transform: uppercase; letter-spacing: 0.05em;
-                    pointer-events: none; opacity: 1; transition: opacity 0.5s; white-space: nowrap;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+                    #bi-float-toggle:active {
+                        cursor: grabbing;
+                        transform: scale(0.95);
                     }
-                    #bi-drag-tip::after {
-                    content: ''; position: absolute; left: -4px; /* CHANGED: right to left */
-                    top: 50%; transform: translateY(-50%);
-                    border-width: 4px; border-style: solid;
-                    border-color: transparent rgba(24, 24, 27, 0.9) transparent transparent; /* CHANGED: Arrow points right */
+                    #bi-float-toggle svg {
+                        transition: transform 0.3s ease;
+                        width: 18px;
+                        height: 18px;
                     }
-                    
+                    #bi-float-toggle.active svg {
+                        transform: rotate(180deg);
+                    }
+
                     /* --- SIDEBAR --- */
                     #bi-sidebar {
-                    position: fixed; top: 10px; bottom: 10px; left: 10px; /* CHANGED: right to left */
-                    width: 340px; max-width: 90vw;
+                    position: fixed; top: 0; bottom: 0; left: 0;
+                    width: 340px;
                     background: ${this.theme.glassBg};
                     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-                    border: 1px solid ${this.theme.glassBorder};
-                    border-radius: 24px;
-                    z-index: 2147483646;
-                    transform: translateX(-120%); /* CHANGED: Slide out to left */
-                    opacity: 0;
-                    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    border-right: 1px solid ${this.theme.glassBorder};
+                    z-index: 10002; 
+                    transform: translateX(0); 
+                    opacity: 1;
+                    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
                     display: flex; flex-direction: column;
-                    box-shadow: 20px 0 50px rgba(0,0,0,0.5); /* CHANGED: Shadow on right */
+                    box-shadow: 20px 0 50px rgba(0,0,0,0.5);
                     overflow: hidden;
                     }
-                    #bi-sidebar.open { transform: translateX(0); opacity: 1; }
+
+                    /* Hidden State (width 0) */
+                    #bi-sidebar.hidden {
+                        width: 0;
+                        opacity: 0;
+                        border: none;
+                    }
                     
-                    .bi-header { padding: 16px 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid ${this.theme.glassBorder}; background: rgba(255,255,255,0.02); }
-                    .bi-logo { width: 24px; height: 24px; border-radius: 6px; background: ${this.theme.accent}; display: grid; place-items: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0; }
-                    .bi-title { font-weight: 600; font-size: 15px; color: ${this.theme.textMain}; letter-spacing: -0.02em; margin-right: auto; }
+                    .bi-header { 
+                        padding: 16px 20px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 12px; 
+                        border-bottom: 1px solid ${this.theme.glassBorder}; 
+                        background: rgba(255,255,255,0.02);
+                        flex-shrink: 0;
+                    }
+                    .bi-logo { width: 28px; height: 28px; border-radius: 8px; background: ${this.theme.accent}; display: grid; place-items: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+                    .bi-title { font-weight: 600; font-size: 15px; color: ${this.theme.textMain}; letter-spacing: -0.02em; margin-right: auto; white-space: nowrap; overflow: hidden; }
                     
+                    .bi-actions-row {
+                        display: flex; gap: 8px; padding: 12px; border-bottom: 1px solid ${this.theme.glassBorder}; background: rgba(255,255,255,0.01);
+                        flex-wrap: wrap;
+                    }
+
                     .bi-action-btn {
                     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-                    color: ${this.theme.textMuted}; border-radius: 8px; padding: 6px; cursor: pointer;
+                    color: ${this.theme.textMuted}; border-radius: 8px; padding: 6px 10px; cursor: pointer;
                     display: flex; align-items: center; justify-content: center;
                     transition: all 0.2s; font-size: 11px; font-weight: 600; flex-shrink: 0;
+                    gap: 6px;
                     }
                     .bi-action-btn:hover { background: rgba(255,255,255,0.1); color: white; }
                     #bi-home-btn:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
                     
-                    .bi-btn-os { padding: 6px 10px; gap: 6px; }
                     .bi-btn-os svg { width: 14px; height: 14px; }
-                    
-                    /* Master Button Style */
-                    #bi-master-btn { padding: 0 12px; height: 36px; gap: 6px; color: #d4d4d8; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); }
+                    #bi-master-btn { padding: 0 12px; height: 36px; color: #d4d4d8; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); flex: 1; }
                     #bi-master-btn:hover { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: #60a5fa; }
-
-                    /* Form Button Style (Replaces Fullscreen) */
                     #bi-form-btn { color: #d4d4d8; background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3); }
                     #bi-form-btn:hover { background: rgba(168, 85, 247, 0.2); color: #c084fc; border-color: #c084fc; }
 
-                    .bi-search-wrap { padding: 12px 12px 4px 12px; display: flex; align-items: center; gap: 8px; }
+                    .bi-search-wrap { padding: 16px 12px 8px 12px; display: flex; align-items: center; gap: 8px; }
                     .bi-search-box {
-                    background: rgba(0,0,0,0.2); border: 1px solid ${this.theme.glassBorder};
-                    border-radius: 12px; display: flex; align-items: center; padding: 8px 12px; gap: 8px;
+                    background: rgba(0,0,0,0.3); border: 1px solid ${this.theme.glassBorder};
+                    border-radius: 12px; display: flex; align-items: center; padding: 10px 12px; gap: 8px;
                     transition: border-color 0.2s; flex: 1;
                     }
-                    .bi-search-box:focus-within { border-color: ${this.theme.accent}; }
+                    .bi-search-box:focus-within { border-color: ${this.theme.accent}; background: rgba(0,0,0,0.5); }
                     .bi-search-box svg { width: 14px; height: 14px; color: ${this.theme.textMuted}; }
                     .bi-input { background: transparent; border: none; outline: none; color: white; font-size: 13px; width: 100%; font-family: ${this.theme.font}; }
                     .bi-input::placeholder { color: #52525b; }
                     
                     .bi-content { flex: 1; overflow-y: auto; padding: 8px 12px; }
-                    .bi-content::-webkit-scrollbar { width: 0px; background: transparent; }
+                    .bi-content::-webkit-scrollbar { width: 4px; background: transparent; }
+                    .bi-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
                     /* --- FILTER TABS --- */
-                    .bi-filters { display: flex; gap: 8px; padding: 8px 12px; border-bottom: 1px solid ${this.theme.glassBorder}; }
+                    .bi-filters { display: flex; gap: 8px; padding: 8px 12px 12px 12px; border-bottom: 1px solid ${this.theme.glassBorder}; }
                     .bi-filter-tab {
                         flex: 1; padding: 6px; font-size: 11px; font-weight: 600; text-align: center;
                         background: rgba(255,255,255,0.03); border-radius: 6px; color: #71717a;
@@ -206,13 +202,13 @@
                     /* --- PROJECT CARD --- */
                     .bi-card {
                     display: flex; align-items: center; gap: 14px;
-                    padding: 12px; margin-bottom: 4px;
+                    padding: 12px; margin-bottom: 6px;
                     border-radius: 12px; text-decoration: none;
                     transition: all 0.2s ease;
                     background: transparent; border: 1px solid transparent;
                     cursor: pointer; position: relative;
                     }
-                    .bi-card:hover { background: rgba(255,255,255,0.03); border-color: ${this.theme.glassBorder}; transform: translateX(4px); }
+                    .bi-card:hover { background: rgba(255,255,255,0.04); border-color: ${this.theme.glassBorder}; transform: translateX(4px); }
                     .bi-card.pinned { border-left: 2px solid ${this.theme.accent}; background: rgba(59,130,246,0.05); }
                     
                     .bi-card-img {
@@ -266,16 +262,14 @@
                         pointer-events: auto;
                     }
 
-                    /* --- IFRAME & OVERLAY --- */
-                    #bi-iframe-container { position: fixed; inset: 0; width: 100%; height: 100%; background: #fff; z-index: 2147483645; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+                    /* --- IFRAME --- */
+                    #bi-iframe-container { position: fixed; inset: 0; width: 100%; height: 100%; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
                     #bi-iframe-container.active { opacity: 1; pointer-events: auto; }
                     #bi-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #fff; }
-                    #bi-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 2147483645; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
-                    #bi-overlay.visible { opacity: 1; pointer-events: auto; }
                     
                     /* --- SHARE MODAL --- */
                     #bi-share-modal {
-                    position: fixed; inset: 0; z-index: 2147483647;
+                    position: fixed; inset: 0; z-index: 10004;
                     display: flex; align-items: center; justify-content: center;
                     opacity: 0; pointer-events: none; transition: opacity 0.3s;
                     }
@@ -325,8 +319,8 @@
                     .bi-copy-small:hover { background: #52525b; }
                     
                     /* CRISP CHAT Z-INDEX FIX */
-                    #crisp-chatbox { z-index: 2147483648 !important; }
-                    .crisp-client .crisp-1s7z6t4 { z-index: 2147483648 !important; }
+                    #crisp-chatbox { z-index: 10005 !important; }
+                    .crisp-client .crisp-1s7z6t4 { z-index: 10005 !important; }
                     `;
                     const s = document.createElement('style');
                     s.textContent = css;
@@ -336,15 +330,17 @@
                 createElements() {
                     console.log("Creating DOM Elements...");
                     
-                    this.overlay = document.createElement('div');
-                    this.overlay.id = 'bi-overlay';
-                    this.overlay.onclick = () => this.toggle();
+                    // 1. Create Floating Toggle Button (Chevron)
+                    this.toggleBtn = document.createElement('div');
+                    this.toggleBtn.id = 'bi-float-toggle';
+                    this.toggleBtn.className = 'active'; 
+                    this.toggleBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
 
-                    // Iframe Container (Toolbar Removed)
+                    // 2. Iframe Container (No controls)
                     this.iframeContainer = document.createElement('div');
                     this.iframeContainer.id = 'bi-iframe-container';
                     this.iframeContainer.className = 'bi-root';
-                    // Only the iframe, no toolbar
+                    
                     this.iframeContainer.innerHTML = `
                         <iframe id="bi-iframe" src="about:blank" allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera; midi; encrypted-media; autoplay"></iframe>
                     `;
@@ -394,32 +390,20 @@
                             </div>
                         </div>
                     `;
-                     this.dbUrl = "https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
-                    const menuIcon = `<svg class="bi-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
-                    const closeIcon = `<svg class="bi-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-
-                    this.btn = document.createElement('div');
-                    this.btn.id = 'bi-trigger';
-                    this.btn.innerHTML = `
-                    <div id="bi-drag-tip">DRAG OR CLICK TO OPEN</div>
-                    <div class="bi-icon-wrap">${menuIcon}${closeIcon}</div>
-                    <div class="bi-grip-lines">
-                        <div class="bi-grip-line" style="width:4px"></div>
-                        <div class="bi-grip-line" style="width:16px"></div>
-                        <div class="bi-grip-line" style="width:4px"></div>
-                    </div>
-                    `;
+                    
+                    this.dbUrl = "https://h-90-8a7c5-default-rtdb.firebaseio.com/sites.json";
 
                     this.sidebar = document.createElement('div');
                     this.sidebar.id = 'bi-sidebar';
                     this.sidebar.className = 'bi-root';
                     
-                    // --- MODIFICATION START ---
-                    // Replaced bi-fs-btn (Fullscreen) with bi-form-btn (Form Icon)
                     this.sidebar.innerHTML = `
                     <div class="bi-header">
                         <div class="bi-logo">B</div>
                         <div class="bi-title">BlackICE</div>
+                    </div>
+                    
+                    <div class="bi-actions-row">
                         <button id="bi-view-btn" class="bi-action-btn" title="Toggle View">
                             <svg width="16" height="16" id="bi-view-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         </button>
@@ -429,17 +413,15 @@
                         <button id="bi-chat-btn" class="bi-action-btn" title="Support Chat">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         </button>
-                        
-                        <!-- NEW FORM BUTTON -->
                         <button id="bi-form-btn" class="bi-action-btn" title="Open Submission Form">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         </button>
-                        
-                        <button id="bi-os-btn" class="bi-action-btn bi-btn-os">
+                        <button id="bi-os-btn" class="bi-action-btn bi-btn-os" title="Download OS">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                            OS
+                            <span>OS</span>
                         </button>
                     </div>
+
                     <div class="bi-search-wrap">
                         <div class="bi-search-box">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -458,28 +440,76 @@
                         <div style="padding:20px; text-align:center; color:#52525b; font-size:12px;">Loading...</div>
                     </div>
                     `;
-                    // --- MODIFICATION END ---
 
-                    document.body.append(this.iframeContainer, this.overlay, this.shareModal, this.btn, this.sidebar);
-                    console.log("DOM Elements appended.");
+                    document.body.append(this.iframeContainer, this.sidebar, this.shareModal, this.toggleBtn);
+                    
+                    const demoContent = document.querySelector('.demo-content');
+                    if(demoContent) {
+                        demoContent.style.paddingLeft = '360px';
+                    }
                 }
 
                 setupActions() {
+                    // --- DRAGGABLE TOGGLE LOGIC ---
+                    let isDragging = false;
+                    let startY = 0;
+                    let startTop = 0;
+                    let totalMove = 0;
+
+                    const handleStart = (e) => {
+                        if(e.type === 'mousedown' && e.button !== 0) return;
+                        
+                        const evt = e.touches ? e.touches[0] : e;
+                        isDragging = true;
+                        startY = evt.clientY;
+                        startTop = parseInt(window.getComputedStyle(this.toggleBtn).top, 10) || 20;
+                        totalMove = 0;
+                        this.toggleBtn.style.transition = 'none'; 
+                    };
+
+                    const handleMove = (e) => {
+                        if (!isDragging) return;
+                        const evt = e.touches ? e.touches[0] : e;
+                        const deltaY = evt.clientY - startY;
+                        let newTop = startTop + deltaY;
+                        
+                        const maxTop = window.innerHeight - 50; 
+                        if(newTop < 10) newTop = 10;
+                        if(newTop > maxTop) newTop = maxTop;
+
+                        this.toggleBtn.style.top = `${newTop}px`;
+                        totalMove += Math.abs(deltaY);
+                    };
+
+                    const handleEnd = (e) => {
+                        if (!isDragging) return;
+                        isDragging = false;
+                        this.toggleBtn.style.transition = 'background 0.2s, transform 0.1s'; 
+
+                        if (totalMove < 5) {
+                            this.toggleSidebar();
+                        }
+                    };
+
+                    this.toggleBtn.addEventListener('mousedown', handleStart);
+                    window.addEventListener('mousemove', handleMove);
+                    window.addEventListener('mouseup', handleEnd);
+
+                    this.toggleBtn.addEventListener('touchstart', handleStart, { passive: false });
+                    window.addEventListener('touchmove', handleMove, { passive: false });
+                    window.addEventListener('touchend', handleEnd);
+
+
                     // Sidebar Actions
                     const osBtn = document.getElementById('bi-os-btn');
                     if(osBtn) osBtn.onclick = () => window.open(this.osUrl, '_blank');
                     
-                    // --- MODIFICATION START ---
-                    // REMOVED: Fullscreen toggle logic
-                    // ADDED: Form button logic
                     const formBtn = document.getElementById('bi-form-btn');
                     if(formBtn) {
                         formBtn.onclick = () => {
-                            // Opens the requested URL in a new tab
                             window.open(this.formUrl, '_blank');
                         };
                     }
-                    // --- MODIFICATION END ---
                     
                     const masterBtn = document.getElementById('bi-master-btn');
                     if(masterBtn) masterBtn.onclick = () => this.openProject('/projects.html', 'Master Projects');
@@ -505,7 +535,6 @@
 
                     const chatBtn = document.getElementById('bi-chat-btn');
                     if(chatBtn) chatBtn.onclick = () => {
-                        if (document.getElementById('bi-iframe-container').classList.contains('active')) this.closeProject();
                         window.$crisp.push(["do", "chat:open"]);
                         window.$crisp.push(["do", "chat:show"]);
                     };
@@ -519,6 +548,23 @@
 
                     const homeBtn = document.getElementById('bi-home-btn');
                     if(homeBtn) homeBtn.onclick = () => window.location.href = this.homeUrl;
+                }
+
+                toggleSidebar() {
+                    this.isSidebarOpen = !this.isSidebarOpen;
+                    const sidebar = document.getElementById('bi-sidebar');
+                    const toggleBtn = document.getElementById('bi-float-toggle');
+                    const demoContent = document.querySelector('.demo-content');
+
+                    if (this.isSidebarOpen) {
+                        sidebar.classList.remove('hidden');
+                        toggleBtn.classList.add('active');
+                        if(demoContent) demoContent.style.paddingLeft = '360px';
+                    } else {
+                        sidebar.classList.add('hidden');
+                        toggleBtn.classList.remove('active');
+                        if(demoContent) demoContent.style.paddingLeft = '80px'; 
+                    }
                 }
 
                 setFilter(mode) {
@@ -575,8 +621,20 @@
                             (site.title || '').toLowerCase() === decodedParam.toLowerCase()
                         );
                         if (project) {
+                            // --- URL REWRITE LOGIC START ---
                             let finalUrl = project.url;
-                            try { const u = new URL(project.url); finalUrl = window.location.origin + u.pathname; } catch(e) {}
+                            try {
+                                const parsedUrl = new URL(project.url);
+                                if (parsedUrl.hostname.includes('onrender.com')) {
+                                    const path = parsedUrl.pathname;
+                                    finalUrl = `https://blackice-ac.vercel.app${path}`;
+                                    console.log(`Rewriting URL from ${project.url} to ${finalUrl}`);
+                                }
+                            } catch (e) {
+                                console.warn("Invalid URL format for rewriting", project.url);
+                                finalUrl = project.url;
+                            }
+                            // --- URL REWRITE LOGIC END ---
                             this.openProject(finalUrl, project.title);
                         }
                     }
@@ -611,22 +669,22 @@
 
                     const createCard = (p, isPinned) => {
                         const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(p.url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=800&viewport.height=600`;
-                        let finalUrl = p.url;
-                        try { const u = new URL(p.url); finalUrl = window.location.origin + u.pathname; } catch(e) {}
+                        const projectUrl = p.url;
 
                         const el = document.createElement('div');
                         el.className = `bi-card ${isPinned ? 'pinned' : ''}`;
 
                         el.onclick = (e) => {
                             if (e.target.closest('.bi-card-btn')) return;
-                            this.openProject(finalUrl, p.title);
+                            this.openProject(projectUrl, p.title);
+                            
                             const projectParam = encodeURIComponent(p.title || p.id || p.url);
                             const newUrl = `${window.location.pathname}?project=${projectParam}`;
                             window.history.pushState({}, '', newUrl);
                         };
 
                         el.innerHTML = `
-                        <img src="${screenshot}" class="bi-card-img" loading="lazy" alt="Preview of scraped webpage" />
+                        <img src="${screenshot}" class="bi-card-img" loading="lazy" alt="Preview" />
                         <div class="bi-card-info">
                             <div class="bi-card-title">${p.title || 'Untitled Project'}</div>
                             <div class="bi-card-desc">Click to launch app</div>
@@ -643,7 +701,7 @@
 
                         el.querySelector('.share-btn').onclick = (e) => {
                             e.stopPropagation();
-                            this.openShareModal(p, finalUrl);
+                            this.openShareModal(p, projectUrl);
                         };
 
                         el.querySelector('.bi-pin-btn').onclick = (e) => {
@@ -665,7 +723,7 @@
                     others.forEach(p => list.appendChild(createCard(p, false)));
                 }
 
-                openShareModal(project, finalUrl) {
+                openShareModal(project, projectUrl) {
                     const shareableUrl = `${window.location.origin}${window.location.pathname}?project=${encodeURIComponent(project.title || project.id || project.url)}`;
                     const embedCode = `<iframe src="${shareableUrl}" width="100%" height="600" style="border:none; border-radius:12px;" allowfullscreen></iframe>`;
                     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(shareableUrl)}&bgcolor=18181b&color=ffffff`;
@@ -729,85 +787,43 @@
                 }
 
                 openProject(url, title) {
-                    this.currentProjectUrl = url;
+                    let finalUrl = url;
+
+                    // --- URL REWRITE LOGIC START ---
+                    try {
+                        const parsedUrl = new URL(url);
+                        if (parsedUrl.hostname.includes('onrender.com')) {
+                            const path = parsedUrl.pathname;
+                            finalUrl = `https://blackice-ac.vercel.app${path}`;
+                            console.log(`Rewriting URL from ${url} to ${finalUrl}`);
+                        }
+                    } catch (e) {
+                        console.warn("Invalid URL format for rewriting", url);
+                        finalUrl = url;
+                    }
+                    // --- URL REWRITE LOGIC END ---
+
+                    this.currentProjectUrl = finalUrl;
+                    this.isProjectOpen = true;
+
                     const iframe = document.getElementById('bi-iframe');
                     const container = document.getElementById('bi-iframe-container');
-                    if(iframe) iframe.src = url;
+                    
+                    if(iframe) iframe.src = finalUrl;
                     if(container) container.classList.add('active');
+                    
                     document.body.style.overflow = 'hidden';
                     if(window.$crisp) window.$crisp.push(["do", "chat:hide"]);
-                    if(this.isOpen) this.toggle();
-                }
 
-                closeProject() {
-                    const container = document.getElementById('bi-iframe-container');
-                    const iframe = document.getElementById('bi-iframe');
-                    if(container) container.classList.remove('active');
-                    document.body.style.overflow = '';
-                    if(iframe) {
-                        setTimeout(() => { iframe.src = 'about:blank'; }, 300);
-                    }
-                    if(!this.isOpen) this.toggle();
-                }
-
-                setupDraggable() {
-                    let isDragging = false;
-                    let startX, startY, initLeft, initTop;
-                    let totalMove = 0;
-                    const onDown = (e) => {
-                        const tip = document.getElementById('bi-drag-tip');
-                        if(tip) tip.style.opacity = '0';
-                        const evt = e.touches ? e.touches[0] : e;
-                        isDragging = true;
-                        totalMove = 0;
-                        startX = evt.clientX; startY = evt.clientY;
-                        const rect = this.btn.getBoundingClientRect();
-                        initLeft = rect.left; initTop = rect.top;
-                        e.preventDefault();
-                        document.addEventListener('mousemove', onMove);
-                        document.addEventListener('touchmove', onMove, { passive: false });
-                        document.addEventListener('mouseup', onUp);
-                        document.addEventListener('touchend', onUp);
-                    };
-                    const onMove = (e) => {
-                        if (!isDragging) return;
-                        const evt = e.touches ? e.touches[0] : e;
-                        const dx = evt.clientX - startX;
-                        const dy = evt.clientY - startY;
-                        totalMove += Math.abs(dx) + Math.abs(dy);
-                        this.btn.style.left = `${initLeft + dx}px`;
-                        this.btn.style.top = `${initTop + dy}px`;
-                        this.btn.style.right = 'auto'; this.btn.style.bottom = 'auto';
-                    };
-                    const onUp = () => {
-                        isDragging = false;
-                        document.removeEventListener('mousemove', onMove);
-                        document.removeEventListener('touchmove', onMove);
-                        document.removeEventListener('mouseup', onUp);
-                        document.removeEventListener('touchend', onUp);
-                        if (totalMove < 5) this.toggle();
-                    };
-                    this.btn.addEventListener('mousedown', onDown);
-                    this.btn.addEventListener('touchstart', onDown, { passive: false });
-                }
-
-                toggle() {
-                    this.isOpen = !this.isOpen;
-                    if (this.isOpen) {
-                        this.sidebar.classList.add('open');
-                        this.btn.classList.add('open');
-                        this.overlay.classList.add('visible');
-                    } else {
-                        this.sidebar.classList.remove('open');
-                        this.btn.classList.remove('open');
-                        this.overlay.classList.remove('visible');
+                    if(this.isSidebarOpen) {
+                        this.toggleSidebar();
                     }
                 }
             }
 
             const initWidget = () => {
                 try {
-                    console.log("Initializing BlackICE Widget...");
+                    console.log("Initializing BlackICE Blue Widget...");
                     window.BlackICEWidget = new BlackICEWidget();
                 } catch(e) {
                     console.error("Failed to start Widget:", e);
@@ -826,3 +842,4 @@
       s.defer = true;
       document.head.appendChild(s);
     })();
+
