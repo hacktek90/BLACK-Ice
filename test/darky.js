@@ -1,4 +1,18 @@
 (function () {
+
+    // 🔴 MOBILE REDIRECT (runs first)
+    (function () {
+        const ua = navigator.userAgent;
+        const isMobileUA = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(ua);
+        const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+
+        if ((isMobileUA || isSmallScreen) && window.location.pathname !== "/mobile.html") {
+            window.location.replace("/mobile.html"); // better than href (no back button loop)
+            return; // stop further execution
+        }
+    })();
+
+
     class DarkyWidget {
         constructor(options = {}) {
             this.options = {
@@ -25,8 +39,8 @@
                     top: 50%;
                     ${isRight ? 'right: 0;' : 'left: 0;'}
                     transform: translateY(-50%);
-                    width: 24px;   /* Smaller width */
-                    height: 34px;  /* Smaller height */
+                    width: 24px;
+                    height: 34px;
                     border-radius: ${isRight ? '4px 0 0 4px' : '0 4px 4px 0'};
                     cursor: pointer;
                     z-index: 2147483647;
@@ -42,21 +56,19 @@
                 }
                 
                 .dw-widget:hover {
-                    width: 28px; /* Subtle growth on hover */
+                    width: 28px;
                 }
 
                 .dw-icon {
-                    width: 16px; height: 16px; /* Scaled down icon */
+                    width: 16px; height: 16px;
                     position: absolute;
                     transition: opacity 0.4s, transform 0.4s; pointer-events: none;
                 }
                 .dw-icon-moon { opacity: 1; fill: #000; }
                 .dw-icon-sun { opacity: 0; fill: #fff; }
                 
-                /* DARK MODE FILTER */
                 html.dw-dark-mode { filter: invert(1) hue-rotate(180deg); transition: filter 0.4s ease; }
                 
-                /* RE-INVERSION */
                 html.dw-dark-mode img, 
                 html.dw-dark-mode video, 
                 html.dw-dark-mode .dw-ignore,
@@ -68,7 +80,6 @@
                 html.dw-dark-mode .dw-icon-moon { opacity: 0; transform: scale(0.6) rotate(45deg); }
                 html.dw-dark-mode .dw-icon-sun { opacity: 1; transform: scale(1) rotate(0deg); }
 
-                /* HIDE ON MOBILE (Screens smaller than 768px) */
                 @media (max-width: 768px) {
                     .dw-widget {
                         display: none !important;
@@ -121,10 +132,3 @@
         new DarkyWidget();
     }
 })();
-// Credits
-const asciiLogo = `
-    ▄▀█ ▀▄▀ █▀█ ▄▀█ █▀▄ █▀▀ █▀█
-    █▀█ █░█ █▀▄ █▀█ █▄▀ ██▄ █▀▄`;
-console.log('%c' + asciiLogo, 'color: #00ff41; font-weight: bold; font-family: monospace;');
-
-
