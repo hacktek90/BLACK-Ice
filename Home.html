@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
 
@@ -7,23 +7,27 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>BlackICE Portal — AI, Productivity & Web Tools Platform(SUBHO)</title>
+    <!-- SEO Optimized Title: Includes main keywords -->
+    <title>BlackICE Portal — AI Tools, Productivity Apps & Developer Utilities</title>
 
+    <!-- SEO Optimized Description: Natural keyword placement -->
     <meta
       name="description"
-      content="BlackICE Portal is a minimal, modern web-based platform offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration — accessible instantly in your browser."
+      content="BlackICE Portal is a modern web-based platform offering AI tools, productivity apps, developer utilities, and privacy-focused search. Access document creation, media tools, and real-time collaboration instantly in your browser."
     />
     <meta name="author" content="BlackICE" />
     <meta name="robots" content="index, follow" />
+    <meta name="keywords" content="AI Tools, Web Productivity, Developer Utilities, Privacy Search, Online Workspace, Web Apps" />
 
     <meta name="theme-color" content="#09090b" />
     <meta name="color-scheme" content="dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
-    <meta property="og:title" content="BlackICE Portal" />
+    <!-- Open Graph for Social Media -->
+    <meta property="og:title" content="BlackICE Portal — AI & Web Productivity Platform" />
     <meta
       property="og:description"
-      content="A modern, minimal portal for launching AI tools, productivity apps, and web utilities."
+      content="Launch AI tools, productivity apps, and web utilities from one minimal, secure dashboard."
     />
     
     <link href="https://blackice-ac.vercel.app/home.html" rel="canonical" />
@@ -32,6 +36,7 @@
 
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -47,7 +52,7 @@
         --glass-bg: rgba(9, 9, 11, 0.65);
         --glass-border: rgba(255, 255, 255, 0.08);
         --accent-blue: #3b82f6;
-        --accent-green: #10b981; /* Added for Ecosia accent */
+        --accent-green: #10b981;
         --accent-glow: rgba(59, 130, 246, 0.5);
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
@@ -96,7 +101,7 @@
         z-index: -1;
       }
 
-      /* --- Original Layout Container --- */
+      /* --- Main Layout --- */
       .main-container {
         width: 100%;
         max-width: 900px;
@@ -294,11 +299,11 @@
         font-size: 0.8rem;
         letter-spacing: 0.02em;
         color: var(--text-muted);
-        background: rgba(16, 185, 129, 0.08); /* Subtle green tint */
+        background: rgba(16, 185, 129, 0.08);
         border: 1px solid rgba(16, 185, 129, 0.15);
         padding: 8px 16px;
         border-radius: 30px;
-        display: none; /* Hidden by default */
+        display: none;
         align-items: center;
         justify-content: center;
         gap: 8px;
@@ -333,6 +338,7 @@
         text-align: center;
       }
 
+      /* SEO: Changed span to h2 for better hierarchy */
       .section-title {
         font-size: 0.875rem;
         text-transform: uppercase;
@@ -351,12 +357,15 @@
         margin-top: 20px;
       }
 
+      /* SEO: Using article tag for self-contained content */
       .feature-item {
         padding: 16px;
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.05);
         transition: transform 0.2s ease, background 0.2s ease;
+        display: flex;
+        flex-direction: column;
       }
 
       .feature-item:hover {
@@ -404,22 +413,8 @@
           transform: translateY(0);
         }
       }
-
-      /* SEO hidden content for structure but visual separation */
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border-width: 0;
-      }
     </style>
   <base target="_blank">
-<base target="_blank">
 </head>
 
   <body>
@@ -428,7 +423,8 @@
 
     <div class="main-container">
       
-      <main class="hero-section">
+      <!-- Semantic Header for the Hero Section -->
+      <header class="hero-section">
         <h1
           role="button"
           tabindex="0"
@@ -442,19 +438,19 @@
         
         <!-- === SEARCH BAR === -->
         <div class="search-wrapper">
-          <form class="search-bar" onsubmit="handleSearch(event, 'standard')">
+          <form class="search-bar" onsubmit="handleSearch(event, 'standard')" aria-label="Search the web">
             <div class="engine-selector">
-              <select id="engine-select" onchange="updateUI()">
+              <select id="engine-select" onchange="updateUI()" aria-label="Select Search Engine">
                 <!-- Reordered: Ecosia, Startpage, DuckDuckGo -->
                 <option value="https://www.ecosia.org/search?q=%s" data-domain="www.ecosia.org" data-ai-url="">Ecosia</option>
                 <option value="https://www.startpage.com/do/search?q=%s" data-domain="www.startpage.com" data-ai-url="">Startpage</option>
                 <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com" data-ai-url="https://duck.ai/chat?q=%s">DuckDuckGo</option>
               </select>
               <!-- Default icon updated to Ecosia -->
-              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=www.ecosia.org&sz=32" alt="Search Engine">
+              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=www.ecosia.org&sz=32" alt="Search Engine Icon">
               <svg class="selector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <input type="text" id="search-query" class="search-input" placeholder="Search the web..." required autocomplete="off">
+            <input type="text" id="search-query" class="search-input" placeholder="Search the web..." required autocomplete="off" aria-label="Search Query">
             
             <div class="search-actions">
               <button type="submit" class="search-btn" title="Standard Search">
@@ -478,88 +474,94 @@
         <div class="hint-wrap">
           <div class="hint-text">Click the button toggle at left bottom to open projects</div>
         </div>
-      </main>
+      </header>
 
-      <section class="glass-card">
-        <span class="section-title">System Capabilities</span>
+      <!-- Semantic Section for Features -->
+      <section class="glass-card" itemscope itemtype="https://schema.org/SoftwareApplication">
+        <meta itemprop="name" content="BlackICE Portal" />
+        <meta itemprop="applicationCategory" content="ProductivityApplication" />
+        <meta itemprop="operatingSystem" content="Web" />
+        
+        <h2 class="section-title">System Capabilities</h2>
         
         <div class="features-grid">
-          <div class="feature-item">
-            <h3>AI Core</h3>
-            <p>Focus enhancement, health tracking, and automated intelligence workflows.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Productivity</h3>
-            <p>Task management, habit tracking, and advanced planning systems.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Creation</h3>
-            <p>Docs, slides, whiteboards, and mind maps in one unified interface.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Dev Tools</h3>
-            <p>HTML viewers, Git utilities, and minimal developer environments.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Collaboration</h3>
-            <p>Real-time chat, video calls, shared documents, and team workspaces.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Automation</h3>
-            <p>Workflow automation, AI agents, and cross-app integrations.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Media Studio</h3>
-            <p>Image generation, video editing, audio processing, and content creation tools.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Research & Analysis</h3>
-            <p>AI-powered search, document analysis, and knowledge management.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Security & Privacy</h3>
-            <p>End-to-end encryption, secure vaults, and privacy-first architecture.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Integrations</h3>
-            <p>Connect with Slack, Google Drive, Notion, and 100+ popular apps.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Calendar & Scheduling</h3>
-            <p>Smart scheduling, focus time protection, and unified calendar views.</p>
-          </div>
-          <div class="feature-item">
-            <h3>Cloud Storage</h3>
-            <p>Secure file storage, sync across devices, and team asset management.</p>
-          </div>
-        </div>
+          <!-- Feature 1: AI Core -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">AI Core</h3>
+            <p itemprop="description">Focus enhancement, health tracking, and automated intelligence workflows.</p>
+          </article>
 
-        <div class="sr-only">
-          <h2>All-in-One Web Tools & AI Utilities Platform</h2>
-          <p>
-            BlackICE Portal is a browser-based platform combining AI-powered tools,
-            productivity apps, developer utilities, document creation systems, media
-            tools, workflow automation, and real-time collaboration in a single minimal interface.
-          </p>
-          <ul>
-            <li>Use AI tools for focus, health tracking, and intelligent automation</li>
-            <li>Manage tasks, habits, notes, and advanced planning workflows</li>
-            <li>Create documents, slides, mind maps, and interactive whiteboards</li>
-            <li>Access developer utilities like HTML viewers, Git tools, and code editors</li>
-            <li>Collaborate via real-time chat, video calls, shared docs, and team workspaces</li>
-            <li>Automate workflows with AI agents and cross-platform integrations</li>
-            <li>Generate and edit media content with AI-powered image and video tools</li>
-            <li>Conduct research with AI search, document analysis, and knowledge management</li>
-            <li>Secure your data with end-to-end encryption and privacy controls</li>
-            <li>Connect with Slack, Google Drive, Notion, and 100+ popular applications</li>
-            <li>Optimize scheduling with smart calendar management and focus time protection</li>
-            <li>Store and sync files securely across all your devices</li>
-          </ul>
+          <!-- Feature 2: Productivity -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Productivity</h3>
+            <p itemprop="description">Task management, habit tracking, and advanced planning systems.</p>
+          </article>
+
+          <!-- Feature 3: Creation -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Creation</h3>
+            <p itemprop="description">Docs, slides, whiteboards, and mind maps in one unified interface.</p>
+          </article>
+
+          <!-- Feature 4: Dev Tools -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Dev Tools</h3>
+            <p itemprop="description">HTML viewers, Git utilities, and minimal developer environments.</p>
+          </article>
+
+          <!-- Feature 5: Collaboration -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Collaboration</h3>
+            <p itemprop="description">Real-time chat, video calls, shared documents, and team workspaces.</p>
+          </article>
+
+          <!-- Feature 6: Automation -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Automation</h3>
+            <p itemprop="description">Workflow automation, AI agents, and cross-app integrations.</p>
+          </article>
+
+          <!-- Feature 7: Media Studio -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Media Studio</h3>
+            <p itemprop="description">Image generation, video editing, audio processing, and content creation tools.</p>
+          </article>
+
+          <!-- Feature 8: Research & Analysis -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Research & Analysis</h3>
+            <p itemprop="description">AI-powered search, document analysis, and knowledge management.</p>
+          </article>
+
+          <!-- Feature 9: Security -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Security & Privacy</h3>
+            <p itemprop="description">End-to-end encryption, secure vaults, and privacy-first architecture.</p>
+          </article>
+
+          <!-- Feature 10: Integrations -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Integrations</h3>
+            <p itemprop="description">Connect with Slack, Google Drive, Notion, and 100+ popular apps.</p>
+          </article>
+
+          <!-- Feature 11: Calendar -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Calendar & Scheduling</h3>
+            <p itemprop="description">Smart scheduling, focus time protection, and unified calendar views.</p>
+          </article>
+
+          <!-- Feature 12: Cloud Storage -->
+          <article class="feature-item" itemscope itemprop="featureList" itemtype="https://schema.org/SoftwareFeature">
+            <h3 itemprop="name">Cloud Storage</h3>
+            <p itemprop="description">Secure file storage, sync across devices, and team asset management.</p>
+          </article>
         </div>
       </section>
 
     </div>
 
+    <!-- Enhanced JSON-LD Structured Data for Rich Snippets -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -569,6 +571,22 @@
         "operatingSystem": "Web",
         "description": "A minimal web-based portal offering AI tools, productivity apps, developer utilities, document creation, media tools, and real-time collaboration.",
         "url": "https://blackice-ac.vercel.app/",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "AI Core",
+            "Productivity Apps",
+            "Document Creation",
+            "Developer Utilities",
+            "Real-time Collaboration",
+            "Workflow Automation",
+            "Media Studio",
+            "Privacy Tools",
+            "Cloud Storage"
+        ],
         "creator": {
           "@type": "Organization",
           "name": "BlackICE"
