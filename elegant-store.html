@@ -400,11 +400,11 @@
     </div>
   </div>
 
-  <!-- Edit Title Modal (Admin Only) -->
+  <!-- Edit Project Modal (Admin Only) -->
   <div id="edit-drawer" class="drawer">
     <div class="drawer-content">
-      <h2 style="margin:0 0 8px; font-size:20px;">Edit Project Name</h2>
-      <p style="margin:0; color:var(--text-muted); font-size:14px;">Update the title for this site.</p>
+      <h2 style="margin:0 0 8px; font-size:20px;">Edit Project</h2>
+      <p style="margin:0; color:var(--text-muted); font-size:14px;">Update the project details.</p>
       
       <div class="form-stack">
         <input id="edit-id" type="hidden">
@@ -412,9 +412,13 @@
           <label>Project Name</label>
           <input id="edit-title-input" class="input-field" placeholder="Enter new project name">
         </div>
+        <div>
+          <label>Live URL</label>
+          <input id="edit-url-input" type="url" class="input-field" placeholder="https://...">
+        </div>
 
         <div style="display:flex; gap:10px; margin-top:8px;">
-          <button id="do-edit" class="btn primary" style="flex:1; justify-content:center;">Save Change</button>
+          <button id="do-edit" class="btn primary" style="flex:1; justify-content:center;">Save Changes</button>
           <button id="close-edit-drawer" class="btn" style="flex:1; justify-content:center;">Cancel</button>
         </div>
       </div>
@@ -467,6 +471,7 @@
     // Edit Drawer Logic
     const editDrawer = $('edit-drawer');
     const editInput = $('edit-title-input');
+    const editUrlInput = $('edit-url-input'); // New reference
     const editIdField = $('edit-id');
 
     // Expose to window so inline HTML can call it
@@ -475,6 +480,7 @@
       if(site) {
         editIdField.value = site.id;
         editInput.value = site.title || '';
+        editUrlInput.value = site.url || ''; // Pre-fill URL
         editDrawer.classList.add('open');
         setTimeout(() => editInput.focus(), 100); // Focus after transition
       }
@@ -486,13 +492,15 @@
     // Save Edit Logic
     $('do-edit').onclick = async () => {
       const newTitle = editInput.value.trim();
+      const newUrl = editUrlInput.value.trim(); // Get URL value
       const id = editIdField.value;
 
-      if(!newTitle) return alert('Title cannot be empty.');
+      if(!newTitle || !newUrl) return alert('Project Name and URL cannot be empty.');
       if(!id) return;
 
       try {
-        await update(ref(db, `sites/${id}`), { title: newTitle });
+        // Update both title and url
+        await update(ref(db, `sites/${id}`), { title: newTitle, url: newUrl });
         editDrawer.classList.remove('open');
       } catch(e) {
         alert(e.message);
@@ -537,7 +545,7 @@
         if(isAdmin) {
           adminHTML = `
             <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
-               <button class="chip edit-chip" onclick="openEditModal('${s.id}')">Edit Name</button>
+               <button class="chip edit-chip" onclick="openEditModal('${s.id}')">Edit</button>
                <button class="chip delete-chip" onclick="delSite('${s.id}')">Delete</button>
             </div>
           `;
