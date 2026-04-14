@@ -182,7 +182,7 @@
 
     .card-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 16px;
     }
 
@@ -258,6 +258,7 @@
       cursor: pointer;
       border: 1px solid transparent;
       transition: all 0.2s;
+      white-space: nowrap;
     }
     .delete-chip {
       background: rgba(239, 68, 68, 0.1);
@@ -302,8 +303,16 @@
       box-shadow: 0 40px 80px rgba(0,0,0,0.8);
       transform: scale(0.95);
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .drawer.open .drawer-content { transform: scale(1); }
+
+    /* Custom scrollbar for drawer */
+    .drawer-content::-webkit-scrollbar { width: 6px; }
+    .drawer-content::-webkit-scrollbar-track { background: transparent; }
+    .drawer-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    .drawer-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
     .form-stack { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
     label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
@@ -316,14 +325,62 @@
       border-radius: 10px;
       color: white;
       font-family: inherit;
+      font-size: 14px;
       outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
     }
     .input-field:focus { border-color: var(--accent); }
+
+    /* Character count */
+    .char-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 4px;
+      transition: color 0.2s;
+    }
+    .char-count.warn { color: #f59e0b; }
+    .char-count.over { color: var(--danger); }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #18181b;
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34,197,94,0.5);
+      flex-shrink: 0;
+    }
 
     @media (max-width: 600px) {
       header { top: 0; margin-bottom: 24px; }
       .nav-island { border-radius: 0; border-top: none; border-left: none; border-right: none; }
       .grid { grid-template-columns: 1fr; }
+      .drawer-content { padding: 24px; border-radius: 20px; }
     }
   </style>
 </head>
@@ -384,7 +441,8 @@
         </div>
         <div>
           <label>Description</label>
-          <textarea id="f-desc" class="input-field" rows="3" placeholder="Briefly describe functionality..."></textarea>
+          <textarea id="f-desc" class="input-field" rows="3" placeholder="Briefly describe functionality..." maxlength="300"></textarea>
+          <div class="char-count"><span id="submit-char-count">0</span>/300</div>
         </div>
         
         <!-- Hosting Hint -->
@@ -416,6 +474,15 @@
           <label>Live URL</label>
           <input id="edit-url-input" type="url" class="input-field" placeholder="https://...">
         </div>
+        <div>
+          <label>Icon URL</label>
+          <input id="edit-img-input" type="url" class="input-field" placeholder="https://... (leave blank to keep current)">
+        </div>
+        <div>
+          <label>Description</label>
+          <textarea id="edit-desc-input" class="input-field" rows="4" placeholder="Update the description..." maxlength="300"></textarea>
+          <div class="char-count"><span id="edit-char-count">0</span>/300</div>
+        </div>
 
         <div style="display:flex; gap:10px; margin-top:8px;">
           <button id="do-edit" class="btn primary" style="flex:1; justify-content:center;">Save Changes</button>
@@ -425,9 +492,14 @@
     </div>
   </div>
 
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <span class="dot"></span>
+    <span id="toast-msg">Saved successfully</span>
+  </div>
+
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    // Added 'update' to imports
     import { getDatabase, ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     const firebaseConfig = {
@@ -444,13 +516,40 @@
     const db = getDatabase(app);
     const $ = id => document.getElementById(id);
 
-    // Drawer Logic (Submit)
+    // --- Toast ---
+    let toastTimer;
+    function showToast(msg) {
+      const toast = $('toast');
+      $('toast-msg').textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // --- Character Counters ---
+    function setupCharCounter(textareaId, countId) {
+      const ta = $(textareaId);
+      const countEl = $(countId);
+      const updateCount = () => {
+        const len = ta.value.length;
+        countEl.textContent = len;
+        const wrapper = countEl.parentElement;
+        wrapper.classList.remove('warn', 'over');
+        if (len > 300) wrapper.classList.add('over');
+        else if (len > 250) wrapper.classList.add('warn');
+      };
+      ta.addEventListener('input', updateCount);
+      return updateCount;
+    }
+    const updateSubmitCount = setupCharCounter('f-desc', 'submit-char-count');
+    const updateEditCount = setupCharCounter('edit-desc-input', 'edit-char-count');
+
+    // --- Submit Drawer ---
     const drawer = $('drawer');
     $('open-submit').onclick = () => drawer.classList.add('open');
     $('close-drawer').onclick = () => drawer.classList.remove('open');
     drawer.onclick = (e) => { if(e.target === drawer) drawer.classList.remove('open'); }
 
-    // Submit Logic
     $('do-submit').onclick = async () => {
       const title = $('f-title').value.trim();
       const url = $('f-url').value.trim();
@@ -463,51 +562,64 @@
         await push(ref(db, 'sites'), { title, url, image, description, timestamp: Date.now() });
         drawer.classList.remove('open');
         ['f-title','f-url','f-img','f-desc'].forEach(id => $(id).value = '');
+        updateSubmitCount();
+        showToast('Site published successfully');
       } catch(e) {
         alert(e.message);
       }
     };
 
-    // Edit Drawer Logic
+    // --- Edit Drawer ---
     const editDrawer = $('edit-drawer');
     const editInput = $('edit-title-input');
-    const editUrlInput = $('edit-url-input'); // New reference
+    const editUrlInput = $('edit-url-input');
+    const editImgInput = $('edit-img-input');
+    const editDescInput = $('edit-desc-input');
     const editIdField = $('edit-id');
 
-    // Expose to window so inline HTML can call it
     window.openEditModal = (id) => {
       const site = sitesCache.find(s => s.id === id);
       if(site) {
         editIdField.value = site.id;
         editInput.value = site.title || '';
-        editUrlInput.value = site.url || ''; // Pre-fill URL
+        editUrlInput.value = site.url || '';
+        editImgInput.value = site.image || '';
+        editDescInput.value = site.description || '';
+        updateEditCount();
         editDrawer.classList.add('open');
-        setTimeout(() => editInput.focus(), 100); // Focus after transition
+        setTimeout(() => editInput.focus(), 100);
       }
     };
 
     $('close-edit-drawer').onclick = () => editDrawer.classList.remove('open');
     editDrawer.onclick = (e) => { if(e.target === editDrawer) editDrawer.classList.remove('open'); }
 
-    // Save Edit Logic
     $('do-edit').onclick = async () => {
       const newTitle = editInput.value.trim();
-      const newUrl = editUrlInput.value.trim(); // Get URL value
+      const newUrl = editUrlInput.value.trim();
+      const newImg = editImgInput.value.trim();
+      const newDesc = editDescInput.value.trim();
       const id = editIdField.value;
 
       if(!newTitle || !newUrl) return alert('Project Name and URL cannot be empty.');
       if(!id) return;
 
       try {
-        // Update both title and url
-        await update(ref(db, `sites/${id}`), { title: newTitle, url: newUrl });
+        const updates = { title: newTitle, url: newUrl };
+        // Only update description if it's not empty
+        if (newDesc) updates.description = newDesc;
+        // Only update image if a new one is provided
+        if (newImg) updates.image = newImg;
+
+        await update(ref(db, `sites/${id}`), updates);
         editDrawer.classList.remove('open');
+        showToast('Project updated successfully');
       } catch(e) {
         alert(e.message);
       }
     };
 
-    // Render Logic
+    // --- Render ---
     let sitesCache = [];
     const grid = $('grid');
     const params = new URLSearchParams(location.search);
@@ -527,7 +639,12 @@
 
     function render(list) {
       const q = $('q').value.toLowerCase();
-      const filtered = q ? list.filter(s => (s.title||'').toLowerCase().includes(q)) : list;
+      const filtered = q ? list.filter(s => (s.title||'').toLowerCase().includes(q) || (s.description||'').toLowerCase().includes(q)) : list;
+      
+      if (filtered.length === 0 && q) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted)">No results for "${esc(q)}".</div>`;
+        return;
+      }
       
       grid.innerHTML = filtered.map(s => {
         const title = esc(s.title);
@@ -540,13 +657,12 @@
           ? `<img src="${img}" class="icon-img" onerror="this.style.display='none';this.parentNode.innerText='${letter}'">`
           : letter;
 
-        // Admin Buttons
         let adminHTML = '';
         if(isAdmin) {
           adminHTML = `
-            <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+            <div style="margin-left:auto; display:flex; gap:6px; align-items:center; flex-shrink:0;">
                <button class="chip edit-chip" onclick="openEditModal('${s.id}')">Edit</button>
-               <button class="chip delete-chip" onclick="delSite('${s.id}')">Delete</button>
+               <button class="chip delete-chip" onclick="delSite('${s.id}')">Del</button>
             </div>
           `;
         }
@@ -555,7 +671,7 @@
           <article class="card">
             <div class="card-header">
               <div class="icon-box">${iconHTML}</div>
-              <div class="meta">
+              <div class="meta" style="flex:1; min-width:0;">
                 <h3>${title}</h3>
                 <p>${desc}</p>
               </div>
@@ -572,7 +688,10 @@
     $('q').oninput = () => render(sitesCache);
     
     window.delSite = async (id) => {
-      if(confirm('Delete this site permanently?')) await remove(ref(db, `sites/${id}`));
+      if(confirm('Delete this site permanently?')) {
+        await remove(ref(db, `sites/${id}`));
+        showToast('Site deleted');
+      }
     }
   </script>
 </body>
