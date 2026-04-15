@@ -1,0 +1,2882 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotionTrack — Real-Time Motion Detector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --bg: #0a0e13;
+      --bg-secondary: #111820;
+      --card: #151c27;
+      --border: #1e2a3a;
+      --fg: #e0e8f0;
+      --muted: #5a6a7e;
+      --accent: #00e59b;
+      --accent-dim: rgba(0, 229, 155, 0.15);
+      --danger: #ff4757;
+      --danger-dim: rgba(255, 71, 87, 0.15);
+      --warning: #ffa726;
+      --warning-dim: rgba(255, 167, 38, 0.15);
+      --cyan: #00d4ff;
+      --cyan-dim: rgba(0, 212, 255, 0.1);
+      --remote: #c084fc;
+      --remote-dim: rgba(192, 132, 252, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 20% 50%, rgba(0, 229, 155, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(255, 71, 87, 0.015) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============ HEADER ============ */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 14, 19, 0.85);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 12px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), #00b87a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--bg);
+      box-shadow: 0 0 20px rgba(0, 229, 155, 0.25);
+    }
+
+    .logo-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--fg);
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .room-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 229, 155, 0.3);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .room-badge.visible {
+      display: flex;
+    }
+
+    .room-badge:hover {
+      background: rgba(0, 229, 155, 0.25);
+    }
+
+    .room-badge i {
+      font-size: 11px;
+    }
+
+    .device-count-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      background: var(--cyan-dim);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      font-size: 12px;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    .device-count-badge.visible {
+      display: flex;
+    }
+
+    .device-count-badge i {
+      font-size: 10px;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .status-badge .badge-text {
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    .status-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    .status-dot.motion {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      animation: pulse-dot 0.5s infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    /* ============ MAIN LAYOUT ============ */
+    main {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 0;
+      height: calc(100vh - 65px);
+      height: calc(100dvh - 65px);
+    }
+
+    /* ============ VIDEO SECTION ============ */
+    .video-section {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .video-container {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    #videoFeed {
+      display: none;
+    }
+
+    #mainCanvas,
+    #overlayCanvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    #mainCanvas {
+      z-index: 1;
+    }
+
+    #overlayCanvas {
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+    }
+
+    .corner-brackets {
+      position: absolute;
+      inset: 16px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .corner-brackets::before,
+    .corner-brackets::after,
+    .corner-brackets span::before,
+    .corner-brackets span::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: var(--accent);
+      border-style: solid;
+      border-width: 0;
+      opacity: 0.6;
+    }
+
+    .corner-brackets::before {
+      top: 0;
+      left: 0;
+      border-top-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .corner-brackets::after {
+      top: 0;
+      right: 0;
+      border-top-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .corner-brackets span::before {
+      bottom: 0;
+      left: 0;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .corner-brackets span::after {
+      bottom: 0;
+      right: 0;
+      border-bottom-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .motion-alert {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 7px 20px;
+      border-radius: 8px;
+      background: rgba(255, 71, 87, 0.9);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 30px rgba(255, 71, 87, 0.4);
+      animation: alert-flash 0.6s ease-out;
+      white-space: nowrap;
+    }
+
+    .motion-alert.visible {
+      display: flex;
+    }
+
+    @keyframes alert-flash {
+      0% {
+        transform: translateX(-50%) scale(1.2);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .timestamp-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 16px;
+      z-index: 5;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: rgba(224, 232, 240, 0.65);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .motion-pct-overlay {
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      z-index: 5;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .no-camera {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+      padding: 30px;
+      width: 100%;
+    }
+
+    .no-camera-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      color: var(--muted);
+    }
+
+    .no-camera h2 {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--fg);
+    }
+
+    .no-camera p {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .video-bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(21, 28, 39, 0.9);
+      backdrop-filter: blur(10px);
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .motion-meter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .motion-meter-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .meter-track {
+      flex: 1;
+      height: 5px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 3px;
+      background: var(--accent);
+      transition: width 0.15s ease, background 0.3s;
+      box-shadow: 0 0 8px rgba(0, 229, 155, 0.3);
+    }
+
+    .meter-fill.warning {
+      background: var(--warning);
+      box-shadow: 0 0 8px rgba(255, 167, 38, 0.3);
+    }
+
+    .meter-fill.danger {
+      background: var(--danger);
+      box-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
+    }
+
+    .meter-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      min-width: 44px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .bottom-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* ============ BUTTONS ============ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #00b87a);
+      color: var(--bg);
+      border: none;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #00ffaa, var(--accent));
+      color: var(--bg);
+      box-shadow: 0 0 20px rgba(0, 229, 155, 0.3);
+    }
+
+    .btn-danger {
+      border-color: var(--danger);
+      background: var(--danger-dim);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+
+    .btn-icon {
+      padding: 6px;
+      min-width: 32px;
+      justify-content: center;
+    }
+
+    /* ============ SIDEBAR ============ */
+    .sidebar {
+      border-left: 1px solid var(--border);
+      background: var(--bg-secondary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .sidebar-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header h3 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+    }
+
+    /* Collapsible section wrapper */
+    .sidebar-section {
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .section-toggle {
+      display: none;
+      width: 100%;
+      padding: 12px 18px;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--fg);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: left;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .section-toggle i.toggle-chevron {
+      margin-left: auto;
+      font-size: 10px;
+      transition: transform 0.25s;
+      color: var(--muted);
+    }
+
+    .section-toggle.collapsed i.toggle-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .section-toggle:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .section-toggle .section-icon {
+      margin-right: 6px;
+      font-size: 11px;
+    }
+
+    .section-content {
+      transition: max-height 0.35s ease, opacity 0.25s;
+      max-height: 600px;
+      opacity: 1;
+      overflow: hidden;
+    }
+
+    .section-content.collapsed {
+      max-height: 0;
+      opacity: 0;
+    }
+
+    /* Room info */
+    .room-info-section {
+      display: none;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 229, 155, 0.03);
+      flex-shrink: 0;
+    }
+
+    .room-info-section.visible {
+      display: block;
+    }
+
+    .room-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .room-info-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .room-id-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .room-id-code {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 3px;
+    }
+
+    .room-id-copy {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .room-id-copy:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .room-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .room-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .room-meta-item i {
+      font-size: 9px;
+    }
+
+    .room-meta-item .val {
+      color: var(--fg);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .leave-room-btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      background: transparent;
+      color: var(--danger);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .leave-room-btn:hover {
+      background: var(--danger-dim);
+      border-color: var(--danger);
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      transition: border-color 0.3s;
+    }
+
+    .stat-card.highlight {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-dim);
+    }
+
+    .stat-card .stat-icon {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-card .stat-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .stat-card.accent .stat-value {
+      color: var(--accent);
+    }
+
+    .stat-card.danger .stat-value {
+      color: var(--danger);
+    }
+
+    .stat-card.warning .stat-value {
+      color: var(--warning);
+    }
+
+    .stat-card.cyan .stat-value {
+      color: var(--cyan);
+    }
+
+    .stat-card.remote .stat-value {
+      color: var(--remote);
+    }
+
+    /* Controls */
+    .controls-section {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .control-group {
+      margin-bottom: 12px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .control-label span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .control-label .control-val {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--bg);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0, 229, 155, 0.3);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .toggle-row label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+    }
+
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      background: var(--bg);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.3s;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .toggle.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: all 0.3s;
+    }
+
+    .toggle.active::after {
+      left: 20px;
+      background: var(--accent);
+      box-shadow: 0 0 6px rgba(0, 229, 155, 0.4);
+    }
+
+    /* Event Log */
+    .log-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .event-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .event-log::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .event-log::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .event-log::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .log-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      animation: log-in 0.3s ease-out;
+      transition: background 0.2s;
+    }
+
+    .log-entry:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .log-entry.remote-entry {
+      background: rgba(192, 132, 252, 0.04);
+    }
+
+    @keyframes log-in {
+      0% {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .log-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .log-icon.enter {
+      background: var(--danger-dim);
+      color: var(--danger);
+    }
+
+    .log-icon.move {
+      background: var(--warning-dim);
+      color: var(--warning);
+    }
+
+    .log-icon.exit {
+      background: var(--cyan-dim);
+      color: var(--cyan);
+    }
+
+    .log-icon.system {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .log-icon.remote {
+      background: var(--remote-dim);
+      color: var(--remote);
+    }
+
+    .log-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .log-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg);
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .remote-tag {
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: var(--remote-dim);
+      color: var(--remote);
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .log-meta {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .log-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px;
+      color: var(--muted);
+      text-align: center;
+      gap: 6px;
+    }
+
+    .log-empty i {
+      font-size: 24px;
+      opacity: 0.3;
+    }
+
+    .log-empty p {
+      font-size: 12px;
+    }
+
+    /* ============ ALARM INDICATOR ============ */
+    .alarm-indicator {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      background: rgba(255, 71, 87, 0.15);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--danger);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: alarm-pulse 0.8s ease-in-out infinite;
+    }
+
+    .alarm-indicator.visible {
+      display: flex;
+    }
+
+    @keyframes alarm-pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* ============ MODAL ============ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: modal-bg-in 0.3s ease-out;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    @keyframes modal-bg-in {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .modal-card {
+      width: 420px;
+      max-width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: modal-card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes modal-card-in {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-top {
+      padding: 24px 24px 0;
+      text-align: center;
+    }
+
+    .modal-top .modal-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #00b87a);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--bg);
+      margin-bottom: 14px;
+      box-shadow: 0 0 30px rgba(0, 229, 155, 0.3);
+    }
+
+    .modal-top h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .modal-top p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .modal-tabs {
+      display: flex;
+      margin: 16px 24px 0;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 3px;
+    }
+
+    .modal-tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s;
+      border: none;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .modal-tab.active {
+      background: var(--card);
+      color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-tab:hover:not(.active) {
+      color: var(--fg);
+    }
+
+    .modal-body {
+      padding: 18px 24px 24px;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: tab-fade 0.25s ease-out;
+    }
+
+    @keyframes tab-fade {
+      0% {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .create-preview {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .create-preview .room-code-big {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 6px;
+      text-shadow: 0 0 30px rgba(0, 229, 155, 0.3);
+      margin-bottom: 10px;
+      min-height: 48px;
+    }
+
+    .create-preview .hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .join-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .join-input {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 20px;
+      letter-spacing: 6px;
+      text-align: center;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .join-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .join-input::placeholder {
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: none;
+    }
+
+    .join-error {
+      font-size: 12px;
+      color: var(--danger);
+      text-align: center;
+      min-height: 16px;
+      margin-bottom: 6px;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .modal-btn-primary {
+      background: linear-gradient(135deg, var(--accent), #00b87a);
+      color: var(--bg);
+    }
+
+    .modal-btn-primary:hover {
+      box-shadow: 0 0 24px rgba(0, 229, 155, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .modal-btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .modal-btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .modal-btn-ghost:hover {
+      border-color: var(--muted);
+      color: var(--fg);
+    }
+
+    .modal-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ============ TOAST ============ */
+    .toast-container {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      animation: toast-in 0.3s ease-out;
+      backdrop-filter: blur(10px);
+      max-width: 340px;
+      pointer-events: auto;
+    }
+
+    .toast.leaving {
+      animation: toast-out 0.3s ease-in forwards;
+    }
+
+    @keyframes toast-in {
+      0% {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes toast-out {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+    }
+
+    /* ============================================
+     RESPONSIVE BREAKPOINTS
+     ============================================ */
+
+    /* Tablet / small desktop */
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr 320px;
+      }
+    }
+
+    /* Tablet portrait — stack layout */
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: 48vh minmax(0, 1fr);
+        height: calc(100vh - 65px);
+        height: calc(100dvh - 65px);
+      }
+
+      .sidebar {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .header-center {
+        display: none;
+      }
+
+      /* Make sidebar sections collapsible */
+      .section-toggle {
+        display: flex;
+      }
+
+      .stats-grid {
+        border-bottom: none;
+      }
+
+      .controls-section {
+        border-bottom: none;
+      }
+
+      .log-section {
+        flex: 1 1 auto;
+        min-height: 200px;
+      }
+    }
+
+    /* Large phone */
+    @media (max-width: 600px) {
+      header {
+        padding: 10px 14px;
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        border-radius: 8px;
+      }
+
+      .logo-text {
+        font-size: 15px;
+        letter-spacing: 1px;
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+        gap: 5px;
+      }
+
+      .status-badge .badge-text {
+        max-width: 56px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      main {
+        grid-template-rows: 44vh minmax(0, 1fr);
+      }
+
+      .video-bottom-bar {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+
+      .motion-meter {
+        flex: 1 1 100%;
+        order: 1;
+      }
+
+      .bottom-actions {
+        order: 2;
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .motion-meter-label {
+        font-size: 9px;
+      }
+
+      .stats-grid {
+        gap: 6px;
+        padding: 10px 14px;
+      }
+
+      .stat-card {
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      .stat-card .stat-value {
+        font-size: 17px;
+      }
+
+      .stat-card .stat-label {
+        font-size: 9px;
+      }
+
+      .stat-card .stat-icon {
+        font-size: 11px;
+        margin-bottom: 2px;
+      }
+
+      .controls-section {
+        padding: 10px 14px;
+      }
+
+      .control-group {
+        margin-bottom: 10px;
+      }
+
+      .room-info-section {
+        padding: 10px 14px;
+      }
+
+      .room-id-code {
+        font-size: 15px;
+        letter-spacing: 2px;
+      }
+
+      .room-meta {
+        gap: 8px;
+      }
+
+      .room-meta-item {
+        font-size: 10px;
+      }
+
+      .sidebar-header {
+        padding: 10px 14px;
+      }
+
+      .sidebar-header h3 {
+        font-size: 11px;
+      }
+
+      .section-toggle {
+        padding: 10px 14px;
+        font-size: 11px;
+      }
+
+      .event-log {
+        padding: 4px 8px;
+      }
+
+      .log-entry {
+        padding: 6px;
+        gap: 6px;
+      }
+
+      .log-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
+      }
+
+      .log-title {
+        font-size: 11px;
+      }
+
+      .log-meta {
+        font-size: 9px;
+      }
+
+      .corner-brackets {
+        inset: 10px;
+      }
+
+      .corner-brackets::before,
+      .corner-brackets::after,
+      .corner-brackets span::before,
+      .corner-brackets span::after {
+        width: 18px;
+        height: 18px;
+      }
+
+      .motion-alert {
+        font-size: 11px;
+        padding: 6px 14px;
+        top: 8px;
+      }
+
+      .timestamp-overlay {
+        font-size: 10px;
+        bottom: 8px;
+        left: 10px;
+      }
+
+      .motion-pct-overlay {
+        font-size: 10px;
+        bottom: 8px;
+        right: 10px;
+      }
+
+      .alarm-indicator {
+        font-size: 9px;
+        padding: 4px 8px;
+        top: 8px;
+        left: 8px;
+      }
+
+      .no-camera {
+        padding: 20px;
+        gap: 12px;
+      }
+
+      .no-camera-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+      }
+
+      .no-camera h2 {
+        font-size: 16px;
+      }
+
+      .no-camera p {
+        font-size: 12px;
+      }
+
+      .modal-top {
+        padding: 20px 20px 0;
+      }
+
+      .modal-top .modal-logo {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+
+      .modal-top h2 {
+        font-size: 18px;
+      }
+
+      .modal-top p {
+        font-size: 12px;
+      }
+
+      .modal-tabs {
+        margin: 14px 20px 0;
+      }
+
+      .modal-tab {
+        padding: 8px;
+        font-size: 11px;
+      }
+
+      .modal-body {
+        padding: 16px 20px 20px;
+      }
+
+      .create-preview .room-code-big {
+        font-size: 28px;
+        letter-spacing: 4px;
+      }
+
+      .join-input {
+        font-size: 18px;
+        letter-spacing: 4px;
+        padding: 10px 12px;
+      }
+    }
+
+    /* Small phone */
+    @media (max-width: 400px) {
+      header {
+        padding: 8px 10px;
+        gap: 8px;
+      }
+
+      .logo-text {
+        font-size: 13px;
+        letter-spacing: 1px;
+      }
+
+      .logo-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+        border-radius: 7px;
+      }
+
+      .status-badge {
+        padding: 3px 6px;
+        border-radius: 14px;
+        gap: 4px;
+      }
+
+      .status-badge .badge-text {
+        max-width: 0;
+        overflow: hidden;
+        display: none;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+      }
+
+      main {
+        grid-template-rows: 40vh minmax(0, 1fr);
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        padding: 8px 10px;
+      }
+
+      .stat-card {
+        padding: 8px;
+      }
+
+      .stat-card .stat-value {
+        font-size: 15px;
+      }
+
+      .stat-card .stat-label {
+        font-size: 8px;
+      }
+
+      .controls-section {
+        padding: 8px 10px;
+      }
+
+      .room-info-section {
+        padding: 8px 10px;
+      }
+
+      .room-id-code {
+        font-size: 14px;
+        letter-spacing: 2px;
+      }
+
+      .btn-sm {
+        padding: 5px 8px;
+        font-size: 10px;
+      }
+
+      .btn-sm .btn-label {
+        display: none;
+      }
+
+      .btn-icon {
+        min-width: 28px;
+        padding: 5px;
+      }
+
+      .corner-brackets::before,
+      .corner-brackets::after,
+      .corner-brackets span::before,
+      .corner-brackets span::after {
+        width: 14px;
+        height: 14px;
+      }
+
+      .toast {
+        font-size: 11px;
+        padding: 8px 12px;
+        max-width: 280px;
+      }
+
+      .toast-container {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+      }
+
+      .modal-tabs {
+        margin: 12px 16px 0;
+      }
+
+      .modal-body {
+        padding: 14px 16px 18px;
+      }
+
+      .modal-top {
+        padding: 18px 16px 0;
+      }
+
+      .create-preview .room-code-big {
+        font-size: 24px;
+        letter-spacing: 3px;
+      }
+    }
+
+    /* Very small (iPhone SE, etc.) */
+    @media (max-width: 340px) {
+      main {
+        grid-template-rows: 36vh minmax(0, 1fr);
+      }
+
+      .stat-card .stat-value {
+        font-size: 14px;
+      }
+
+      .stat-card .stat-label {
+        font-size: 7px;
+      }
+
+      .room-id-code {
+        font-size: 12px;
+      }
+
+      .create-preview .room-code-big {
+        font-size: 20px;
+        letter-spacing: 2px;
+      }
+    }
+
+    /* Landscape phone */
+    @media (max-height: 500px) and (orientation: landscape) {
+      header {
+        padding: 6px 14px;
+      }
+
+      .logo-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+
+      .logo-text {
+        font-size: 14px;
+      }
+
+      .status-badge {
+        padding: 3px 8px;
+        font-size: 10px;
+      }
+
+      main {
+        grid-template-columns: 1fr 300px;
+        grid-template-rows: 1fr;
+        height: calc(100vh - 50px);
+        height: calc(100dvh - 50px);
+      }
+
+      .sidebar {
+        overflow-y: auto;
+      }
+
+      .section-toggle {
+        display: flex;
+      }
+
+      .stats-grid {
+        border-bottom: none;
+      }
+
+      .controls-section {
+        border-bottom: none;
+      }
+
+      .log-section {
+        min-height: 120px;
+        flex: 1;
+      }
+
+      .video-bottom-bar {
+        padding: 6px 12px;
+      }
+
+      .no-camera {
+        padding: 12px;
+        gap: 8px;
+      }
+
+      .no-camera-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+
+      .no-camera h2 {
+        font-size: 14px;
+      }
+
+      .no-camera p {
+        font-size: 11px;
+      }
+    }
+
+    @media (max-height: 420px) and (orientation: landscape) {
+      main {
+        grid-template-columns: 1fr 260px;
+      }
+
+      .stat-card {
+        padding: 6px;
+      }
+
+      .stat-card .stat-value {
+        font-size: 14px;
+      }
+
+      .stat-card .stat-label {
+        font-size: 8px;
+      }
+
+      .control-group {
+        margin-bottom: 6px;
+      }
+
+      .toggle-row {
+        padding: 4px 0;
+      }
+    }
+
+    /* Safe area for notched phones */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      .video-bottom-bar {
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      }
+
+      .toast-container {
+        bottom: calc(16px + env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Room Modal -->
+  <div class="modal-overlay" id="roomModal">
+    <div class="modal-card">
+      <div class="modal-top">
+        <div class="modal-logo"><i class="fas fa-crosshairs"></i></div>
+        <h2>Join a Tracking Room</h2>
+        <p>Create a new room or join an existing one to share motion events across devices in real-time.</p>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="create" aria-label="Create room tab">Create Room</button>
+        <button class="modal-tab" data-tab="join" aria-label="Join room tab">Join Room</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-panel active" id="panelCreate">
+          <div class="create-preview">
+            <div class="room-code-big" id="previewRoomCode">------</div>
+            <div class="hint">Share this code with other devices</div>
+          </div>
+          <button class="modal-btn modal-btn-primary" id="createRoomBtn">
+          <i class="fas fa-plus"></i> Create Room
+        </button>
+          <button class="modal-btn modal-btn-ghost" id="regenerateBtn">
+          <i class="fas fa-sync-alt"></i> Generate New Code
+        </button>
+        </div>
+        <div class="tab-panel" id="panelJoin">
+          <div class="join-input-group">
+            <input type="text" class="join-input" id="joinCodeInput" maxlength="6" placeholder="Enter code" autocomplete="off" spellcheck="false" aria-label="Room code">
+          </div>
+          <div class="join-error" id="joinError"></div>
+          <button class="modal-btn modal-btn-primary" id="joinRoomBtn" disabled>
+          <i class="fas fa-sign-in-alt"></i> Join Room
+        </button>
+        </div>
+        <div class="tab-panel" id="panelLocal" style="display:none;">
+          <p style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px;">Could not connect to
+            Firebase. You can still use MotionTrack locally.</p>
+          <button class="modal-btn modal-btn-primary" id="useLocalBtn">
+          <i class="fas fa-laptop"></i> Use Locally
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <header>
+      <div class="logo">
+        <div class="logo-icon"><i class="fas fa-crosshairs"></i></div>
+        <div class="logo-text">MOTION<span>TRACK</span></div>
+      </div>
+      <div class="header-center">
+        <div class="room-badge" id="roomBadge" title="Click to copy room code">
+          <i class="fas fa-link"></i>
+          <span id="roomBadgeCode">------</span>
+        </div>
+        <div class="device-count-badge" id="deviceCountBadge">
+          <i class="fas fa-circle"></i>
+          <span id="deviceCountText">1 device</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-badge" id="cameraStatus">
+          <div class="status-dot" id="cameraDot"></div>
+          <span class="badge-text" id="cameraLabel">Camera Off</span>
+        </div>
+        <div class="status-badge" id="detectionStatus">
+          <div class="status-dot" id="detectionDot"></div>
+          <span class="badge-text" id="detectionLabel">Idle</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="video-section">
+        <div class="video-container" id="videoContainer">
+          <div class="no-camera" id="noCameraPlaceholder">
+            <div class="no-camera-icon"><i class="fas fa-video-slash"></i></div>
+            <h2>No Camera Feed</h2>
+            <p>Start the camera to begin real-time motion detection. All processing happens locally in your browser.</p>
+            <button class="btn btn-primary" id="startBtnPlaceholder" aria-label="Start Camera">
+            <i class="fas fa-play"></i> Start Camera
+          </button>
+          </div>
+
+          <video id="videoFeed" autoplay playsinline></video>
+          <canvas id="mainCanvas"></canvas>
+          <canvas id="overlayCanvas"></canvas>
+          <div class="scanlines"></div>
+          <div class="corner-brackets"><span></span></div>
+
+          <div class="alarm-indicator" id="alarmIndicator">
+            <i class="fas fa-bell"></i> ALARM
+          </div>
+
+          <div class="motion-alert" id="motionAlert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>MOTION DETECTED</span>
+          </div>
+
+          <div class="timestamp-overlay" id="timestampOverlay"></div>
+          <div class="motion-pct-overlay" id="motionPctOverlay">0.0% MOTION</div>
+        </div>
+
+        <div class="video-bottom-bar">
+          <div class="motion-meter">
+            <span class="motion-meter-label">Motion</span>
+            <div class="meter-track">
+              <div class="meter-fill" id="meterFill"></div>
+            </div>
+            <span class="meter-value" id="meterValue">0%</span>
+          </div>
+          <div class="bottom-actions">
+            <button class="btn btn-sm btn-icon" id="toggleOverlayBtn" aria-label="Toggle overlay" title="Toggle overlay">
+            <i class="fas fa-layer-group"></i>
+          </button>
+            <button class="btn btn-sm btn-icon" id="screenshotBtn" aria-label="Take screenshot" title="Screenshot" style="display:none;">
+            <i class="fas fa-camera"></i>
+          </button>
+            <button class="btn btn-sm btn-icon btn-danger" id="stopBtn" style="display:none;" aria-label="Stop camera" title="Stop">
+            <i class="fas fa-stop"></i>
+          </button>
+            <button class="btn btn-sm btn-icon btn-primary" id="startBtn" aria-label="Start camera" title="Start" style="display:none;">
+            <i class="fas fa-play"></i>
+          </button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <!-- Room Info -->
+        <div class="room-info-section" id="roomInfoSection">
+          <div class="room-info-row">
+            <div class="room-id-display">
+              <span class="room-id-code" id="sidebarRoomCode">------</span>
+              <button class="room-id-copy" id="copyRoomBtn" title="Copy room code" aria-label="Copy room code">
+              <i class="fas fa-copy"></i>
+            </button>
+            </div>
+            <button class="leave-room-btn" id="leaveRoomBtn">Leave</button>
+          </div>
+          <div class="room-meta">
+            <div class="room-meta-item">
+              <i class="fas fa-satellite-dish"></i>
+              <span class="val" id="sidebarDeviceCount">1</span> devices
+            </div>
+            <div class="room-meta-item">
+              <i class="fas fa-bolt"></i>
+              <span class="val" id="sidebarEventCount">0</span> events
+            </div>
+            <div class="room-meta-item">
+              <i class="fas fa-signal"></i>
+              <span class="val" style="color:var(--accent);">Live</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats — collapsible on mobile -->
+        <div class="sidebar-section" id="statsSection">
+          <button class="section-toggle" id="statsToggle" aria-expanded="true">
+          <i class="fas fa-chart-bar section-icon"></i> Statistics
+          <i class="fas fa-chevron-down toggle-chevron"></i>
+        </button>
+          <div class="section-content" id="statsContent">
+            <div class="stats-grid">
+              <div class="stat-card accent" id="statTotalCard">
+                <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Detections</div>
+              </div>
+              <div class="stat-card danger">
+                <div class="stat-icon"><i class="fas fa-walking"></i></div>
+                <div class="stat-value" id="statEntries">0</div>
+                <div class="stat-label">Entries</div>
+              </div>
+              <div class="stat-card warning">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value" id="statDuration">0s</div>
+                <div class="stat-label">Total Time</div>
+              </div>
+              <div class="stat-card remote">
+                <div class="stat-icon"><i class="fas fa-globe"></i></div>
+                <div class="stat-value" id="statRemote">0</div>
+                <div class="stat-label">Remote Events</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls — collapsible on mobile -->
+        <div class="sidebar-section" id="controlsSection">
+          <button class="section-toggle" id="controlsToggle" aria-expanded="true">
+          <i class="fas fa-sliders-h section-icon"></i> Controls
+          <i class="fas fa-chevron-down toggle-chevron"></i>
+        </button>
+          <div class="section-content" id="controlsContent">
+            <div class="controls-section">
+              <div class="control-group">
+                <div class="control-label">
+                  <span>Sensitivity</span>
+                  <span class="control-val" id="sensitivityVal">50</span>
+                </div>
+                <input type="range" id="sensitivitySlider" min="10" max="90" value="50" aria-label="Sensitivity">
+              </div>
+              <div class="control-group">
+                <div class="control-label">
+                  <span>Min Motion Area</span>
+                  <span class="control-val" id="minAreaVal">0.5%</span>
+                </div>
+                <input type="range" id="minAreaSlider" min="1" max="20" value="5" aria-label="Minimum motion area">
+              </div>
+              <div class="control-group">
+                <div class="control-label">
+                  <span>Alarm Volume</span>
+                  <span class="control-val" id="volumeVal">70%</span>
+                </div>
+                <input type="range" id="volumeSlider" min="0" max="100" value="70" aria-label="Alarm volume">
+              </div>
+              <div class="control-group">
+                <div class="toggle-row">
+                  <label>Heatmap Overlay</label>
+                  <div class="toggle active" id="toggleHeatmap" role="switch" aria-checked="true" tabindex="0"></div>
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="toggle-row">
+                  <label>Bounding Boxes</label>
+                  <div class="toggle active" id="toggleBoxes" role="switch" aria-checked="true" tabindex="0"></div>
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="toggle-row">
+                  <label>Alarm Beep</label>
+                  <div class="toggle active" id="toggleSound" role="switch" aria-checked="true" tabindex="0"></div>
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="toggle-row">
+                  <label>Continuous Alarm</label>
+                  <div class="toggle" id="toggleContinuous" role="switch" aria-checked="false" tabindex="0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Log — always visible -->
+        <div class="log-section">
+          <div class="sidebar-header">
+            <h3><i class="fas fa-list" style="margin-right:8px;"></i> Event Log</h3>
+            <button class="btn btn-sm" id="clearLogBtn" aria-label="Clear log">
+            <i class="fas fa-trash"></i> <span class="btn-label">Clear</span>
+          </button>
+          </div>
+          <div class="event-log" id="eventLog">
+            <div class="log-empty">
+              <i class="fas fa-satellite-dish"></i>
+              <p>Waiting for motion events...</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // =============================================
+// MotionTrack — Firebase Room + Motion Detection
+// =============================================
+
+(() => {
+  // --- Firebase ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyAp9kCBsDLnQEmR7wWHXwt3FB2T1zDtiqU",
+    authDomain: "h-90-8a7c5.firebaseapp.com",
+    databaseURL: "https://h-90-8a7c5-default-rtdb.firebaseio.com",
+    projectId: "h-90-8a7c5",
+    storageBucket: "h-90-8a7c5.firebasestorage.app",
+    messagingSenderId: "367196609301",
+    appId: "1:367196609301:web:156e24c1b4532c26af671c"
+  };
+
+  let db = null;
+  let firebaseConnected = false;
+
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    db.ref('.info/connected').on('value', (snap) => {
+      firebaseConnected = snap.val() === true;
+    });
+  } catch (e) {
+    console.error('Firebase init failed:', e);
+    firebaseConnected = false;
+  }
+
+  // --- Device ID ---
+  let deviceId = localStorage.getItem('mt_device_id');
+  if (!deviceId) {
+    deviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('mt_device_id', deviceId);
+  }
+
+  // --- Collapsible Sections (mobile) ---
+  function setupSectionToggle(toggleId, contentId) {
+    const toggle = document.getElementById(toggleId);
+    const content = document.getElementById(contentId);
+    if (!toggle || !content) return;
+
+    toggle.addEventListener('click', () => {
+      const isCollapsed = toggle.classList.toggle('collapsed');
+      content.classList.toggle('collapsed');
+      toggle.setAttribute('aria-expanded', !isCollapsed);
+    });
+  }
+
+  setupSectionToggle('statsToggle', 'statsContent');
+  setupSectionToggle('controlsToggle', 'controlsContent');
+
+  // --- DOM ---
+  const roomModal = document.getElementById('roomModal');
+  const previewRoomCode = document.getElementById('previewRoomCode');
+  const createRoomBtn = document.getElementById('createRoomBtn');
+  const regenerateBtn = document.getElementById('regenerateBtn');
+  const joinCodeInput = document.getElementById('joinCodeInput');
+  const joinError = document.getElementById('joinError');
+  const joinRoomBtn = document.getElementById('joinRoomBtn');
+  const useLocalBtn = document.getElementById('useLocalBtn');
+  const panelLocal = document.getElementById('panelLocal');
+
+  const roomBadge = document.getElementById('roomBadge');
+  const roomBadgeCode = document.getElementById('roomBadgeCode');
+  const deviceCountBadge = document.getElementById('deviceCountBadge');
+  const deviceCountText = document.getElementById('deviceCountText');
+  const roomInfoSection = document.getElementById('roomInfoSection');
+  const sidebarRoomCode = document.getElementById('sidebarRoomCode');
+  const copyRoomBtn = document.getElementById('copyRoomBtn');
+  const leaveRoomBtn = document.getElementById('leaveRoomBtn');
+  const sidebarDeviceCount = document.getElementById('sidebarDeviceCount');
+  const sidebarEventCount = document.getElementById('sidebarEventCount');
+
+  const video = document.getElementById('videoFeed');
+  const mainCanvas = document.getElementById('mainCanvas');
+  const overlayCanvas = document.getElementById('overlayCanvas');
+  const mainCtx = mainCanvas.getContext('2d', { willReadFrequently: true });
+  const overlayCtx = overlayCanvas.getContext('2d');
+
+  const noCameraPlaceholder = document.getElementById('noCameraPlaceholder');
+  const motionAlert = document.getElementById('motionAlert');
+  const alarmIndicator = document.getElementById('alarmIndicator');
+  const timestampOverlay = document.getElementById('timestampOverlay');
+  const motionPctOverlay = document.getElementById('motionPctOverlay');
+  const meterFill = document.getElementById('meterFill');
+  const meterValue = document.getElementById('meterValue');
+
+  const cameraDot = document.getElementById('cameraDot');
+  const cameraLabel = document.getElementById('cameraLabel');
+  const detectionDot = document.getElementById('detectionDot');
+  const detectionLabel = document.getElementById('detectionLabel');
+
+  const statTotal = document.getElementById('statTotal');
+  const statEntries = document.getElementById('statEntries');
+  const statDuration = document.getElementById('statDuration');
+  const statRemote = document.getElementById('statRemote');
+  const statTotalCard = document.getElementById('statTotalCard');
+
+  const sensitivitySlider = document.getElementById('sensitivitySlider');
+  const sensitivityVal = document.getElementById('sensitivityVal');
+  const minAreaSlider = document.getElementById('minAreaSlider');
+  const minAreaVal = document.getElementById('minAreaVal');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumeVal = document.getElementById('volumeVal');
+  const toggleHeatmap = document.getElementById('toggleHeatmap');
+  const toggleBoxes = document.getElementById('toggleBoxes');
+  const toggleSound = document.getElementById('toggleSound');
+  const toggleContinuous = document.getElementById('toggleContinuous');
+
+  const eventLog = document.getElementById('eventLog');
+  const clearLogBtn = document.getElementById('clearLogBtn');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const startBtnPlaceholder = document.getElementById('startBtnPlaceholder');
+  const screenshotBtn = document.getElementById('screenshotBtn');
+  const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+  const toastContainer = document.getElementById('toastContainer');
+
+  // --- State ---
+  let currentRoomId = null;
+  let currentRoomRef = null;
+  let eventsRef = null;
+  let devicesRef = null;
+  let myDeviceRef = null;
+  let eventsListenerAttached = false;
+  let usingLocalMode = false;
+
+  let cameraActive = false;
+  let animFrameId = null;
+  let previousFrame = null;
+  let showHeatmap = true;
+  let showBoxes = true;
+  let playSoundEnabled = true;
+  let continuousAlarm = false;
+  let sensitivity = 50;
+  let minMotionPercent = 0.5;
+  let alarmVolume = 0.7;
+  let peakMotion = 0;
+  let remoteEventCount = 0;
+
+  let isMotionActive = false;
+  let motionStartTime = null;
+  let totalMotionTime = 0;
+  let detectionCount = 0;
+  let entryCount = 0;
+  let cooldownActive = false;
+  let cooldownTimer = null;
+  let continuousLogCounter = 0;
+  let continuousAlarmInterval = null;
+  let lastBeepTime = 0;
+
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  // --- Audio ---
+  function playEntryBeep() {
+    if (!playSoundEnabled || !audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      [0, 0.13].forEach(delay => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1400, now + delay);
+        osc.frequency.exponentialRampToValueAtTime(1100, now + delay + 0.06);
+        gain.gain.setValueAtTime(alarmVolume * 0.12, now + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.09);
+        osc.start(now + delay); osc.stop(now + delay + 0.09);
+      });
+    } catch (e) {}
+  }
+
+  function playExitBeep() {
+    if (!playSoundEnabled || !audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(400, now + 0.25);
+      gain.gain.setValueAtTime(alarmVolume * 0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
+    } catch (e) {}
+  }
+
+  function playRemoteBeep() {
+    if (!playSoundEnabled || !audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      [0, 0.1].forEach(delay => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1000, now + delay);
+        gain.gain.setValueAtTime(alarmVolume * 0.07, now + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.07);
+        osc.start(now + delay); osc.stop(now + delay + 0.07);
+      });
+    } catch (e) {}
+  }
+
+  function playContinuousBeep() {
+    if (!playSoundEnabled || !audioCtx || !continuousAlarm || !isMotionActive) return;
+    const now = Date.now();
+    if (now - lastBeepTime < 400) return;
+    lastBeepTime = now;
+    try {
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1200, t);
+      gain.gain.setValueAtTime(alarmVolume * 0.06, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc.start(t); osc.stop(t + 0.06);
+    } catch (e) {}
+  }
+
+  function startContinuousAlarm() {
+    if (continuousAlarmInterval) return;
+    continuousAlarmInterval = setInterval(playContinuousBeep, 400);
+    alarmIndicator.classList.add('visible');
+  }
+
+  function stopContinuousAlarm() {
+    if (continuousAlarmInterval) { clearInterval(continuousAlarmInterval); continuousAlarmInterval = null; }
+    alarmIndicator.classList.remove('visible');
+  }
+
+  // --- Room Code ---
+  const ROOM_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+  function generateRoomCode() {
+    let code = '';
+    for (let i = 0; i < 6; i++) code += ROOM_CHARS[Math.floor(Math.random() * ROOM_CHARS.length)];
+    return code;
+  }
+
+  let pendingRoomCode = generateRoomCode();
+  function setPreviewCode(code) { previewRoomCode.textContent = code; pendingRoomCode = code; }
+  setPreviewCode(pendingRoomCode);
+  regenerateBtn.addEventListener('click', () => setPreviewCode(generateRoomCode()));
+
+  // --- Modal Tabs ---
+  document.querySelectorAll('.modal-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab === 'create' ? 'panelCreate' : 'panelJoin').classList.add('active');
+    });
+  });
+
+  joinCodeInput.addEventListener('input', () => {
+    joinCodeInput.value = joinCodeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    joinError.textContent = '';
+    joinRoomBtn.disabled = joinCodeInput.value.length < 6;
+  });
+
+  // --- Room Management ---
+  function enterRoom(roomId, isCreator) {
+    currentRoomId = roomId;
+    currentRoomRef = db.ref('rooms/' + roomId);
+    eventsRef = currentRoomRef.child('events');
+    devicesRef = currentRoomRef.child('devices');
+    myDeviceRef = devicesRef.child(deviceId);
+
+    myDeviceRef.onDisconnect().remove();
+    myDeviceRef.set({ connected: true, lastSeen: firebase.database.ServerValue.TIMESTAMP, isCreator: isCreator });
+
+    const hb = setInterval(() => { if (!currentRoomId) { clearInterval(hb); return; } myDeviceRef.update({ lastSeen: firebase.database.ServerValue.TIMESTAMP }); }, 10000);
+
+    if (isCreator) currentRoomRef.child('createdAt').set(firebase.database.ServerValue.TIMESTAMP);
+    currentRoomRef.child('lastActivity').set(firebase.database.ServerValue.TIMESTAMP);
+
+    devicesRef.on('value', (snap) => {
+      const data = snap.val();
+      let count = 0;
+      if (data) { const now = Date.now(); Object.values(data).forEach(info => { if (now - info.lastSeen < 30000) count++; }); }
+      updateDeviceCount(count);
+    });
+
+    const ci = setInterval(() => {
+      if (!currentRoomId) { clearInterval(ci); return; }
+      const now = Date.now();
+      devicesRef.once('value', (snap) => {
+        const data = snap.val(); if (!data) return;
+        Object.entries(data).forEach(([id, info]) => { if (now - info.lastSeen > 35000) devicesRef.child(id).remove(); });
+      });
+    }, 15000);
+
+    if (!eventsListenerAttached) {
+      eventsRef.orderByChild('timestamp').limitToLast(100).on('child_added', (snap) => {
+        const evt = snap.val();
+        if (!evt || evt.deviceId === deviceId) return;
+        if (evt.timestamp < (Date.now() - 3000)) return;
+        remoteEventCount++;
+        addLogEntry(evt.type, evt.title, evt.detail, true, evt.deviceIdShort);
+        playRemoteBeep();
+        statRemote.textContent = remoteEventCount;
+        sidebarEventCount.textContent = detectionCount + remoteEventCount;
+      });
+      eventsListenerAttached = true;
+    }
+
+    roomBadgeCode.textContent = roomId;
+    roomBadge.classList.add('visible');
+    sidebarRoomCode.textContent = roomId;
+    roomInfoSection.classList.add('visible');
+    roomModal.classList.add('hidden');
+    showToast('Joined room ' + roomId, 'fa-link', 'var(--accent)');
+    addLogEntry('system', 'Connected to room ' + roomId, isCreator ? 'Created' : 'Joined');
+  }
+
+  function leaveRoom() {
+    if (myDeviceRef) myDeviceRef.remove();
+    if (currentRoomRef) currentRoomRef.child('lastActivity').set(firebase.database.ServerValue.TIMESTAMP);
+    currentRoomId = null; currentRoomRef = null; eventsRef = null; devicesRef = null; myDeviceRef = null;
+    roomBadge.classList.remove('visible');
+    deviceCountBadge.classList.remove('visible');
+    roomInfoSection.classList.remove('visible');
+    addLogEntry('system', 'Left room', '');
+    showToast('Left room', 'fa-unlink', 'var(--muted)');
+    setTimeout(() => { roomModal.classList.remove('hidden'); setPreviewCode(generateRoomCode()); }, 300);
+  }
+
+  function updateDeviceCount(count) {
+    deviceCountText.textContent = count === 1 ? '1 device' : count + ' devices';
+    sidebarDeviceCount.textContent = count;
+    if (count > 1) deviceCountBadge.classList.add('visible');
+    else deviceCountBadge.classList.remove('visible');
+  }
+
+  createRoomBtn.addEventListener('click', () => {
+    initAudio();
+    if (!db) { showToast('Firebase not available', 'fa-exclamation-triangle', 'var(--danger)'); return; }
+    createRoomBtn.disabled = true;
+    createRoomBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    const roomId = pendingRoomCode;
+    db.ref('rooms/' + roomId).once('value', (snap) => {
+      if (snap.exists()) { setPreviewCode(generateRoomCode()); createRoomBtn.disabled = false; createRoomBtn.innerHTML = '<i class="fas fa-plus"></i> Create Room'; return; }
+      enterRoom(roomId, true);
+      createRoomBtn.disabled = false;
+      createRoomBtn.innerHTML = '<i class="fas fa-plus"></i> Create Room';
+    }).catch(() => { createRoomBtn.disabled = false; createRoomBtn.innerHTML = '<i class="fas fa-plus"></i> Create Room'; showToast('Failed to create room', 'fa-exclamation-triangle', 'var(--danger)'); });
+  });
+
+  joinRoomBtn.addEventListener('click', () => {
+    initAudio();
+    if (!db) { showToast('Firebase not available', 'fa-exclamation-triangle', 'var(--danger)'); return; }
+    const code = joinCodeInput.value.trim().toUpperCase();
+    if (code.length !== 6) return;
+    joinRoomBtn.disabled = true;
+    joinRoomBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Joining...';
+    joinError.textContent = '';
+    db.ref('rooms/' + code).once('value', (snap) => {
+      if (!snap.exists()) { joinError.textContent = 'Room not found.'; joinRoomBtn.disabled = false; joinRoomBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Join Room'; return; }
+      enterRoom(code, false);
+      joinRoomBtn.disabled = false;
+      joinRoomBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Join Room';
+    }).catch(() => { joinError.textContent = 'Connection error.'; joinRoomBtn.disabled = false; joinRoomBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Join Room'; });
+  });
+
+  useLocalBtn.addEventListener('click', () => {
+    usingLocalMode = true; roomModal.classList.add('hidden');
+    showToast('Running in local mode', 'fa-laptop', 'var(--warning)');
+    addLogEntry('system', 'Local mode', '');
+  });
+
+  leaveRoomBtn.addEventListener('click', leaveRoom);
+
+  function copyRoomCode() {
+    if (!currentRoomId) return;
+    navigator.clipboard.writeText(currentRoomId).then(() => showToast('Copied: ' + currentRoomId, 'fa-copy', 'var(--accent)')).catch(() => showToast('Could not copy', 'fa-exclamation-triangle', 'var(--danger)'));
+  }
+
+  copyRoomBtn.addEventListener('click', copyRoomCode);
+  roomBadge.addEventListener('click', copyRoomCode);
+
+  function pushEventToFirebase(type, title, detail, pct) {
+    if (!eventsRef || !currentRoomId) return;
+    eventsRef.push({ type, title, detail, motionPercent: pct || 0, deviceId: deviceId, deviceIdShort: deviceId.substr(0, 8), timestamp: firebase.database.ServerValue.TIMESTAMP });
+    currentRoomRef.child('lastActivity').set(firebase.database.ServerValue.TIMESTAMP);
+    sidebarEventCount.textContent = detectionCount + remoteEventCount;
+  }
+
+  setTimeout(() => {
+    if (!firebaseConnected && db) setTimeout(() => {
+      if (!firebaseConnected) {
+        document.querySelectorAll('.modal-tab').forEach(t => t.style.display = 'none');
+        document.getElementById('panelCreate').classList.remove('active');
+        document.getElementById('panelJoin').classList.remove('active');
+        panelLocal.style.display = 'block'; panelLocal.classList.add('active');
+      }
+    }, 3000);
+    if (!db) {
+      document.querySelectorAll('.modal-tab').forEach(t => t.style.display = 'none');
+      document.getElementById('panelCreate').classList.remove('active');
+      document.getElementById('panelJoin').classList.remove('active');
+      panelLocal.style.display = 'block'; panelLocal.classList.add('active');
+    }
+  }, 500);
+
+  // --- Toast ---
+  function showToast(message, icon = 'fa-info-circle', color = 'var(--accent)') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<i class="fas ${icon}" style="color:${color};font-size:15px;flex-shrink:0;"></i> <span>${message}</span>`;
+    toastContainer.appendChild(toast);
+    setTimeout(() => { toast.classList.add('leaving'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  // --- Log ---
+  function addLogEntry(type, title, detail, isRemote = false, remoteId = '') {
+    const emptyMsg = eventLog.querySelector('.log-empty');
+    if (emptyMsg) emptyMsg.remove();
+    const iconMap = { enter: { icon: 'fa-arrow-right', cls: 'enter' }, move: { icon: 'fa-arrows-alt', cls: 'move' }, exit: { icon: 'fa-arrow-left', cls: 'exit' }, system: { icon: 'fa-cog', cls: 'system' }, remote: { icon: 'fa-globe', cls: 'remote' } };
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-US', { hour12: false });
+    const iconInfo = isRemote ? iconMap.remote : (iconMap[type] || iconMap.system);
+    const remoteTag = isRemote ? `<span class="remote-tag">REMOTE${remoteId ? ' ' + remoteId : ''}</span>` : '';
+    const entry = document.createElement('div');
+    entry.className = 'log-entry' + (isRemote ? ' remote-entry' : '');
+    entry.innerHTML = `<div class="log-icon ${iconInfo.cls}"><i class="fas ${iconInfo.icon}"></i></div><div class="log-content"><div class="log-title">${remoteTag}${title}</div><div class="log-meta">${time}${detail ? ' · ' + detail : ''}</div></div>`;
+    eventLog.prepend(entry);
+    while (eventLog.children.length > 150) eventLog.removeChild(eventLog.lastChild);
+  }
+
+  // --- Stats ---
+  function updateStats() {
+    statTotal.textContent = detectionCount;
+    statEntries.textContent = entryCount;
+    statDuration.textContent = totalMotionTime < 60 ? Math.round(totalMotionTime) + 's' : `${Math.floor(totalMotionTime / 60)}m ${Math.round(totalMotionTime % 60)}s`;
+    statRemote.textContent = remoteEventCount;
+  }
+
+  function updateTimestamp() {
+    const now = new Date();
+    timestampOverlay.textContent = `${now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}  ${now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}.${String(now.getMilliseconds()).padStart(3, '0')}`;
+  }
+
+  // --- Toggles ---
+  function setupToggle(el, initialState, callback) {
+    if (initialState) el.classList.add('active'); else el.classList.remove('active');
+    function toggle() { el.classList.toggle('active'); const a = el.classList.contains('active'); el.setAttribute('aria-checked', a); callback(a); }
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  }
+
+  setupToggle(toggleHeatmap, true, (v) => { showHeatmap = v; });
+  setupToggle(toggleBoxes, true, (v) => { showBoxes = v; });
+  setupToggle(toggleSound, true, (v) => { playSoundEnabled = v; if (v) initAudio(); if (!v) stopContinuousAlarm(); });
+  setupToggle(toggleContinuous, false, (v) => { continuousAlarm = v; if (!v) stopContinuousAlarm(); if (v && isMotionActive) startContinuousAlarm(); });
+
+  sensitivitySlider.addEventListener('input', () => { sensitivity = parseInt(sensitivitySlider.value); sensitivityVal.textContent = sensitivity; });
+  minAreaSlider.addEventListener('input', () => { minMotionPercent = parseInt(minAreaSlider.value) / 10; minAreaVal.textContent = minMotionPercent.toFixed(1) + '%'; });
+  volumeSlider.addEventListener('input', () => { alarmVolume = parseInt(volumeSlider.value) / 100; volumeVal.textContent = volumeSlider.value + '%'; });
+
+  clearLogBtn.addEventListener('click', () => {
+    eventLog.innerHTML = '<div class="log-empty"><i class="fas fa-satellite-dish"></i><p>Waiting for motion events...</p></div>';
+    detectionCount = 0; entryCount = 0; remoteEventCount = 0; totalMotionTime = 0; peakMotion = 0; updateStats();
+    showToast('Log cleared', 'fa-trash', 'var(--muted)');
+  });
+
+  toggleOverlayBtn.addEventListener('click', () => { overlayCanvas.style.display = overlayCanvas.style.display === 'none' ? 'block' : 'none'; });
+
+  screenshotBtn.addEventListener('click', () => {
+    if (!cameraActive) return;
+    const link = document.createElement('a');
+    link.download = `motiontrack_${currentRoomId || 'local'}_${Date.now()}.png`;
+    link.href = mainCanvas.toDataURL('image/png');
+    link.click();
+    showToast('Screenshot saved', 'fa-camera', 'var(--cyan)');
+  });
+
+  // --- Camera ---
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } });
+      video.srcObject = stream;
+      await video.play();
+      const vw = video.videoWidth, vh = video.videoHeight;
+      mainCanvas.width = vw; mainCanvas.height = vh;
+      overlayCanvas.width = vw; overlayCanvas.height = vh;
+      cameraActive = true; previousFrame = null; isMotionActive = false; cooldownActive = false;
+      noCameraPlaceholder.style.display = 'none';
+      mainCanvas.style.display = 'block'; overlayCanvas.style.display = 'block';
+      stopBtn.style.display = 'inline-flex'; startBtn.style.display = 'none'; startBtnPlaceholder.style.display = 'none'; screenshotBtn.style.display = 'inline-flex';
+      cameraDot.classList.add('active'); cameraLabel.textContent = 'Camera On';
+      addLogEntry('system', 'Camera started', `${vw}x${vh}`);
+      if (currentRoomId) pushEventToFirebase('system', 'Camera started', `${vw}x${vh}`, 0);
+      showToast('Camera activated', 'fa-video', 'var(--accent)');
+      processFrame();
+    } catch (err) { showToast('Camera access denied', 'fa-exclamation-triangle', 'var(--danger)'); }
+  }
+
+  function stopCamera() {
+    cameraActive = false;
+    if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+    if (video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; }
+    if (isMotionActive) { isMotionActive = false; motionAlert.classList.remove('visible'); detectionDot.className = 'status-dot'; detectionLabel.textContent = 'Idle'; stopContinuousAlarm(); }
+    noCameraPlaceholder.style.display = 'flex';
+    mainCanvas.style.display = 'none'; overlayCanvas.style.display = 'none';
+    stopBtn.style.display = 'none'; startBtn.style.display = 'inline-flex'; screenshotBtn.style.display = 'none';
+    cameraDot.classList.remove('active'); cameraLabel.textContent = 'Camera Off';
+    meterFill.style.width = '0%'; meterFill.className = 'meter-fill'; meterValue.textContent = '0%'; motionPctOverlay.textContent = '0.0% MOTION';
+    addLogEntry('system', 'Camera stopped', '');
+    if (currentRoomId) pushEventToFirebase('system', 'Camera stopped', '', 0);
+    showToast('Camera deactivated', 'fa-video-slash', 'var(--muted)');
+  }
+
+  startBtn.addEventListener('click', startCamera);
+  startBtnPlaceholder.addEventListener('click', startCamera);
+  stopBtn.addEventListener('click', stopCamera);
+
+  // --- Motion Detection ---
+  function processFrame() {
+    if (!cameraActive) return;
+    mainCtx.drawImage(video, 0, 0);
+    const w = mainCanvas.width, h = mainCanvas.height;
+    const currentFrame = mainCtx.getImageData(0, 0, w, h);
+    overlayCtx.clearRect(0, 0, w, h);
+
+    let motionPixels = 0;
+    const totalPixels = w * h;
+    const threshold = Math.round(95 - sensitivity);
+    let minX = w, minY = h, maxX = 0, maxY = 0;
+
+    if (previousFrame) {
+      const curr = currentFrame.data, prev = previousFrame.data;
+      const motionMask = overlayCtx.createImageData(w, h);
+      const mask = motionMask.data;
+      const step = 2;
+
+      for (let y = 0; y < h; y += step) {
+        for (let x = 0; x < w; x += step) {
+          const i = (y * w + x) * 4;
+          const diff = (Math.abs(curr[i] - prev[i]) + Math.abs(curr[i+1] - prev[i+1]) + Math.abs(curr[i+2] - prev[i+2])) / 3;
+          if (diff > threshold) {
+            motionPixels++;
+            if (x < minX) minX = x; if (y < minY) minY = y;
+            if (x > maxX) maxX = x; if (y > maxY) maxY = y;
+            for (let dy = 0; dy < step && (y+dy) < h; dy++) {
+              for (let dx = 0; dx < step && (x+dx) < w; dx++) {
+                const mi = ((y+dy) * w + (x+dx)) * 4;
+                const intensity = Math.min(255, diff * 3);
+                mask[mi] = 255; mask[mi+1] = Math.round(71*(intensity/255)); mask[mi+2] = Math.round(87*(intensity/255)); mask[mi+3] = Math.round(120+100*(intensity/255));
+              }
+            }
+          }
+        }
+      }
+
+      const motionPercent = (motionPixels * step * step) / totalPixels * 100;
+
+      if (showHeatmap && motionPixels > 0) overlayCtx.putImageData(motionMask, 0, 0);
+
+      if (showBoxes && motionPixels > 10) {
+        const pad = 15, bx = Math.max(0, minX-pad), by = Math.max(0, minY-pad);
+        const bw = Math.min(w, maxX+pad)-bx, bh = Math.min(h, maxY+pad)-by;
+        if (bw > 5 && bh > 5) {
+          overlayCtx.strokeStyle = '#ff4757'; overlayCtx.lineWidth = 2; overlayCtx.setLineDash([8,4]);
+          overlayCtx.strokeRect(bx, by, bw, bh); overlayCtx.setLineDash([]);
+          const cl = Math.min(16, bw/4, bh/4);
+          overlayCtx.strokeStyle = '#ff4757'; overlayCtx.lineWidth = 3;
+          [[bx,by,1,1],[bx+bw,by,-1,1],[bx,by+bh,1,-1],[bx+bw,by+bh,-1,-1]].forEach(([cx,cy,dx,dy]) => {
+            overlayCtx.beginPath(); overlayCtx.moveTo(cx, cy+cl*dy); overlayCtx.lineTo(cx, cy); overlayCtx.lineTo(cx+cl*dx, cy); overlayCtx.stroke();
+          });
+          overlayCtx.fillStyle = 'rgba(255,71,87,0.85)';
+          const lt = `MOTION ${motionPercent.toFixed(1)}%`;
+          overlayCtx.font = `bold ${Math.min(13, bh/6)}px "Share Tech Mono", monospace`;
+          const tw = overlayCtx.measureText(lt).width;
+          overlayCtx.fillRect(bx, by-20, tw+10, 18);
+          overlayCtx.fillStyle = '#ffffff'; overlayCtx.fillText(lt, bx+5, by-6);
+        }
+      }
+
+      const cp = Math.min(100, motionPercent * 3);
+      meterFill.style.width = cp + '%'; meterValue.textContent = motionPercent.toFixed(1) + '%';
+      motionPctOverlay.textContent = motionPercent.toFixed(1) + '% MOTION';
+      if (cp > 60) { meterFill.className = 'meter-fill danger'; meterValue.style.color = 'var(--danger)'; motionPctOverlay.style.color = 'var(--danger)'; }
+      else if (cp > 30) { meterFill.className = 'meter-fill warning'; meterValue.style.color = 'var(--warning)'; motionPctOverlay.style.color = 'var(--warning)'; }
+      else { meterFill.className = 'meter-fill'; meterValue.style.color = 'var(--accent)'; motionPctOverlay.style.color = 'var(--accent)'; }
+      if (motionPercent > peakMotion) peakMotion = motionPercent;
+
+      if (motionPercent >= minMotionPercent) {
+        if (!isMotionActive && !cooldownActive) {
+          isMotionActive = true; motionStartTime = performance.now(); detectionCount++; entryCount++;
+          motionAlert.classList.add('visible'); detectionDot.className = 'status-dot motion'; detectionLabel.textContent = 'Motion';
+          statTotalCard.classList.add('highlight'); playEntryBeep(); if (continuousAlarm) startContinuousAlarm();
+          const d = `Intensity: ${motionPercent.toFixed(1)}%`;
+          addLogEntry('enter', 'Motion detected', d); pushEventToFirebase('enter', 'Motion detected', d, motionPercent); updateStats();
+        }
+        if (isMotionActive) totalMotionTime += 1/60;
+      } else if (isMotionActive) {
+        isMotionActive = false; motionAlert.classList.remove('visible'); detectionDot.className = 'status-dot'; detectionLabel.textContent = 'Monitoring';
+        statTotalCard.classList.remove('highlight'); stopContinuousAlarm(); playExitBeep();
+        const d = `Duration: ${((performance.now()-motionStartTime)/1000).toFixed(1)}s`;
+        addLogEntry('exit', 'Motion ended', d); pushEventToFirebase('exit', 'Motion ended', d, 0); updateStats();
+        cooldownActive = true; if (cooldownTimer) clearTimeout(cooldownTimer); cooldownTimer = setTimeout(() => { cooldownActive = false; }, 1500);
+      }
+    }
+
+    previousFrame = currentFrame;
+    updateTimestamp();
+    animFrameId = requestAnimationFrame(processFrame);
+  }
+
+  setInterval(() => {
+    if (isMotionActive) { continuousLogCounter++; if (continuousLogCounter >= 5) { continuousLogCounter = 0; const d = `Active ${((performance.now()-motionStartTime)/1000).toFixed(0)}s`; addLogEntry('move', 'Continuous motion', d); detectionCount++; pushEventToFirebase('move', 'Continuous motion', d, 0); updateStats(); } } else continuousLogCounter = 0;
+  }, 1000);
+
+  setInterval(() => { if (isMotionActive) updateStats(); }, 500);
+  updateTimestamp(); setInterval(updateTimestamp, 50);
+})();
+  </script>
+</body>
+
+</html>
