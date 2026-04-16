@@ -405,6 +405,117 @@
         color: rgba(255, 255, 255, 0.8);
       }
 
+      /* --- Mobile Redirect Modal Styles --- */
+      .mobile-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        padding: 20px;
+      }
+
+      .mobile-modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .mobile-modal-content {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 32px 24px;
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        transform: scale(0.95);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .mobile-modal-overlay.active .mobile-modal-content {
+        transform: scale(1);
+      }
+
+      .mobile-modal-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(59, 130, 246, 0.15);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: var(--accent-blue);
+      }
+
+      .mobile-modal-content h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 10px;
+      }
+
+      .mobile-modal-content p {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 24px;
+      }
+
+      .modal-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .modal-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        font-family: inherit;
+      }
+
+      .btn-primary {
+        background: var(--accent-blue);
+        color: white;
+        border: 1px solid transparent;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+      }
+
+      .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+      }
     
       /* --- Animations --- */
       @keyframes fadeIn {
@@ -561,6 +672,24 @@
 
     </div>
 
+    <!-- Mobile Redirect Modal -->
+    <div id="mobile-modal" class="mobile-modal-overlay">
+      <div class="mobile-modal-content">
+        <div class="mobile-modal-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+        </div>
+        <h3>Mobile Experience</h3>
+        <p>You appear to be visiting on a mobile device. For the best experience and optimized touch controls, please visit our dedicated mobile interface.</p>
+        <div class="modal-actions">
+          <a href="/mobile.html" class="modal-btn btn-primary">Go to Mobile Version</a>
+          <button id="dismiss-modal" class="modal-btn btn-secondary">Stay on Desktop View</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Enhanced JSON-LD Structured Data for Rich Snippets -->
     <script type="application/ld+json">
       {
@@ -595,63 +724,93 @@
     </script>
      
     <script>
-      // --- Search Functionality ---
-      const aiButton = document.getElementById('ai-search-btn');
-      const ecosiaMsg = document.getElementById('ecosia-msg');
-
-      function updateUI() {
-        const select = document.getElementById('engine-select');
-        const icon = document.getElementById('engine-favicon');
-        const selectedOption = select.options[select.selectedIndex];
-        const domain = selectedOption.getAttribute('data-domain');
-        const aiUrl = selectedOption.getAttribute('data-ai-url');
+      // --- Mobile Detection & Popup Logic ---
+      document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('mobile-modal');
+        const dismissBtn = document.getElementById('dismiss-modal');
         
-        // Update Favicon
-        icon.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-        
-        // Toggle AI Button Visibility
-        if (aiUrl && aiUrl !== "") {
-          aiButton.classList.remove('hidden');
-        } else {
-          aiButton.classList.add('hidden');
+        // Check for mobile breakpoint (768px is standard tablet/mobile cutoff)
+        function checkMobile() {
+          if (window.innerWidth < 768) {
+            // Short delay to ensure styles load
+            setTimeout(() => {
+              modal.classList.add('active');
+            }, 500);
+          }
         }
 
-        // Toggle Ecosia Message Visibility
-        if (domain === 'www.ecosia.org') {
-            ecosiaMsg.classList.add('visible');
-        } else {
-            ecosiaMsg.classList.remove('visible');
+        // Initial check
+        checkMobile();
+
+        // Dismiss functionality
+        dismissBtn.addEventListener('click', () => {
+          modal.classList.remove('active');
+          // Optional: Set session storage so it doesn't show again on refresh during this session
+          sessionStorage.setItem('mobileModalDismissed', 'true');
+        });
+
+        // Check session storage in case user refreshes
+        if (sessionStorage.getItem('mobileModalDismissed') === 'true') {
+            modal.style.display = 'none';
         }
-      }
 
-      function handleSearch(e, type) {
-        e.preventDefault();
-        const select = document.getElementById('engine-select');
-        const input = document.getElementById('search-query');
-        const query = encodeURIComponent(input.value);
-        
-        if (!query) return;
+        // --- Search Functionality ---
+        const aiButton = document.getElementById('ai-search-btn');
+        const ecosiaMsg = document.getElementById('ecosia-msg');
 
-        const selectedOption = select.options[select.selectedIndex];
-        let urlTemplate = "";
+        window.updateUI = function() {
+          const select = document.getElementById('engine-select');
+          const icon = document.getElementById('engine-favicon');
+          const selectedOption = select.options[select.selectedIndex];
+          const domain = selectedOption.getAttribute('data-domain');
+          const aiUrl = selectedOption.getAttribute('data-ai-url');
+          
+          // Update Favicon
+          icon.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+          
+          // Toggle AI Button Visibility
+          if (aiUrl && aiUrl !== "") {
+            aiButton.classList.remove('hidden');
+          } else {
+            aiButton.classList.add('hidden');
+          }
 
-        if (type === 'ai') {
-            urlTemplate = selectedOption.getAttribute('data-ai-url');
-            // Fallback if AI url is somehow missing
-            if(!urlTemplate) urlTemplate = selectedOption.value; 
-        } else {
-            urlTemplate = selectedOption.value;
+          // Toggle Ecosia Message Visibility
+          if (domain === 'www.ecosia.org') {
+              ecosiaMsg.classList.add('visible');
+          } else {
+              ecosiaMsg.classList.remove('visible');
+          }
         }
-        
-        // Replace %s with the encoded query
-        const finalUrl = urlTemplate.replace('%s', query);
-        
-        window.open(finalUrl, '_blank');
-      }
 
-      // Initialize state on page load
-      document.addEventListener('DOMContentLoaded', updateUI);
-    
+        window.handleSearch = function(e, type) {
+          e.preventDefault();
+          const select = document.getElementById('engine-select');
+          const input = document.getElementById('search-query');
+          const query = encodeURIComponent(input.value);
+          
+          if (!query) return;
+
+          const selectedOption = select.options[select.selectedIndex];
+          let urlTemplate = "";
+
+          if (type === 'ai') {
+              urlTemplate = selectedOption.getAttribute('data-ai-url');
+              // Fallback if AI url is somehow missing
+              if(!urlTemplate) urlTemplate = selectedOption.value; 
+          } else {
+              urlTemplate = selectedOption.value;
+          }
+          
+          // Replace %s with the encoded query
+          const finalUrl = urlTemplate.replace('%s', query);
+          
+          window.open(finalUrl, '_blank');
+        }
+
+        // Initialize UI state
+        updateUI();
+      });
     </script>
 
     <script src="/test/portalloader.js" defer></script>
