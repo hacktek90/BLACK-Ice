@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>BlackICE Portal | The Free Web OS & Cloud Workspace</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="BlackICE Portal is a free, browser-based Web OS. Transform your browser into a cloud operating system with AI tools, code editors, and virtual workspaces. No download required.">
+    <meta name="keywords"
+        content="Web OS, Cloud Operating System, Browser OS, Online Desktop, Virtual Workspace, Web Developer Tools, AI Productivity Suite, Cloud Computing">
+    <meta name="author" content="Subhankar">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://blackice-ac.vercel.app">
+     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+     <link rel="icon" href="/favicon.png" type="image/png" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Structured Data -->
+  <script type="application/ld+json">
+        {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "BlackICE Portal",
+      "url": "https://blackice-ac.vercel.app/",
+      "logo": "https://blackice-ac.vercel.app/favicon.png",
+      "sameAs": [
+        "https://github.com/blackice",
+        "https://twitter.com/blackice"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "name": "BlackICE Portal",
+      "url": "https://blackice-ac.vercel.app/",
+      "publisher": {
+        "@type": "Organization",
+        "name": "BlackICE Portal"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://blackice-ac.vercel.app/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
+    </script>
+    <style>
+        :root {
+            --font-main: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --bg-dark: #050505;
+            --bg-card: #121212;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* --- Smooth Scrolling & Offset Fix --- */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        section {
+            /* This padding creates space so the fixed navbar doesn't cover titles when jumping */
+            scroll-margin-top: 100px;
+        }
+
+        /* Abstract Background Pattern */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-main);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .text-gradient-primary {
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Navbar */
+        .navbar {
+            backdrop-filter: blur(12px);
+            background: rgba(5, 5, 5, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.2rem 0;
+        }
+
+        .navbar-brand {
+            font-family: var(--font-main);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff !important;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff !important;
+        }
+
+        /* --- Custom Labs Button --- */
+        .btn-labs {
+            --duration: 7s;
+            --easing: linear;
+            --c-color-1: rgba(255, 163, 26, .7);
+            --c-color-2: #1a23ff;
+            --c-color-3: #e21bda;
+            --c-color-4: rgba(255, 232, 26, .7);
+            --c-shadow: rgba(0, 0, 0, .5);
+            --c-shadow-inset-top: rgba(0, 0, 0, .9);
+            --c-shadow-inset-bottom: rgba(50, 50, 50, .8);
+            --c-radial-inner: #1a1a1a;
+            --c-radial-outer: #2a2a2a;
+            --c-color: #fff;
+            outline: none;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            display: table;
+            border-radius: 24px;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--c-color);
+            background: radial-gradient(circle, var(--c-radial-inner), var(--c-radial-outer) 80%);
+            box-shadow: 0 0 14px var(--c-shadow);
+            text-decoration: none;
+        }
+
+        .btn-labs:before {
+            content: "";
+            pointer-events: none;
+            position: absolute;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            box-shadow: inset 0 3px 12px var(--c-shadow-inset-top), inset 0 -3px 4px var(--c-shadow-inset-bottom);
+        }
+
+        .btn-labs .wrapper {
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            overflow: hidden;
+            border-radius: 24px;
+            min-width: 140px;
+            padding: 12px 0;
+        }
+
+        .btn-labs .wrapper span {
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-labs:hover {
+            --duration: 1400ms;
+        }
+
+        .btn-labs .wrapper .circle {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            filter: blur(var(--blur, 8px));
+            background: var(--background, transparent);
+            transform: translate(var(--x, 0), var(--y, 0)) translateZ(0);
+            animation: var(--animation, none) var(--duration) var(--easing) infinite;
+        }
+
+        .btn-labs .wrapper .circle:nth-child(odd) {
+            --background: var(--c-color-4);
+        }
+
+        .btn-labs .wrapper .circle:nth-child(even) {
+            --background: var(--c-color-2);
+            --blur: 14px;
+        }
+
+        .btn-labs .wrapper .circle:nth-child(3n) {
+            --background: var(--c-color-3);
+        }
+
+        .c1 {
+            --x: 0;
+            --y: -40px;
+            --animation: float1;
+        }
+
+        .c2 {
+            --x: 92px;
+            --y: 8px;
+            --animation: float2;
+        }
+
+        .c3 {
+            --x: -12px;
+            --y: -12px;
+            --animation: float3;
+        }
+
+        .c4 {
+            --x: 80px;
+            --y: -12px;
+            --animation: float4;
+        }
+
+        @keyframes float1 {
+            33% {
+                transform: translate(0, 16px) translateZ(0);
+            }
+
+            66% {
+                transform: translate(12px, 64px) translateZ(0);
+            }
+        }
+
+        @keyframes float2 {
+            33% {
+                transform: translate(80px, -10px) translateZ(0);
+            }
+
+            66% {
+                transform: translate(72px, -48px) translateZ(0);
+            }
+        }
+
+        @keyframes float3 {
+            33% {
+                transform: translate(20px, 12px) translateZ(0);
+            }
+
+            66% {
+                transform: translate(12px, 4px) translateZ(0);
+            }
+        }
+
+        @keyframes float4 {
+            33% {
+                transform: translate(76px, -12px) translateZ(0);
+            }
+
+            66% {
+                transform: translate(112px, -8px) translateZ(0);
+            }
+        }
+
+        /* --- Buttons --- */
+        .btn-primary-custom {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .btn-primary-custom:hover {
+            border-color: transparent;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary-custom:hover::before {
+            opacity: 1;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        /* Bento & Cards */
+        .bento-card {
+            background-color: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 2rem;
+            height: 100%;
+            transition: transform 0.1s ease-out, box-shadow 0.3s;
+            transform-style: preserve-3d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06), transparent 40%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+
+        .bento-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .bento-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .shape-orb {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            filter: blur(40px);
+            opacity: 0.4;
+            position: absolute;
+            top: -20px;
+            right: -20px;
+        }
+
+        .label-sm {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(to bottom, #fff, #555);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: var(--accent-primary);
+        }
+
+        /* Lucide Styling */
+        i.lucide {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* Accordion Customization */
+        .accordion-item {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+            border-radius: 12px !important;
+            overflow: hidden;
+        }
+
+        .accordion-button {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            box-shadow: none;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            box-shadow: none;
+        }
+
+        .accordion-button::after {
+            filter: invert(1);
+        }
+
+        .accordion-body {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
+        }
+
+        /* Floating Elements */
+        .circle-btn-wrap {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .circle-ring {
+            transition: stroke-dashoffset 0.8s ease;
+        }
+
+        .circle-btn:hover .circle-ring {
+            stroke-dashoffset: 0;
+        }
+
+        #infoPanel {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            color: #ccc;
+            text-align: center;
+            padding: 20px 20px 80px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(100%);
+            z-index: 999;
+        }
+
+        #infoPanel.open {
+            transform: translateY(0);
+        }
+
+        .india-badge {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BlackICE</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center gap-3">
+                    <li class="nav-item"><a class="nav-link text-white-50 fw-medium" href="/about.html">About Web OS</a></li>
+                    <li class="nav-item"><a class="nav-link text-white-50 fw-medium" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link text-white-50 fw-medium" href="#faq">FAQ</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn-labs" href="/Home.html">
+                            <div class="wrapper">
+                                <span>Launch OS</span>
+                                <div class="circle c1"></div>
+                                <div class="circle c2"></div>
+                                <div class="circle c3"></div>
+                                <div class="circle c4"></div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="d-flex align-items-center min-vh-100 pt-5 position-relative">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="badge bg-primary/20 text-primary border border-primary/20 rounded-pill px-3 py-2 mb-4">
+                        <span class="fw-bold">New:</span> Version 2.0 Live
+                    </div>
+                    <h1 class="display-3 mb-4">
+                        Your Browser, Upgraded to a <br>
+                        <span class="text-gradient-primary">Web OS</span>
+                    </h1>
+                    <p class="lead text-white-50 mb-5 mx-auto" style="max-width: 650px;">
+                        BlackICE Portal transforms Chrome, Edge, or Firefox into a full-fledged cloud operating system.
+                        Access AI, coding environments, and productivity tools without downloading a single file.
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+                        <a href="/Home.html" class="btn btn-primary-custom">Start Using Web OS</a>
+                        <a href="https://bicochat.onrender.com/" target="_blank"
+                            class="btn btn-outline-custom d-flex align-items-center gap-2">
+                            <i data-lucide="message-circle"></i> Try BICOChat AI
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- What is Web OS Section -->
+    <section class="py-5" id="about">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="label-sm text-primary">The Concept</span>
+                    <h2 class="display-5 mb-4">What is a Web OS?</h2>
+                    <p class="text-white-50 mb-4">
+                        A <strong>Web Operating System (Web OS)</strong> is a cloud-based platform that simulates a
+                        traditional desktop environment entirely within your web browser. Unlike Windows or macOS, there
+                        is nothing to install.
+                    </p>
+                    <p class="text-white-50 mb-4">
+                        BlackICE Portal provides a virtual workspace where you can manage files, run developer
+                        utilities, collaborate with teams, and access AI assistants from any device, anywhere in the
+                        world. It is the future of operating systems—lightweight, secure, and universally accessible.
+                    </p>
+                    <ul class="list-unstyled text-white-50">
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i data-lucide="check-circle" class="text-success" style="width:18px;"></i> Zero
+                            installation latency</li>
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i data-lucide="check-circle" class="text-success" style="width:18px;"></i> Automatic cloud
+                            backup</li>
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i data-lucide="check-circle" class="text-success" style="width:18px;"></i> Cross-device
+                            synchronization</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6">
+                    <div class="bento-card border-0 bg-gradient"
+                        style="background: linear-gradient(135deg, #131313, #000000); min-height: 400px; display: flex; align-items: center; justify-content: center;">
+                        <div
+                            style="position: absolute; width: 200px; height: 200px; background: var(--accent-primary); filter: blur(80px); opacity: 0.3;">
+                        </div>
+                        <div class="text-center position-relative z-2">
+                            <i data-lucide="monitor" style="width: 80px; height: 80px; color: white; opacity: 0.8;"></i>
+                            <h3 class="mt-4 h2">Browser Native</h3>
+                            <p class="text-white-50 small">Running entirely on client-side & serverless logic.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Features -->
+    <section class="py-5" id="features">
+        <div class="container">
+            <h2 class="text-center mb-5 display-6">Integrated Workspace Apps</h2>
+            <div class="row g-4">
+                <!-- Main Feature -->
+                <div class="col-12 col-lg-8">
+                    <div class="bento-card h-100 tilt-card"
+                        style="background: linear-gradient(145deg, #131313, #0a0a0a);">
+                        <div class="shape-orb"></div>
+                        <div class="bento-content">
+                            <span class="label-sm">Core Environment</span>
+                            <h3 class="display-5 mb-3">Unified Virtual Desktop</h3>
+                            <p class="text-white-50 lead">
+                                Manage your entire digital life in one minimal interface. Switch between AI, Dev, and
+                                Workspace tools instantly without tab switching. Experience the stability of a native OS
+                                within Chrome.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stat -->
+                <div class="col-6 col-lg-4">
+                    <div class="bento-card tilt-card">
+                        <div class="bento-content d-flex flex-column justify-content-center h-100">
+                            <span class="stat-number">10+</span>
+                            <span class="label-sm mb-0">Pre-installed Apps</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- App Categories -->
+                <div class="col-6 col-lg-4">
+                    <div class="bento-card tilt-card">
+                        <div class="bento-content">
+                            <div class="mb-3 text-primary"><i data-lucide="cpu" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h4 class="h5">AI Core Engine</h4>
+                            <p class="text-white-50 small mb-0">Integrated LLMs for focus enhancement, health tracking,
+                                and automated intelligence workflows.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-4">
+                    <div class="bento-card tilt-card">
+                        <div class="bento-content">
+                            <div class="mb-3 text-info"><i data-lucide="zap" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h4 class="h5">Productivity Suite</h4>
+                            <p class="text-white-50 small mb-0">Task management, habit tracking, and advanced planning
+                                systems built into the OS.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="bento-card tilt-card">
+                        <div class="bento-content">
+                            <div class="mb-3 text-warning">
+                                <i data-lucide="layout-template" style="width: 32px; height: 32px;"></i></div>
+                            <h4 class="h5">Creative Studio</h4>
+                            <p class="text-white-50 small mb-0">Cloud-based docs, slides, whiteboards, and mind maps
+                                accessible from anywhere.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="py-5 bg-white-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Who is this Web OS for?</h2>
+            <div class="row g-4 text-center">
+                <div class="col-md-4">
+                    <div class="p-4 h-100">
+                        <i data-lucide="code-2" class="mb-3 text-primary" style="width: 40px; height: 40px;"></i>
+                        <h4>Developers</h4>
+                        <p class="text-white-50 small">A portable coding environment with built-in utilities. Debug and
+                            deploy directly from the browser OS.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 h-100">
+                        <i data-lucide="users" class="mb-3 text-success" style="width: 40px; height: 40px;"></i>
+                        <h4>Remote Teams</h4>
+                        <p class="text-white-50 small">Real-time collaboration workspaces. Share documents and manage
+                            projects in a unified cloud desktop.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 h-100">
+                        <i data-lucide="graduation-cap" class="mb-3 text-warning" style="width: 40px; height: 40px;"></i>
+                        <h4>Students & Creators</h4>
+                        <p class="text-white-50 small">Organize research, notes, and media without cluttering your local
+                            hard drive.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-5" id="faq">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+            <div class="accordion" id="faqAccordion">
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Do I need to install BlackICE Portal?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            No. BlackICE Portal is a Web OS, meaning it runs 100% in your browser. Simply navigate to
+                            the URL, log in, and your operating system loads instantly. No .exe or .dmg files are
+                            required.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Is my data safe in the Cloud OS?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes. We prioritize security with encrypted connections (SSL) and do not mine your personal
+                            data. Your workspace state is synced securely to your account.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Can I use this on mobile devices?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Absolutely. BlackICE Portal is responsive and works on tablets and smartphones, giving you
+                            access to your Web OS desktop on the go.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            What makes it different from a normal website?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Unlike standard websites, a Web OS manages state, multitasking, and window management. It
+                            allows you to run multiple "apps" simultaneously within a single browser tab, mimicking the
+                            experience of Windows or macOS.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-5 mt-5 border-top border-white/5">
+        <div class="container text-center">
+            <h4 class="mb-4 text-white">BlackICE Portal</h4>
+            <p class="text-white-50 small mb-5">
+                The next generation of cloud computing. Built for speed, privacy, and productivity.
+            </p>
+
+            <div class="status-embed-wrapper mb-5">
+                <iframe src="https://blackice.instatus.com/embed-status/cba436dd/dark-sm" width="250" height="60"
+                    frameborder="0" scrolling="no" style="pointer-events: none;"></iframe>
+            </div>
+
+            <div class="text-white-25 small">
+                &copy;  BlackICE Portal. All rights reserved. | <a href="#"
+                    class="text-decoration-none text-white-25">Privacy Policy</a> | <a href="#"
+                    class="text-decoration-none text-white-25">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- UI Elements -->
+    <div class="circle-btn-wrap">
+        <svg class="circle-btn" id="circleBtn" width="48" height="48" viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0" aria-label="Toggle Info">
+            <defs>
+                <linearGradient id="grad" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#00d4ff" />
+                    <stop offset="100%" stop-color="#7b61ff" />
+                </linearGradient>
+            </defs>
+            <circle class="circle-ring" cx="32" cy="32" r="30" stroke="url(#grad)" stroke-width="3" fill="none"
+                stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round" />
+            <circle cx="32" cy="32" r="28" fill="rgba(255,255,255,0.1)" />
+            <text x="32" y="37" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif"
+                font-weight="bold">INFO</text>
+        </svg>
+    </div>
+
+    <div id="infoPanel">
+        <p class="mb-0 text-white-50">
+            Site created to streamline productivity and enhance digital workflows.<br>
+            <span class="text-white fw-bold mt-2 d-block">Author/Owner: Subhankar</span>
+        </p>
+    </div>
+
+    <div class="india-badge">
+        <span>🇮🇳</span>
+        <span>Made in India</span>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Initialize Lucide
+        lucide.createIcons();
+
+        // 1. Fix for Mobile Menu: Close it when a link is clicked
+        const navLinks = document.querySelectorAll('.nav-link');
+        const menuToggle = document.getElementById('navbarNav');
+        const bsCollapse = new bootstrap.Collapse(menuToggle, {toggle:false});
+        
+        navLinks.forEach((l) => {
+            l.addEventListener('click', () => {
+                if(menuToggle.classList.contains('show')){
+                    bsCollapse.toggle();
+                }
+            })
+        });
+
+        // 2. Tilt Effect
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -3;
+                const rotateY = ((x - centerX) / centerX) * 3;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        });
+
+        // 3. Info Panel
+        const btn = document.getElementById('circleBtn');
+        const panel = document.getElementById('infoPanel');
+        function togglePanel() { panel.classList.toggle('open'); }
+        btn.addEventListener('click', togglePanel);
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePanel(); }
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+     <!-- Analytics -->
+
+      <script src="/test/tracking.js" defer></script>
+      <!-- Analytics -->
+
+     <!-- Product Hunt Badge -->
+                <div class="ph-badge-wrapper">
+                    <a href="https://www.producthunt.com/products/blackice-portalos?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-blackice-portalos" target="_blank" rel="noopener noreferrer"><img alt="BlackICE PortalOS - The Future of Web OS | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1097231&amp;theme=light&amp;t=1773386799745"></a>
+                </div>
+    
+  
+</body>
+
+</html>
