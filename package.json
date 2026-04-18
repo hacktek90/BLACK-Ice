@@ -1,7 +1,0 @@
-{
-  "name": "html-script-injector",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "node inject-script.js"
-  }
-}
