@@ -18,3 +18,7 @@
     }
   ]
 }
+{
+  "buildCommand": "node inject-script.js",
+  "outputDirectory": "."
+}
