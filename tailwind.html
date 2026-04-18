@@ -2,33 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tailwind Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend reCAPTCHA Popup</title>
 
-  <!-- Your compiled Tailwind CSS -->
-  <link href="./dist/output.css" rel="stylesheet">
+  <!-- Load reCAPTCHA v3 -->
+  <script src="https://www.google.com/recaptcha/api.js?render=6LfiE74sAAAAAHKTfyy99FUIZBCjRYrOZ7gGA7AL"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
-<body class="bg-black text-white flex items-center justify-center h-screen">
+<body>
 
-  <div class="text-center space-y-4">
-    
-    <h1 class="text-4xl font-bold text-blue-400">
-      Tailwind Working 🚀
-    </h1>
+  <h2>Protected Popup (Frontend Only)</h2>
+  <button onclick="handleClick()">Open Popup</button>
 
-    <p class="text-gray-400">
-      If you see styling, Tailwind is configured correctly.
-    </p>
+  <div class="overlay" id="overlay"></div>
 
-    <button class="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition">
-      Test Button
-    </button>
-
-    <div class="border border-gray-700 p-4 rounded-lg">
-      Card UI Test
-    </div>
-
+  <div class="popup" id="popup">
+    <h3>Access Granted ✅</h3>
+    <p>reCAPTCHA token generated successfully.</p>
+    <button onclick="closePopup()">Close</button>
   </div>
+
+  <script>
+    function openPopup() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("popup").style.display = "none";
+    }
+
+    function handleClick() {
+      grecaptcha.ready(function() {
+        grecaptcha.execute('6LfiE74sAAAAAHKTfyy99FUIZBCjRYrOZ7gGA7AL', { action: 'popup_access' })
+          .then(function(token) {
+
+            console.log("Token:", token);
+
+            // Frontend-only check (NOT secure)
+            if (token && token.length > 10) {
+              openPopup();
+            } else {
+              alert("Verification failed ❌");
+            }
+
+          })
+          .catch(() => {
+            alert("reCAPTCHA error ❌");
+          });
+      });
+    }
+  </script>
 
 </body>
 </html>
