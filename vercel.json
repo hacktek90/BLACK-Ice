@@ -9,9 +9,22 @@
       "source": "/home.html",
       "destination": "/Home.html",
       "permanent": true
+    },
+    {
+      "source": "/:path*.html",
+      "destination": "/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/:path*.html"
+    },
     {
       "source": "/portalloader.js",
       "destination": "/test/portal.js"
