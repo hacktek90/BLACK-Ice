@@ -2,495 +2,515 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Media Reader - PDF & Images</title>
-<meta name=keywords content="PDF Viewer">
-    <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Media Reader - PDF.js & Images</title>
+  <meta name=keywords content="PDF Viewer, PDF.js">
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    <style>
-        /* --- GLOBAL RESET --- */
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: #0f172a;
-            display: flex;
-            flex-direction: column;
-        }
+  <style>
+    /* --- GLOBAL RESET --- */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* --- HEADER STRUCTURE --- */
-        #main-header {
-            flex-shrink: 0;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            z-index: 1000;
-            height: auto;
-            transition: margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-            width: 100%;
-            position: relative;
-        }
+    /* --- HEADER STRUCTURE --- */
+    #main-header {
+      flex-shrink: 0;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      z-index: 1000;
+      height: auto;
+      transition: margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+      width: 100%;
+      position: relative;
+    }
 
-        .header-hidden-state {
-            opacity: 0;
-            pointer-events: none;
-        }
+    .header-hidden-state {
+      opacity: 0;
+      pointer-events: none;
+    }
 
-        /* --- TAB BAR --- */
-        .tab-bar {
-            display: flex;
-            align-items: center;
-            padding: 8px 16px;
-            background: #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
+    /* --- TAB BAR --- */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
 
-        .tab-bar::-webkit-scrollbar {
-            display: none;
-        }
+    .tab-bar::-webkit-scrollbar {
+      display: none;
+    }
 
-        .tab {
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 13px;
-            color: #475569;
-            cursor: pointer;
-            user-select: none;
-            min-width: 100px;
-            max-width: 200px;
-            justify-content: space-between;
-            transition: all 0.2s;
-            position: relative;
-        }
+    .tab {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: #475569;
+      cursor: pointer;
+      user-select: none;
+      min-width: 100px;
+      max-width: 200px;
+      justify-content: space-between;
+      transition: all 0.2s;
+      position: relative;
+    }
 
-        .tab:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
+    .tab:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
 
-        .tab.active {
-            background: #ffffff;
-            border-color: #6366f1;
-            color: #6366f1;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            font-weight: 600;
-        }
+    .tab.active {
+      background: #ffffff;
+      border-color: #6366f1;
+      color: #6366f1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+    }
 
-        .tab-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex-grow: 1;
-        }
+    .tab-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+    }
 
-        .tab-close {
-            margin-left: 8px;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #94a3b8;
-            flex-shrink: 0;
-        }
+    .tab-close {
+      margin-left: 8px;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
 
-        .tab-close:hover {
-            background: #fee2e2;
-            color: #ef4444;
-        }
+    .tab-close:hover {
+      background: #fee2e2;
+      color: #ef4444;
+    }
 
-        .new-tab-btn {
-            padding: 6px;
-            border-radius: 6px;
-            color: #64748b;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            flex-shrink: 0;
-        }
+    .new-tab-btn {
+      padding: 6px;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
 
-        .new-tab-btn:hover {
-            background: #e2e8f0;
-            color: #0f172a;
-        }
+    .new-tab-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
 
-        /* --- CONTROLS AREA --- */
-        .controls-area {
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-        }
+    /* --- CONTROLS AREA --- */
+    .controls-area {
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+    }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .brand span {
-            font-weight: 700;
-            font-size: 16px;
-            color: #1e293b;
-            letter-spacing: -0.5px;
-        }
+    .brand span {
+      font-weight: 700;
+      font-size: 16px;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
 
-        .input-group {
-            display: flex;
-            align-items: center;
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 4px 8px;
-            width: 100%;
-            max-width: 850px;
-            border: 1px solid #e2e8f0;
-            gap: 8px;
-        }
+    .input-group {
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 4px 8px;
+      width: 100%;
+      max-width: 850px;
+      border: 1px solid #e2e8f0;
+      gap: 8px;
+    }
 
-        input[type="text"] {
-            flex-grow: 1;
-            border: none;
-            background: transparent;
-            outline: none;
-            padding: 10px 0;
-            font-size: 14px;
-            color: #1e293b;
-            min-width: 0;
-        }
+    input[type="text"] {
+      flex-grow: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      padding: 10px 0;
+      font-size: 14px;
+      color: #1e293b;
+      min-width: 0;
+    }
 
-        .icon-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s;
-            color: #64748b;
-            white-space: nowrap;
-        }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+      color: #64748b;
+      white-space: nowrap;
+    }
 
-        .icon-btn:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-        
-        .divider {
-            width: 1px;
-            height: 20px;
-            background-color: #cbd5e1;
-            flex-shrink: 0;
-        }
+    .icon-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
 
-        /* --- UPLOAD BUTTONS GROUP --- */
-        .upload-group {
-            display: flex;
-            gap: 4px;
-        }
+    .divider {
+      width: 1px;
+      height: 20px;
+      background-color: #cbd5e1;
+      flex-shrink: 0;
+    }
 
-        .btn-upload-pdf {
-            color: #dc2626; /* Red-ish for PDF */
-        }
-        .btn-upload-pdf:hover {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+    /* --- UPLOAD BUTTONS GROUP --- */
+    .upload-group {
+      display: flex;
+      gap: 4px;
+    }
 
-        .btn-upload-img {
-            color: #0284c7; /* Blue-ish for Image */
-        }
-        .btn-upload-img:hover {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
+    .btn-upload-pdf {
+      color: #dc2626;
+      /* Red-ish for PDF */
+    }
 
-        .btn-label {
-            margin-left: 6px;
-            font-size: 13px;
-            font-weight: 500;
-        }
+    .btn-upload-pdf:hover {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
-        .load-trigger {
-            color: #6366f1;
-        }
+    .btn-upload-img {
+      color: #0284c7;
+      /* Blue-ish for Image */
+    }
 
-        .load-trigger:hover {
-            background: #e0e7ff;
-            color: #4338ca;
-        }
+    .btn-upload-img:hover {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
 
-        /* --- NATIVE TOGGLE BUTTON STYLE --- */
-        .btn-native-toggle.active {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        
-        .btn-native-toggle.active:hover {
-            background: #bfdbfe;
-        }
+    .btn-label {
+      margin-left: 6px;
+      font-size: 13px;
+      font-weight: 500;
+    }
 
-        /* --- FLOATING SHOW BUTTON --- */
-        #show-header-btn {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 1001;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
-            transition: transform 0.2s, box-shadow 0.2s;
-            color: #475569;
-        }
+    .load-trigger {
+      color: #6366f1;
+    }
 
-        #show-header-btn:hover {
-            transform: translateY(2px);
-            box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
-            color: #6366f1;
-        }
+    .load-trigger:hover {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
 
-        /* --- VIEWER AREA --- */
-        #media-viewer {
-            flex-grow: 1;
-            width: 100%;
-            height: 100%;
-            background: #1e293b;
-            position: relative;
-            overflow: hidden;
-            transition: height 0.4s ease;
-        }
+    /* --- NATIVE TOGGLE BUTTON STYLE --- */
+    .btn-native-toggle.active {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
 
-        .media-instance {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-        }
+    .btn-native-toggle.active:hover {
+      background: #bfdbfe;
+    }
 
-        .media-instance.active {
-            display: block;
-        }
+    /* --- FLOATING SHOW BUTTON --- */
+    #show-header-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1001;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+      color: #475569;
+    }
 
-        /* --- IMAGE VIEWER STYLES --- */
-        .image-wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow: hidden;
-            background-color: #1e293b;
-            position: relative;
-            cursor: grab;
-        }
+    #show-header-btn:hover {
+      transform: translateY(2px);
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+      color: #6366f1;
+    }
 
-        .image-wrapper:active {
-            cursor: grabbing;
-        }
+    /* --- VIEWER AREA --- */
+    #media-viewer {
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      background: #1e293b;
+      position: relative;
+      overflow: hidden;
+      transition: height 0.4s ease;
+    }
 
-        .image-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            transform-origin: center center;
-            transition: transform 0.1s ease-out;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            border-radius: 4px;
-            pointer-events: auto; 
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-        
-        .image-error {
-            color: #94a3b8;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
+    .media-instance {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
 
-        /* --- ZOOM TOOLBAR --- */
-        .zoom-toolbar {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 50;
-            transition: opacity 0.3s ease, visibility 0.3s;
-        }
+    .media-instance.active {
+      display: block;
+    }
 
-        .zoom-toolbar.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+    /* --- IMAGE VIEWER STYLES --- */
+    .image-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      background-color: #1e293b;
+      position: relative;
+      cursor: grab;
+    }
 
-        .zoom-btn {
-            background: transparent;
-            border: none;
-            color: #ffffff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-            padding: 4px;
-        }
+    .image-wrapper:active {
+      cursor: grabbing;
+    }
 
-        .zoom-btn:hover {
-            color: #6366f1;
-        }
+    .image-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      transform-origin: center center;
+      transition: transform 0.1s ease-out;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      pointer-events: auto;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
 
-        .zoom-value {
-            color: #e2e8f0;
-            font-size: 14px;
-            font-variant-numeric: tabular-nums;
-            min-width: 45px;
-            text-align: center;
-        }
+    .image-error {
+      color: #94a3b8;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
 
-        /* --- NATIVE PDF IFRAME --- */
-        .native-pdf-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
+    /* --- ZOOM TOOLBAR --- */
+    .zoom-toolbar {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 8px 16px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 50;
+      transition: opacity 0.3s ease, visibility 0.3s;
+    }
 
-        /* --- MOBILE RESPONSIVENESS --- */
-        @media (max-width: 768px) {
-            .btn-label { display: none; }
-            .input-group { padding: 4px 8px; }
-            .brand span { display: none; }
-            .zoom-toolbar { bottom: 20px; padding: 6px 12px; gap: 12px; }
-            
-            /* On small screens, stack upload buttons or shrink them */
-            .btn-upload-pdf span, .btn-upload-img span {
-                display: none;
-            }
-        }
+    .zoom-toolbar.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
-        /* Hide the actual file inputs */
-        .hidden-file-input { display: none; }
-    </style>
+    .zoom-btn {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+      padding: 4px;
+    }
+
+    .zoom-btn:hover {
+      color: #6366f1;
+    }
+
+    .zoom-value {
+      color: #e2e8f0;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+      min-width: 45px;
+      text-align: center;
+    }
+
+    /* --- NATIVE PDF IFRAME --- */
+    .native-pdf-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+    }
+
+    /* --- MOBILE RESPONSIVENESS --- */
+    @media (max-width: 768px) {
+      .btn-label {
+        display: none;
+      }
+
+      .input-group {
+        padding: 4px 8px;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .zoom-toolbar {
+        bottom: 20px;
+        padding: 6px 12px;
+        gap: 12px;
+      }
+
+      /* On small screens, stack upload buttons or shrink them */
+      .btn-upload-pdf span,
+      .btn-upload-img span {
+        display: none;
+      }
+    }
+
+    /* Hide the actual file inputs */
+    .hidden-file-input {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
 
-    <button id="show-header-btn" title="Exit Focus Mode (Esc)">
+  <button id="show-header-btn" title="Exit Focus Mode (Esc)">
         <i data-lucide="arrow-down-from-line"></i>
     </button>
 
-    <header id="main-header">
-        <div class="tab-bar" id="tab-bar-container">
-            <button class="new-tab-btn" id="new-tab-btn" title="New Empty Tab">
+  <header id="main-header">
+    <div class="tab-bar" id="tab-bar-container">
+      <button class="new-tab-btn" id="new-tab-btn" title="New Empty Tab">
                 <i data-lucide="plus"></i>
             </button>
-        </div>
+    </div>
 
-        <div class="controls-area">
-            <div class="brand">
-                <i data-lucide="layout-template" style="color:#6366f1;"></i>
-                <span>Media View</span>
-            </div>
+    <div class="controls-area">
+      <div class="brand">
+        <i data-lucide="layout-template" style="color:#6366f1;"></i>
+        <span>Media View</span>
+      </div>
 
-            <div class="input-group">
-                
-                <!-- TWO SEPARATE UPLOAD BUTTONS -->
-                <div class="upload-group">
-                    <button class="icon-btn btn-upload-pdf" onclick="document.getElementById('pdf-input').click()" title="Upload PDF">
+      <div class="input-group">
+
+        <!-- TWO SEPARATE UPLOAD BUTTONS -->
+        <div class="upload-group">
+          <button class="icon-btn btn-upload-pdf" onclick="document.getElementById('pdf-input').click()" title="Upload PDF">
                         <i data-lucide="file-text"></i>
                         <span class="btn-label">PDF</span>
                     </button>
-                    <button class="icon-btn btn-upload-img" onclick="document.getElementById('img-input').click()" title="Upload Image">
+          <button class="icon-btn btn-upload-img" onclick="document.getElementById('img-input').click()" title="Upload Image">
                         <i data-lucide="image"></i>
                         <span class="btn-label">Image</span>
                     </button>
-                </div>
+        </div>
 
-                <div class="divider"></div>
+        <div class="divider"></div>
 
-                <input type="text" id="media-url-input" placeholder="Paste PDF or Image link here...">
+        <input type="text" id="media-url-input" placeholder="Paste PDF or Image link here...">
 
-                <button class="icon-btn load-trigger" id="load-btn" title="Open Link in New Tab">
+        <button class="icon-btn load-trigger" id="load-btn" title="Open Link in New Tab">
                     <i data-lucide="arrow-right"></i>
                 </button>
-            </div>
+      </div>
 
-            <!-- Header Right Actions -->
-            <div style="display:flex; gap: 4px;">
-                <button class="icon-btn btn-native-toggle" id="native-toggle-btn" title="Toggle Native PDF Viewer (Browser Default)">
+      <!-- Header Right Actions -->
+      <div style="display:flex; gap: 4px;">
+        <button class="icon-btn btn-native-toggle" id="native-toggle-btn" title="Toggle PDF.js Viewer (Mozilla)">
                     <i data-lucide="file-check"></i>
                 </button>
-                <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
+        <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
                     <i data-lucide="expand"></i>
                 </button>
-            </div>
-        </div>
-    </header>
+      </div>
+    </div>
+  </header>
 
-    <!-- Hidden File Inputs -->
-    <input type="file" id="pdf-input" class="hidden-file-input" accept="application/pdf">
-    <input type="file" id="img-input" class="hidden-file-input" accept="image/*">
+  <!-- Hidden File Inputs -->
+  <input type="file" id="pdf-input" class="hidden-file-input" accept="application/pdf">
+  <input type="file" id="img-input" class="hidden-file-input" accept="image/*">
 
-    <!-- Global Zoom Toolbar -->
-    <div id="global-zoom-toolbar" class="zoom-toolbar hidden">
-        <button class="zoom-btn" id="zoom-out-btn" title="Zoom Out">
+  <!-- Global Zoom Toolbar -->
+  <div id="global-zoom-toolbar" class="zoom-toolbar hidden">
+    <button class="zoom-btn" id="zoom-out-btn" title="Zoom Out">
             <i data-lucide="minus"></i>
         </button>
-        <span class="zoom-value" id="zoom-level-text">100%</span>
-        <button class="zoom-btn" id="zoom-reset-btn" title="Reset Zoom">
+    <span class="zoom-value" id="zoom-level-text">100%</span>
+    <button class="zoom-btn" id="zoom-reset-btn" title="Reset Zoom">
             <i data-lucide="refresh-cw"></i>
         </button>
-        <button class="zoom-btn" id="zoom-in-btn" title="Zoom In">
+    <button class="zoom-btn" id="zoom-in-btn" title="Zoom In">
             <i data-lucide="plus"></i>
         </button>
-    </div>
+  </div>
 
-    <div id="media-viewer">
-    </div>
+  <div id="media-viewer">
+  </div>
 
-    <script type="module">
-        import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
+  <script type="module">
+    import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
 
         // --- ICONS ---
         lucide.createIcons();
@@ -500,7 +520,7 @@
             tabs: [],
             activeTabId: null,
             isFocusMode: false,
-            nativePdfMode: false, // <-- New state for Native PDF
+            nativePdfMode: false, 
             // Dragging State
             isDragging: false,
             startX: 0,
@@ -648,14 +668,19 @@
             }
 
             if (type === 'pdf') {
-                // Check for Native Mode Toggle
+                // Check for PDF.js Viewer Mode
                 if (state.nativePdfMode) {
                     const iframe = document.createElement('iframe');
                     iframe.className = 'native-pdf-frame';
-                    iframe.src = source;
+                    
+                    // Construct the URL to load the Mozilla PDF.js viewer with the file parameter
+                    // encodeURIComponent ensures special characters in URLs/Blob URLs don't break the query string
+                    const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(source)}`;
+                    
+                    iframe.src = viewerUrl;
                     container.appendChild(iframe);
                 } else {
-                    // Use EmbedPDF (Custom Viewer)
+                    // Use EmbedPDF (Default Viewer)
                     try {
                         EmbedPDF.init({
                             type: 'container',
@@ -910,9 +935,9 @@
 
         // --- INIT ---
         createTab('Start', '');
-    </script>
-    
-   
+  </script>
+
+
 
 </body>
 
