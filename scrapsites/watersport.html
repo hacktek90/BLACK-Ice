@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Aqua Tycoon Mobile</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        
+        body {
+            background: #0a1628;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+            color: #fff;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overscroll-behavior: none;
+        }
+        
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Mobile UI Overlay */
+        #uiLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        #uiLayer > * {
+            pointer-events: auto;
+        }
+        
+        /* Top Stats Bar */
+        #statsBar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 4px;
+            background: rgba(0, 10, 20, 0.85);
+            border-bottom: 2px solid #2a4d6e;
+            backdrop-filter: blur(4px);
+            z-index: 20;
+        }
+        
+        .stat-pill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            min-width: 60px;
+        }
+        
+        .stat-icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+        
+        .stat-value {
+            font-size: 10px;
+            color: #ffd700;
+            text-shadow: 1px 1px 0 #000;
+        }
+        
+        .stat-label {
+            font-size: 7px;
+            color: #7ab8e0;
+        }
+        
+        /* Combo Display */
+        #comboDisplay {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #ff6b9d;
+            text-shadow: 2px 2px 0 #000;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+        
+        #comboDisplay.active {
+            opacity: 1;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(-50%) rotate(-5deg); }
+            75% { transform: translateX(-50%) rotate(5deg); }
+        }
+        
+        /* Streak Fire */
+        #streakFire {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #ff4500;
+            z-index: 15;
+            opacity: 0;
+            text-align: center;
+        }
+        
+        #streakFire.active {
+            opacity: 1;
+            animation: flicker 0.1s ease-in-out infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Bottom Control Bar */
+        #controlBar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 5px;
+            background: rgba(0, 10, 20, 0.9);
+            border-top: 2px solid #2a4d6e;
+            z-index: 20;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            background: #1a3a5c;
+            border: 2px solid #4a90c2;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            padding: 12px 8px;
+            min-width: 60px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+            background: #2a5a8a;
+        }
+        
+        .control-btn .btn-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        .control-btn .btn-text {
+            font-size: 8px;
+        }
+        
+        .control-btn.badge::after {
+            content: attr(data-badge);
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: #fff;
+            font-size: 9px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
+        
+        /* Main Action Button (Cast/Reel) */
+        #actionBtn {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #2a8a5a, #1a5a3a);
+            border: 4px solid #4ecdc4;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4), inset 0 2px 10px rgba(255,255,255,0.1);
+            transition: all 0.2s;
+        }
+        
+        #actionBtn:active {
+            transform: translateX(-50%) scale(0.92);
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+        }
+        
+        #actionBtn.casting {
+            background: radial-gradient(circle, #8a4a2a, #5a2a1a);
+            border-color: #ff6b9d;
+            animation: pulse-ring 1s ease-out infinite;
+        }
+        
+        #actionBtn.reeling {
+            background: radial-gradient(circle, #ffd700, #b8860b);
+            border-color: #fff;
+            animation: shake-btn 0.3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 157, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 107, 157, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 157, 0); }
+        }
+        
+        @keyframes shake-btn {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(-50%) rotate(-3deg); }
+            75% { transform: translateX(-50%) rotate(3deg); }
+        }
+        
+        /* Notification Area */
+        #notificationArea {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .notification {
+            animation: floatUp 2s ease-out forwards;
+            margin: 8px auto;
+            font-size: 12px;
+            text-shadow: 2px 2px 0 #000;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            display: inline-block;
+        }
+        
+        .notification.rare {
+            color: #ff6b9d;
+            font-size: 14px;
+            background: rgba(255, 107, 157, 0.2);
+            border: 1px solid #ff6b9d;
+        }
+        
+        .notification.legendary {
+            color: #ffd700;
+            font-size: 16px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            animation: pulse 0.5s ease-in-out infinite, floatUp 3s ease-out forwards;
+        }
+        
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.1); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Side Panels */
+        .side-panel {
+            position: absolute;
+            top: 60px;
+            bottom: 80px;
+            width: 85%;
+            max-width: 320px;
+            background: rgba(0, 15, 30, 0.95);
+            border: 2px solid #4a90c2;
+            border-radius: 16px;
+            z-index: 50;
+            padding: 15px;
+            overflow-y: auto;
+            transform: translateX(-120%);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .side-panel.active {
+            transform: translateX(0);
+        }
+        
+        .side-panel.right {
+            right: 10px;
+            left: auto;
+            transform: translateX(120%);
+        }
+        
+        .side-panel.right.active {
+            transform: translateX(0);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2a4d6e;
+        }
+        
+        .panel-title {
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: 2px solid #ff4444;
+            color: #ff4444;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* Upgrade Items */
+        .upgrade-item {
+            background: rgba(20, 40, 60, 0.8);
+            border: 2px solid #2a5a8a;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .upgrade-item:active {
+            transform: scale(0.98);
+            border-color: #ffd700;
+        }
+        
+        .upgrade-item.locked {
+            opacity: 0.4;
+            cursor: default;
+        }
+        
+        .upgrade-item.purchased {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .upgrade-info {
+            flex: 1;
+        }
+        
+        .upgrade-name {
+            color: #7ab8e0;
+            margin-bottom: 4px;
+            font-size: 10px;
+        }
+        
+        .upgrade-desc {
+            font-size: 7px;
+            color: #4a90c2;
+        }
+        
+        .upgrade-cost {
+            color: #ffd700;
+            font-size: 10px;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        /* Fish Collection Grid */
+        .fish-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .fish-card {
+            background: rgba(20, 40, 60, 0.8);
+            border: 2px solid #2a5a8a;
+            border-radius: 10px;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 8px;
+            transition: all 0.3s;
+        }
+        
+        .fish-card.caught {
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+        
+        .fish-card.uncaught {
+            opacity: 0.3;
+            filter: grayscale(1);
+        }
+        
+        .fish-sprite {
+            font-size: 28px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        
+        .fish-name {
+            font-size: 7px;
+            margin-bottom: 2px;
+        }
+        
+        .fish-rarity {
+            font-size: 6px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        
+        /* Achievements */
+        .achievement-list {
+            margin-top: 10px;
+        }
+        
+        .achievement {
+            font-size: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(20, 40, 60, 0.6);
+            border: 1px solid #2a5a8a;
+        }
+        
+        .achievement.locked {
+            opacity: 0.4;
+        }
+        
+        .achievement.unlocked {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: #00ff88;
+        }
+        
+        .achievement-icon {
+            font-size: 20px;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .achievement-text {
+            flex: 1;
+        }
+        
+        .achievement-name {
+            color: #ffd700;
+            margin-bottom: 2px;
+        }
+        
+        .achievement-desc {
+            font-size: 7px;
+            color: #4a90c2;
+        }
+        
+        /* Daily Reward */
+        #dailyReward {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid #ffd700;
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 15;
+            font-size: 9px;
+            text-align: center;
+            animation: glow 2s ease-in-out infinite;
+            backdrop-filter: blur(4px);
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+        }
+        
+        #dailyReward.claimed {
+            opacity: 0.4;
+            animation: none;
+            cursor: default;
+        }
+        
+        /* Start Screen */
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 10, 20, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .game-title {
+            font-size: 24px;
+            color: #4ecdc4;
+            text-shadow: 3px 3px 0 #1a5f5a, 0 0 20px rgba(78, 205, 196, 0.5);
+            margin-bottom: 15px;
+            animation: wave 2s ease-in-out infinite;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .game-subtitle {
+            font-size: 9px;
+            color: #7ab8e0;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+        
+        .start-btn {
+            background: #2a5a8a;
+            border: 3px solid #4a90c2;
+            color: #fff;
+            padding: 18px 40px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 12px;
+            margin: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #1a3a5a;
+        }
+        
+        .start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #1a3a5a;
+        }
+        
+        .tutorial-text {
+            margin-top: 30px;
+            font-size: 8px;
+            color: #4a90c2;
+            line-height: 2;
+        }
+        
+        /* Depth Indicator */
+        #depthIndicator {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 150px;
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 4px;
+            overflow: hidden;
+            z-index: 15;
+            border: 1px solid #2a4d6e;
+        }
+        
+        #depthFill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #001a33, #0066cc);
+            transition: height 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        /* Haptic feedback visual */
+        .haptic-burst {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3), transparent);
+            pointer-events: none;
+            animation: burst 0.4s ease-out forwards;
+            z-index: 60;
+        }
+        
+        @keyframes burst {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        /* Scrollbar styling for panels */
+        .side-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .side-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .side-panel::-webkit-scrollbar-thumb {
+            background: #4a90c2;
+            border-radius: 2px;
+        }
+        
+        /* Offline earnings popup */
+        #offlinePopup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 20, 40, 0.95);
+            border: 3px solid #ffd700;
+            border-radius: 16px;
+            padding: 20px;
+            z-index: 200;
+            text-align: center;
+            display: none;
+            max-width: 90%;
+            backdrop-filter: blur(10px);
+        }
+        
+        #offlinePopup.active {
+            display: block;
+            animation: popIn 0.3s ease-out;
+        }
+        
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .offline-title {
+            color: #ffd700;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .offline-amount {
+            font-size: 24px;
+            color: #4ecdc4;
+            margin: 15px 0;
+        }
+        
+        /* Vibration indicator */
+        .vibrate-indicator {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #ff6b9d;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 15;
+        }
+        
+        .vibrate-indicator.active {
+            opacity: 1;
+        }
+        
+        /* Progress bar for reeling */
+        #reelProgress {
+            position: absolute;
+            bottom: 210px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            display: none;
+            z-index: 15;
+            border: 1px solid #4a90c2;
+        }
+        
+        #reelProgress.active {
+            display: block;
+        }
+        
+        #reelBar {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #ffd700);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 4px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-height: 600px) {
+            #actionBtn {
+                width: 80px;
+                height: 80px;
+                bottom: 80px;
+                font-size: 10px;
+            }
+            
+            .control-btn {
+                padding: 8px 4px;
+                min-width: 50px;
+            }
+            
+            .control-btn .btn-icon {
+                font-size: 16px;
+            }
+        }
+        
+        @media (min-height: 800px) {
+            #actionBtn {
+                width: 120px;
+                height: 120px;
+                bottom: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="uiLayer">
+            <!-- Stats Bar -->
+            <div id="statsBar">
+                <div class="stat-pill">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="coinDisplay">0</div>
+                    <div class="stat-label">COINS</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value" id="levelDisplay">1</div>
+                    <div class="stat-label">LVL</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="xpDisplay">0%</div>
+                    <div class="stat-label">XP</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-icon">🐟</div>
+                    <div class="stat-value" id="fishCount">0</div>
+                    <div class="stat-label">CATCH</div>
+                </div>
+            </div>
+            
+            <!-- Combo & Streak -->
+            <div id="comboDisplay">COMBO x<span id="comboValue">0</span>!</div>
+            <div id="streakFire">🔥 STREAK! 🔥</div>
+            
+            <!-- Daily Reward -->
+            <div id="dailyReward" onclick="claimDailyReward()">
+                <div style="font-size: 12px;">📅</div>
+                <div style="font-size: 8px; color: #ffd700;">TAP!</div>
+            </div>
+            
+            <!-- Depth Indicator -->
+            <div id="depthIndicator">
+                <div id="depthFill" style="height: 0%"></div>
+            </div>
+            
+            <!-- Reel Progress -->
+            <div id="reelProgress">
+                <div id="reelBar"></div>
+            </div>
+            
+            <!-- Vibration Indicator -->
+            <div class="vibrate-indicator" id="vibrateInd">📳 BITE DETECTED!</div>
+            
+            <!-- Main Action Button -->
+            <button id="actionBtn" onclick="handleAction()">
+                <span style="font-size: 24px;">🎣</span>
+                <span id="actionText">CAST</span>
+            </button>
+            
+            <!-- Bottom Control Bar -->
+            <div id="controlBar">
+                <div class="control-btn" onclick="toggleShop()">
+                    <span class="btn-icon">🛒</span>
+                    <span class="btn-text">SHOP</span>
+                </div>
+                <div class="control-btn" onclick="toggleCollection()">
+                    <span class="btn-icon">📖</span>
+                    <span class="btn-text">FISH</span>
+                </div>
+                <div class="control-btn" onclick="toggleAchievements()">
+                    <span class="btn-icon">🏆</span>
+                    <span class="btn-text">BADGES</span>
+                </div>
+                <div class="control-btn" onclick="showStats()">
+                    <span class="btn-icon">📈</span>
+                    <span class="btn-text">STATS</span>
+                </div>
+            </div>
+            
+            <!-- Shop Panel -->
+            <div class="side-panel" id="shopPanel">
+                <div class="panel-header">
+                    <span class="panel-title">🛒 UPGRADES</span>
+                    <button class="close-btn" onclick="toggleShop()">✕</button>
+                </div>
+                <div id="upgradeList"></div>
+            </div>
+            
+            <!-- Collection Panel -->
+            <div class="side-panel right" id="collectionPanel">
+                <div class="panel-header">
+                    <span class="panel-title">📖 COLLECTION</span>
+                    <button class="close-btn" onclick="toggleCollection()">✕</button>
+                </div>
+                <div class="fish-grid" id="fishGrid"></div>
+            </div>
+            
+            <!-- Achievements Panel -->
+            <div class="side-panel" id="achievementsPanel">
+                <div class="panel-header">
+                    <span class="panel-title">🏆 ACHIEVEMENTS</span>
+                    <button class="close-btn" onclick="toggleAchievements()">✕</button>
+                </div>
+                <div class="achievement-list" id="achievementList"></div>
+            </div>
+            
+            <!-- Stats Panel -->
+            <div class="side-panel right" id="statsPanel">
+                <div class="panel-header">
+                    <span class="panel-title">📈 STATISTICS</span>
+                    <button class="close-btn" onclick="showStats()">✕</button>
+                </div>
+                <div id="statsContent" style="font-size: 9px; line-height: 2;"></div>
+            </div>
+            
+            <!-- Notification Area -->
+            <div id="notificationArea"></div>
+            
+            <!-- Offline Earnings Popup -->
+            <div id="offlinePopup">
+                <div class="offline-title">Welcome Back!</div>
+                <div style="font-size: 9px; color: #7ab8e0;">While you were away...</div>
+                <div class="offline-amount" id="offlineAmount">+0</div>
+                <div style="font-size: 9px; color: #4ecdc4;">coins earned</div>
+                <button class="start-btn" onclick="closeOffline()" style="margin-top: 15px; padding: 12px 30px; font-size: 10px;">COLLECT</button>
+            </div>
+        </div>
+        
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <div class="game-title">AQUA TYCOON</div>
+            <div class="game-subtitle">
+                Tap to cast into pixel waters<br>
+                Catch rare fish • Upgrade gear<br>
+                Build your aquatic empire!
+            </div>
+            <button class="start-btn" onclick="startGame()">🎣 START FISHING</button>
+            <div class="tutorial-text">
+                TAP water area to set depth<br>
+                TAP 🎣 button to cast & reel<br>
+                Swipe panels for upgrades<br>
+                Collect daily rewards!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Mobile-optimized game state
+        let gameState = {
+            coins: 0,
+            level: 1,
+            xp: 0,
+            xpToNext: 100,
+            totalFish: 0,
+            combo: 0,
+            maxCombo: 0,
+            streak: 0,
+            maxStreak: 0,
+            depth: 0,
+            maxDepth: 100,
+            rodLevel: 1,
+            lineLength: 100,
+            reelSpeed: 1,
+            luck: 1,
+            autoReel: false,
+            magnet: false,
+            dailyClaimed: false,
+            lastDaily: 0,
+            fishCollection: {},
+            achievements: {},
+            stats: {
+                casts: 0,
+                bites: 0,
+                escapes: 0,
+                rareCaught: 0,
+                legendaryCaught: 0,
+                playTime: 0,
+                bestCombo: 0
+            },
+            particles: [],
+            fishes: [],
+            bubbles: [],
+            waterLevel: 0,
+            time: 0,
+            hook: null,
+            targetDepth: 50
+        };
+        
+        // Fish database - mobile optimized with visual clarity
+        const FISH_TYPES = [
+            { name: "Minnow", emoji: "🐟", rarity: "common", baseValue: 10, depth: [0, 20], color: "#7ab8e0", weight: 10 },
+            { name: "Bluegill", emoji: "🐠", rarity: "common", baseValue: 15, depth: [0, 30], color: "#4a90c2", weight: 8 },
+            { name: "Trout", emoji: "🦈", rarity: "uncommon", baseValue: 30, depth: [10, 40], color: "#ff6b9d", weight: 5 },
+            { name: "Bass", emoji: "🐡", rarity: "uncommon", baseValue: 45, depth: [15, 50], color: "#ffd700", weight: 4 },
+            { name: "Pike", emoji: "🦈", rarity: "rare", baseValue: 80, depth: [30, 60], color: "#ff4500", weight: 2 },
+            { name: "Catfish", emoji: "🐋", rarity: "rare", baseValue: 100, depth: [40, 70], color: "#9b59b6", weight: 1.5 },
+            { name: "Sturgeon", emoji: "🐊", rarity: "epic", baseValue: 200, depth: [50, 85], color: "#e74c3c", weight: 0.8 },
+            { name: "Golden Koi", emoji: "🎏", rarity: "legendary", baseValue: 500, depth: [70, 100], color: "#ffd700", weight: 0.3 },
+            { name: "Abyssal Eel", emoji: "🐍", rarity: "legendary", baseValue: 750, depth: [80, 100], color: "#2ecc71", weight: 0.2 },
+            { name: "Kraken", emoji: "🦑", rarity: "mythic", baseValue: 2000, depth: [95, 100], color: "#ff00ff", weight: 0.05 }
+        ];
+        
+        // Upgrades
+        const UPGRADES = [
+            { id: "rod1", name: "Better Rod", cost: 50, effect: "rodLevel", value: 2, desc: "Catch bigger fish", icon: "🎣" },
+            { id: "line1", name: "Longer Line", cost: 100, effect: "lineLength", value: 150, desc: "Reach deeper water", icon: "📏" },
+            { id: "reel1", name: "Fast Reel", cost: 75, effect: "reelSpeed", value: 1.5, desc: "Reel in faster", icon: "⚡" },
+            { id: "luck1", name: "Lucky Charm", cost: 150, effect: "luck", value: 1.5, desc: "Better fish odds", icon: "🍀" },
+            { id: "rod2", name: "Pro Rod", cost: 300, effect: "rodLevel", value: 3, desc: "Expert fishing", icon: "🏆" },
+            { id: "line2", name: "Deep Line", cost: 500, effect: "lineLength", value: 250, desc: "Deep sea access", icon: "🔱" },
+            { id: "auto1", name: "Auto Reel", cost: 1000, effect: "autoReel", value: true, desc: "Auto catch!", icon: "🤖" },
+            { id: "magnet", name: "Fish Magnet", cost: 2000, effect: "magnet", value: true, desc: "Attract rare fish", icon: "🧲" },
+            { id: "luck2", name: "Golden Bait", cost: 3000, effect: "luck", value: 2.5, desc: "Legendary odds", icon: "✨" }
+        ];
+        
+        // Achievements
+        const ACHIEVEMENTS = [
+            { id: "first", name: "First Catch", desc: "Catch your first fish", icon: "🐟", check: () => gameState.totalFish >= 1 },
+            { id: "hundred", name: "Century", desc: "Catch 100 fish", icon: "💯", check: () => gameState.totalFish >= 100 },
+            { id: "combo5", name: "Combo King", desc: "Reach 5x combo", icon: "🔥", check: () => gameState.maxCombo >= 5 },
+            { id: "combo10", name: "Combo God", desc: "Reach 10x combo", icon: "👑", check: () => gameState.maxCombo >= 10 },
+            { id: "rich", name: "Millionaire", desc: "Earn 1000 coins", icon: "💰", check: () => gameState.coins >= 1000 },
+            { id: "deep", name: "Deep Diver", desc: "Reach 100m depth", icon: "🔱", check: () => gameState.maxDepth >= 100 },
+            { id: "legendary", name: "Legend Hunter", desc: "Catch a legendary fish", icon: "🌟", check: () => gameState.stats.legendaryCaught > 0 },
+            { id: "collector", name: "Collector", desc: "Catch all fish types", icon: "📖", check: () => Object.keys(gameState.fishCollection).length >= FISH_TYPES.length }
+        ];
+        
+        // Canvas sizing for mobile
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gameState.waterLevel = canvas.height * 0.25;
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        // Touch handling - mobile optimized
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let isDragging = false;
+        
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        
+        // Prevent default touch behaviors
+        document.addEventListener('touchmove', (e) => {
+            if (e.target === canvas) e.preventDefault();
+        }, { passive: false });
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            touchStartX = touch.clientX - rect.left;
+            touchStartY = touch.clientY - rect.top;
+            isDragging = false;
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            // Detect drag for depth setting
+            if (Math.abs(y - touchStartY) > 20) {
+                isDragging = true;
+                if (y > gameState.waterLevel) {
+                    gameState.targetDepth = Math.min(
+                        ((y - gameState.waterLevel) / (canvas.height - gameState.waterLevel)) * gameState.maxDepth,
+                        gameState.lineLength
+                    );
+                }
+            }
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (!isDragging && !isCasting) {
+                // Tap to cast at target depth
+                castLine();
+            }
+        }
+        
+        // Haptic feedback helper
+        function haptic(type = 'light') {
+            if (navigator.vibrate) {
+                const patterns = {
+                    light: [10],
+                    medium: [20],
+                    heavy: [30, 50, 30],
+                    success: [10, 30, 10],
+                    bite: [50, 100, 50],
+                    legendary: [50, 50, 50, 50, 100]
+                };
+                navigator.vibrate(patterns[type] || patterns.light);
+            }
+        }
+        
+        // Visual haptic burst
+        function createHapticBurst(x, y) {
+            const burst = document.createElement('div');
+            burst.className = 'haptic-burst';
+            burst.style.left = x + 'px';
+            burst.style.top = y + 'px';
+            burst.style.width = '60px';
+            burst.style.height = '60px';
+            burst.style.marginLeft = '-30px';
+            burst.style.marginTop = '-30px';
+            document.getElementById('uiLayer').appendChild(burst);
+            setTimeout(() => burst.remove(), 400);
+        }
+        
+        let isCasting = false;
+        let isReeling = false;
+        
+        function handleAction() {
+            if (!isCasting) {
+                castLine();
+            } else if (gameState.hook && gameState.hook.caught) {
+                reelIn();
+            } else if (gameState.hook && gameState.hook.state === 'waiting') {
+                // Cancel cast
+                gameState.hook = null;
+                isCasting = false;
+                updateActionButton();
+            }
+        }
+        
+        function castLine() {
+            if (isCasting) return;
+            
+            isCasting = true;
+            gameState.stats.casts++;
+            
+            // Use target depth or random
+            const targetDepth = gameState.targetDepth || (Math.random() * gameState.lineLength * 0.5);
+            
+            gameState.hook = {
+                x: canvas.width / 2 + (Math.random() - 0.5) * 40,
+                y: gameState.waterLevel,
+                targetY: gameState.waterLevel + (targetDepth / gameState.maxDepth) * (canvas.height - gameState.waterLevel),
+                depth: 0,
+                caught: null,
+                state: 'sinking',
+                bobOffset: 0,
+                sinkSpeed: 2 + gameState.reelSpeed
+            };
+            
+            haptic('medium');
+            createHapticBurst(canvas.width / 2, gameState.waterLevel);
+            updateActionButton();
+        }
+        
+        function reelIn() {
+            if (!gameState.hook || isReeling) return;
+            isReeling = true;
+            gameState.hook.state = 'reeling';
+            haptic('heavy');
+            updateActionButton();
+        }
+        
+        function updateActionButton() {
+            const btn = document.getElementById('actionBtn');
+            const text = document.getElementById('actionText');
+            
+            btn.className = '';
+            if (!isCasting) {
+                text.textContent = 'CAST';
+                btn.style.background = 'radial-gradient(circle, #2a8a5a, #1a5a3a)';
+                btn.style.borderColor = '#4ecdc4';
+            } else if (gameState.hook && gameState.hook.caught) {
+                text.textContent = 'REEL!';
+                btn.classList.add('reeling');
+            } else if (gameState.hook && gameState.hook.state === 'waiting') {
+                text.textContent = 'WAIT';
+                btn.classList.add('casting');
+            } else {
+                text.textContent = '...';
+                btn.classList.add('casting');
+            }
+        }
+        
+        // Fish spawning optimized for mobile
+        function spawnFish() {
+            const maxFish = Math.min(5 + gameState.level, 12);
+            if (gameState.fishes.length < maxFish) {
+                const availableFish = FISH_TYPES.filter(f => {
+                    const maxAvailableDepth = (gameState.lineLength / 250) * 100;
+                    return f.depth[0] <= maxAvailableDepth;
+                });
+                
+                // Weighted random selection
+                const totalWeight = availableFish.reduce((sum, f) => sum + (f.weight * gameState.luck), 0);
+                let random = Math.random() * totalWeight;
+                let selected = availableFish[0];
+                
+                for (const fish of availableFish) {
+                    random -= (fish.weight * gameState.luck);
+                    if (random <= 0) {
+                        selected = fish;
+                        break;
+                    }
+                }
+                
+                const depthRange = selected.depth;
+                const actualDepth = depthRange[0] + Math.random() * (depthRange[1] - depthRange[0]);
+                const y = gameState.waterLevel + (actualDepth / 100) * (canvas.height - gameState.waterLevel);
+                
+                gameState.fishes.push({
+                    type: selected,
+                    x: Math.random() * canvas.width,
+                    y: y,
+                    vx: (Math.random() - 0.5) * (selected.rarity === 'legendary' ? 4 : 2),
+                    vy: (Math.random() - 0.5) * 1,
+                    size: 24 + Math.random() * 12,
+                    caught: false,
+                    escapeTimer: 0,
+                    wobble: Math.random() * Math.PI * 2,
+                    flash: 0,
+                    biteDelay: Math.random() * 2 + 1
+                });
+            }
+        }
+        
+        // Game update loop
+        function update() {
+            gameState.time += 0.016;
+            gameState.stats.playTime += 0.016;
+            
+            // Update hook
+            if (gameState.hook) {
+                if (gameState.hook.state === 'sinking') {
+                    gameState.hook.depth += gameState.hook.sinkSpeed;
+                    gameState.hook.y = gameState.waterLevel + (gameState.hook.depth / 100) * (canvas.height - gameState.waterLevel);
+                    
+                    if (gameState.hook.y >= gameState.hook.targetY) {
+                        gameState.hook.state = 'waiting';
+                        gameState.hook.bobOffset = 0;
+                    }
+                    
+                    checkFishCollision();
+                } else if (gameState.hook.state === 'waiting') {
+                    gameState.hook.bobOffset = Math.sin(gameState.time * 3) * 3;
+                    gameState.hook.y += gameState.hook.bobOffset;
+                    
+                    // Auto reel
+                    if (gameState.autoReel && gameState.hook.caught && !isReeling) {
+                        setTimeout(() => reelIn(), 300);
+                    }
+                    
+                    // Fish escape
+                    if (gameState.hook.caught) {
+                        gameState.hook.caught.escapeTimer += 0.016;
+                        const escapeTime = 4 / gameState.reelSpeed;
+                        
+                        // Update progress bar
+                        const progress = (gameState.hook.caught.escapeTimer / escapeTime) * 100;
+                        document.getElementById('reelBar').style.width = (100 - progress) + '%';
+                        
+                        if (gameState.hook.caught.escapeTimer > escapeTime) {
+                            gameState.hook.caught.caught = false;
+                            gameState.hook.caught = null;
+                            gameState.hook.state = 'sinking';
+                            gameState.stats.escapes++;
+                            showNotification("Got away!", "#ff6b9d");
+                            gameState.combo = 0;
+                            document.getElementById('reelProgress').classList.remove('active');
+                            haptic('heavy');
+                            updateUI();
+                        }
+                    } else {
+                        checkFishCollision();
+                    }
+                } else if (gameState.hook.state === 'reeling') {
+                    gameState.hook.y -= 4 * gameState.reelSpeed;
+                    gameState.hook.depth = ((gameState.hook.y - gameState.waterLevel) / (canvas.height - gameState.waterLevel)) * 100;
+                    
+                    if (gameState.hook.y <= gameState.waterLevel) {
+                        if (gameState.hook.caught) {
+                            catchFish(gameState.hook.caught);
+                        }
+                        gameState.hook = null;
+                        isCasting = false;
+                        isReeling = false;
+                        document.getElementById('reelProgress').classList.remove('active');
+                        updateActionButton();
+                    }
+                }
+            }
+            
+            // Update fish
+            gameState.fishes.forEach(fish => {
+                if (!fish.caught) {
+                    fish.x += fish.vx;
+                    fish.y += fish.vy;
+                    fish.wobble += 0.08;
+                    
+                    // Magnet effect
+                    if (gameState.magnet && gameState.hook && !gameState.hook.caught) {
+                        const dx = gameState.hook.x - fish.x;
+                        const dy = gameState.hook.y - fish.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120 && fish.type.rarity !== 'common') {
+                            fish.x += dx * 0.015;
+                            fish.y += dy * 0.015;
+                        }
+                    }
+                    
+                    // Bounds
+                    if (fish.x < -60 || fish.x > canvas.width + 60) fish.vx *= -1;
+                    if (fish.y < gameState.waterLevel || fish.y > canvas.height - 20) fish.vy *= -1;
+                    
+                    // Flash for rare fish
+                    if (['rare', 'epic', 'legendary', 'mythic'].includes(fish.type.rarity)) {
+                        fish.flash = Math.sin(gameState.time * 4) * 0.5 + 0.5;
+                    }
+                } else if (gameState.hook) {
+                    fish.x = gameState.hook.x;
+                    fish.y = gameState.hook.y + 15;
+                }
+            });
+            
+            gameState.fishes = gameState.fishes.filter(f => !f.caught || (f.caught && gameState.hook));
+            
+            // Bubbles
+            if (Math.random() < 0.08) {
+                gameState.bubbles.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height,
+                    vy: -1 - Math.random() * 2,
+                    size: 2 + Math.random() * 5,
+                    life: 1
+                });
+            }
+            
+            gameState.bubbles = gameState.bubbles.filter(b => {
+                b.y += b.vy;
+                b.life -= 0.008;
+                return b.life > 0 && b.y > gameState.waterLevel;
+            });
+            
+            // Particles
+            gameState.particles = gameState.particles.filter(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.08;
+                p.life -= 0.015;
+                return p.life > 0;
+            });
+            
+            // Spawn fish
+            if (Math.random() < 0.015 + (gameState.level * 0.003)) {
+                spawnFish();
+            }
+            
+            // Check achievements
+            checkAchievements();
+            
+            // Update depth meter
+            const depthPercent = Math.min((gameState.hook ? gameState.hook.depth : 0) / gameState.maxDepth * 100, 100);
+            document.getElementById('depthFill').style.height = depthPercent + '%';
+        }
+        
+        function checkFishCollision() {
+            if (!gameState.hook || gameState.hook.caught) return;
+            
+            gameState.fishes.forEach(fish => {
+                if (fish.caught) return;
+                
+                const dx = gameState.hook.x - fish.x;
+                const dy = gameState.hook.y - fish.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 30) {
+                    const biteChance = {
+                        common: 0.9,
+                        uncommon: 0.7,
+                        rare: 0.5,
+                        epic: 0.4,
+                        legendary: 0.25,
+                        mythic: 0.15
+                    };
+                    
+                    const chance = (biteChance[fish.type.rarity] || 0.5) * gameState.luck;
+                    
+                    if (Math.random() < chance) {
+                        fish.caught = true;
+                        gameState.hook.caught = fish;
+                        gameState.hook.state = 'waiting';
+                        gameState.stats.bites++;
+                        
+                        createParticles(fish.x, fish.y, fish.type.color, 15);
+                        
+                        // Haptic feedback for bite
+                        const hapticType = ['epic', 'legendary', 'mythic'].includes(fish.type.rarity) ? 'legendary' : 'bite';
+                        haptic(hapticType);
+                        
+                        // Show vibration indicator
+                        const vibeInd = document.getElementById('vibrateInd');
+                        vibeInd.textContent = ['epic', 'legendary', 'mythic'].includes(fish.type.rarity) 
+                            ? `🚨 ${fish.type.rarity.toUpperCase()} BITE!` 
+                            : '📳 FISH ON!';
+                        vibeInd.classList.add('active');
+                        setTimeout(() => vibeInd.classList.remove('active'), 2000);
+                        
+                        // Show reel progress
+                        document.getElementById('reelProgress').classList.add('active');
+                        
+                        if (['epic', 'legendary', 'mythic'].includes(fish.type.rarity)) {
+                            showNotification(`${fish.type.name} hooked! REEL NOW!`, fish.type.color, true);
+                        }
+                        
+                        updateActionButton();
+                    }
+                }
+            });
+        }
+        
+        function catchFish(fish) {
+            const multiplier = 1 + (gameState.combo * 0.5);
+            const value = Math.floor(fish.type.baseValue * multiplier);
+            
+            gameState.coins += value;
+            gameState.xp += fish.type.baseValue;
+            gameState.totalFish++;
+            gameState.combo++;
+            gameState.streak++;
+            
+            if (gameState.combo > gameState.maxCombo) {
+                gameState.maxCombo = gameState.combo;
+                gameState.stats.bestCombo = gameState.maxCombo;
+            }
+            if (gameState.streak > gameState.maxStreak) gameState.maxStreak = gameState.streak;
+            
+            // Track rare catches
+            if (['rare', 'epic'].includes(fish.type.rarity)) gameState.stats.rareCaught++;
+            if (['legendary', 'mythic'].includes(fish.type.rarity)) gameState.stats.legendaryCaught++;
+            
+            // Level up
+            if (gameState.xp >= gameState.xpToNext) {
+                gameState.level++;
+                gameState.xp -= gameState.xpToNext;
+                gameState.xpToNext = Math.floor(gameState.xpToNext * 1.5);
+                gameState.maxDepth += 10;
+                showNotification(`LEVEL ${gameState.level}!`, "#ffd700", true);
+                haptic('success');
+            }
+            
+            // Collection
+            if (!gameState.fishCollection[fish.type.name]) {
+                gameState.fishCollection[fish.type.name] = { ...fish.type, count: 0 };
+                showNotification(`NEW: ${fish.type.name}!`, "#00ff88");
+            }
+            gameState.fishCollection[fish.type.name].count++;
+            
+            // Notification
+            let notifText = `+${value}`;
+            if (gameState.combo > 1) notifText += ` (x${gameState.combo})`;
+            
+            const isRare = ['epic', 'legendary', 'mythic'].includes(fish.type.rarity);
+            showNotification(notifText, fish.type.color, isRare);
+            
+            // Combo display
+            if (gameState.combo >= 3) {
+                document.getElementById('comboValue').textContent = gameState.combo;
+                document.getElementById('comboDisplay').classList.add('active');
+                setTimeout(() => document.getElementById('comboDisplay').classList.remove('active'), 1500);
+            }
+            
+            // Streak fire
+            if (gameState.streak >= 10) {
+                document.getElementById('streakFire').classList.add('active');
+            }
+            
+            // Success haptic
+            haptic('success');
+            createHapticBurst(canvas.width / 2, gameState.waterLevel);
+            
+            updateUI();
+        }
+        
+        function createParticles(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                gameState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5 - 2,
+                    life: 1,
+                    color: color,
+                    size: 3 + Math.random() * 4
+                });
+            }
+        }
+        
+        function showNotification(text, color = '#fff', legendary = false) {
+            const notif = document.createElement('div');
+            notif.className = 'notification' + (legendary ? ' legendary' : '');
+            notif.style.color = color;
+            notif.textContent = text;
+            document.getElementById('notificationArea').appendChild(notif);
+            setTimeout(() => notif.remove(), legendary ? 3000 : 2000);
+        }
+        
+        // Rendering - optimized for mobile
+        function draw() {
+            // Sky
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, gameState.waterLevel);
+            skyGrad.addColorStop(0, '#1a3a5c');
+            skyGrad.addColorStop(1, '#2a5a8a');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, gameState.waterLevel);
+            
+            // Sun/moon
+            ctx.fillStyle = 'rgba(255, 255, 200, 0.3)';
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.8, gameState.waterLevel * 0.3, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            for (let i = 0; i < 2; i++) {
+                const cx = ((gameState.time * 8 + i * 150) % (canvas.width + 80)) - 40;
+                const cy = 25 + i * 15;
+                ctx.fillRect(cx, cy, 35, 12);
+                ctx.fillRect(cx + 8, cy - 8, 18, 8);
+            }
+            
+            // Water surface
+            ctx.fillStyle = '#1a5f8a';
+            ctx.fillRect(0, gameState.waterLevel - 2, canvas.width, 4);
+            
+            // Water gradient
+            const waterGrad = ctx.createLinearGradient(0, gameState.waterLevel, 0, canvas.height);
+            waterGrad.addColorStop(0, '#1a5f8a');
+            waterGrad.addColorStop(0.3, '#0d3d5c');
+            waterGrad.addColorStop(1, '#051a2e');
+            ctx.fillStyle = waterGrad;
+            ctx.fillRect(0, gameState.waterLevel, canvas.width, canvas.height - gameState.waterLevel);
+            
+            // Depth zones (subtle)
+            const zoneHeight = (canvas.height - gameState.waterLevel) / 5;
+            for (let i = 0; i < 5; i++) {
+                ctx.fillStyle = `rgba(0, 0, 0, ${i * 0.08})`;
+                ctx.fillRect(0, gameState.waterLevel + i * zoneHeight, canvas.width, zoneHeight);
+            }
+            
+            // Target depth indicator (when dragging)
+            if (isDragging && !isCasting) {
+                const targetY = gameState.waterLevel + (gameState.targetDepth / gameState.maxDepth) * (canvas.height - gameState.waterLevel);
+                ctx.strokeStyle = 'rgba(78, 205, 196, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 8]);
+                ctx.beginPath();
+                ctx.moveTo(0, targetY);
+                ctx.lineTo(canvas.width, targetY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                ctx.fillStyle = 'rgba(78, 205, 196, 0.3)';
+                ctx.font = '10px "Press Start 2P"';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${Math.floor(gameState.targetDepth)}m`, canvas.width - 10, targetY - 5);
+            }
+            
+            // Bubbles
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            gameState.bubbles.forEach(b => {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Fish
+            gameState.fishes.forEach(fish => {
+                const bounce = Math.sin(fish.wobble) * 4;
+                
+                if (fish.flash > 0) {
+                    ctx.shadowColor = fish.type.color;
+                    ctx.shadowBlur = 8 * fish.flash;
+                }
+                
+                ctx.font = `${fish.size}px serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                ctx.save();
+                ctx.translate(fish.x, fish.y + bounce);
+                if (fish.vx < 0) ctx.scale(-1, 1);
+                ctx.fillText(fish.type.emoji, 0, 0);
+                ctx.restore();
+                
+                ctx.shadowBlur = 0;
+                
+                // Rarity sparkles for rare fish
+                if (['epic', 'legendary', 'mythic'].includes(fish.type.rarity) && !fish.caught) {
+                    if (Math.sin(gameState.time * 6) > 0.5) {
+                        ctx.fillStyle = fish.type.color;
+                        ctx.font = '10px "Press Start 2P"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('✦', fish.x, fish.y - fish.size * 0.6);
+                    }
+                }
+            });
+            
+            // Hook and line
+            if (gameState.hook) {
+                // Line
+                ctx.strokeStyle = 'rgba(220, 220, 220, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.moveTo(gameState.hook.x, 0);
+                ctx.lineTo(gameState.hook.x, gameState.hook.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Hook
+                ctx.fillStyle = '#c0c0c0';
+                ctx.font = '18px serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('🪝', gameState.hook.x, gameState.hook.y);
+                
+                // Caught fish
+                if (gameState.hook.caught) {
+                    ctx.font = '22px serif';
+                    ctx.fillText(gameState.hook.caught.type.emoji, gameState.hook.x, gameState.hook.y + 18);
+                }
+            }
+            
+            // Particles
+            gameState.particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+            
+            requestAnimationFrame(draw);
+        }
+        
+        // UI Functions
+        function updateUI() {
+            document.getElementById('coinDisplay').textContent = formatNumber(gameState.coins);
+            document.getElementById('levelDisplay').textContent = gameState.level;
+            document.getElementById('xpDisplay').textContent = Math.floor((gameState.xp / gameState.xpToNext) * 100) + '%';
+            document.getElementById('fishCount').textContent = gameState.totalFish;
+            
+            renderShop();
+            renderCollection();
+            renderAchievements();
+            renderStats();
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+        
+        function renderShop() {
+            const list = document.getElementById('upgradeList');
+            list.innerHTML = '';
+            
+            UPGRADES.forEach(upgrade => {
+                const purchased = gameState[upgrade.effect] >= upgrade.value || 
+                                 (typeof upgrade.value === 'boolean' && gameState[upgrade.effect] === upgrade.value);
+                const canAfford = gameState.coins >= upgrade.cost;
+                
+                const div = document.createElement('div');
+                div.className = `upgrade-item ${purchased ? 'purchased' : ''} ${!canAfford && !purchased ? 'locked' : ''}`;
+                div.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${upgrade.icon} ${upgrade.name}</div>
+                        <div class="upgrade-desc">${upgrade.desc}</div>
+                    </div>
+                    <div class="upgrade-cost">${purchased ? '✅' : `💰${formatNumber(upgrade.cost)}`}</div>
+                `;
+                
+                if (!purchased && canAfford) {
+                    div.onclick = () => buyUpgrade(upgrade);
+                }
+                
+                list.appendChild(div);
+            });
+        }
+        
+        function buyUpgrade(upgrade) {
+            if (gameState.coins >= upgrade.cost) {
+                gameState.coins -= upgrade.cost;
+                gameState[upgrade.effect] = upgrade.value;
+                
+                if (upgrade.effect === 'lineLength') {
+                    gameState.maxDepth = Math.min(upgrade.value / 2.5, 100);
+                }
+                
+                haptic('success');
+                showNotification(`Upgraded!`, '#00ff88');
+                updateUI();
+            }
+        }
+        
+        function renderCollection() {
+            const grid = document.getElementById('fishGrid');
+            grid.innerHTML = '';
+            
+            FISH_TYPES.forEach(fish => {
+                const caught = gameState.fishCollection[fish.name];
+                const div = document.createElement('div');
+                div.className = `fish-card ${caught ? 'caught' : 'uncaught'}`;
+                div.innerHTML = `
+                    <div class="fish-sprite">${caught ? fish.emoji : '❓'}</div>
+                    <div class="fish-name" style="color: ${caught ? fish.color : '#666'};">${fish.name}</div>
+                    <div class="fish-rarity" style="color: ${fish.color};">${fish.rarity}</div>
+                    <div style="font-size: 7px; color: #ffd700; margin-top: 2px;">${caught ? `x${caught.count}` : '???'}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+        
+        function renderAchievements() {
+            const list = document.getElementById('achievementList');
+            list.innerHTML = '';
+            
+            ACHIEVEMENTS.forEach(ach => {
+                const unlocked = gameState.achievements[ach.id];
+                const div = document.createElement('div');
+                div.className = `achievement ${unlocked ? 'unlocked' : 'locked'}`;
+                div.innerHTML = `
+                    <div class="achievement-icon">${unlocked ? ach.icon : '🔒'}</div>
+                    <div class="achievement-text">
+                        <div class="achievement-name">${ach.name}</div>
+                        <div class="achievement-desc">${ach.desc}</div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        function renderStats() {
+            const content = document.getElementById('statsContent');
+            const s = gameState.stats;
+            const hours = Math.floor(s.playTime / 3600);
+            const mins = Math.floor((s.playTime % 3600) / 60);
+            
+            content.innerHTML = `
+                <div style="display: grid; gap: 8px;">
+                    <div>🎣 Total Casts: ${s.casts}</div>
+                    <div>🐟 Fish Caught: ${gameState.totalFish}</div>
+                    <div>👊 Bites: ${s.bites}</div>
+                    <div>😭 Escapes: ${s.escapes}</div>
+                    <div>🌟 Rare Caught: ${s.rareCaught}</div>
+                    <div>💎 Legendary: ${s.legendaryCaught}</div>
+                    <div>🔥 Best Combo: ${s.bestCombo}x</div>
+                    <div>⏱️ Play Time: ${hours}h ${mins}m</div>
+                    <div>📊 Collection: ${Object.keys(gameState.fishCollection).length}/${FISH_TYPES.length}</div>
+                </div>
+            `;
+        }
+        
+        function checkAchievements() {
+            ACHIEVEMENTS.forEach(ach => {
+                if (!gameState.achievements[ach.id] && ach.check()) {
+                    gameState.achievements[ach.id] = true;
+                    showNotification(`🏆 ${ach.name}!`, '#ffd700', true);
+                    haptic('success');
+                    gameState.coins += 50;
+                    createParticles(canvas.width/2, canvas.height/2, '#ffd700', 20);
+                    updateUI();
+                }
+            });
+        }
+        
+        // Panel toggles
+        function toggleShop() {
+            document.getElementById('shopPanel').classList.toggle('active');
+            closeOthers('shopPanel');
+        }
+        
+        function toggleCollection() {
+            document.getElementById('collectionPanel').classList.toggle('active');
+            closeOthers('collectionPanel');
+        }
+        
+        function toggleAchievements() {
+            document.getElementById('achievementsPanel').classList.toggle('active');
+            closeOthers('achievementsPanel');
+        }
+        
+        function showStats() {
+            document.getElementById('statsPanel').classList.toggle('active');
+            closeOthers('statsPanel');
+        }
+        
+        function closeOthers(activeId) {
+            ['shopPanel', 'collectionPanel', 'achievementsPanel', 'statsPanel'].forEach(id => {
+                if (id !== activeId) document.getElementById(id).classList.remove('active');
+            });
+        }
+        
+        function claimDailyReward() {
+            if (gameState.dailyClaimed) return;
+            
+            const now = Date.now();
+            const lastClaim = gameState.lastDaily || 0;
+            const dayMs = 24 * 60 * 60 * 1000;
+            
+            if (now - lastClaim < dayMs) {
+                showNotification("Come back tomorrow!", "#ff6b9d");
+                return;
+            }
+            
+            gameState.dailyClaimed = true;
+            gameState.lastDaily = now;
+            const reward = 50 + gameState.level * 15;
+            gameState.coins += reward;
+            
+            const btn = document.getElementById('dailyReward');
+            btn.classList.add('claimed');
+            btn.innerHTML = '<div style="font-size: 12px;">✅</div><div style="font-size: 7px;">DONE</div>';
+            
+            haptic('success');
+            showNotification(`Daily: +${reward} coins!`, '#ffd700', true);
+            updateUI();
+        }
+        
+        // Offline earnings
+        function checkOfflineEarnings() {
+            const lastSave = localStorage.getItem('aquaTycoonLastSave');
+            if (!lastSave) return;
+            
+            const offline = Math.floor((Date.now() - parseInt(lastSave)) / 1000);
+            if (offline > 120) { // 2 minutes minimum
+                const rate = gameState.level * 0.8;
+                const maxOffline = 8 * 3600; // Cap at 8 hours
+                const effective = Math.min(offline, maxOffline);
+                const earnings = Math.floor(effective * rate);
+                
+                if (earnings > 0) {
+                    gameState.coins += earnings;
+                    document.getElementById('offlineAmount').textContent = `+${formatNumber(earnings)}`;
+                    document.getElementById('offlinePopup').classList.add('active');
+                    haptic('success');
+                }
+            }
+        }
+        
+        function closeOffline() {
+            document.getElementById('offlinePopup').classList.remove('active');
+            updateUI();
+        }
+        
+        // Audio (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            const now = audioCtx.currentTime;
+            
+            switch(type) {
+                case 'splash':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    break;
+                case 'catch':
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(523, now);
+                    osc.frequency.setValueAtTime(659, now + 0.1);
+                    osc.frequency.setValueAtTime(784, now + 0.2);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                    break;
+            }
+        }
+        
+        // Game loop
+        function gameLoop() {
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Save/Load
+        function saveGame() {
+            const saveData = {
+                ...gameState,
+                particles: [],
+                fishes: [],
+                bubbles: [],
+                hook: null
+            };
+            localStorage.setItem('aquaTycoonSave', JSON.stringify(saveData));
+            localStorage.setItem('aquaTycoonLastSave', Date.now().toString());
+        }
+        
+        function loadGame() {
+            const saved = localStorage.getItem('aquaTycoonSave');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                Object.assign(gameState, parsed);
+                gameState.particles = [];
+                gameState.fishes = [];
+                gameState.bubbles = [];
+                gameState.hook = null;
+                gameState.time = 0;
+            }
+        }
+        
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            
+            // Resume audio context on first interaction
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            loadGame();
+            checkOfflineEarnings();
+            
+            gameLoop();
+            draw();
+            updateUI();
+            
+            // Auto-save every 20 seconds
+            setInterval(saveGame, 20000);
+            
+            // Check daily reward status
+            const now = Date.now();
+            const lastClaim = gameState.lastDaily || 0;
+            const dayMs = 24 * 60 * 60 * 1000;
+            if (now - lastClaim < dayMs) {
+                const btn = document.getElementById('dailyReward');
+                btn.classList.add('claimed');
+                btn.innerHTML = '<div style="font-size: 12px;">⏰</div><div style="font-size: 7px;">WAIT</div>';
+            }
+        }
+        
+        // Expose functions
+        window.startGame = startGame;
+        window.toggleShop = toggleShop;
+        window.toggleCollection = toggleCollection;
+        window.toggleAchievements = toggleAchievements;
+        window.showStats = showStats;
+        window.claimDailyReward = claimDailyReward;
+        window.closeOffline = closeOffline;
+        window.handleAction = handleAction;
+        
+        // Save on page hide
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) saveGame();
+        });
+    </script>
+</body>
+</html>
