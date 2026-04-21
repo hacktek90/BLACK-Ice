@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart maker — Visual Analytics</title>
+    <meta name="description"
+        content="Advanced data analytics platform with multiple interactive graph views. Visualize insights using dynamic charts, real-time dashboards, and customizable data visualization tools for smarter decisions.">
+    
+    <meta name="keywords"
+        content="data analytics, data visualization, interactive graphs, dashboard charts, real-time analytics, chart maker, chart tools, graph visualization, analytics dashboard, data insights, web analytics platform">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js">
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #F5F4F0;
+            --card: #FFFFFF;
+            --fg: #1A1A1A;
+            --muted: #8C8C8C;
+            --accent: #D4503A;
+            --accent-fade: rgba(212, 80, 58, .08);
+            --green: #2D8B55;
+            --amber: #C4881A;
+            --sage: #5B8C7E;
+            --brown: #8B6F4E;
+            --rose: #9B5E6F;
+            --border: #E5E4E0;
+            --grid-line: rgba(0, 0, 0, .04);
+            --shadow: 0 1px 3px rgba(0, 0, 0, .04), 0 4px 12px rgba(0, 0, 0, .02);
+            --shadow-h: 0 2px 8px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .04);
+            --radius: 8px;
+            --chart-grid: rgba(0, 0, 0, .04);
+            --chart-tick: #8C8C8C;
+            --chart-fg: #1A1A1A;
+            --tooltip-bg: #1A1A1A;
+            --tooltip-fg: #FFFFFF;
+        }
+
+        body.dark {
+            --bg: #111111;
+            --card: #1A1A1A;
+            --fg: #E0E0E0;
+            --muted: #666666;
+            --accent-fade: rgba(212, 80, 58, .12);
+            --border: #2A2A2A;
+            --grid-line: rgba(255, 255, 255, .025);
+            --shadow: 0 1px 3px rgba(0, 0, 0, .2), 0 4px 12px rgba(0, 0, 0, .15);
+            --shadow-h: 0 2px 8px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+            --chart-grid: rgba(255, 255, 255, .06);
+            --chart-tick: #555555;
+            --chart-fg: #E0E0E0;
+            --tooltip-bg: #2A2A2A;
+            --tooltip-fg: #E0E0E0;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 48px 48px;
+            transition: background .3s, color .3s
+        }
+
+        .fm {
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+
+        /* Header */
+        .cf-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(245, 244, 240, .88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            transition: background .3s, border-color .3s
+        }
+
+        body.dark .cf-header {
+            background: rgba(17, 17, 17, .88)
+        }
+
+        .cf-header-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap
+        }
+
+        .cf-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0
+        }
+
+        .cf-logo-mark {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .cf-logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -.02em
+        }
+
+        .cf-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none
+        }
+
+        .cf-nav::-webkit-scrollbar {
+            display: none
+        }
+
+        .cf-pill {
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .2s;
+            font-family: inherit
+        }
+
+        .cf-pill:hover {
+            color: var(--fg);
+            border-color: #BBBAB5
+        }
+
+        .cf-pill.active {
+            background: var(--fg);
+            color: var(--card);
+            border-color: var(--fg)
+        }
+
+        body.dark .cf-pill.active {
+            background: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .cf-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto
+        }
+
+        /* Buttons */
+        .cf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 13px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card);
+            color: var(--fg);
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap
+        }
+
+        .cf-btn:hover {
+            border-color: #BBBAB5;
+            background: var(--bg)
+        }
+
+        .cf-btn--icon {
+            padding: 5px 7px;
+            min-width: 30px;
+            justify-content: center
+        }
+
+        .cf-btn--accent {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent)
+        }
+
+        .cf-btn--accent:hover {
+            filter: brightness(.9);
+            background: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .cf-btn--danger {
+            color: #C0392B;
+            border-color: rgba(192, 57, 43, .3)
+        }
+
+        .cf-btn--danger:hover {
+            background: rgba(192, 57, 43, .06);
+            border-color: #C0392B
+        }
+
+        .cf-btn--sm {
+            padding: 4px 10px;
+            font-size: 11px
+        }
+
+        .cf-btn--ghost {
+            border-color: transparent;
+            background: transparent
+        }
+
+        .cf-btn--ghost:hover {
+            background: var(--accent-fade);
+            border-color: transparent;
+            color: var(--accent)
+        }
+
+        /* Mode toggle */
+        .cf-mode {
+            display: flex;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 2px;
+            gap: 1px
+        }
+
+        .cf-mode-btn {
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            border: none;
+            border-radius: 100px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit
+        }
+
+        .cf-mode-btn.active {
+            background: var(--fg);
+            color: var(--card)
+        }
+
+        body.dark .cf-mode-btn.active {
+            background: var(--accent);
+            color: #fff
+        }
+
+        /* Selects */
+        .cf-select {
+            appearance: none;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 26px 4px 9px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%238C8C8C'/%3E%3C/svg%3E") no-repeat right 7px center;
+            color: var(--fg);
+            cursor: pointer;
+            transition: border-color .2s
+        }
+
+        .cf-select:hover {
+            border-color: #BBBAB5
+        }
+
+        .cf-select:focus {
+            outline: none;
+            border-color: var(--accent)
+        }
+
+        .cf-time-select {
+            padding: 6px 30px 6px 11px;
+            font-size: 13px;
+            border-radius: var(--radius);
+            background-color: var(--card);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%238C8C8C'/%3E%3C/svg%3E")
+        }
+
+        /* Inputs */
+        .cf-input {
+            width: 100%;
+            padding: 7px 11px;
+            font-family: inherit;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--fg);
+            transition: border-color .2s
+        }
+
+        .cf-input:focus {
+            outline: none;
+            border-color: var(--accent)
+        }
+
+        .cf-textarea {
+            width: 100%;
+            padding: 8px 11px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--fg);
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color .2s
+        }
+
+        .cf-textarea:focus {
+            outline: none;
+            border-color: var(--accent)
+        }
+
+        .cf-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--muted);
+            margin-bottom: 5px
+        }
+
+        /* Toggle */
+        .cf-toggle {
+            width: 34px;
+            height: 18px;
+            border-radius: 9px;
+            background: var(--border);
+            cursor: pointer;
+            transition: background .25s;
+            position: relative;
+            flex-shrink: 0
+        }
+
+        .cf-toggle.on {
+            background: var(--accent)
+        }
+
+        .cf-toggle-knob {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform .25s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .15)
+        }
+
+        .cf-toggle.on .cf-toggle-knob {
+            transform: translateX(16px)
+        }
+
+        /* Cards */
+        .cf-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: box-shadow .3s, border-color .3s;
+            opacity: 0;
+            animation: cfIn .45s ease forwards
+        }
+
+        .cf-card:hover {
+            box-shadow: var(--shadow-h);
+            border-color: #D0CFCA
+        }
+
+        body.dark .cf-card:hover {
+            border-color: #3A3A3A
+        }
+
+        .cf-card--primary {
+            grid-column: span 2;
+            grid-row: span 2
+        }
+
+        @keyframes cfIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* KPI */
+        .cf-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 14px
+        }
+
+        .cf-kpi {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all .3s
+        }
+
+        .cf-kpi:hover {
+            border-color: var(--accent)
+        }
+
+        .cf-kpi-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .05em;
+            color: var(--muted);
+            margin-bottom: 3px
+        }
+
+        .cf-kpi-value {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -.02em
+        }
+
+        .cf-kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 2px
+        }
+
+        .cf-kpi-trend-up {
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 500
+        }
+
+        .cf-kpi-trend-down {
+            color: #C0392B;
+            font-size: 11px;
+            font-weight: 500
+        }
+
+        .cf-kpi-trend-flat {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500
+        }
+
+        .cf-kpi-trend-label {
+            color: var(--muted);
+            font-size: 10px
+        }
+
+        /* Chart grid */
+        .cf-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            transition: all .35s cubic-bezier(.25, .46, .45, .94)
+        }
+
+        .cf-grid--compact {
+            grid-template-columns: 1fr 1fr 1fr
+        }
+
+        .cf-chart-wrap {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            padding: 0 6px
+        }
+
+        .cf-card--primary .cf-chart-wrap {
+            height: calc(100% - 56px);
+            min-height: 320px
+        }
+
+        .cf-grid--compact .cf-chart-wrap {
+            height: 185px
+        }
+
+        .cf-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px 6px
+        }
+
+        .cf-card-title {
+            font-size: 13px;
+            font-weight: 600
+        }
+
+        .cf-card-sub {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .cf-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        /* Pro panel */
+        .cf-pro-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease, padding .35s ease, opacity .25s;
+            opacity: 0;
+            padding: 0 14px;
+            border-top: 1px solid transparent
+        }
+
+        .cf-pro-panel.open {
+            max-height: 80px;
+            opacity: 1;
+            padding: 8px 14px;
+            border-top-color: var(--border)
+        }
+
+        .cf-pro-toggles {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .cf-pro-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .cf-pro-stats {
+            font-size: 11px;
+            color: var(--muted);
+            margin-left: auto
+        }
+
+        /* Summary bar */
+        .cf-summary {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .3s, opacity .25s;
+            opacity: 0
+        }
+
+        .cf-summary.open {
+            max-height: 36px;
+            opacity: 1
+        }
+
+        .cf-summary-inner {
+            padding: 6px 14px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            color: var(--muted);
+            flex-wrap: wrap
+        }
+
+        /* Settings panel */
+        .cf-settings-wrap {
+            position: relative
+        }
+
+        .cf-settings {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            width: 260px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow-h);
+            padding: 14px;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+            transition: all .25s
+        }
+
+        .cf-settings.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all
+        }
+
+        .cf-settings-section {
+            margin-bottom: 12px
+        }
+
+        .cf-settings-section:last-child {
+            margin-bottom: 0
+        }
+
+        .cf-settings-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+            margin-bottom: 8px
+        }
+
+        .cf-theme-btns {
+            display: flex;
+            gap: 6px
+        }
+
+        .cf-theme-btn {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: inherit;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px
+        }
+
+        .cf-theme-btn:hover {
+            color: var(--fg);
+            border-color: #BBBAB5
+        }
+
+        .cf-theme-btn.active {
+            background: var(--fg);
+            color: var(--card);
+            border-color: var(--fg)
+        }
+
+        body.dark .cf-theme-btn.active {
+            background: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .cf-accent-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .cf-accent-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .cf-accent-swatch:hover {
+            transform: scale(1.15)
+        }
+
+        .cf-accent-swatch.active {
+            border-color: var(--fg);
+            box-shadow: 0 0 0 2px var(--bg)
+        }
+
+        .cf-accent-custom {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 1px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 10px;
+            transition: border-color .2s
+        }
+
+        .cf-accent-custom:hover {
+            border-color: var(--muted)
+        }
+
+        .cf-accent-custom input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%
+        }
+
+        .cf-settings-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0
+        }
+
+        .cf-settings-actions {
+            display: flex;
+            gap: 6px
+        }
+
+        .cf-settings-actions .cf-btn {
+            flex: 1;
+            justify-content: center;
+            font-size: 11px;
+            padding: 6px 8px
+        }
+
+        /* Modals */
+        .cf-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .35);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(2px)
+        }
+
+        .cf-modal-overlay.open {
+            display: flex;
+            animation: cfFadeIn .2s ease
+        }
+
+        .cf-modal {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .15);
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            animation: cfModalIn .3s cubic-bezier(.25, .46, .45, .94)
+        }
+
+        .cf-modal--sm {
+            max-width: 400px
+        }
+
+        .cf-modal--lg {
+            max-width: 680px
+        }
+
+        .cf-modal--xl {
+            max-width: 860px
+        }
+
+        .cf-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .cf-modal-header h3 {
+            font-size: 15px;
+            font-weight: 600
+        }
+
+        .cf-modal-body {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex: 1
+        }
+
+        .cf-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border)
+        }
+
+        @keyframes cfFadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes cfModalIn {
+            from {
+                opacity: 0;
+                transform: scale(.96) translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0)
+            }
+        }
+
+        /* Data table */
+        .cf-data-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .cf-data-table th {
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+            padding: 6px 10px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .cf-data-table td {
+            padding: 3px 6px
+        }
+
+        .cf-data-table input {
+            width: 100%;
+            padding: 5px 7px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--fg);
+            transition: all .2s
+        }
+
+        .cf-data-table input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg)
+        }
+
+        .cf-data-table-wrap {
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px
+        }
+
+        .cf-editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px
+        }
+
+        .cf-editor-data-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px
+        }
+
+        .cf-field {
+            margin-bottom: 12px
+        }
+
+        .cf-field:last-child {
+            margin-bottom: 0
+        }
+
+        /* Focus */
+        .cf-focus-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .3);
+            z-index: 60;
+            display: none;
+            backdrop-filter: blur(2px)
+        }
+
+        .cf-focus-overlay.open {
+            display: block;
+            animation: cfFadeIn .2s ease
+        }
+
+        .cf-focus-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 92vw;
+            max-width: 1000px;
+            max-height: 82vh;
+            z-index: 70;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .18);
+            display: none;
+            flex-direction: column;
+            animation: cfModalIn .3s cubic-bezier(.25, .46, .45, .94);
+            overflow: hidden
+        }
+
+        .cf-focus-card.open {
+            display: flex
+        }
+
+        .cf-focus-chart {
+            flex: 1;
+            padding: 0 20px 16px;
+            min-height: 0
+        }
+
+        .cf-focus-chart canvas {
+            width: 100% !important;
+            height: 100% !important
+        }
+
+        /* Toast */
+        .cf-toast-wrap {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center
+        }
+
+        .cf-toast {
+            background: var(--fg);
+            color: var(--card);
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .2);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            animation: cfToastIn .3s ease, cfToastOut .3s ease 2.2s forwards
+        }
+
+        .cf-toast i {
+            color: var(--accent)
+        }
+
+        @keyframes cfToastIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes cfToastOut {
+            to {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+        }
+
+        /* Controls bar */
+        .cf-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px
+        }
+
+        .cf-controls-left {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .cf-controls-right {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        /* Misc */
+        .cf-color-input {
+            width: 36px;
+            height: 30px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 2px;
+            cursor: pointer;
+            background: var(--bg)
+        }
+
+        .cf-color-input::-webkit-color-swatch-wrapper {
+            padding: 0
+        }
+
+        .cf-color-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 3px
+        }
+
+        .cf-empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted)
+        }
+
+        .cf-empty-state i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+            opacity: .4
+        }
+
+        .cf-empty-state p {
+            font-size: 13px
+        }
+
+        /* Responsive */
+        @media(max-width:1024px) {
+            .cf-grid--compact {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .cf-card--primary {
+                grid-column: span 2;
+                grid-row: span 1
+            }
+
+            .cf-card--primary .cf-chart-wrap {
+                min-height: 280px
+            }
+        }
+
+        @media(max-width:768px) {
+
+            .cf-grid,
+            .cf-grid--compact {
+                grid-template-columns: 1fr
+            }
+
+            .cf-card--primary {
+                grid-column: span 1
+            }
+
+            .cf-card--primary .cf-chart-wrap {
+                min-height: 260px
+            }
+
+            .cf-kpi-row {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .cf-nav {
+                order: 10;
+                width: 100%;
+                padding-bottom: 2px
+            }
+
+            .cf-header-right .cf-btn--hide-m {
+                display: none
+            }
+
+            .cf-editor-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:480px) {
+            .cf-kpi-row {
+                grid-template-columns: 1fr
+            }
+
+            .cf-header-inner {
+                padding: 8px 12px
+            }
+
+            .cf-focus-card {
+                width: 96vw
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="cf-header">
+        <div class="cf-header-inner">
+            <div class="cf-logo">
+                <div class="cf-logo-mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <rect x="1" y="8" width="3" height="7" rx="1" fill="#fff" />
+                        <rect x="5.5" y="4" width="3" height="11" rx="1" fill="#fff" opacity=".8" />
+                        <rect x="10" y="1" width="3" height="14" rx="1" fill="#fff" opacity=".6" />
+                    </svg></div>
+                <span class="cf-logo-text">Chartflow</span>
+            </div>
+            <nav class="cf-nav" id="perspNav" aria-label="Perspectives"></nav>
+            <div class="cf-header-right">
+                <div class="cf-mode" role="radiogroup" aria-label="Mode">
+                    <button class="cf-mode-btn active" data-mode="essential" role="radio" aria-checked="true">Essential</button>
+                    <button class="cf-mode-btn" data-mode="pro" role="radio" aria-checked="false">Pro</button>
+                </div>
+                <button class="cf-btn cf-btn--icon cf-btn--hide-m" id="addChartBtn" title="Add chart" aria-label="Add chart"><i class="fas fa-plus" style="font-size:12px"></i></button>
+                <button class="cf-btn cf-btn--icon cf-btn--hide-m" id="exportBtn" title="Export CSV" aria-label="Export CSV"><i class="fas fa-download" style="font-size:12px"></i></button>
+                <div class="cf-settings-wrap">
+                    <button class="cf-btn cf-btn--icon" id="settingsBtn" title="Settings" aria-label="Settings"><i class="fas fa-gear" style="font-size:13px"></i></button>
+                    <div class="cf-settings" id="settingsPanel">
+                        <div class="cf-settings-section">
+                            <div class="cf-settings-title">Theme</div>
+                            <div class="cf-theme-btns">
+                                <button class="cf-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
+                                <button class="cf-theme-btn" data-theme="dark"><i class="fas fa-moon"></i> Dark</button>
+                            </div>
+                        </div>
+                        <div class="cf-settings-section">
+                            <div class="cf-settings-title">Accent Color</div>
+                            <div class="cf-accent-row" id="accentRow"></div>
+                        </div>
+                        <div class="cf-settings-divider"></div>
+                        <div class="cf-settings-actions">
+                            <button class="cf-btn" id="saveBtn"><i class="fas fa-bookmark"></i> Save</button>
+                            <button class="cf-btn cf-btn--danger" id="resetBtn"><i class="fas fa-rotate-left"></i> Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main style="max-width:1440px;margin:0 auto;padding:14px 20px">
+        <!-- Controls -->
+        <div class="cf-controls">
+            <div class="cf-controls-left">
+                <select class="cf-select cf-time-select" id="timeRange" aria-label="Time range">
+        <option value="0">Full Year</option>
+        <option value="3">Last 3 Months</option>
+        <option value="6">Last 6 Months</option>
+        <option value="9">Last 9 Months</option>
+      </select>
+                <div id="viewModeWrap" style="display:none;gap:4px;display:none;align-items:center">
+                    <button class="cf-btn cf-btn--icon cf-view-btn active" data-view="grid" title="Grid"><i class="fas fa-th-large" style="font-size:11px"></i></button>
+                    <button class="cf-btn cf-btn--icon cf-view-btn" data-view="compact" title="Compact"><i class="fas fa-grip" style="font-size:11px"></i></button>
+                </div>
+            </div>
+            <div class="cf-controls-right" id="lastUpdated"></div>
+        </div>
+
+        <!-- KPI Row -->
+        <div class="cf-kpi-row" id="kpiRow"></div>
+
+        <!-- Chart Grid -->
+        <div class="cf-grid" id="chartGrid"></div>
+    </main>
+
+    <!-- ═══ DATA EDITOR MODAL ═══ -->
+    <div class="cf-modal-overlay" id="editorOverlay">
+        <div class="cf-modal cf-modal--lg">
+            <div class="cf-modal-header">
+                <h3 id="editorHeading">Edit Chart</h3>
+                <button class="cf-btn cf-btn--icon" data-close="editor"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="cf-modal-body">
+                <div class="cf-editor-grid">
+                    <div class="cf-field"><label class="cf-label">Title</label><input class="cf-input" id="edTitle" type="text">
+                    </div>
+                    <div class="cf-field"><label class="cf-label">Subtitle</label><input class="cf-input" id="edSub" type="text">
+                    </div>
+                    <div class="cf-field">
+                        <label class="cf-label">Chart Type</label><select class="cf-select" id="edType" style="width:100%;padding:7px 26px 7px 9px;font-size:13px"></select>
+                    </div>
+                    <div class="cf-field"><label class="cf-label">Color</label><input class="cf-color-input" id="edColor" type="color">
+                    </div>
+                </div>
+                <div class="cf-editor-data-head"><label class="cf-label" style="margin:0">Data Points</label>
+                    <div style="display:flex;gap:4px">
+                        <button class="cf-btn cf-btn--sm" id="edAddRow"><i class="fas fa-plus"></i> Row</button><button class="cf-btn cf-btn--sm" id="edDelRow"><i class="fas fa-minus"></i> Row</button>
+                    </div>
+                </div>
+                <div class="cf-data-table-wrap">
+                    <table class="cf-data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40%">Label</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="edBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="cf-modal-footer">
+                <button class="cf-btn" data-close="editor">Cancel</button>
+                <button class="cf-btn cf-btn--accent" id="edSave">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ ADD CHART MODAL ═══ -->
+    <div class="cf-modal-overlay" id="addOverlay">
+        <div class="cf-modal cf-modal--lg">
+            <div class="cf-modal-header">
+                <h3>Add New Chart</h3>
+                <button class="cf-btn cf-btn--icon" data-close="add"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="cf-modal-body">
+                <div class="cf-editor-grid">
+                    <div class="cf-field"><label class="cf-label">Title</label><input class="cf-input" id="addTitle" type="text" placeholder="e.g. Monthly Sales">
+                    </div>
+                    <div class="cf-field"><label class="cf-label">Subtitle</label><input class="cf-input" id="addSub" type="text" placeholder="e.g. Q4 report">
+                    </div>
+                    <div class="cf-field">
+                        <label class="cf-label">Data Shape</label>
+                        <div style="display:flex;gap:10px;margin-top:4px">
+                            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="addShape" value="time" checked> Time Series</label>
+                            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="addShape" value="cat"> Categories</label>
+                        </div>
+                    </div>
+                    <div class="cf-field">
+                        <label class="cf-label">Chart Type</label><select class="cf-select" id="addType" style="width:100%;padding:7px 26px 7px 9px;font-size:13px"></select>
+                    </div>
+                </div>
+                <div class="cf-field">
+                    <label class="cf-label">Paste Data</label>
+                    <textarea class="cf-textarea" id="addPaste" placeholder="Label, Value&#10;Jan, 5000&#10;Feb, 6200&#10;Mar, 5800"></textarea>
+                    <div style="font-size:10px;color:var(--muted);margin-top:4px">One entry per line. Format: label,
+                        value</div>
+                </div>
+                <div class="cf-field" style="margin-top:12px"><label class="cf-label">Color</label><input class="cf-color-input" id="addColor" type="color" value="#5B8C7E">
+                </div>
+            </div>
+            <div class="cf-modal-footer">
+                <button class="cf-btn" data-close="add">Cancel</button>
+                <button class="cf-btn cf-btn--accent" id="addSave">Add Chart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CONFIRM MODAL ═══ -->
+    <div class="cf-modal-overlay" id="confirmOverlay">
+        <div class="cf-modal cf-modal--sm">
+            <div class="cf-modal-body" style="padding:20px">
+                <p id="confirmMsg" style="font-size:13px;line-height:1.5"></p>
+            </div>
+            <div class="cf-modal-footer">
+                <button class="cf-btn" id="confirmNo">Cancel</button>
+                <button class="cf-btn cf-btn--accent" id="confirmYes">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ FOCUS ═══ -->
+    <div class="cf-focus-overlay" id="focusOverlay"></div>
+    <div class="cf-focus-card" id="focusCard">
+        <div class="cf-modal-header">
+            <div>
+                <div class="cf-card-title" id="focusTitle"></div>
+                <div class="cf-card-sub" id="focusSub"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+                <select class="cf-select" id="focusType"></select>
+                <button class="cf-btn cf-btn--icon" id="focusPng" title="Download PNG"><i class="fas fa-image" style="font-size:12px"></i></button>
+                <button class="cf-btn cf-btn--icon" id="focusClose" aria-label="Close"><i class="fas fa-xmark" style="font-size:13px"></i></button>
+            </div>
+        </div>
+        <div class="cf-focus-chart"><canvas id="focusCanvas"></canvas></div>
+    </div>
+
+    <!-- ═══ TOASTS ═══ -->
+    <div class="cf-toast-wrap" id="toastWrap"></div>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════
+   Chartflow — Production Analytics Engine
+   ═══════════════════════════════════════════════════════════ */
+
+// Register datalabels plugin globally (disabled by default per chart)
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels.display = false;
+
+// ── Palette ──────────────────────────────────────────────
+const PALETTE = ['#D4503A','#2D8B55','#C4881A','#5B8C7E','#8B6F4E','#9B5E6F','#4A7FB5','#7B6BB5'];
+const ACCENT_PRESETS = ['#D4503A','#2D8B55','#C4881A','#5B8C7E','#8B6F4E','#9B5E6F'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const TYPE_LABELS = {line:'Line',area:'Area',bar:'Bar',scatter:'Scatter',doughnut:'Donut',pie:'Pie',polarArea:'Polar',radar:'Radar'};
+const TIME_TYPES = ['line','area','bar','scatter'];
+const CAT_TYPES = ['doughnut','pie','polarArea','radar','bar'];
+
+// ── Default Charts ───────────────────────────────────────
+function getDefaultCharts(){
+  return [
+    {id:1,title:'Revenue',subtitle:'Monthly recurring',isTime:true,labels:[...MONTHS],
+     data:[42000,48000,45000,52000,58000,61000,59000,67000,72000,68000,75000,82000],
+     color:'#D4503A',chartType:'line',
+     opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:true}},
+    {id:2,title:'Active Users',subtitle:'Monthly active',isTime:true,labels:[...MONTHS],
+     data:[1200,1350,1280,1520,1680,1890,1750,2100,2340,2180,2450,2700],
+     color:'#2D8B55',chartType:'bar',
+     opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:true}},
+    {id:3,title:'Conversion Rate',subtitle:'Visitor to customer',isTime:false,labels:[...MONTHS],
+     data:[3.2,3.5,3.1,3.8,4.1,4.3,4.0,4.5,4.8,4.6,5.0,5.3],
+     color:'#C4881A',chartType:'doughnut',
+     opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:true}},
+    {id:4,title:'Traffic Sources',subtitle:'Channel distribution',isTime:false,
+     labels:['Direct','Organic','Social','Referral','Paid'],data:[35,28,18,12,7],
+     color:'#5B8C7E',chartType:'polarArea',
+     opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:true}},
+    {id:5,title:'Performance Score',subtitle:'System metrics',isTime:false,
+     labels:['Speed','Reliability','Usability','Security','Scalability'],data:[85,92,78,88,72],
+     color:'#8B6F4E',chartType:'radar',
+     opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:true}},
+    {id:6,title:'Growth Trend',subtitle:'Month over month %',isTime:true,labels:[...MONTHS],
+     data:[0,12.5,-5.2,18.8,10.5,12.5,-7.4,20.0,11.4,-6.8,12.4,8.2],
+     color:'#9B5E6F',chartType:'scatter',
+     opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:false}},
+  ];
+}
+
+const PERSPECTIVES = {
+  overview:{label:'Overview',primary:null,filter:null},
+  revenue:{label:'Revenue',primary:1,filter:[1,6,3]},
+  users:{label:'Users',primary:2,filter:[2,3,4]},
+  performance:{label:'Performance',primary:5,filter:[5,6,1]},
+};
+
+// ── State ────────────────────────────────────────────────
+let S = {
+  mode:'essential', persp:'overview', view:'grid', range:0,
+  theme:'light', accent:'#D4503A',
+  charts:getDefaultCharts(), nextId:100
+};
+let chartInst = {};   // chartId → Chart instance
+let focusId = null;   // chartId in focus mode
+let editingId = null; // chartId in editor
+let confirmCb = null; // confirm callback
+
+// ── Helpers ──────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const $$=s=>document.querySelectorAll(s);
+function hexRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`}
+function fmt(n){if(n==null)return'0';if(Math.abs(n)>=1e6)return(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e4)return(n/1e3).toFixed(0)+'k';if(Math.abs(n)>=1e3)return(n/1e3).toFixed(1)+'k';return n%1!==0?n.toFixed(1):n.toString()}
+function fmtPct(v){return(v>=0?'+':'')+v.toFixed(1)+'%'}
+
+function toast(msg,icon='fa-check'){
+  const t=document.createElement('div');t.className='cf-toast';
+  t.innerHTML=`<i class="fas ${icon}"></i> ${msg}`;
+  $('toastWrap').appendChild(t);setTimeout(()=>t.remove(),2600);
+}
+
+function calcStats(data){
+  if(!data||!data.length)return null;
+  const n=data.length,sum=data.reduce((a,b)=>a+b,0),mean=sum/n;
+  const std=Math.sqrt(data.reduce((a,b)=>a+Math.pow(b-mean,2),0)/n);
+  const min=Math.min(...data),max=Math.max(...data);
+  const h=Math.floor(n/2),fA=data.slice(0,h).reduce((a,b)=>a+b,0)/Math.max(h,1);
+  const sA=data.slice(h).reduce((a,b)=>a+b,0)/Math.max(n-h,1);
+  const trend=sA>fA*1.02?'Up':sA<fA*0.98?'Down':'Flat';
+  return{mean,std,min,max,trend};
+}
+
+function themeColors(){
+  const d=S.theme==='dark';
+  return{grid:d?'rgba(255,255,255,.06)':'rgba(0,0,0,.04)',tick:d?'#555':'#8C8C8C',
+    fg:d?'#E0E0E0':'#1A1A1A',ttBg:d?'#2A2A2A':'#1A1A1A',ttFg:d?'#E0E0E0':'#fff'};
+}
+
+// ── Persistence ──────────────────────────────────────────
+function saveState(){
+  try{localStorage.setItem('chartflow',JSON.stringify({mode:S.mode,persp:S.persp,view:S.view,range:S.range,
+    theme:S.theme,accent:S.accent,charts:S.charts,nextId:S.nextId}))}catch(e){}
+}
+function loadState(){
+  try{const d=JSON.parse(localStorage.getItem('chartflow'));
+    if(d&&d.charts){Object.assign(S,d);return true}}catch(e){}
+  return false;
+}
+function resetState(){
+  S.mode='essential';S.persp='overview';S.view='grid';S.range=0;
+  S.theme='light';S.accent='#D4503A';S.charts=getDefaultCharts();S.nextId=100;
+  localStorage.removeItem('chartflow');
+  applyTheme();applyAccent();renderAll();toast('Reset to defaults','fa-rotate-left');
+}
+
+// ── Theme ────────────────────────────────────────────────
+function applyTheme(){
+  document.body.classList.toggle('dark',S.theme==='dark');
+  $$('.cf-theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===S.theme));
+  renderAll();
+}
+function applyAccent(){
+  document.documentElement.style.setProperty('--accent',S.accent);
+  document.documentElement.style.setProperty('--accent-fade',hexRgba(S.accent,.08));
+  $$('.cf-accent-swatch').forEach(s=>s.classList.toggle('active',s.dataset.color===S.accent));
+}
+
+// ── Perspectives Nav ─────────────────────────────────────
+function renderPerspNav(){
+  const nav=$('perspNav');nav.innerHTML='';
+  Object.entries(PERSPECTIVES).forEach(([k,v])=>{
+    const b=document.createElement('button');b.className='cf-pill'+(S.persp===k?' active':'');
+    b.textContent=v.label;b.dataset.persp=k;
+    b.addEventListener('click',()=>{S.persp=k;renderPerspNav();renderGrid();saveState()});
+    nav.appendChild(b);
+  });
+}
+
+// ── KPIs ─────────────────────────────────────────────────
+function renderKPIs(){
+  const row=$('kpiRow');row.innerHTML='';
+  const visible=getVisibleCharts();
+  const count=Math.min(4,visible.length);
+  for(let i=0;i<count;i++){
+    const c=visible[i];
+    const d=c.data;const last=d[d.length-1];const prev=d.length>3?d[d.length-4]:d[0];
+    const pct=prev!==0?((last-prev)/Math.abs(prev))*100:0;
+    const up=pct>0.5,down=pct<-0.5;
+    const sparkData=d.slice(-12);
+    const sparkColor=up?'var(--green)':down?'#C0392B':'var(--muted)';
+    const div=document.createElement('div');div.className='cf-kpi';
+    div.innerHTML=`<div><div class="cf-kpi-label">${c.title.toUpperCase()}</div>
+      <div class="cf-kpi-value fm">${fmt(last)}</div>
+      <div class="cf-kpi-trend"><i class="fas fa-arrow-${up?'up':down?'down':'right'}" style="font-size:9px;color:${sparkColor}"></i>
+      <span class="cf-kpi-trend-${up?'up':down?'down':'flat'}">${fmtPct(pct)}</span>
+      <span class="cf-kpi-trend-label">vs prior</span></div></div>
+      <div style="flex-shrink:0">${sparkSVG(sparkData,sparkColor)}</div>`;
+    row.appendChild(div);
+  }
+}
+function sparkSVG(data,color){
+  const w=72,h=28;const mx=Math.max(...data),mn=Math.min(...data),rng=mx-mn||1;
+  const pts=data.map((v,i)=>`${(i/(data.length-1))*w},${h-((v-mn)/rng)*(h-4)-2}`).join(' ');
+  const fill=`0,${h} ${pts} ${w},${h}`;
+  return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polygon points="${fill}" fill="${color}" opacity=".08"/><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+// ── Chart Grid ───────────────────────────────────────────
+function getVisibleCharts(){
+  const p=PERSPECTIVES[S.persp];
+  if(!p||!p.filter)return[...S.charts];
+  return S.charts.filter(c=>p.filter.includes(c.id));
+}
+
+function renderGrid(){
+  const grid=$('chartGrid');grid.innerHTML='';
+  grid.className='cf-grid'+(S.view==='compact'?' cf-grid--compact':'');
+  const visible=getVisibleCharts();
+  const p=PERSPECTIVES[S.persp];
+  const primaryId=p?p.primary:null;
+
+  if(!visible.length){
+    grid.innerHTML='<div class="cf-empty-state" style="grid-column:1/-1"><i class="fas fa-chart-bar"></i><p>No charts in this view. Add one to get started.</p></div>';
+    return;
+  }
+
+  visible.forEach((c,i)=>{
+    const isPrimary=c.id===primaryId;
+    const card=document.createElement('div');
+    card.className='cf-card'+(isPrimary?' cf-card--primary':'');
+    card.id=`card-${c.id}`;
+    card.style.animationDelay=`${i*50}ms`;
+
+    const availTypes=c.isTime?TIME_TYPES:CAT_TYPES;
+    const typeOpts=availTypes.map(t=>`<option value="${t}"${t===c.chartType?' selected':''}>${TYPE_LABELS[t]}</option>`).join('');
+
+    card.innerHTML=`
+      <div class="cf-card-header">
+        <div><div class="cf-card-title">${c.title}</div><div class="cf-card-sub">${c.subtitle}</div></div>
+        <div class="cf-card-actions">
+          <select class="cf-select" data-cid="${c.id}" data-action="type">${typeOpts}</select>
+          <button class="cf-btn cf-btn--icon" data-cid="${c.id}" data-action="edit" title="Edit data"><i class="fas fa-pen" style="font-size:11px"></i></button>
+          <button class="cf-btn cf-btn--icon" data-cid="${c.id}" data-action="focus" title="Expand"><i class="fas fa-expand" style="font-size:11px"></i></button>
+          <button class="cf-btn cf-btn--icon cf-btn--ghost" data-cid="${c.id}" data-action="delete" title="Delete"><i class="fas fa-trash" style="font-size:11px"></i></button>
+        </div>
+      </div>
+      <div class="cf-chart-wrap"><canvas id="canvas-${c.id}"></canvas></div>
+      <div class="cf-pro-panel${S.mode==='pro'?' open':''}" id="pro-${c.id}">
+        <div class="cf-pro-toggles">
+          <label class="cf-pro-toggle">Labels <div class="cf-toggle${c.opts.showLabels?' on':''}" data-cid="${c.id}" data-opt="showLabels"><div class="cf-toggle-knob"></div></div></label>
+          <label class="cf-pro-toggle">Grid <div class="cf-toggle${c.opts.showGrid?' on':''}" data-cid="${c.id}" data-opt="showGrid"><div class="cf-toggle-knob"></div></div></label>
+          <label class="cf-pro-toggle">Smooth <div class="cf-toggle${c.opts.smooth?' on':''}" data-cid="${c.id}" data-opt="smooth"><div class="cf-toggle-knob"></div></div></label>
+          <label class="cf-pro-toggle">Fill <div class="cf-toggle${c.opts.fill?' on':''}" data-cid="${c.id}" data-opt="fill"><div class="cf-toggle-knob"></div></div></label>
+          <label class="cf-pro-toggle">Zero <div class="cf-toggle${c.opts.zeroStart?' on':''}" data-cid="${c.id}" data-opt="zeroStart"><div class="cf-toggle-knob"></div></div></label>
+          <span class="cf-pro-stats fm" id="stats-${c.id}"></span>
+        </div>
+      </div>
+      <div class="cf-summary${S.mode==='pro'?' open':''}" id="sum-${c.id}">
+        <div class="cf-summary-inner" id="sumInner-${c.id}"></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Render charts after DOM is ready
+  requestAnimationFrame(()=>{visible.forEach(c=>renderChart(c.id));updateStats()});
+}
+
+// ── Build Chart.js Config ────────────────────────────────
+function buildConfig(c){
+  const tc=themeColors();
+  const realType=c.chartType==='area'?'line':c.chartType;
+  const isArea=c.chartType==='area';
+  const isScatter=c.chartType==='scatter';
+  const isRadial=['doughnut','pie','polarArea'].includes(realType);
+  const isRadar=realType==='radar';
+  const si=S.range||0;
+  const labels=c.labels.slice(si);
+  const data=c.data.slice(si);
+
+  let bgCol,brCol;
+  if(isRadial){
+    bgCol=labels.map((_,i)=>hexRgba(PALETTE[i%PALETTE.length],.18));
+    brCol=labels.map((_,i)=>PALETTE[i%PALETTE.length]);
+  }else if(realType==='polarArea'){
+    bgCol=labels.map((_,i)=>hexRgba(c.color,.12+i*.06));
+    brCol=labels.map(()=>c.color);
+  }else{
+    bgCol=hexRgba(c.color,.15);
+    brCol=c.color;
+  }
+
+  const ds={
+    label:c.title,
+    data:isScatter?data.map((v,i)=>({x:i+1,y:v})):data,
+    borderColor:brCol,backgroundColor:bgCol,
+    borderWidth:isRadial?2:(realType==='line'?2.5:0),
+    borderRadius:realType==='bar'?5:0,
+    pointRadius:realType==='line'?2.5:(isScatter?5:0),
+    pointBackgroundColor:brCol,pointHoverRadius:5,
+    tension:c.opts.smooth?.4:0,
+    fill:isArea||c.opts.fill,
+    barPercentage:.65,hoverOffset:isRadial?6:0,
+  };
+
+  const cfg={
+    type:realType,
+    data:{labels,datasets:[ds]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:450,easing:'easeOutQuart'},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:tc.ttBg,titleColor:tc.ttFg,bodyColor:tc.ttFg,
+          titleFont:{family:'Space Grotesk',size:12},bodyFont:{family:'JetBrains Mono',size:12},
+          padding:10,cornerRadius:6,displayColors:false,
+          callbacks:{label:ctx=>isScatter?`Growth: ${ctx.parsed.y.toFixed(1)}%`:typeof ctx.parsed==='number'?fmt(ctx.parsed):fmt(ctx.parsed.y)}
+        },
+        datalabels:{display:c.opts.showLabels&&!isRadial&&!isRadar,color:tc.tick,
+          font:{family:'JetBrains Mono',size:9},anchor:'end',align:'top',formatter:v=>fmt(v)}
+      }
+    }
+  };
+
+  // Scales for linear charts
+  if(!isRadial&&!isRadar){
+    cfg.options.scales={
+      x:{grid:{display:c.opts.showGrid,color:tc.grid,drawBorder:false},ticks:{font:{family:'Space Grotesk',size:10},color:tc.tick,maxRotation:0},border:{display:false}},
+      y:{grid:{display:c.opts.showGrid,color:tc.grid,drawBorder:false},ticks:{font:{family:'JetBrains Mono',size:10},color:tc.tick,callback:v=>fmt(v)},border:{display:false},beginAtZero:c.opts.zeroStart}
+    };
+    if(isScatter)cfg.options.scales.x.ticks.callback=v=>labels[v-1]||v;
+  }
+  // Radar
+  if(isRadar){
+    cfg.options.scales={r:{beginAtZero:true,max:100,grid:{color:tc.grid},angleLines:{color:tc.grid},
+      pointLabels:{font:{family:'Space Grotesk',size:11},color:tc.fg},ticks:{display:false}}};
+  }
+  // Legend for radial/radar when labels on
+  if((isRadial||isRadar)&&c.opts.showLabels){
+    cfg.options.plugins.legend={display:true,position:'right',
+      labels:{font:{family:'Space Grotesk',size:10},color:tc.tick,boxWidth:10,padding:6}};
+  }
+  // For horizontal bar on categorical single-dataset with few items
+  if(realType==='bar'&&!c.isTime&&labels.length<=6){
+    cfg.options.indexAxis='y';
+    cfg.options.scales.x.ticks.callback=v=>v+'%';
+    cfg.data.datasets[0].backgroundColor=labels.map((_,i)=>hexRgba(PALETTE[i%PALETTE.length],.18));
+    cfg.data.datasets[0].borderColor=labels.map((_,i)=>PALETTE[i%PALETTE.length]);
+  }
+  return cfg;
+}
+
+// ── Render Single Chart ──────────────────────────────────
+function renderChart(cid,canvasId){
+  const c=S.charts.find(x=>x.id===cid);if(!c)return;
+  const cv=document.getElementById(canvasId||`canvas-${cid}`);if(!cv)return;
+  const ctx=cv.getContext('2d');
+  if(chartInst[cid]){chartInst[cid].destroy();chartInst[cid]=null}
+  const cfg=buildConfig(c);
+  // Gradient for line/area
+  if(['line','area'].includes(c.chartType)&&cfg.data.datasets[0]){
+    const h=cv.parentElement.clientHeight||240;
+    const g=ctx.createLinearGradient(0,0,0,Math.max(h,1));
+    g.addColorStop(0,hexRgba(c.color,.16));g.addColorStop(1,hexRgba(c.color,.01));
+    if(c.chartType==='area'||c.opts.fill)cfg.data.datasets[0].backgroundColor=g;
+  }
+  chartInst[cid]=new Chart(ctx,cfg);
+}
+
+// ── Stats Display ────────────────────────────────────────
+function updateStats(){
+  S.charts.forEach(c=>{
+    const el=$(`stats-${c.id}`);if(!el)return;
+    if(S.mode!=='pro'){el.textContent='';return}
+    const si=S.range||0,d=c.data.slice(si);const st=calcStats(d);
+    if(!st){el.textContent='';return}
+    el.textContent=`μ ${fmt(st.mean)} · σ ${st.std.toFixed(1)} · ${st.trend}`;
+    const sumEl=$(`sumInner-${c.id}`);if(!sumEl)return;
+    sumEl.innerHTML=`<span>Min: <strong class="fm">${fmt(st.min)}</strong></span>
+      <span>Max: <strong class="fm">${fmt(st.max)}</strong></span>
+      <span>Range: <strong class="fm">${fmt(st.max-st.min)}</strong></span>
+      <span>Points: <strong class="fm">${d.length}</strong></span>`;
+  });
+}
+
+// ── Render All ───────────────────────────────────────────
+function renderAll(){
+  renderPerspNav();renderGrid();renderKPIs();
+  $('lastUpdated').textContent=`Updated: ${new Date().toLocaleTimeString()}`;
+  const vw=$('viewModeWrap');vw.style.display=S.mode==='pro'?'flex':'none';
+}
+
+// ── Focus Mode ───────────────────────────────────────────
+function openFocus(cid){
+  focusId=cid;const c=S.charts.find(x=>x.id===cid);if(!c)return;
+  $('focusTitle').textContent=c.title;$('focusSub').textContent=c.subtitle;
+  const avail=c.isTime?TIME_TYPES:CAT_TYPES;
+  $('focusType').innerHTML=avail.map(t=>`<option value="${t}"${t===c.chartType?' selected':''}>${TYPE_LABELS[t]}</option>`).join('');
+  $('focusOverlay').classList.add('open');$('focusCard').classList.add('open');
+  setTimeout(()=>{renderChart(cid,'focusCanvas')},60);
+}
+function closeFocus(){
+  $('focusOverlay').classList.remove('open');$('focusCard').classList.remove('open');
+  if(chartInst['focus']){chartInst['focus'].destroy();chartInst['focus']=null}focusId=null;
+}
+
+// ── Data Editor ──────────────────────────────────────────
+function openEditor(cid){
+  editingId=cid;const c=S.charts.find(x=>x.id===cid);if(!c)return;
+  $('editorHeading').textContent='Edit: '+c.title;
+  $('edTitle').value=c.title;$('edSub').value=c.subtitle;$('edColor').value=c.color;
+  const avail=c.isTime?TIME_TYPES:CAT_TYPES;
+  $('edType').innerHTML=avail.map(t=>`<option value="${t}"${t===c.chartType?' selected':''}>${TYPE_LABELS[t]}</option>`).join('');
+  const body=$('edBody');body.innerHTML='';
+  c.labels.forEach((l,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${l}" data-idx="${i}" data-field="label"></td>
+      <td><input type="text" value="${c.data[i]}" data-idx="${i}" data-field="value"></td>`;
+    body.appendChild(tr);
+  });
+  $('editorOverlay').classList.add('open');
+}
+function saveEditor(){
+  const c=S.charts.find(x=>x.id===editingId);if(!c)return;
+  c.title=$('edTitle').value.trim()||c.title;
+  c.subtitle=$('edSub').value.trim();c.color=$('edColor').value;
+  const newType=$('edType').value;
+  if(newType!==c.chartType){c.chartType=newType;c.isTime=TIME_TYPES.includes(newType)}
+  const rows=$('edBody').querySelectorAll('tr');
+  const labels=[],data=[];
+  rows.forEach(tr=>{
+    const l=tr.querySelector('[data-field="label"]').value.trim();
+    const v=parseFloat(tr.querySelector('[data-field="value"]').value);
+    if(l){labels.push(l);data.push(isNaN(v)?0:v)}
+  });
+  if(labels.length){c.labels=labels;c.data=data}
+  $('editorOverlay').classList.remove('open');editingId=null;
+  renderAll();saveState();toast('Chart updated','fa-check');
+}
+
+// ── Add Chart ────────────────────────────────────────────
+function openAddModal(){
+  $('addTitle').value='';$('addSub').value='';$('addPaste').value='';$('addColor').value='#5B8C7E';
+  document.querySelector('input[name="addShape"][value="time"]').checked=true;
+  updateAddTypes();
+  $('addOverlay').classList.add('open');
+}
+function updateAddTypes(){
+  const isTime=document.querySelector('input[name="addShape"]:checked').value==='time';
+  const types=isTime?TIME_TYPES:CAT_TYPES;
+  $('addType').innerHTML=types.map(t=>`<option value="${t}">${TYPE_LABELS[t]}</option>`).join('');
+}
+function saveAddChart(){
+  const title=$('addTitle').value.trim();
+  if(!title){toast('Title is required','fa-exclamation-triangle');return}
+  const sub=$('addSub').value.trim();
+  const isTime=document.querySelector('input[name="addShape"]:checked').value==='time';
+  const chartType=$('addType').value;
+  const color=$('addColor').value;
+  const raw=$('addPaste').value.trim();
+  if(!raw){toast('Data is required','fa-exclamation-triangle');return}
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const labels=[],data=[];
+  lines.forEach(line=>{
+    const parts=line.split(/[,;\t]+/).map(s=>s.trim());
+    if(parts.length>=2){labels.push(parts[0]);data.push(parseFloat(parts[1])||0)}
+  });
+  if(!labels.length){toast('Could not parse data','fa-exclamation-triangle');return}
+  S.charts.push({id:S.nextId++,title,subtitle:sub,isTime,labels,data,color,chartType,
+    opts:{showLabels:false,showGrid:true,smooth:true,fill:false,zeroStart:true}});
+  $('addOverlay').classList.remove('open');
+  // Switch to overview to see the new chart
+  S.persp='overview';renderAll();saveState();toast('Chart added','fa-plus');
+}
+
+// ── Confirm ──────────────────────────────────────────────
+function showConfirm(msg,cb){
+  $('confirmMsg').textContent=msg;confirmCb=cb;$('confirmOverlay').classList.add('open');
+}
+function closeConfirm(){$('confirmOverlay').classList.remove('open');confirmCb=null}
+
+// ── Delete Chart ─────────────────────────────────────────
+function deleteChart(cid){
+  const c=S.charts.find(x=>x.id===cid);if(!c)return;
+  showConfirm(`Delete "${c.title}"? This cannot be undone.`,()=>{
+    S.charts=S.charts.filter(x=>x.id!==cid);
+    if(chartInst[cid]){chartInst[cid].destroy();delete chartInst[cid]}
+    renderAll();saveState();toast('Chart deleted','fa-trash');
+  });
+}
+
+// ── Export CSV ───────────────────────────────────────────
+function exportCSV(){
+  let csv='# Chartflow Export\n# '+new Date().toISOString()+'\n\n';
+  S.charts.forEach(c=>{
+    csv+=`# ${c.title} (${c.subtitle})\nLabel,Value\n`;
+    c.labels.forEach((l,i)=>csv+=`"${l}",${c.data[i]}\n`);
+    csv+='\n';
+  });
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`chartflow-${Date.now()}.csv`;a.click();URL.revokeObjectURL(a.href);
+  toast('CSV exported','fa-download');
+}
+function exportPNG(cid){
+  const cv=$('focusCanvas');if(!cv)return;
+  const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+  a.download=`chart-${cid}.png`;a.click();toast('PNG downloaded','fa-image');
+}
+
+// ── Accent Swatches ─────────────────────────────────────
+function renderAccents(){
+  const row=$('accentRow');row.innerHTML='';
+  ACCENT_PRESETS.forEach(c=>{
+    const b=document.createElement('button');b.className='cf-accent-swatch'+(S.accent===c?' active':'');
+    b.style.background=c;b.dataset.color=c;
+    b.addEventListener('click',()=>{S.accent=c;applyAccent();saveState()});
+    row.appendChild(b);
+  });
+  const custom=document.createElement('label');custom.className='cf-accent-custom';
+  custom.innerHTML=`<i class="fas fa-plus"></i><input type="color" value="${S.accent}">`;
+  custom.querySelector('input').addEventListener('input',e=>{S.accent=e.target.value;applyAccent();saveState()});
+  row.appendChild(custom);
+}
+
+// ── Event Binding ────────────────────────────────────────
+function bindEvents(){
+  // Mode toggle
+  $$('.cf-mode-btn').forEach(b=>b.addEventListener('click',()=>{
+    S.mode=b.dataset.mode;$$('.cf-mode-btn').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-checked',x===b)});
+    renderAll();saveState();toast(S.mode==='pro'?'Pro mode':'Essential mode','fa-sliders');
+  }));
+
+  // View mode
+  $$('.cf-view-btn').forEach(b=>b.addEventListener('click',()=>{
+    S.view=b.dataset.view;$$('.cf-view-btn').forEach(x=>{
+      x.classList.toggle('active',x===b);
+      x.style.background=x===b?'var(--fg)':'';x.style.color=x===b?'var(--card)':'';x.style.borderColor=x===b?'var(--fg)':'';
+    });
+    renderGrid();saveState();
+  }));
+
+  // Time range
+  $('timeRange').addEventListener('change',e=>{
+    S.range=parseInt(e.target.value);renderGrid();renderKPIs();updateStats();saveState();
+    const labels={'0':'Full Year','3':'Last 3 Months','6':'Last 6 Months','9':'Last 9 Months'};
+    toast(`Range: ${labels[e.target.value]}`,'fa-calendar');
+  });
+
+  // Grid delegation: type change, edit, focus, delete
+  $('chartGrid').addEventListener('change',e=>{
+    if(e.target.dataset.action==='type'){
+      const cid=parseInt(e.target.dataset.cid);const c=S.charts.find(x=>x.id===cid);
+      if(c){c.chartType=e.target.value;renderChart(cid);saveState()}
+    }
+  });
+  $('chartGrid').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-action]');if(!btn)return;
+    const cid=parseInt(btn.dataset.cid);
+    switch(btn.dataset.action){
+      case'edit':openEditor(cid);break;
+      case'focus':openFocus(cid);break;
+      case'delete':deleteChart(cid);break;
+    }
+  });
+
+  // Pro toggles delegation
+  $('chartGrid').addEventListener('click',e=>{
+    const t=e.target.closest('.cf-toggle');if(!t)return;
+    const cid=parseInt(t.dataset.cid),opt=t.dataset.opt;
+    const c=S.charts.find(x=>x.id===cid);if(!c)return;
+    c.opts[opt]=!c.opts[opt];t.classList.toggle('on',c.opts[opt]);
+    renderChart(cid);updateStats();saveState();
+  });
+
+  // Settings panel
+  $('settingsBtn').addEventListener('click',e=>{e.stopPropagation();$('settingsPanel').classList.toggle('open')});
+  document.addEventListener('click',e=>{if(!e.target.closest('.cf-settings-wrap'))$('settingsPanel').classList.remove('open')});
+
+  // Theme
+  $$('.cf-theme-btn').forEach(b=>b.addEventListener('click',()=>{S.theme=b.dataset.theme;applyTheme();saveState()}));
+
+  // Save/Reset
+  $('saveBtn').addEventListener('click',()=>{saveState();toast('Saved to browser','fa-bookmark')});
+  $('resetBtn').addEventListener('click',()=>showConfirm('Reset everything to default settings and data?',resetState));
+
+  // Add chart
+  $('addChartBtn').addEventListener('click',openAddModal);
+  document.querySelector('input[name="addShape"]').addEventListener('change',updateAddTypes);
+  $('addSave').addEventListener('click',saveAddChart);
+
+  // Editor
+  $('edAddRow').addEventListener('click',()=>{
+    const body=$('edBody');const n=body.rows.length;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="" data-idx="${n}" data-field="label"></td>
+      <td><input type="text" value="0" data-idx="${n}" data-field="value"></td>`;
+    body.appendChild(tr);tr.querySelector('input').focus();
+  });
+  $('edDelRow').addEventListener('click',()=>{
+    const body=$('edBody');if(body.rows.length>1)body.deleteRow(-1);
+  });
+  $('edSave').addEventListener('click',saveEditor);
+
+  // Focus
+  $('focusClose').addEventListener('click',closeFocus);
+  $('focusOverlay').addEventListener('click',closeFocus);
+  $('focusType').addEventListener('change',e=>{
+    if(focusId===null)return;const c=S.charts.find(x=>x.id===focusId);
+    if(c){c.chartType=e.target.value;renderChart(focusId,'focusCanvas');
+      // Also update the grid select
+      const gs=document.querySelector(`select[data-cid="${focusId}"]`);if(gs)gs.value=e.target.value;
+      saveState()}
+  });
+  $('focusPng').addEventListener('click',()=>{if(focusId!==null)exportPNG(focusId)});
+
+  // Confirm
+  $('confirmYes').addEventListener('click',()=>{if(confirmCb)confirmCb();closeConfirm()});
+  $('confirmNo').addEventListener('click',closeConfirm);
+
+  // Close modals
+  $$('[data-close="editor"]').forEach(b=>b.addEventListener('click',()=>$('editorOverlay').classList.remove('open')));
+  $$('[data-close="add"]').forEach(b=>b.addEventListener('click',()=>$('addOverlay').classList.remove('open')));
+
+  // Close modals on overlay click
+  ['editorOverlay','addOverlay','confirmOverlay'].forEach(id=>{
+    $(id).addEventListener('click',e=>{if(e.target===$(id))$(id).classList.remove('open')});
+  });
+
+  // Escape key
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if(focusId!==null)closeFocus();
+      else{$('editorOverlay').classList.remove('open');$('addOverlay').classList.remove('open');closeConfirm()}
+    }
+  });
+
+  // Export
+  $('exportBtn').addEventListener('click',exportCSV);
+}
+
+// ── Init ─────────────────────────────────────────────────
+function init(){
+  const loaded=loadState();
+  applyTheme();applyAccent();renderAccents();renderAll();
+  // Set initial view mode button state
+  $$('.cf-view-btn').forEach(x=>{
+    x.classList.toggle('active',x.dataset.view===S.view);
+    if(x.dataset.view===S.view){x.style.background='var(--fg)';x.style.color='var(--card)';x.style.borderColor='var(--fg)'}
+  });
+  // Set initial mode button state
+  $$('.cf-mode-btn').forEach(x=>{x.classList.toggle('active',x.dataset.mode===S.mode);x.setAttribute('aria-checked',x.dataset.mode===S.mode)});
+  $('timeRange').value=S.range.toString();
+  bindEvents();
+  if(loaded)toast('State restored','fa-bookmark');
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+    </script>
+</body>
+
+</html>
