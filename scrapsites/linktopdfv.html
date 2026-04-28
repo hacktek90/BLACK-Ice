@@ -211,7 +211,6 @@
 
     .btn-upload-pdf {
       color: #dc2626;
-      /* Red-ish for PDF */
     }
 
     .btn-upload-pdf:hover {
@@ -221,7 +220,6 @@
 
     .btn-upload-img {
       color: #0284c7;
-      /* Blue-ish for Image */
     }
 
     .btn-upload-img:hover {
@@ -245,6 +243,10 @@
     }
 
     /* --- NATIVE TOGGLE BUTTON STYLE --- */
+    .btn-native-toggle {
+      position: relative;
+    }
+
     .btn-native-toggle.active {
       background: #dbeafe;
       color: #1d4ed8;
@@ -252,6 +254,105 @@
 
     .btn-native-toggle.active:hover {
       background: #bfdbfe;
+    }
+
+    /* Small dot indicator on the toggle */
+    .btn-native-toggle .toggle-dot {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 7px;
+      height: 7px;
+      background: #3b82f6;
+      border-radius: 50%;
+      display: none;
+      border: 1.5px solid #ffffff;
+    }
+
+    .btn-native-toggle.active .toggle-dot {
+      display: block;
+    }
+
+    /* --- TOAST NOTIFICATION --- */
+    #toast-container {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(12px);
+      color: #e2e8f0;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: auto;
+      animation: toastIn 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+      max-width: 420px;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .toast.toast-out {
+      animation: toastOut 0.3s ease forwards;
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .toast-icon.warn {
+      color: #fbbf24;
+    }
+
+    .toast-icon.info {
+      color: #60a5fa;
+    }
+
+    .toast-icon.success {
+      color: #34d399;
+    }
+
+    .toast-text strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    @keyframes toastIn {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes toastOut {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+      }
     }
 
     /* --- FLOATING SHOW BUTTON --- */
@@ -420,14 +521,18 @@
         gap: 12px;
       }
 
-      /* On small screens, stack upload buttons or shrink them */
       .btn-upload-pdf span,
       .btn-upload-img span {
         display: none;
       }
+
+      .toast {
+        max-width: 320px;
+        font-size: 12px;
+        padding: 10px 14px;
+      }
     }
 
-    /* Hide the actual file inputs */
     .hidden-file-input {
       display: none;
     }
@@ -437,14 +542,14 @@
 <body>
 
   <button id="show-header-btn" title="Exit Focus Mode (Esc)">
-        <i data-lucide="arrow-down-from-line"></i>
-    </button>
+    <i data-lucide="arrow-down-from-line"></i>
+  </button>
 
   <header id="main-header">
     <div class="tab-bar" id="tab-bar-container">
       <button class="new-tab-btn" id="new-tab-btn" title="New Empty Tab">
-                <i data-lucide="plus"></i>
-            </button>
+        <i data-lucide="plus"></i>
+      </button>
     </div>
 
     <div class="controls-area">
@@ -454,56 +559,56 @@
       </div>
 
       <div class="input-group">
-
-        <!-- TWO SEPARATE UPLOAD BUTTONS -->
         <div class="upload-group">
-          <button class="icon-btn btn-upload-pdf" onclick="document.getElementById('pdf-input').click()" title="Upload PDF">
-                        <i data-lucide="file-text"></i>
-                        <span class="btn-label">PDF</span>
-                    </button>
-          <button class="icon-btn btn-upload-img" onclick="document.getElementById('img-input').click()" title="Upload Image">
-                        <i data-lucide="image"></i>
-                        <span class="btn-label">Image</span>
-                    </button>
+          <button class="icon-btn btn-upload-pdf" onclick="document.getElementById('pdf-input').click()" title="Upload PDF from PC">
+            <i data-lucide="file-text"></i>
+            <span class="btn-label">PDF</span>
+          </button>
+          <button class="icon-btn btn-upload-img" onclick="document.getElementById('img-input').click()" title="Upload Image from PC">
+            <i data-lucide="image"></i>
+            <span class="btn-label">Image</span>
+          </button>
         </div>
 
         <div class="divider"></div>
 
-        <input type="text" id="media-url-input" placeholder="Paste PDF or Image link here...">
+        <input type="text" id="media-url-input" placeholder="Paste PDF or Image URL here...">
 
         <button class="icon-btn load-trigger" id="load-btn" title="Open Link in New Tab">
-                    <i data-lucide="arrow-right"></i>
-                </button>
+          <i data-lucide="arrow-right"></i>
+        </button>
       </div>
 
-      <!-- Header Right Actions -->
       <div style="display:flex; gap: 4px;">
-        <button class="icon-btn btn-native-toggle" id="native-toggle-btn" title="Toggle PDF.js Viewer (Mozilla)">
-                    <i data-lucide="file-check"></i>
-                </button>
+        <button class="icon-btn btn-native-toggle" id="native-toggle-btn" title="Mozilla PDF.js Viewer (URLs only)">
+          <i data-lucide="file-check"></i>
+          <span class="toggle-dot"></span>
+        </button>
         <button class="icon-btn" id="hide-btn" title="Enter Focus Mode">
-                    <i data-lucide="expand"></i>
-                </button>
+          <i data-lucide="expand"></i>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- Hidden File Inputs -->
   <input type="file" id="pdf-input" class="hidden-file-input" accept="application/pdf">
   <input type="file" id="img-input" class="hidden-file-input" accept="image/*">
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
 
   <!-- Global Zoom Toolbar -->
   <div id="global-zoom-toolbar" class="zoom-toolbar hidden">
     <button class="zoom-btn" id="zoom-out-btn" title="Zoom Out">
-            <i data-lucide="minus"></i>
-        </button>
+      <i data-lucide="minus"></i>
+    </button>
     <span class="zoom-value" id="zoom-level-text">100%</span>
     <button class="zoom-btn" id="zoom-reset-btn" title="Reset Zoom">
-            <i data-lucide="refresh-cw"></i>
-        </button>
+      <i data-lucide="refresh-cw"></i>
+    </button>
     <button class="zoom-btn" id="zoom-in-btn" title="Zoom In">
-            <i data-lucide="plus"></i>
-        </button>
+      <i data-lucide="plus"></i>
+    </button>
   </div>
 
   <div id="media-viewer">
@@ -512,432 +617,494 @@
   <script type="module">
     import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
 
-        // --- ICONS ---
-        lucide.createIcons();
+    // --- ICONS ---
+    lucide.createIcons();
 
-        // --- STATE MANAGEMENT ---
-        const state = {
-            tabs: [],
-            activeTabId: null,
-            isFocusMode: false,
-            nativePdfMode: false, 
-            // Dragging State
-            isDragging: false,
-            startX: 0,
-            startY: 0,
-            initialPanX: 0,
-            initialPanY: 0
-        };
+    // --- TOAST SYSTEM ---
+    const toastContainer = document.getElementById('toast-container');
 
-        // --- DOM ELEMENTS ---
-        const header = document.getElementById('main-header');
-        const showBtn = document.getElementById('show-header-btn');
-        const hideBtn = document.getElementById('hide-btn');
-        const viewerContainer = document.getElementById('media-viewer');
-        const tabBar = document.getElementById('tab-bar-container');
-        const urlInput = document.getElementById('media-url-input');
-        const loadBtn = document.getElementById('load-btn');
-        const newTabBtn = document.getElementById('new-tab-btn');
-        const pdfInput = document.getElementById('pdf-input');
-        const imgInput = document.getElementById('img-input');
-        const nativeToggleBtn = document.getElementById('native-toggle-btn');
-        
-        const zoomToolbar = document.getElementById('global-zoom-toolbar');
-        const zoomLevelText = document.getElementById('zoom-level-text');
-        const zoomInBtn = document.getElementById('zoom-in-btn');
-        const zoomOutBtn = document.getElementById('zoom-out-btn');
-        const zoomResetBtn = document.getElementById('zoom-reset-btn');
+    function showToast(message, type = 'info', duration = 4500) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
 
-        // --- HELPER: DETECT RESOURCE TYPE ---
-        function getResourceType(source, fileObj = null) {
-            if (fileObj) {
-                if (fileObj.type === 'application/pdf') return 'pdf';
-                if (fileObj.type.startsWith('image/')) return 'image';
-                return 'unknown';
-            }
-            const lowerSource = source.toLowerCase();
-            if (lowerSource.endsWith('.pdf')) return 'pdf';
-            const imageExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.ico'];
-            if (imageExts.some(ext => lowerSource.endsWith(ext))) return 'image';
-            return 'image'; // Default fallback for URL
+      let iconName = 'info';
+      if (type === 'warn') iconName = 'alert-triangle';
+      if (type === 'success') iconName = 'check-circle-2';
+
+      toast.innerHTML = `
+        <span class="toast-icon ${type}">
+          <i data-lucide="${iconName}" style="width:18px; height:18px;"></i>
+        </span>
+        <span class="toast-text">${message}</span>
+      `;
+
+      toastContainer.appendChild(toast);
+      lucide.createIcons({ root: toast });
+
+      setTimeout(() => {
+        toast.classList.add('toast-out');
+        toast.addEventListener('animationend', () => toast.remove());
+      }, duration);
+    }
+
+    // --- STATE MANAGEMENT ---
+    const state = {
+      tabs: [],
+      activeTabId: null,
+      isFocusMode: false,
+      nativePdfMode: false,
+      isDragging: false,
+      startX: 0,
+      startY: 0,
+      initialPanX: 0,
+      initialPanY: 0
+    };
+
+    // --- DOM ELEMENTS ---
+    const header = document.getElementById('main-header');
+    const showBtn = document.getElementById('show-header-btn');
+    const hideBtn = document.getElementById('hide-btn');
+    const viewerContainer = document.getElementById('media-viewer');
+    const tabBar = document.getElementById('tab-bar-container');
+    const urlInput = document.getElementById('media-url-input');
+    const loadBtn = document.getElementById('load-btn');
+    const newTabBtn = document.getElementById('new-tab-btn');
+    const pdfInput = document.getElementById('pdf-input');
+    const imgInput = document.getElementById('img-input');
+    const nativeToggleBtn = document.getElementById('native-toggle-btn');
+
+    const zoomToolbar = document.getElementById('global-zoom-toolbar');
+    const zoomLevelText = document.getElementById('zoom-level-text');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomResetBtn = document.getElementById('zoom-reset-btn');
+
+    // --- HELPERS ---
+    function isBlobUrl(source) {
+      return source && source.startsWith('blob:');
+    }
+
+    function isDataUrl(source) {
+      return source && source.startsWith('data:');
+    }
+
+    function isLocalSource(source) {
+      return isBlobUrl(source) || isDataUrl(source);
+    }
+
+    function getResourceType(source, fileObj = null) {
+      if (fileObj) {
+        if (fileObj.type === 'application/pdf') return 'pdf';
+        if (fileObj.type.startsWith('image/')) return 'image';
+        return 'unknown';
+      }
+      const lowerSource = source.toLowerCase();
+      if (lowerSource.endsWith('.pdf')) return 'pdf';
+      const imageExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.ico'];
+      if (imageExts.some(ext => lowerSource.endsWith(ext))) return 'image';
+      // Try to guess from URL path if no extension
+      if (lowerSource.includes('.pdf?') || lowerSource.includes('/pdf/')) return 'pdf';
+      return 'image';
+    }
+
+    // --- TAB LOGIC ---
+    function generateId() {
+      return 'tab-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function createTab(title, source = '', type = 'empty', isLocal = false) {
+      const id = generateId();
+
+      state.tabs.push({
+        id,
+        title,
+        source,
+        type,
+        isLocal,
+        zoom: 1.0,
+        panX: 0,
+        panY: 0
+      });
+
+      // Tab Button DOM
+      const tabBtn = document.createElement('div');
+      tabBtn.className = 'tab';
+      tabBtn.dataset.id = id;
+      tabBtn.addEventListener('click', () => switchTab(id));
+
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'tab-title';
+      titleSpan.textContent = title;
+
+      const closeSpan = document.createElement('span');
+      closeSpan.className = 'tab-close';
+      closeSpan.innerHTML = '<i data-lucide="x" style="width:10px;"></i>';
+      closeSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeTab(id);
+      });
+
+      tabBtn.appendChild(titleSpan);
+      tabBtn.appendChild(closeSpan);
+      tabBar.appendChild(tabBtn);
+      lucide.createIcons({ root: tabBtn });
+
+      // Viewer Instance DOM
+      const viewerInstance = document.createElement('div');
+      viewerInstance.className = 'media-instance';
+      viewerInstance.id = `viewer-${id}`;
+      viewerContainer.appendChild(viewerInstance);
+
+      renderContent(source, type, viewerInstance, isLocal);
+
+      switchTab(id);
+    }
+
+    function switchTab(id) {
+      state.activeTabId = id;
+
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const activeTabBtn = document.querySelector(`.tab[data-id="${id}"]`);
+      if (activeTabBtn) activeTabBtn.classList.add('active');
+
+      document.querySelectorAll('.media-instance').forEach(v => v.classList.remove('active'));
+      const activeViewer = document.getElementById(`viewer-${id}`);
+      if (activeViewer) activeViewer.classList.add('active');
+
+      const tabData = state.tabs.find(t => t.id === id);
+      if (tabData && tabData.type === 'image') {
+        zoomToolbar.classList.remove('hidden');
+        updateZoomUI(tabData);
+      } else {
+        zoomToolbar.classList.add('hidden');
+      }
+    }
+
+    function closeTab(id) {
+      const tabBtn = document.querySelector(`.tab[data-id="${id}"]`);
+      const viewerInstance = document.getElementById(`viewer-${id}`);
+      if (tabBtn) tabBtn.remove();
+      if (viewerInstance) viewerInstance.remove();
+      state.tabs = state.tabs.filter(t => t.id !== id);
+
+      if (state.activeTabId === id) {
+        if (state.tabs.length > 0) {
+          switchTab(state.tabs[state.tabs.length - 1].id);
+        } else {
+          state.activeTabId = null;
+          createTab('New Tab');
         }
+      }
+    }
 
-        // --- LOGIC: TABS ---
-        function generateId() { return 'tab-' + Math.random().toString(36).substr(2, 9); }
+    // --- CORE: RENDER LOGIC ---
+    function renderContent(source, type, container, isLocal = false) {
+      container.innerHTML = '';
 
-        function createTab(title, source = '', type = 'empty') {
-            const id = generateId();
-            
-            // State for this tab: include zoom/pan data
-            state.tabs.push({ 
-                id, 
-                title, 
-                source, 
-                type,
-                zoom: 1.0,
-                panX: 0,
-                panY: 0
+      if (type === 'empty') {
+        container.innerHTML = `
+          <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#64748b; flex-direction:column; gap:10px;">
+            <i data-lucide="layout-template" style="width:48px; height:48px; opacity:0.5"></i>
+            <p>No media loaded</p>
+          </div>`;
+        lucide.createIcons({ root: container });
+        return;
+      }
+
+      if (type === 'pdf') {
+        // Decide rendering strategy
+        const canUseMozilla = state.nativePdfMode && !isLocal;
+
+        if (canUseMozilla) {
+          // Mozilla PDF.js viewer — only works with public URLs
+          const iframe = document.createElement('iframe');
+          iframe.className = 'native-pdf-frame';
+          const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(source)}`;
+          iframe.src = viewerUrl;
+          container.appendChild(iframe);
+        } else {
+          // Fallback: EmbedPDF — works for both URLs and local blob files
+          if (state.nativePdfMode && isLocal) {
+            // Show a one-time toast explaining the fallback
+            showToast(
+              '<strong>Mozilla Viewer unavailable</strong> — local files require the default viewer.',
+              'warn',
+              5000
+            );
+          }
+          try {
+            EmbedPDF.init({
+              type: 'container',
+              target: container,
+              src: source,
+              openLinksInNewWindow: true
             });
-
-            // Tab Button DOM
-            const tabBtn = document.createElement('div');
-            tabBtn.className = 'tab';
-            tabBtn.dataset.id = id;
-            tabBtn.addEventListener('click', () => switchTab(id));
-
-            const titleSpan = document.createElement('span');
-            titleSpan.className = 'tab-title';
-            titleSpan.textContent = title;
-            
-            const closeSpan = document.createElement('span');
-            closeSpan.className = 'tab-close';
-            closeSpan.innerHTML = '<i data-lucide="x" style="width:10px;"></i>';
-            closeSpan.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeTab(id);
-            });
-
-            tabBtn.appendChild(titleSpan);
-            tabBtn.appendChild(closeSpan);
-            tabBar.appendChild(tabBtn);
-            lucide.createIcons({ root: tabBtn });
-
-            // Viewer Instance DOM
-            const viewerInstance = document.createElement('div');
-            viewerInstance.className = 'media-instance';
-            viewerInstance.id = `viewer-${id}`;
-            viewerContainer.appendChild(viewerInstance);
-
-            renderContent(source, type, viewerInstance);
-
-            switchTab(id);
+          } catch (e) {
+            container.innerHTML = `
+              <div class="image-error">
+                <i data-lucide="file-x" style="width:32px; height:32px;"></i>
+                <p>Failed to load PDF.<br>${e.message || 'Unknown error'}</p>
+              </div>`;
+            lucide.createIcons({ root: container });
+          }
         }
+      } else if (type === 'image') {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'image-wrapper';
+        wrapper.addEventListener('mousedown', handleMouseDown);
+        wrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
 
-        function switchTab(id) {
-            state.activeTabId = id;
-            
-            // UI Updates for Tabs
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const activeTabBtn = document.querySelector(`.tab[data-id="${id}"]`);
-            if (activeTabBtn) activeTabBtn.classList.add('active');
+        const img = document.createElement('img');
+        img.src = source;
+        img.alt = "Loaded Content";
+        img.draggable = false;
 
-            // UI Updates for Viewers
-            document.querySelectorAll('.media-instance').forEach(v => v.classList.remove('active'));
-            const activeViewer = document.getElementById(`viewer-${id}`);
-            if (activeViewer) activeViewer.classList.add('active');
-
-            // Handle Zoom Toolbar Visibility
-            const tabData = state.tabs.find(t => t.id === id);
-            if (tabData && tabData.type === 'image') {
-                zoomToolbar.classList.remove('hidden');
-                updateZoomUI(tabData);
-            } else {
-                zoomToolbar.classList.add('hidden');
-            }
-        }
-
-        function closeTab(id) {
-            const tabBtn = document.querySelector(`.tab[data-id="${id}"]`);
-            const viewerInstance = document.getElementById(`viewer-${id}`);
-            if (tabBtn) tabBtn.remove();
-            if (viewerInstance) viewerInstance.remove();
-            state.tabs = state.tabs.filter(t => t.id !== id);
-
-            if (state.activeTabId === id) {
-                if (state.tabs.length > 0) {
-                    switchTab(state.tabs[state.tabs.length - 1].id);
-                } else {
-                    state.activeTabId = null;
-                    createTab('New Tab');
-                }
-            }
-        }
-
-        // --- CORE: RENDER LOGIC ---
-        function renderContent(source, type, container) {
-            container.innerHTML = '';
-
-            if (type === 'empty') {
-                container.innerHTML = `
-                    <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#64748b; flex-direction:column; gap:10px;">
-                        <i data-lucide="layout-template" style="width:48px; height:48px; opacity:0.5"></i>
-                        <p>No media loaded</p>
-                    </div>`;
-                lucide.createIcons({ root: container });
-                return;
-            }
-
-            if (type === 'pdf') {
-                // Check for PDF.js Viewer Mode
-                if (state.nativePdfMode) {
-                    const iframe = document.createElement('iframe');
-                    iframe.className = 'native-pdf-frame';
-                    
-                    // Construct the URL to load the Mozilla PDF.js viewer with the file parameter
-                    // encodeURIComponent ensures special characters in URLs/Blob URLs don't break the query string
-                    const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(source)}`;
-                    
-                    iframe.src = viewerUrl;
-                    container.appendChild(iframe);
-                } else {
-                    // Use EmbedPDF (Default Viewer)
-                    try {
-                        EmbedPDF.init({
-                            type: 'container',
-                            target: container,
-                            src: source,
-                            openLinksInNewWindow: true
-                        });
-                    } catch (e) {
-                        container.innerHTML = `<div class="image-error"><p>Failed to load PDF.</p></div>`;
-                    }
-                }
-            } 
-            else if (type === 'image') {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'image-wrapper';
-                
-                // Attach Drag Event Listeners to the wrapper
-                wrapper.addEventListener('mousedown', handleMouseDown);
-                wrapper.addEventListener('touchstart', handleTouchStart, {passive: false});
-
-                const img = document.createElement('img');
-                img.src = source;
-                img.alt = "Loaded Content";
-                img.draggable = false; 
-                
-                img.onerror = function() {
-                    wrapper.innerHTML = `
-                        <div class="image-error">
-                            <i data-lucide="image-off" style="width:32px; height:32px;"></i>
-                            <p>Failed to load image.<br>The link might be broken or protected.</p>
-                        </div>
-                    `;
-                    lucide.createIcons({ root: wrapper });
-                };
-
-                wrapper.appendChild(img);
-                container.appendChild(wrapper);
-            }
-        }
-
-        // --- ZOOM & PAN LOGIC ---
-
-        function applyTransform(tabId) {
-            const tab = state.tabs.find(t => t.id === tabId);
-            if (!tab || tab.type !== 'image') return;
-
-            const viewer = document.getElementById(`viewer-${tabId}`);
-            const img = viewer.querySelector('img');
-            if (img) {
-                img.style.transform = `translate(${tab.panX}px, ${tab.panY}px) scale(${tab.zoom})`;
-            }
-            updateZoomUI(tab);
-        }
-
-        function updateZoomUI(tab) {
-            if(!tab) return;
-            zoomLevelText.textContent = Math.round(tab.zoom * 100) + '%';
-        }
-
-        function changeZoom(delta) {
-            if (!state.activeTabId) return;
-            const tab = state.tabs.find(t => t.id === state.activeTabId);
-            if (!tab || tab.type !== 'image') return;
-
-            const newZoom = tab.zoom + delta;
-            if (newZoom >= 0.1 && newZoom <= 10.0) {
-                tab.zoom = newZoom;
-                applyTransform(state.activeTabId);
-            }
-        }
-
-        function resetZoom() {
-            if (!state.activeTabId) return;
-            const tab = state.tabs.find(t => t.id === state.activeTabId);
-            if (!tab || tab.type !== 'image') return;
-
-            tab.zoom = 1.0;
-            tab.panX = 0;
-            tab.panY = 0;
-            applyTransform(state.activeTabId);
-        }
-
-        // Zoom Button Events
-        zoomInBtn.addEventListener('click', () => changeZoom(0.2));
-        zoomOutBtn.addEventListener('click', () => changeZoom(-0.2));
-        zoomResetBtn.addEventListener('click', resetZoom);
-        
-        // Mouse Wheel Zoom
-        document.addEventListener('wheel', (e) => {
-            if (!state.activeTabId) return;
-            const tab = state.tabs.find(t => t.id === state.activeTabId);
-            if (!tab || tab.type !== 'image') return;
-
-            if (e.target.closest('.image-wrapper')) {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -0.1 : 0.1;
-                changeZoom(delta);
-            }
-        }, { passive: false });
-
-
-        // --- DRAG/PAN LOGIC ---
-
-        function handleMouseDown(e) {
-            if (e.button !== 0) return;
-            state.isDragging = true;
-            state.startX = e.clientX;
-            state.startY = e.clientY;
-            
-            const tab = state.tabs.find(t => t.id === state.activeTabId);
-            if(tab) {
-                state.initialPanX = tab.panX;
-                state.initialPanY = tab.panY;
-            }
-        }
-
-        function handleMouseMove(e) {
-            if (!state.isDragging || !state.activeTabId) return;
-            e.preventDefault();
-
-            const dx = e.clientX - state.startX;
-            const dy = e.clientY - state.startY;
-
-            const tab = state.tabs.find(t => t.id === state.activeTabId);
-            if (tab) {
-                tab.panX = state.initialPanX + dx;
-                tab.panY = state.initialPanY + dy;
-                applyTransform(state.activeTabId);
-            }
-        }
-
-        function handleMouseUp() {
-            state.isDragging = false;
-        }
-
-        // Touch support for dragging
-        function handleTouchStart(e) {
-             if (e.touches.length === 1) {
-                 state.isDragging = true;
-                 state.startX = e.touches[0].clientX;
-                 state.startY = e.touches[0].clientY;
-                 const tab = state.tabs.find(t => t.id === state.activeTabId);
-                 if(tab) {
-                    state.initialPanX = tab.panX;
-                    state.initialPanY = tab.panY;
-                 }
-             }
-        }
-        
-        function handleTouchMove(e) {
-            if (!state.isDragging || !state.activeTabId) return;
-            const dx = e.touches[0].clientX - state.startX;
-            const dy = e.touches[0].clientY - state.startY;
-            const tab = state.tabs.find(t => t.id === state.activeTabId);
-            if (tab) {
-                tab.panX = state.initialPanX + dx;
-                tab.panY = state.initialPanY + dy;
-                applyTransform(state.activeTabId);
-            }
-        }
-
-        // Global Listeners for Drag
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        window.addEventListener('touchmove', handleTouchMove, {passive: false});
-        window.addEventListener('touchend', handleMouseUp);
-
-
-        // --- FOCUS MODE LOGIC ---
-        function toggleFocusMode(shouldHide) {
-            if (shouldHide) {
-                const headerHeight = header.offsetHeight;
-                header.style.marginTop = `-${headerHeight}px`;
-                header.classList.add('header-hidden-state');
-                showBtn.style.display = 'flex';
-                state.isFocusMode = true;
-            } else {
-                header.style.marginTop = '0px';
-                header.classList.remove('header-hidden-state');
-                showBtn.style.display = 'none';
-                state.isFocusMode = false;
-            }
-        }
-
-        hideBtn.onclick = () => toggleFocusMode(true);
-        showBtn.onclick = () => toggleFocusMode(false);
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && state.isFocusMode) {
-                toggleFocusMode(false);
-            }
-        });
-
-        // --- NATIVE PDF TOGGLE LOGIC ---
-        nativeToggleBtn.addEventListener('click', () => {
-            state.nativePdfMode = !state.nativePdfMode;
-            nativeToggleBtn.classList.toggle('active', state.nativePdfMode);
-
-            // Re-render active tab if it's a PDF
-            if(state.activeTabId) {
-                const activeTabData = state.tabs.find(t => t.id === state.activeTabId);
-                if(activeTabData && activeTabData.type === 'pdf') {
-                    const container = document.getElementById(`viewer-${activeTabData.id}`);
-                    renderContent(activeTabData.source, 'pdf', container);
-                }
-            }
-        });
-
-
-        // --- GENERAL EVENTS ---
-        newTabBtn.addEventListener('click', () => createTab(`Tab ${state.tabs.length + 1}`));
-
-        function loadUrlInNewTab() {
-            const url = urlInput.value.trim();
-            if (!url) return;
-
-            const type = getResourceType(url);
-            let title = type === 'pdf' ? "Web PDF" : "Web Image";
-            try { title = decodeURIComponent(url.split('/').pop()) || title; } catch(e){}
-
-            createTab(title, url, type);
-            urlInput.value = ''; 
-        }
-
-        loadBtn.onclick = loadUrlInNewTab;
-        urlInput.onkeypress = (e) => { if(e.key === 'Enter') loadUrlInNewTab(); };
-
-        // --- FILE HANDLERS (Separated for PDF and Image) ---
-        
-        function processFile(file) {
-            if (!file) return;
-            const type = getResourceType(null, file);
-            if (type !== 'unknown') {
-                const blobUrl = URL.createObjectURL(file);
-                createTab(file.name, blobUrl, type);
-            } else {
-                alert("Unsupported file format selected.");
-            }
-        }
-
-        pdfInput.onchange = (e) => {
-            const file = e.target.files[0];
-            processFile(file);
-            pdfInput.value = ''; // Reset input so same file can be selected again
+        img.onerror = function () {
+          wrapper.innerHTML = `
+            <div class="image-error">
+              <i data-lucide="image-off" style="width:32px; height:32px;"></i>
+              <p>Failed to load image.<br>The link might be broken or protected.</p>
+            </div>`;
+          lucide.createIcons({ root: wrapper });
         };
 
-        imgInput.onchange = (e) => {
-            const file = e.target.files[0];
-            processFile(file);
-            imgInput.value = ''; // Reset input
-        };
+        wrapper.appendChild(img);
+        container.appendChild(wrapper);
+      }
+    }
 
-        // --- INIT ---
-        createTab('Start', '');
+    // --- ZOOM & PAN LOGIC ---
+    function applyTransform(tabId) {
+      const tab = state.tabs.find(t => t.id === tabId);
+      if (!tab || tab.type !== 'image') return;
+
+      const viewer = document.getElementById(`viewer-${tabId}`);
+      const img = viewer.querySelector('img');
+      if (img) {
+        img.style.transform = `translate(${tab.panX}px, ${tab.panY}px) scale(${tab.zoom})`;
+      }
+      updateZoomUI(tab);
+    }
+
+    function updateZoomUI(tab) {
+      if (!tab) return;
+      zoomLevelText.textContent = Math.round(tab.zoom * 100) + '%';
+    }
+
+    function changeZoom(delta) {
+      if (!state.activeTabId) return;
+      const tab = state.tabs.find(t => t.id === state.activeTabId);
+      if (!tab || tab.type !== 'image') return;
+
+      const newZoom = tab.zoom + delta;
+      if (newZoom >= 0.1 && newZoom <= 10.0) {
+        tab.zoom = newZoom;
+        applyTransform(state.activeTabId);
+      }
+    }
+
+    function resetZoom() {
+      if (!state.activeTabId) return;
+      const tab = state.tabs.find(t => t.id === state.activeTabId);
+      if (!tab || tab.type !== 'image') return;
+
+      tab.zoom = 1.0;
+      tab.panX = 0;
+      tab.panY = 0;
+      applyTransform(state.activeTabId);
+    }
+
+    zoomInBtn.addEventListener('click', () => changeZoom(0.2));
+    zoomOutBtn.addEventListener('click', () => changeZoom(-0.2));
+    zoomResetBtn.addEventListener('click', resetZoom);
+
+    document.addEventListener('wheel', (e) => {
+      if (!state.activeTabId) return;
+      const tab = state.tabs.find(t => t.id === state.activeTabId);
+      if (!tab || tab.type !== 'image') return;
+
+      if (e.target.closest('.image-wrapper')) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        changeZoom(delta);
+      }
+    }, { passive: false });
+
+    // --- DRAG/PAN LOGIC ---
+    function handleMouseDown(e) {
+      if (e.button !== 0) return;
+      state.isDragging = true;
+      state.startX = e.clientX;
+      state.startY = e.clientY;
+
+      const tab = state.tabs.find(t => t.id === state.activeTabId);
+      if (tab) {
+        state.initialPanX = tab.panX;
+        state.initialPanY = tab.panY;
+      }
+    }
+
+    function handleMouseMove(e) {
+      if (!state.isDragging || !state.activeTabId) return;
+      e.preventDefault();
+
+      const dx = e.clientX - state.startX;
+      const dy = e.clientY - state.startY;
+
+      const tab = state.tabs.find(t => t.id === state.activeTabId);
+      if (tab) {
+        tab.panX = state.initialPanX + dx;
+        tab.panY = state.initialPanY + dy;
+        applyTransform(state.activeTabId);
+      }
+    }
+
+    function handleMouseUp() {
+      state.isDragging = false;
+    }
+
+    function handleTouchStart(e) {
+      if (e.touches.length === 1) {
+        state.isDragging = true;
+        state.startX = e.touches[0].clientX;
+        state.startY = e.touches[0].clientY;
+        const tab = state.tabs.find(t => t.id === state.activeTabId);
+        if (tab) {
+          state.initialPanX = tab.panX;
+          state.initialPanY = tab.panY;
+        }
+      }
+    }
+
+    function handleTouchMove(e) {
+      if (!state.isDragging || !state.activeTabId) return;
+      const dx = e.touches[0].clientX - state.startX;
+      const dy = e.touches[0].clientY - state.startY;
+      const tab = state.tabs.find(t => t.id === state.activeTabId);
+      if (tab) {
+        tab.panX = state.initialPanX + dx;
+        tab.panY = state.initialPanY + dy;
+        applyTransform(state.activeTabId);
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleMouseUp);
+
+    // --- FOCUS MODE LOGIC ---
+    function toggleFocusMode(shouldHide) {
+      if (shouldHide) {
+        const headerHeight = header.offsetHeight;
+        header.style.marginTop = `-${headerHeight}px`;
+        header.classList.add('header-hidden-state');
+        showBtn.style.display = 'flex';
+        state.isFocusMode = true;
+      } else {
+        header.style.marginTop = '0px';
+        header.classList.remove('header-hidden-state');
+        showBtn.style.display = 'none';
+        state.isFocusMode = false;
+      }
+    }
+
+    hideBtn.onclick = () => toggleFocusMode(true);
+    showBtn.onclick = () => toggleFocusMode(false);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && state.isFocusMode) {
+        toggleFocusMode(false);
+      }
+    });
+
+    // --- NATIVE PDF TOGGLE LOGIC ---
+    nativeToggleBtn.addEventListener('click', () => {
+      state.nativePdfMode = !state.nativePdfMode;
+      nativeToggleBtn.classList.toggle('active', state.nativePdfMode);
+
+      // Update the title tooltip based on state
+      if (state.nativePdfMode) {
+        nativeToggleBtn.title = 'Mozilla PDF.js: ON (URLs only, local files use default)';
+        showToast(
+          '<strong>Mozilla PDF.js Viewer enabled</strong> — pasted URLs will open in the Mozilla viewer. Local file uploads will use the default viewer.',
+          'info',
+          4000
+        );
+      } else {
+        nativeToggleBtn.title = 'Mozilla PDF.js Viewer (URLs only)';
+        showToast(
+          '<strong>Mozilla PDF.js Viewer disabled</strong> — all PDFs will use the default viewer.',
+          'info',
+          3000
+        );
+      }
+
+      // Re-render active tab if it's a URL-based PDF
+      if (state.activeTabId) {
+        const activeTabData = state.tabs.find(t => t.id === state.activeTabId);
+        if (activeTabData && activeTabData.type === 'pdf' && !activeTabData.isLocal) {
+          const container = document.getElementById(`viewer-${activeTabData.id}`);
+          renderContent(activeTabData.source, 'pdf', container, false);
+        }
+        // If it's a local PDF, no need to re-render — it was already using EmbedPDF
+      }
+    });
+
+    // --- URL LOADING ---
+    function loadUrlInNewTab() {
+      const url = urlInput.value.trim();
+      if (!url) return;
+
+      const type = getResourceType(url);
+      let title = type === 'pdf' ? "Web PDF" : "Web Image";
+      try {
+        const decoded = decodeURIComponent(url.split('/').pop().split('?')[0]);
+        if (decoded) title = decoded;
+      } catch (e) { }
+
+      // URL is always non-local
+      createTab(title, url, type, false);
+      urlInput.value = '';
+    }
+
+    loadBtn.onclick = loadUrlInNewTab;
+    urlInput.onkeypress = (e) => {
+      if (e.key === 'Enter') loadUrlInNewTab();
+    };
+
+    // --- FILE HANDLERS ---
+    function processFile(file) {
+      if (!file) return;
+      const type = getResourceType(null, file);
+      if (type !== 'unknown') {
+        const blobUrl = URL.createObjectURL(file);
+        // Mark as local — this is the key difference
+        createTab(file.name, blobUrl, type, true);
+      } else {
+        showToast(
+          '<strong>Unsupported format</strong> — please select a PDF or image file.',
+          'warn',
+          3500
+        );
+      }
+    }
+
+    pdfInput.onchange = (e) => {
+      const file = e.target.files[0];
+      processFile(file);
+      pdfInput.value = '';
+    };
+
+    imgInput.onchange = (e) => {
+      const file = e.target.files[0];
+      processFile(file);
+      imgInput.value = '';
+    };
+
+    // --- INIT ---
+    createTab('Start', '');
   </script>
-
-
 
 </body>
 
