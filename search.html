@@ -1,117 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Search | BlackICE Academy</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, follow">
+  <meta charset="UTF-8">
 
-<style>
-  body {
-    font-family: system-ui, sans-serif;
-    background: #0b0b0b;
-    color: #fff;
-    margin: 0;
-    padding: 40px;
-  }
-  h1 {
-    margin-bottom: 10px;
-  }
-  input {
-    width: 100%;
-    max-width: 420px;
-    padding: 12px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    border: none;
-  }
-  .result {
-    background: #161616;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-  }
-  .result a {
-    color: #4cc9f0;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  .muted {
-    color: #aaa;
-    font-size: 14px;
-  }
-</style>
+  <!-- SEO Core -->
+  <title>Search | BlackICE Academy</title>
+  <meta name="description" content="Search cybersecurity labs, CTF challenges, and learning resources on BlackICE Academy.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Keep this for search pages -->
+  <meta name="robots" content="noindex, follow">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://blackice-ac.vercel.app/search">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Algolia -->
+  <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter Tight', sans-serif;
+      background: #ffffff;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+      margin-top: 100px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .search-bar {
+      display: flex;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 0 16px;
+      border: none;
+      background: #111;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .results {
+      margin-top: 24px;
+    }
+
+    .card {
+      padding: 14px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 17px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .no-results {
+      color: #999;
+      font-size: 14px;
+    }
+  </style>
 </head>
 
 <body>
+  <main class="container">
+    <h1>Search</h1>
 
-<h1>Search BlackICE Academy</h1>
-<p class="muted">Results for your query</p>
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Search articles..." aria-label="Search">
+      <button onclick="performSearch()">Search</button>
+    </div>
 
-<input type="search" id="searchInput" placeholder="Search labs, CTFs, courses…" />
+    <div class="status" id="status"></div>
+    <div class="results" id="results"></div>
+  </main>
 
-<div id="results"></div>
+  <script>
+    const client = algoliasearch('32XIY8ASEP', '9cbdb11ece674b4ff5d0b923ac738745');
+    const index = client.initIndex('blacice_vercel_blog_pages');
 
-<script>
-  // Sample searchable data (expand anytime)
-  const data = [
-    {
-      title: "Web Hacking Lab",
-      description: "Practice SQLi, XSS, CSRF and authentication flaws.",
-      url: "/Home.html"
-    },
-    {
-      title: "CTF Challenges",
-      description: "Live capture-the-flag challenges with real exploits.",
-      url: "/projects.html"
-    },
-    {
-      title: "Blue Team Defense",
-      description: "Learn monitoring, detection, and incident response.",
-      url: "/index.html"
+    async function performSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      const resultsDiv = document.getElementById('results');
+      const statusDiv = document.getElementById('status');
+
+      if (!query) {
+        resultsDiv.innerHTML = "";
+        statusDiv.innerText = "Type something to search...";
+        return;
+      }
+
+      statusDiv.innerText = "Searching...";
+      resultsDiv.innerHTML = "";
+
+      try {
+        const { hits } = await index.search(query);
+
+        if (hits.length === 0) {
+          statusDiv.innerText = "";
+          resultsDiv.innerHTML = '<p class="no-results">No results found.</p>';
+          return;
+        }
+
+        statusDiv.innerText = hits.length + " result(s) found";
+
+        resultsDiv.innerHTML = hits.map(hit => `
+          <div class="card">
+            <h3>${hit.title || "Untitled"}</h3>
+            <p>${hit.description || ""}</p>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        statusDiv.innerText = "Error fetching results.";
+        console.error(error);
+      }
     }
-  ];
 
-  const params = new URLSearchParams(window.location.search);
-  const query = params.get("q") || "";
-
-  const input = document.getElementById("searchInput");
-  const resultsBox = document.getElementById("results");
-
-  input.value = query;
-
-  function renderResults(searchTerm) {
-    resultsBox.innerHTML = "";
-    if (!searchTerm) return;
-
-    const matches = data.filter(item =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (matches.length === 0) {
-      resultsBox.innerHTML = "<p class='muted'>No results found.</p>";
-      return;
-    }
-
-    matches.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "result";
-      div.innerHTML = `
-        <a href="${item.url}">${item.title}</a>
-        <p class="muted">${item.description}</p>
-      `;
-      resultsBox.appendChild(div);
+    // Enter key support
+    document.getElementById("searchInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        performSearch();
+      }
     });
-  }
-
-  input.addEventListener("input", e => {
-    renderResults(e.target.value);
-  });
-
-  renderResults(query);
-</script>
-
+  </script>
 </body>
 </html>
