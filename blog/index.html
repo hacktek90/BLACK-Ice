@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — All Posts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #09090b; color: #ffffff; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+        /* Noise overlay */
+        .noise::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.15;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-150 { animation-delay: 150ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-250 { animation-delay: 250ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-350 { animation-delay: 350ms; }
+        .delay-400 { animation-delay: 400ms; }
+        .delay-450 { animation-delay: 450ms; }
+        .delay-500 { animation-delay: 500ms; }
+        .delay-550 { animation-delay: 550ms; }
+        .delay-600 { animation-delay: 600ms; }
+        .delay-650 { animation-delay: 650ms; }
+        .delay-700 { animation-delay: 700ms; }
+        .delay-750 { animation-delay: 750ms; }
+        .delay-800 { animation-delay: 800ms; }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .shimmer-text {
+            background: linear-gradient(to right, #ffffff, #a1a1aa, #ffffff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .pulse-glow { animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+        /* Card hover */
+        .blog-card {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .blog-card:hover {
+            transform: translateY(-4px);
+            border-color: #3f3f46;
+            background: rgba(39, 39, 42, 0.5);
+        }
+        .blog-card:hover .card-arrow {
+            transform: translateX(4px);
+            opacity: 1;
+        }
+        .blog-card:hover .card-title {
+            color: #ffffff;
+        }
+        .blog-card:hover .card-index {
+            color: #a78bfa;
+        }
+        .blog-card:hover .card-line {
+            transform: scaleX(1);
+        }
+
+        .card-arrow {
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+        .card-title {
+            transition: color 0.3s ease;
+            color: #d4d4d8;
+        }
+        .card-index {
+            transition: color 0.3s ease;
+            color: #3f3f46;
+        }
+        .card-line {
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Tag styles */
+        .tag-tech { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: #818cf8; }
+        .tag-sports { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #34d399; }
+        .tag-news { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2); color: #fb923c; }
+        .tag-physics { background: rgba(167, 139, 250, 0.1); border: 1px solid rgba(167, 139, 250, 0.2); color: #a78bfa; }
+        .tag-nature { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.2); color: #6ee7b7; }
+        .tag-govt { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .tag-notebook { background: rgba(244, 114, 182, 0.1); border: 1px solid rgba(244, 114, 182, 0.2); color: #f472b6; }
+        .tag-showcase { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: #38bdf8; }
+        .tag-ad { background: rgba(251, 146, 60, 0.1); border: 1px solid rgba(251, 146, 60, 0.2); color: #fb923c; }
+
+        /* Filter buttons */
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #3f3f46;
+        }
+        .filter-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #52525b;
+            color: #ffffff;
+        }
+
+        /* Search */
+        .search-input:focus {
+            border-color: #3f3f46;
+            outline: none;
+            box-shadow: 0 0 0 1px rgba(63, 63, 70, 0.5);
+        }
+
+        /* Hero gradient text */
+        .hero-gradient {
+            background: linear-gradient(to bottom, #a1a1aa, #3f3f46);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Background glow */
+        .bg-glow {
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(99,102,241,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Stats counter */
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Toast */
+        .toast {
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="noise min-h-screen relative">
+
+    <!-- Background Glow -->
+    <div class="bg-glow"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5" style="backdrop-filter: blur(12px); background: rgba(9,9,11,0.8);">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                    <span class="text-black text-sm font-semibold">B</span>
+                </div>
+                <span class="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">blog</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="#" class="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">About</a>
+                <a href="#" class="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">Projects</a>
+                <a href="#" class="h-8 px-4 bg-white text-black text-xs font-medium rounded-full flex items-center hover:bg-zinc-200 transition-colors">
+                    <span class="iconify mr-1.5" data-icon="ph:github-logo-bold" data-width="14"></span>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-16 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="w-1.5 h-1.5 rounded-full bg-green-500 pulse-glow"></div>
+                    <span class="text-xs font-medium text-zinc-500 uppercase tracking-wider mono">All Posts</span>
+                </div>
+            </div>
+            <h1 class="text-5xl sm:text-6xl font-semibold tracking-tight leading-[1.1] mb-4 fade-in-up delay-100">
+                <span class="shimmer-text">My Blog</span>
+            </h1>
+            <p class="text-zinc-400 text-sm leading-relaxed max-w-lg fade-in-up delay-200">
+                A collection of thoughts, projects, and explorations across tech, sports, science, and more. Dive into whatever catches your eye.
+            </p>
+
+            <!-- Stats -->
+            <div class="flex gap-8 mt-10 fade-in-up delay-300">
+                <div>
+                    <div class="stat-number text-2xl font-semibold text-white" id="postCount">14</div>
+                    <div class="text-xs text-zinc-600 mt-1">Posts</div>
+                </div>
+                <div class="w-px bg-zinc-800"></div>
+                <div>
+                    <div class="stat-number text-2xl font-semibold text-white">6</div>
+                    <div class="text-xs text-zinc-600 mt-1">Categories</div>
+                </div>
+                <div class="w-px bg-zinc-800"></div>
+                <div>
+                    <div class="stat-number text-2xl font-semibold text-white">∞</div>
+                    <div class="text-xs text-zinc-600 mt-1">Curiosity</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search & Filters -->
+    <section class="px-6 pb-8 fade-in-up delay-350">
+        <div class="max-w-6xl mx-auto">
+            <!-- Search -->
+            <div class="relative mb-6">
+                <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" data-icon="ph:magnifying-glass" data-width="16"></span>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search posts..."
+                    class="search-input w-full sm:w-80 bg-zinc-900/50 border border-zinc-800 rounded-xl pl-11 pr-4 py-2.5 text-sm text-zinc-300 placeholder-zinc-600 transition-all"
+                />
+            </div>
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2" id="filterContainer">
+                <button class="filter-btn active text-xs font-medium px-3 py-1.5 rounded-full border border-zinc-800 text-zinc-400" data-filter="all">
+                    All
+                </button>
+                <button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full border border-transparent text-zinc-600" data-filter="tech">
+                    <span class="iconify inline-block mr-1 -mt-0.5" data-icon="ph:code" data-width="12"></span>Tech
+                </button>
+                <button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full border border-transparent text-zinc-600" data-filter="sports">
+                    <span class="iconify inline-block mr-1 -mt-0.5" data-icon="ph:trophy" data-width="12"></span>Sports
+                </button>
+                <button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full border border-transparent text-zinc-600" data-filter="news">
+                    <span class="iconify inline-block mr-1 -mt-0.5" data-icon="ph:newspaper" data-width="12"></span>News
+                </button>
+                <button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full border border-transparent text-zinc-600" data-filter="science">
+                    <span class="iconify inline-block mr-1 -mt-0.5" data-icon="ph:atom" data-width="12"></span>Science
+                </button>
+                <button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full border border-transparent text-zinc-600" data-filter="nature">
+                    <span class="iconify inline-block mr-1 -mt-0.5" data-icon="ph:leaf" data-width="12"></span>Nature
+                </button>
+                <button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full border border-transparent text-zinc-600" data-filter="other">
+                    <span class="iconify inline-block mr-1 -mt-0.5" data-icon="ph:dots-three" data-width="12"></span>Other
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog List -->
+    <main class="px-6 pb-32">
+        <div class="max-w-6xl mx-auto">
+            <div class="space-y-2" id="blogList">
+
+                <!-- Card 1 -->
+                <a href="aiinfra.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="tech" data-title="AI Infrastructure">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">01</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">AI Infrastructure</h3>
+                                    <span class="tag-tech text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">TECH</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Exploring the foundations and architecture behind modern AI systems and infrastructure.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">aiinfra.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 2 -->
+                <a href="/blog/autoytplaylist.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="tech" data-title="Auto YouTube Playlist">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">02</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Auto YouTube Playlist</h3>
+                                    <span class="tag-tech text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">TECH</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Automating YouTube playlist creation and management with code.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">autoytplaylist.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 3 -->
+                <a href="/blog/banvspak.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="sports" data-title="Bangladesh vs Pakistan">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-emerald-500/50 via-green-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">03</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Bangladesh vs Pakistan</h3>
+                                    <span class="tag-sports text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">SPORTS</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Cricket match coverage and analysis of Bangladesh vs Pakistan.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">banvspak.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 4 -->
+                <a href="/blog/banvspakscore.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="sports" data-title="Bangladesh vs Pakistan Score">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-emerald-500/50 via-green-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">04</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Bangladesh vs Pakistan — Score</h3>
+                                    <span class="tag-sports text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">SPORTS</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Full scorecard and match breakdown of the BAN vs PAK encounter.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">banvspakscore.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 5 -->
+                <a href="/blog/blackiceshowcase.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="other" data-title="Black Ice Showcase">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-sky-500/50 via-blue-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">05</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Black Ice Showcase</h3>
+                                    <span class="tag-showcase text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">SHOWCASE</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">A visual showcase of the Black Ice project or design concept.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">blackiceshowcase.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 6 -->
+                <a href="/blog/framead.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="other" data-title="Frame Ad">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-orange-500/50 via-amber-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">06</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Frame Ad</h3>
+                                    <span class="tag-ad text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">AD</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Exploring framed advertisement layouts and creative implementations.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">framead.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 7 -->
+                <a href="/blog/FreeFallKinematics" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="science" data-title="Free Fall Kinematics">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-purple-500/50 via-violet-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">07</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Free Fall Kinematics</h3>
+                                    <span class="tag-physics text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">PHYSICS</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Understanding the physics of free fall — equations, derivations, and real-world applications.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">FreeFallKinematics</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 8 -->
+                <a href="/blog/hello.ipynb" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="tech" data-title="Hello Notebook">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-pink-500/50 via-rose-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">08</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Hello Notebook</h3>
+                                    <span class="tag-notebook text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">NOTEBOOK</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">A Jupyter notebook — likely an introductory exploration or quick experiment.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">hello.ipynb</span>
+                                    <span class="iconify text-zinc-700" data-icon="ph:jupyter-logo" data-width="12"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 9 -->
+                <a href="/blog/iranwar.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="news" data-title="Iran War">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-orange-500/50 via-red-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">09</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Iran War</h3>
+                                    <span class="tag-news text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">NEWS</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Coverage and analysis of the Iran conflict and its geopolitical implications.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">iranwar.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 10 -->
+                <a href="/blog/perplexitynews.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="news" data-title="Perplexity News">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-orange-500/50 via-red-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">10</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Perplexity News</h3>
+                                    <span class="tag-news text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">NEWS</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">News and updates about Perplexity AI and the search engine landscape.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">perplexitynews.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 11 -->
+                <a href="/blog/pmkisan.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="other" data-title="PM Kisan">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-yellow-500/50 via-amber-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">11</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">PM Kisan</h3>
+                                    <span class="tag-govt text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">GOVT</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Information about the PM Kisan Samman Nidhi scheme and related details.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">pmkisan.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 12 -->
+                <a href="/blog/python--sqlcompiller.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="tech" data-title="Python SQL Compiler">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">12</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Python SQL Compiler</h3>
+                                    <span class="tag-tech text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">TECH</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Building a SQL compiler using Python — parsing, optimization, and execution.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">python--sqlcompiller.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 13 -->
+                <a href="/blog/savenature.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="nature" data-title="Save Nature">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-emerald-500/50 via-green-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">13</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">Save Nature</h3>
+                                    <span class="tag-nature text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">NATURE</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Thoughts and initiatives on environmental conservation and protecting our planet.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">savenature.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+                <!-- Card 14 -->
+                <a href="/blog/southafricawomenvsnewzealandwomen.html" class="blog-card block p-5 sm:p-6 rounded-2xl border border-white/5 bg-transparent relative overflow-hidden group" data-category="sports" data-title="South Africa Women vs New Zealand Women">
+                    <div class="card-line absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-emerald-500/50 via-green-500/50 to-transparent"></div>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                            <span class="card-index mono text-xs font-medium mt-1 shrink-0">14</span>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 mb-2">
+                                    <h3 class="card-title text-base sm:text-lg font-medium tracking-tight truncate">SA Women vs NZ Women</h3>
+                                    <span class="tag-sports text-[10px] font-medium mono px-2 py-0.5 rounded-full shrink-0">SPORTS</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">Women's cricket match coverage — South Africa Women taking on New Zealand Women.</p>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span class="text-[10px] text-zinc-700 mono">southafricawomenvsnewzealandwomen.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="iconify card-arrow text-zinc-500 mt-1.5 shrink-0" data-icon="ph:arrow-right" data-width="16"></span>
+                    </div>
+                </a>
+
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-24">
+                <span class="iconify text-zinc-700 mx-auto mb-4" data-icon="ph:magnifying-glass-minus" data-width="48"></span>
+                <p class="text-zinc-500 text-sm">No posts match your search.</p>
+                <button id="clearSearch" class="mt-4 text-xs text-zinc-400 underline underline-offset-4 hover:text-white transition-colors">Clear search</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 px-6 py-8">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="text-xs text-zinc-700 mono">© 2025</span>
+            <div class="flex items-center gap-1 text-xs text-zinc-700">
+                Built with
+                <span class="iconify text-zinc-600 mx-0.5" data-icon="ph:heart-fill" data-width="10"></span>
+                and curiosity
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-xs text-zinc-300 flex items-center gap-2">
+        <span class="iconify text-zinc-400" data-icon="ph:info" data-width="14"></span>
+        <span id="toastMsg">Filter applied</span>
+    </div>
+
+    <script>
+        // Filter functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.blog-card');
+        const searchInput = document.getElementById('searchInput');
+        const emptyState = document.getElementById('emptyState');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const postCountEl = document.getElementById('postCount');
+
+        let activeFilter = 'all';
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const category = card.dataset.category;
+                const title = card.dataset.title.toLowerCase();
+                const filename = card.querySelector('.mono.text-\\[10px\\]')?.textContent.toLowerCase() || '';
+
+                const matchesFilter = activeFilter === 'all' || category === activeFilter;
+                const matchesSearch = !query || title.includes(query) || filename.includes(query);
+
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = '';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    requestAnimationFrame(() => {
+                        card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    });
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            postCountEl.textContent = visibleCount;
+            emptyState.classList.toggle('hidden', visibleCount > 0);
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.dataset.filter;
+
+                const labels = {
+                    all: 'Showing all posts',
+                    tech: 'Filtered: Tech',
+                    sports: 'Filtered: Sports',
+                    news: 'Filtered: News',
+                    science: 'Filtered: Science',
+                    nature: 'Filtered: Nature',
+                    other: 'Filtered: Other'
+                };
+                showToast(labels[activeFilter] || 'Filter applied');
+                applyFilters();
+            });
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            applyFilters();
+            searchInput.focus();
+        });
+
+        // Keyboard shortcut: focus search with "/"
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.blur();
+            }
+        });
+
+        // Add stagger animations on load
+        document.addEventListener('DOMContentLoaded', () => {
+            cards.forEach((card, i) => {
+                card.classList.add(`delay-${Math.min(i * 50 + 400, 800)}`, 'fade-in-up');
+            });
+        });
+    </script>
+</body>
+</html>
