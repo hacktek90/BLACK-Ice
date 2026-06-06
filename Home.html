@@ -552,13 +552,21 @@
           <form class="search-bar" onsubmit="handleSearch(event, 'standard')" aria-label="Search the web">
             <div class="engine-selector">
               <select id="engine-select" onchange="updateUI()" aria-label="Select Search Engine">
-                <!-- Reordered: Ecosia, Startpage, DuckDuckGo -->
+                <!-- Brave Search (Added) -->
+                <option value="https://search.brave.com/search?q=%s" data-domain="search.brave.com" data-ai-url="https://search.brave.com/chat?q=%s">Brave Search</option>
+                
+                <!-- Perplexity AI (Added) -->
+                <option value="https://www.perplexity.ai/search?q=%s" data-domain="www.perplexity.ai" data-ai-url="https://www.perplexity.ai/search?q=%s">Perplexity AI</option>
+                
+                <!-- Ecosia (Moved Down) -->
                 <option value="https://www.ecosia.org/search?q=%s" data-domain="www.ecosia.org" data-ai-url="">Ecosia</option>
+                
+                <!-- Existing Engines -->
                 <option value="https://www.startpage.com/do/search?q=%s" data-domain="www.startpage.com" data-ai-url="">Startpage</option>
                 <option value="https://duckduckgo.com/?q=%s" data-domain="duckduckgo.com" data-ai-url="https://duck.ai/chat?q=%s">DuckDuckGo</option>
               </select>
-              <!-- Default icon updated to Ecosia -->
-              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=www.ecosia.org&sz=32" alt="Search Engine Icon">
+              <!-- Default icon updated to Brave -->
+              <img id="engine-favicon" class="engine-icon" src="https://www.google.com/s2/favicons?domain=search.brave.com&sz=32" alt="Search Engine Icon">
               <svg class="selector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <input type="text" id="search-query" class="search-input" placeholder="Search the web..." required autocomplete="off" aria-label="Search Query">
