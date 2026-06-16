@@ -236,8 +236,15 @@
 
         .pane-actions {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
+        }
+
+        .pane-actions .separator {
+            width: 1px;
+            height: 16px;
+            background: var(--border);
+            margin: 0 4px;
         }
 
         .device-select {
@@ -603,7 +610,7 @@
             <button class="nav-btn" id="sample-btn" title="Load Sample"><i class="ph ph-file-code"></i></button>
             <button class="nav-btn" id="clear-btn" title="Clear Code"><i class="ph ph-trash"></i></button>
             <div style="height: 1px; width: 24px; background: var(--border); margin: 4px 0;"></div>
-            <!-- NEW: FETCH BUTTON -->
+            <!-- FETCH BUTTON -->
             <button class="nav-btn" id="fetch-modal-btn" title="Fetch from URL"><i class="ph ph-globe"></i></button>
             <button class="nav-btn" id="import-btn" title="Import HTML"><i class="ph ph-upload-simple"></i></button>
             <button class="nav-btn" id="export-btn" title="Export HTML"><i class="ph ph-download-simple"></i></button>
@@ -620,8 +627,11 @@
             <header class="pane-header">
                 <div class="pane-title"><i class="ph ph-pencil-simple"></i> Monaco Editor</div>
                 <div class="pane-actions">
-                    <button class="icon-btn" id="find-btn" title="Find (Ctrl+F)"><i class="ph ph-magnifying-glass"></i></button>
-                    <button class="icon-btn" id="copy-btn" title="Copy All"><i class="ph ph-copy"></i></button>
+                    <button class="icon-btn" id="undo-btn" title="Undo (Ctrl+Z)"><i class="ph ph-arrow-counter-clockwise" style="font-size:14px"></i></button>
+                    <button class="icon-btn" id="redo-btn" title="Redo (Ctrl+Y)"><i class="ph ph-arrow-clockwise" style="font-size:14px"></i></button>
+                    <div class="separator"></div>
+                    <button class="icon-btn" id="find-btn" title="Find (Ctrl+F)"><i class="ph ph-magnifying-glass" style="font-size:14px"></i></button>
+                    <button class="icon-btn" id="copy-btn" title="Copy All"><i class="ph ph-copy" style="font-size:14px"></i></button>
                 </div>
             </header>
             <div class="pane-content">
@@ -643,9 +653,9 @@
                         <option value="360x800">Samsung S22 (360x800)</option>
                         <option value="768x1024">iPad Mini (768x1024)</option>
                     </select>
-                    <button class="icon-btn active" id="desktop-btn" title="Desktop View"><i class="ph ph-monitor"></i></button>
-                    <button class="icon-btn" id="mobile-btn" title="Mobile View"><i class="ph ph-device-mobile"></i></button>
-                    <button class="icon-btn" id="newtab-btn" title="Open in New Tab"><i class="ph ph-arrow-square-out"></i></button>
+                    <button class="icon-btn active" id="desktop-btn" title="Desktop View"><i class="ph ph-monitor" style="font-size:14px"></i></button>
+                    <button class="icon-btn" id="mobile-btn" title="Mobile View"><i class="ph ph-device-mobile" style="font-size:14px"></i></button>
+                    <button class="icon-btn" id="newtab-btn" title="Open in New Tab"><i class="ph ph-arrow-square-out" style="font-size:14px"></i></button>
                 </div>
             </header>
             <div class="pane-content">
@@ -659,6 +669,8 @@
     <nav class="mobile-nav">
         <button class="mobile-tab active" data-tab="editor"><i class="ph ph-code" style="font-size: 20px;"></i></button>
         <button class="mobile-tab" data-tab="preview"><i class="ph ph-eye" style="font-size: 20px;"></i></button>
+        <button class="mobile-tab" id="mobile-undo-btn" title="Undo"><i class="ph ph-arrow-counter-clockwise" style="font-size: 20px;"></i></button>
+        <button class="mobile-tab" id="mobile-redo-btn" title="Redo"><i class="ph ph-arrow-clockwise" style="font-size: 20px;"></i></button>
         <button class="mobile-tab" id="mobile-clear-btn"><i class="ph ph-trash" style="font-size: 20px;"></i></button>
         <button class="mobile-tab" id="mobile-theme-btn"><i class="ph ph-moon" style="font-size: 20px;"></i></button>
     </nav>
@@ -1068,6 +1080,20 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 let editor;
 let debounceTimer;
 
+// Perform undo via Monaco API
+function performUndo() {
+    if (!editor) return;
+    editor.trigger('toolbar', 'undo');
+    editor.focus();
+}
+
+// Perform redo via Monaco API
+function performRedo() {
+    if (!editor) return;
+    editor.trigger('toolbar', 'redo');
+    editor.focus();
+}
+
 // --- MONACO CONFIGURATION ---
 require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
 
@@ -1328,10 +1354,10 @@ function initMobileTabs() {
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            if(tab.id === 'mobile-theme-btn' || tab.id === 'mobile-clear-btn') { return; }
+            if(tab.id === 'mobile-theme-btn' || tab.id === 'mobile-clear-btn' || tab.id === 'mobile-undo-btn' || tab.id === 'mobile-redo-btn') { return; }
             
             tabs.forEach(t => { 
-                if(t.id !== 'mobile-theme-btn' && t.id !== 'mobile-clear-btn') t.classList.remove('active'); 
+                if(t.id !== 'mobile-theme-btn' && t.id !== 'mobile-clear-btn' && t.id !== 'mobile-undo-btn' && t.id !== 'mobile-redo-btn') t.classList.remove('active'); 
             });
             tab.classList.add('active');
 
@@ -1358,7 +1384,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Theme Check
     if (localStorage.getItem('theme') === 'light') toggleTheme();
 
-    // Button Bindings
+    // Wire up Undo / Redo buttons
+    document.getElementById('undo-btn').addEventListener('click', performUndo);
+    document.getElementById('redo-btn').addEventListener('click', performRedo);
+    document.getElementById('mobile-undo-btn').addEventListener('click', performUndo);
+    document.getElementById('mobile-redo-btn').addEventListener('click', performRedo);
+
+    // Existing Button Bindings
     document.getElementById('format-btn').addEventListener('click', formatCode);
     
     document.getElementById('sample-btn').addEventListener('click', () => {
