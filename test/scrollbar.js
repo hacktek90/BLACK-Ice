@@ -9,7 +9,8 @@
         searchEngines: {
             brave: 'https://search.brave.com/search?q=',
             duck: 'https://duckduckgo.com/?q=',
-            bing: 'https://www.bing.com/search?q='
+            bing: 'https://www.bing.com/search?q=',
+            perplexity: 'https://www.perplexity.ai/search?q=' // Added Perplexity
         }
     };
 
@@ -177,7 +178,7 @@
     const omniInput = document.createElement('input');
     omniInput.id = 'scifi-omnibox';
     omniInput.type = 'text';
-    omniInput.placeholder = 'Type :brave, :duck, or :bing followed by your query...';
+    omniInput.placeholder = 'Type :brave, :duck, :bing, or :perplexity followed by your query...'; // Updated placeholder
     omniInput.autocomplete = 'off';
     
     const omniEngine = document.createElement('div');
@@ -238,6 +239,9 @@
             } else if (val.startsWith(':bing ')) {
                 const query = val.substring(6);
                 url = query ? CONFIG.searchEngines.bing + encodeURIComponent(query) : 'https://www.bing.com';
+            } else if (val.startsWith(':perplexity ')) { // Added Perplexity logic
+                const query = val.substring(12);
+                url = query ? CONFIG.searchEngines.perplexity + encodeURIComponent(query) : 'https://www.perplexity.ai';
             }
 
             if (url) {
@@ -259,6 +263,9 @@
             omniEngine.style.opacity = '1';
         } else if (val.startsWith(':bing')) {
             omniEngine.innerText = 'BING';
+            omniEngine.style.opacity = '1';
+        } else if (val.startsWith(':perplexity')) { // Added Perplexity visual feedback
+            omniEngine.innerText = 'PERPLEXITY';
             omniEngine.style.opacity = '1';
         } else {
             omniEngine.style.opacity = '0';
