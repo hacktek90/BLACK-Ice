@@ -264,7 +264,7 @@
         } else if (val.startsWith(':bing')) {
             omniEngine.innerText = 'BING';
             omniEngine.style.opacity = '1';
-        } else if (val.startsWith(':perplexity')) { // Added Perplexity visual feedback
+        } else if (val.startsWith(':perp')) { // Added Perplexity visual feedback
             omniEngine.innerText = 'PERPLEXITY';
             omniEngine.style.opacity = '1';
         } else {
