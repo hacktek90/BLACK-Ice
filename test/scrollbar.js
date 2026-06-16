@@ -1,12 +1,16 @@
 (function() {
     // --- CONFIGURATION ---
-    // You can change these colors to match your brand
     const CONFIG = {
         color: '#00f3ff',        // Neon Cyan (Sci-Fi Default)
         glow: '0 0 10px #00f3ff', // Glow effect
         width: '6px',            // Thickness of the rail
         zIndex: 99999,           // Ensures it sits on top
-        speed: 0.08              // Physics friction: Lower = heavier/slower, Higher = snappier
+        speed: 0.08,             // Physics friction: Lower = heavier/slower, Higher = snappier
+        searchEngines: {
+            brave: 'https://search.brave.com/search?q=',
+            duck: 'https://duckduckgo.com/?q=',
+            bing: 'https://www.bing.com/search?q='
+        }
     };
 
     // --- 1. PREVENT DUPLICATION ---
@@ -20,7 +24,7 @@
         html, body {
             margin: 0 !important;
             padding: 0 !important;
-            overflow-x: hidden !important; /* Prevent horizontal glitch */
+            overflow-x: hidden !important;
         }
         
         /* Webkit (Chrome, Safari, Edge) */
@@ -45,7 +49,7 @@
             width: ${CONFIG.width};
             background: rgba(255, 255, 255, 0.05);
             z-index: ${CONFIG.zIndex};
-            pointer-events: none; /* Let clicks pass through */
+            pointer-events: none;
         }
 
         #scifi-puck {
@@ -53,13 +57,11 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 0%; /* JS controls this */
+            height: 0%;
             background: ${CONFIG.color};
             box-shadow: ${CONFIG.glow};
             border-radius: 99px;
-            will-change: height; /* Performance optimization */
-            
-            /* The Sci-Fi Segmented/Dashed Effect */
+            will-change: height;
             background-image: linear-gradient(
                 to bottom,
                 ${CONFIG.color} 50%,
@@ -68,7 +70,6 @@
             background-size: 100% 4px; 
         }
 
-        /* Glowing "Head" of the puck */
         #scifi-puck::after {
             content: '';
             position: absolute;
@@ -78,6 +79,81 @@
             height: 2px;
             background: #fff;
             box-shadow: 0 0 8px #fff;
+        }
+
+        /* --- OMNIBOX SEARCH STYLES --- */
+        #scifi-omnibox-container {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: ${CONFIG.zIndex + 1};
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 15vh;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        #scifi-omnibox-container.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        #scifi-omnibox-wrapper {
+            position: relative;
+            width: 600px;
+            max-width: 90%;
+            animation: scifi-drop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.15);
+        }
+
+        @keyframes scifi-drop {
+            from { transform: translateY(-30px) scaleY(0.8); opacity: 0; }
+            to { transform: translateY(0) scaleY(1); opacity: 1; }
+        }
+
+        #scifi-omnibox {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(5, 5, 15, 0.95);
+            border: 1px solid ${CONFIG.color};
+            box-shadow: ${CONFIG.glow}, 0 0 40px rgba(0, 243, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            color: #fff;
+            outline: none;
+            caret-color: ${CONFIG.color};
+        }
+
+        #scifi-omnibox::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        #scifi-omnibox-engine {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: ${CONFIG.color};
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            text-shadow: ${CONFIG.glow};
+        }
+
+        #scifi-omnibox-hint {
+            text-align: center;
+            margin-top: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
         }
     `;
     document.head.appendChild(style);
@@ -91,25 +167,126 @@
     puck.id = 'scifi-puck';
     rail.appendChild(puck);
 
-    // --- 4. PHYSICS ENGINE ---
+    // Omnibox DOM
+    const omniContainer = document.createElement('div');
+    omniContainer.id = 'scifi-omnibox-container';
+    
+    const omniWrapper = document.createElement('div');
+    omniWrapper.id = 'scifi-omnibox-wrapper';
+    
+    const omniInput = document.createElement('input');
+    omniInput.id = 'scifi-omnibox';
+    omniInput.type = 'text';
+    omniInput.placeholder = 'Type :brave, :duck, or :bing followed by your query...';
+    omniInput.autocomplete = 'off';
+    
+    const omniEngine = document.createElement('div');
+    omniEngine.id = 'scifi-omnibox-engine';
+    
+    const omniHint = document.createElement('div');
+    omniHint.id = 'scifi-omnibox-hint';
+    omniHint.innerText = 'PRESS ENTER TO SEARCH • ESC TO CLOSE';
+
+    omniWrapper.appendChild(omniInput);
+    omniWrapper.appendChild(omniEngine);
+    omniContainer.appendChild(omniWrapper);
+    omniContainer.appendChild(omniHint);
+    document.body.appendChild(omniContainer);
+
+
+    // --- 4. OMNIBOX LOGIC ---
+    function openOmniBox() {
+        omniContainer.classList.add('active');
+        omniInput.value = ':';
+        omniInput.focus();
+    }
+
+    function closeOmniBox() {
+        omniContainer.classList.remove('active');
+        omniInput.value = '';
+        omniEngine.style.opacity = '0';
+        omniEngine.innerText = '';
+    }
+
+    // Listen for ":" key globally to open the search bar
+    document.addEventListener('keydown', (e) => {
+        // Ignore if user is already typing in an input/textarea
+        const tag = e.target.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+
+        if (e.key === ':') {
+            e.preventDefault(); // Prevent typing ':' into the main page
+            openOmniBox();
+        }
+    });
+
+    // Handle interactions inside the Omnibox
+    omniInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeOmniBox();
+        } else if (e.key === 'Enter') {
+            const val = omniInput.value.trim();
+            let url = null;
+
+            // Parse commands
+            if (val.startsWith(':brave ')) {
+                const query = val.substring(7);
+                url = query ? CONFIG.searchEngines.brave + encodeURIComponent(query) : 'https://search.brave.com';
+            } else if (val.startsWith(':duck ')) {
+                const query = val.substring(6);
+                url = query ? CONFIG.searchEngines.duck + encodeURIComponent(query) : 'https://duckduckgo.com';
+            } else if (val.startsWith(':bing ')) {
+                const query = val.substring(6);
+                url = query ? CONFIG.searchEngines.bing + encodeURIComponent(query) : 'https://www.bing.com';
+            }
+
+            if (url) {
+                window.open(url, '_blank'); // Open in new tab
+            }
+            
+            closeOmniBox();
+        }
+    });
+
+    // Dynamic visual feedback as user types the engine name
+    omniInput.addEventListener('input', () => {
+        const val = omniInput.value.toLowerCase();
+        if (val.startsWith(':brave')) {
+            omniEngine.innerText = 'BRAVE';
+            omniEngine.style.opacity = '1';
+        } else if (val.startsWith(':duck')) {
+            omniEngine.innerText = 'DUCK';
+            omniEngine.style.opacity = '1';
+        } else if (val.startsWith(':bing')) {
+            omniEngine.innerText = 'BING';
+            omniEngine.style.opacity = '1';
+        } else {
+            omniEngine.style.opacity = '0';
+        }
+    });
+
+    // Close if clicking the dark background outside the search box
+    omniContainer.addEventListener('click', (e) => {
+        if (e.target === omniContainer) {
+            closeOmniBox();
+        }
+    });
+
+
+    // --- 5. PHYSICS ENGINE ---
     let currentScroll = 0;
     let targetScroll = 0;
     
     function animate() {
-        // Get target scroll position
         targetScroll = window.scrollY || window.pageYOffset;
-        
-        // Get page height dynamically (in case content changes via AJAX)
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         
-        // Prevent division by zero on short pages
         if (docHeight <= 0) {
             puck.style.height = '0%';
             requestAnimationFrame(animate);
             return;
         }
 
-        // Linear Interpolation (Lerp) for inertia
         const diff = targetScroll - currentScroll;
         
         if (Math.abs(diff) > 0.1) {
@@ -118,16 +295,11 @@
             currentScroll = targetScroll;
         }
 
-        // Calculate percentage height
         const scrollPercent = (currentScroll / docHeight) * 100;
-        
-        // Clamp between 0 and 100 to prevent visual glitches
         const safePercent = Math.min(Math.max(scrollPercent, 0), 100);
 
-        // Apply to DOM
         puck.style.height = `${safePercent}%`;
 
-        // Loop
         requestAnimationFrame(animate);
     }
 
