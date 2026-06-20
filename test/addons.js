@@ -10,7 +10,7 @@
             brave: 'https://search.brave.com/search?q=',
             duck: 'https://duckduckgo.com/?q=',
             bing: 'https://www.bing.com/search?q=',
-            perplexity: 'https://www.perplexity.ai/search?q=' // Added Perplexity
+            perplexity: 'https://www.perplexity.ai/search?q=' 
         }
     };
 
@@ -156,6 +156,64 @@
             font-size: 12px;
             color: rgba(255,255,255,0.4);
         }
+
+        /* --- HUD DASHBOARD STYLES --- */
+        #scifi-hud {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: ${CONFIG.zIndex + 1}; /* Keep above the dark omnibox background */
+            background: rgba(5, 5, 15, 0.85);
+            border: 1px solid ${CONFIG.color};
+            box-shadow: ${CONFIG.glow};
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            color: ${CONFIG.color};
+            backdrop-filter: blur(4px);
+            min-width: 180px;
+            /* Hidden by default */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+        
+        #scifi-hud.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        #scifi-hud-time {
+            font-size: 26px;
+            font-weight: bold;
+            text-shadow: 0 0 5px ${CONFIG.color};
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+        #scifi-hud-date {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .scifi-hud-divider {
+            height: 1px;
+            background: ${CONFIG.color};
+            opacity: 0.3;
+            margin: 10px 0;
+        }
+        .scifi-hud-row {
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .scifi-hud-label {
+            opacity: 0.6;
+        }
     `;
     document.head.appendChild(style);
 
@@ -178,7 +236,7 @@
     const omniInput = document.createElement('input');
     omniInput.id = 'scifi-omnibox';
     omniInput.type = 'text';
-    omniInput.placeholder = 'Type :brave, :duck, :bing, or :perplexity followed by your query...'; // Updated placeholder
+    omniInput.placeholder = 'Type :brave, :duck, :bing, or :perplexity followed by your query...';
     omniInput.autocomplete = 'off';
     
     const omniEngine = document.createElement('div');
@@ -194,34 +252,51 @@
     omniContainer.appendChild(omniHint);
     document.body.appendChild(omniContainer);
 
+    // HUD DOM
+    const hud = document.createElement('div');
+    hud.id = 'scifi-hud';
+    hud.innerHTML = `
+        <div id="scifi-hud-time">00:00:00</div>
+        <div id="scifi-hud-date">SYS_DATE</div>
+        <div class="scifi-hud-divider"></div>
+        <div class="scifi-hud-row">
+            <span class="scifi-hud-label">WEATHER</span>
+            <span id="scifi-hud-weather">---.-</span>
+        </div>
+        <div class="scifi-hud-row" style="margin-top: 5px;">
+            <span class="scifi-hud-label">STATUS</span>
+            <span id="scifi-hud-wstatus">LOCATING</span>
+        </div>
+    `;
+    document.body.appendChild(hud);
+
 
     // --- 4. OMNIBOX LOGIC ---
     function openOmniBox() {
         omniContainer.classList.add('active');
+        hud.classList.add('active'); // Show HUD
         omniInput.value = ':';
         omniInput.focus();
     }
 
     function closeOmniBox() {
         omniContainer.classList.remove('active');
+        hud.classList.remove('active'); // Hide HUD
         omniInput.value = '';
         omniEngine.style.opacity = '0';
         omniEngine.innerText = '';
     }
 
-    // Listen for ":" key globally to open the search bar
     document.addEventListener('keydown', (e) => {
-        // Ignore if user is already typing in an input/textarea
         const tag = e.target.tagName.toLowerCase();
         if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
 
         if (e.key === ':') {
-            e.preventDefault(); // Prevent typing ':' into the main page
+            e.preventDefault();
             openOmniBox();
         }
     });
 
-    // Handle interactions inside the Omnibox
     omniInput.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeOmniBox();
@@ -229,7 +304,6 @@
             const val = omniInput.value.trim();
             let url = null;
 
-            // Parse commands
             if (val.startsWith(':brave ')) {
                 const query = val.substring(7);
                 url = query ? CONFIG.searchEngines.brave + encodeURIComponent(query) : 'https://search.brave.com';
@@ -239,20 +313,19 @@
             } else if (val.startsWith(':bing ')) {
                 const query = val.substring(6);
                 url = query ? CONFIG.searchEngines.bing + encodeURIComponent(query) : 'https://www.bing.com';
-            } else if (val.startsWith(':perplexity ')) { // Added Perplexity logic
+            } else if (val.startsWith(':perplexity ')) {
                 const query = val.substring(12);
                 url = query ? CONFIG.searchEngines.perplexity + encodeURIComponent(query) : 'https://www.perplexity.ai';
             }
 
             if (url) {
-                window.open(url, '_blank'); // Open in new tab
+                window.open(url, '_blank');
             }
             
             closeOmniBox();
         }
     });
 
-    // Dynamic visual feedback as user types the engine name
     omniInput.addEventListener('input', () => {
         const val = omniInput.value.toLowerCase();
         if (val.startsWith(':brave')) {
@@ -264,7 +337,7 @@
         } else if (val.startsWith(':bing')) {
             omniEngine.innerText = 'BING';
             omniEngine.style.opacity = '1';
-        } else if (val.startsWith(':perp')) { // Added Perplexity visual feedback
+        } else if (val.startsWith(':perp')) {
             omniEngine.innerText = 'PERPLEXITY';
             omniEngine.style.opacity = '1';
         } else {
@@ -272,15 +345,103 @@
         }
     });
 
-    // Close if clicking the dark background outside the search box
     omniContainer.addEventListener('click', (e) => {
         if (e.target === omniContainer) {
             closeOmniBox();
         }
     });
 
+    // --- 5. HUD LOGIC (Time & Weather) ---
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('scifi-hud-time').innerText = `${h}:${m}:${s}`;
 
-    // --- 5. PHYSICS ENGINE ---
+        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const day = days[now.getDay()];
+        const date = String(now.getDate()).padStart(2, '0');
+        const month = months[now.getMonth()];
+        document.getElementById('scifi-hud-date').innerText = `${day} ${month} ${date}`;
+    }
+
+    function mapWeatherCode(code) {
+        if (code === 0) return 'CLEAR';
+        if (code >= 1 && code <= 3) return 'CLOUDY';
+        if (code >= 45 && code <= 48) return 'FOG';
+        if (code >= 51 && code <= 67) return 'RAIN';
+        if (code >= 71 && code <= 77) return 'SNOW';
+        if (code >= 80 && code <= 82) return 'RAIN';
+        if (code >= 95) return 'STORM';
+        return 'UNKNOWN';
+    }
+
+    // Fetch Weather directly using Open-Meteo
+    function fetchWeather() {
+        const weatherEl = document.getElementById('scifi-hud-weather');
+        const statusEl = document.getElementById('scifi-hud-wstatus');
+        statusEl.innerText = 'LOCATING...';
+
+        // 1. Try IP-based Geolocation (No permissions required)
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(data => {
+                if (data.latitude && data.longitude) {
+                    getWeatherFromCoords(data.latitude, data.longitude);
+                } else {
+                    // 2. Fallback to browser geolocation if IP API fails
+                    tryBrowserGeolocation();
+                }
+            })
+            .catch(() => {
+                // 2. Fallback to browser geolocation if fetch throws an error
+                tryBrowserGeolocation();
+            });
+    }
+
+    function tryBrowserGeolocation() {
+        const statusEl = document.getElementById('scifi-hud-wstatus');
+        if (!navigator.geolocation) {
+            statusEl.innerText = 'GEO-OFFLINE';
+            return;
+        }
+        statusEl.innerText = 'PERMISSION...';
+        navigator.geolocation.getCurrentPosition(
+            (pos) => getWeatherFromCoords(pos.coords.latitude, pos.coords.longitude),
+            () => { statusEl.innerText = 'GEO-DENIED'; }
+        );
+    }
+
+    function getWeatherFromCoords(lat, lon) {
+        const weatherEl = document.getElementById('scifi-hud-weather');
+        const statusEl = document.getElementById('scifi-hud-wstatus');
+        statusEl.innerText = 'FETCHING...';
+        
+        // Call Open-Meteo API
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.current_weather) {
+                    const temp = data.current_weather.temperature.toFixed(1);
+                    const cond = mapWeatherCode(data.current_weather.weathercode);
+                    weatherEl.innerText = `${temp}°C ${cond}`;
+                    statusEl.innerText = 'ONLINE';
+                } else {
+                    statusEl.innerText = 'DATA-ERROR';
+                }
+            })
+            .catch(() => { statusEl.innerText = 'NET-ERROR'; });
+    }
+
+    // Start Clock and Weather in the background
+    setInterval(updateClock, 1000);
+    updateClock();
+    fetchWeather();
+    setInterval(fetchWeather, 600000); // Update weather every 10 mins
+
+    // --- 6. PHYSICS ENGINE ---
     let currentScroll = 0;
     let targetScroll = 0;
     
@@ -310,7 +471,6 @@
         requestAnimationFrame(animate);
     }
 
-    // Start engine
     animate();
 
 })();
